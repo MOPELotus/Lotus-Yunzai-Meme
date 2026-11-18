@@ -14,6 +14,8 @@
 
 作为 Lotus-Yunzai 的内置模块提供 `#表情列表 [页码]` 和 `#表情详情 <编号>`。将旧清语表情数据库的副本放在主仓 `data/meme/data.db`，也可用环境变量 `LOTUS_MEME_DB` 指定路径。目录查询以只读方式打开数据库。
 
+旧清语表情的 `meme.yaml` 和 `access.yaml` 可复制到主仓 `data/meme/config/`，也可通过 `LOTUS_MEME_CONFIG_DIR` 指定目录。目录指令读取模块开关、用户白名单或黑名单，以及按编号或关键词设置的禁用表情。启用用户名单后，目录指令需要来自能提供用户编号的会话。
+
 本仓由 ClarityJS 的清语表情衍生，保留 GPL-3.0 许可及原有历史。Lotus-Yunzai 入口只使用 Bun 自带的 SQLite。
 
 `package.legacy.json` 保留上游发布版的依赖和模块别名，供旧云崽的 `index.js` 使用。Sequelize 和 sqlite3 用于旧数据库操作，Axios 和 Markdown 相关包供旧插件功能使用，ESLint 用于旧代码检查。在独立的旧云崽部署副本中使用本仓时，先运行 `cp package.legacy.json package.json`，再按下方上游说明安装依赖。
