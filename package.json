@@ -1,5 +1,5 @@
 {
-  "name": "meme-plugin",
+  "name": "@lotus-yunzai/meme",
   "version": "1.18.0",
   "author": "ClarityJS",
   "type": "module",
@@ -23,5 +23,9 @@
   "imports": {
     "#components": "./components/index.js",
     "#models": "./models/index.js"
+  },
+  "private": true,
+  "lotusYunzai": {
+    "entry": "./lotus.ts"
   }
 }

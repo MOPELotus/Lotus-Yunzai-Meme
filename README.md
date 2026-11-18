@@ -10,6 +10,12 @@
 
 </div>
 
+## Lotus-Yunzai
+
+作为 Lotus-Yunzai 的内置模块提供 `#表情列表 [页码]` 和 `#表情详情 <编号>`。将旧清语表情数据库的副本放在主仓 `data/meme/data.db`，也可用环境变量 `LOTUS_MEME_DB` 指定路径。目录查询以只读方式打开数据库。
+
+本仓由 ClarityJS 的清语表情衍生，保留 GPL-3.0 许可及原有历史。Lotus-Yunzai 入口使用 Bun 自带 SQLite；本页后半部分是上游旧入口的说明。
+
 ## 介绍 📝
 `清语表情` 是一个 `Yunzai-Bot`的扩展插件，提供表情包合成等功能。
 雾公主已跑路不再进行任何维护
