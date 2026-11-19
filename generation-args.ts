@@ -66,7 +66,12 @@ function unquote(token: string): string {
   return token;
 }
 
-export function parseGenerationArgs(argsType: unknown, input: string) {
+export interface PresetArgument {
+  readonly name: string;
+  readonly value: string;
+}
+
+export function parseGenerationArgs(argsType: unknown, input: string, preset?: PresetArgument) {
   const schema = record(argsType);
   const properties = record(record(schema.args_model).properties);
   const flags = optionsFor(schema, properties);
@@ -79,9 +84,7 @@ export function parseGenerationArgs(argsType: unknown, input: string) {
       issue ??= `该表情不支持参数：${name}`;
       return;
     }
-    const value = asType(raw, properties[name]);
-    if (value === undefined) issue ??= `表情参数 ${name} 的值无效。`;
-    else values.set(name, value);
+    values.set(name, raw);
   }
 
   // The legacy syntax consumes text after #name up to the next # section.
@@ -116,6 +119,12 @@ export function parseGenerationArgs(argsType: unknown, input: string) {
   }
   rest.push(remaining.slice(cursor));
 
+  if (preset) apply(preset.name, preset.value);
+  for (const [name, raw] of values) {
+    const normalized = asType(raw, properties[name]);
+    if (normalized === undefined) issue ??= `表情参数 ${name} 的值无效。`;
+    else values.set(name, normalized);
+  }
   return { values: Object.fromEntries(values), text: rest.join("").trim(), found, issue };
 }
 

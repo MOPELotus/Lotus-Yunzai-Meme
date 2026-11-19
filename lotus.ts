@@ -1,7 +1,7 @@
 import { Database } from "bun:sqlite";
 import { fileURLToPath } from "node:url";
 import { catalogPolicy, generationServer } from "./catalog-policy.ts";
-import { argsTypeFromParams, parseGenerationArgs } from "./generation-args.ts";
+import { argsTypeFromParams, parseGenerationArgs, type PresetArgument } from "./generation-args.ts";
 import { buildGenerationBody, type GenerationInput } from "./generation.ts";
 import { generateMemeReply, type FallbackContext } from "./generate-reply.ts";
 
@@ -104,6 +104,40 @@ function requireTextMatch(row: CatalogDetails, text: string): boolean {
   return /^(@\s*\d+\s*)+$/u.test(text) || /^(#\S+\s+[^#]+(?:\s+#\S+\s+[^#]+)*)$/u.test(text);
 }
 
+interface TriggerMatch {
+  readonly row: CatalogDetails;
+  readonly keyword: string;
+  readonly preset?: PresetArgument;
+}
+
+function legacyPresetKeyword(value: string): string | undefined {
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (typeof parsed === "string" && parsed.trim()) return parsed;
+  } catch {
+    // Incomplete rows in a local copy are ignored.
+  }
+}
+
+function findPreset(db: Database, input: string): TriggerMatch | undefined {
+  if (!db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'preset'").get()) return;
+
+  const presets = db.query<CatalogDetails & { name: string; arg_name: string; arg_value: string }, []>(
+    `SELECT meme.key, keyWords, min_images, max_images, min_texts, max_texts,
+       preset.name, preset.arg_name, preset.arg_value
+     FROM preset JOIN meme ON preset.key = meme.key
+     ORDER BY preset.name, meme.key`,
+  ).all();
+  let match: TriggerMatch | undefined;
+  for (const row of presets) {
+    const keyword = legacyPresetKeyword(row.name);
+    if (!keyword || keyword.length <= (match?.keyword.length ?? 0) || !row.arg_name ||
+        !sameKeyword(input.slice(0, keyword.length), keyword)) continue;
+    match = { row, keyword, preset: { name: row.arg_name, value: row.arg_value } };
+  }
+  return match;
+}
+
 export function resolveMemeTrigger(
   message: string,
   context?: CatalogContext,
@@ -123,14 +157,16 @@ function resolveTrigger(message: string, context?: CatalogContext, withParams = 
     // Select the old keyword before checking whether its template is hidden, so
     // a disabled longer trigger cannot fall through to a shorter template.
     const rows = db.query<CatalogDetails, []>(`SELECT ${detailsFields} FROM meme ORDER BY key`).all();
-    let match: { row: CatalogDetails; keyword: string } | undefined;
+    let match: TriggerMatch | undefined;
     for (const row of rows) {
       for (const keyword of keywords(row.keyWords)) {
         if (keyword.length <= (match?.keyword.length ?? 0)) continue;
         if (sameKeyword(candidate.slice(0, keyword.length), keyword)) match = { row, keyword };
       }
     }
+    match ??= findPreset(db, candidate);
     if (!match) return;
+    if (match.preset && (JSON.parse(hidden) as string[]).includes(match.keyword)) return;
 
     const visible = db.query<{ key: string }, [string, string]>(
       `SELECT key ${visibleCatalog} AND key = ?`,
@@ -155,7 +191,7 @@ function resolveTrigger(message: string, context?: CatalogContext, withParams = 
 export async function prepareMemeRequest(message: string, input: GenerationInput) {
   const match = resolveTrigger(message, input, true);
   if (!match || typeof match === "string") return match;
-  return buildGenerationBody(match.row.key, keywords(match.row.keyWords), match.text, match.params, input);
+  return buildGenerationBody(match.row.key, keywords(match.row.keyWords), match.text, match.params, input, match.preset);
 }
 
 function details(key: string, context?: CatalogContext): string {

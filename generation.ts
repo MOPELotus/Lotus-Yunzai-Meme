@@ -1,5 +1,5 @@
 import { generationSettings } from "./catalog-policy.ts";
-import { parseGenerationArgs } from "./generation-args.ts";
+import { parseGenerationArgs, type PresetArgument } from "./generation-args.ts";
 
 export interface GenerationInput {
   readonly user_id: number;
@@ -75,6 +75,7 @@ export async function buildGenerationBody(
   text: string,
   serialized: string | undefined,
   input: GenerationInput,
+  preset?: PresetArgument,
 ) {
   let settings: ReturnType<typeof generationSettings>;
   let params: ReturnType<typeof paramsOf>;
@@ -88,7 +89,8 @@ export async function buildGenerationBody(
   const users = [...new Set([...(input.mentions ?? []).map(String), ...typedMentions])]
     .filter((id) => /^\d+$/u.test(id) && id !== String(input.quoted?.userId));
   const message = text.replace(/@\s*\d+/gu, "").trim();
-  const parsed = params.args_type == null ? undefined : parseGenerationArgs(params.args_type, message);
+  if (preset && params.args_type == null) return "表情预设缺少对应的模板参数。";
+  const parsed = params.args_type == null ? undefined : parseGenerationArgs(params.args_type, message, preset);
   if (parsed?.issue) return parsed.issue;
   const caption = parsed?.text ?? message;
   const texts = caption ? caption.split("/").map((part) => part.trim()).slice(0, params.max_texts) : [];
