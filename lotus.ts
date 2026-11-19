@@ -1,15 +1,14 @@
 import { Database } from "bun:sqlite";
-import { statSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { catalogPath, catalogVersion } from "./catalog-file.ts";
 import { catalogPolicy, generationServer } from "./catalog-policy.ts";
 import { argsTypeFromParams, parseGenerationArgs, type PresetArgument } from "./generation-args.ts";
 import { buildGenerationBody, type GenerationInput } from "./generation.ts";
 import { generateMemeReply, type FallbackContext } from "./generate-reply.ts";
 
 import { handleMemeSettings } from "./settings.ts";
+import { handleCatalogUpdate } from "./catalog-update.ts";
 
 const pageSize = 12;
-const defaultPath = fileURLToPath(new URL("../../data/meme/data.db", import.meta.url));
 
 // A legacy disable entry may be a stored key or one of its keywords.
 const visibleCatalog = `FROM meme
@@ -56,19 +55,6 @@ function currentPolicy(userId: number | undefined, forGeneration = false) {
   if (!policy.enabled) return "表情模块已停用。";
   if (!policy.allowed) return "当前用户无权使用表情模块。";
   return policy;
-}
-
-function catalogPath(): string {
-  return Bun.env.LOTUS_MEME_DB || defaultPath;
-}
-
-function catalogVersion(): string {
-  const path = catalogPath();
-  const files = [path, `${path}-wal`, `${path}-journal`].map((file) => {
-    const stat = statSync(file, { bigint: true, throwIfNoEntry: false });
-    return stat ? [stat.dev, stat.ino, stat.size, stat.mtimeNs, stat.ctimeNs].join(":") : "";
-  });
-  return JSON.stringify([path, ...files]);
 }
 
 function withCatalog<T>(query: (db: Database) => T): T | string {
@@ -260,6 +246,8 @@ export default {
   async fallback(message: string, context: FallbackContext) {
     const setting = handleMemeSettings(message, context);
     if (setting !== undefined) return setting;
+    const update = handleCatalogUpdate(message, context);
+    if (update !== undefined) return update;
     if (context.user_id === undefined || context.message_type === "terminal") return;
     let server: ReturnType<typeof generationServer>;
     try {

@@ -122,10 +122,13 @@ function namesFor(argument: string, context: SettingsContext, users: boolean): s
     ? [...new Set(mentions)] : [];
 }
 
+export function isMemeOwner(context: SettingsContext): boolean {
+  return context.isDelegated !== true && (context.isMaster === true ||
+    (context.user_id !== undefined && context.isBotMaster?.(context.user_id) === true));
+}
+
 function memeSettings(argument: string, context: SettingsContext): string {
-  const owner = context.isMaster === true || (context.user_id !== undefined &&
-    context.isBotMaster?.(context.user_id) === true);
-  if (!owner || context.isDelegated === true) return "只有主人可以修改清语表情设置。";
+  if (!isMemeOwner(context)) return "只有主人可以修改清语表情设置。";
   try {
     const directory = configDirectory();
     const selected = sections.find((section) => argument.startsWith(section.title));
