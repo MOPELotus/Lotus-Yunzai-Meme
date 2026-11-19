@@ -154,7 +154,7 @@ export async function generateMemeReply(
     const avatars = new Map<string, Promise<Blob | undefined>>();
     const prepared = await prepare({
       user_id: userId,
-      isMaster: context.isMaster,
+      isMaster: context.isDelegated !== true && (context.isMaster || context.isBotMaster(userId)),
       mentions,
       images,
       hasMessageImage: segments.some((part) => part.type === "image"),

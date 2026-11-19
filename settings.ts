@@ -24,6 +24,13 @@ const sections = [
     ["禁用表情列表", "blackListEnable", "toggle", false],
     ["黑名单表情列表", "blackList", "templates", []],
   ] satisfies Setting[] },
+  { title: "表情保护设置", file: "protect.yaml", fields: [
+    ["表情保护列表", "list", "templates", []],
+    ["保护用户列表", "user", "users", []],
+    ["表情保护", "enable", "toggle", false],
+    ["主人保护", "master", "toggle", false],
+    ["用户保护", "userEnable", "toggle", false],
+  ] satisfies Setting[] },
 ];
 
 const settingPrefix = "#清语表情设置";
@@ -93,6 +100,13 @@ function rewrite(
   }
 }
 
+function settingValue(setting: Setting, values: Record<string, unknown>): unknown {
+  const value = values[setting[1]] ?? setting[3];
+  // Older protection files can store a single QQ number instead of a sequence.
+  if (setting[1] === "user" && (typeof value === "string" || typeof value === "number")) return [value];
+  return value;
+}
+
 function show(setting: Setting, value: unknown): string {
   if (setting[2] === "toggle") return value === true ? "开启" : "关闭";
   if (setting[2] === "mode") return value === 1 ? "黑名单" : "白名单";
@@ -120,12 +134,12 @@ function memeSettings(argument: string, context: SettingsContext): string {
     for (const section of candidates) {
       const setting = section.fields.find(([title]) => action.startsWith(title));
       if (!setting) continue;
-      const [title, key, type, fallback] = setting;
+      const [title, key, type] = setting;
       const value = action.slice(title.length).trim();
       const path = join(directory, section.file);
       const previous = snapshot(path);
       const { document, values } = documentOf(previous.text);
-      const current = values[key] ?? fallback;
+      const current = settingValue(setting, values);
       if (!value) return `${title}：${show(setting, current)}`;
       let next: unknown;
       if (type === "toggle") {
@@ -170,7 +184,7 @@ function memeSettings(argument: string, context: SettingsContext): string {
     return candidates.flatMap((section) => {
       const values = documentOf(snapshot(join(directory, section.file)).text).values;
       return [section.title, ...section.fields.map((field) =>
-        `${field[0]}：${show(field, values[field[1]] ?? field[3])}`)];
+        `${field[0]}：${show(field, settingValue(field, values))}`)];
     }).join("\n");
   } catch {
     return "无法读取或保存清语表情设置，请检查本地 YAML 配置。";
