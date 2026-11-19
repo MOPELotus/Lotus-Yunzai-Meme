@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import module, { resolveMemeTrigger } from "../lotus.ts";
+import module, { prepareMemeRequest, resolveMemeTrigger } from "../lotus.ts";
 
 test("从旧 meme 表分页并查询详情，数据库保持不变", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-catalog-"));
@@ -14,13 +14,16 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     const db = new Database(filename);
     db.run(`CREATE TABLE meme (
       key TEXT PRIMARY KEY, keyWords TEXT, min_images INTEGER, max_images INTEGER,
-      min_texts INTEGER, max_texts INTEGER
+      min_texts INTEGER, max_texts INTEGER, params TEXT
     )`);
-    const insert = db.query("INSERT INTO meme VALUES (?, ?, 1, 2, 0, 1)");
+    const insert = db.query("INSERT INTO meme VALUES (?, ?, 1, 2, 0, 1, NULL)");
     for (let index = 1; index <= 13; index++) {
       insert.run(`meme-${String(index).padStart(2, "0")}`, JSON.stringify(["表情", "样例", `别名${index}`]));
     }
     db.run("UPDATE meme SET keyWords = ?, max_texts = 0 WHERE key = ?", [JSON.stringify(["只图", "a+b"]), "meme-12"]);
+    db.run("UPDATE meme SET params = ? WHERE key = ?", [JSON.stringify({
+      min_images: 1, max_images: 4, min_texts: 2, max_texts: 3, default_texts: ["默认"], args_type: null,
+    }), "meme-13"]);
     db.close();
     const before = await readFile(filename);
 
@@ -41,6 +44,41 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     await writeFile(moduleConfig, "forceSharp: true\n");
     expect(resolveMemeTrigger("别名13 好耶")).toBeUndefined();
     expect(resolveMemeTrigger("#别名13 好耶")).toEqual({ key: "meme-13", keyword: "别名13", text: "好耶" });
+
+    const protectConfig = join(directory, "protect.yaml");
+    await writeFile(protectConfig, "enable: true\nmaster: true\nlist: [别名13]\n");
+    await writeFile(moduleConfig, "forceSharp: true\nuserName: true\nreply: true\n");
+    const input = {
+      user_id: 10003, isMaster: false, mentions: [10001, 10002, 10001, 10004],
+      images: [new Blob(["当前图片"], { type: "image/png" })],
+      quoted: { userId: 10004, images: [new Blob(["引用图片"], { type: "image/png" })] },
+      avatar: async (user: string) => new Blob([user], { type: "image/png" }),
+      nickname: async () => "昵称",
+    };
+    expect(await prepareMemeRequest("#别名13 @10001", input)).toContain("确认目标的主人身份");
+    const prepared = await prepareMemeRequest("#别名13 @10001", {
+      ...input, isTargetMaster: (user) => user === "10002",
+    });
+    if (!prepared || typeof prepared === "string") throw new Error("未生成请求体");
+    expect(prepared.key).toBe("meme-13");
+    expect(prepared.quote).toBe(true);
+    const transmitted = await new Request("http://localhost/memes/meme-13/", {
+      method: "POST", body: prepared.body,
+    }).formData();
+    expect(transmitted.getAll("texts")).toEqual(["昵称", "默认"]);
+    expect(await Promise.all(transmitted.getAll("images").map((image) => (image as Blob).text()))).toEqual([
+      "10002", "10001", "引用图片", "当前图片",
+    ]);
+
+    await writeFile(protectConfig, "enable: true\nuserEnable: true\nuser: 10002\nlist: [meme-13]\n");
+    const fallback = await prepareMemeRequest("#别名13 第一段 / 第二段", {
+      user_id: 10003, isMaster: false, mentions: [10002], avatar: input.avatar,
+    });
+    if (!fallback || typeof fallback === "string") throw new Error("未生成头像回填请求");
+    expect(fallback.body.getAll("texts")).toEqual(["第一段", "第二段"]);
+    expect(await Promise.all(fallback.body.getAll("images").map((image) => (image as Blob).text()))).toEqual([
+      "10003", "10002",
+    ]);
 
     const accessConfig = join(directory, "access.yaml");
     const whitelist = `enable: true

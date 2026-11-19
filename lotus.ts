@@ -1,6 +1,7 @@
 import { Database } from "bun:sqlite";
 import { fileURLToPath } from "node:url";
 import { catalogPolicy } from "./catalog-policy.ts";
+import { buildGenerationBody, type GenerationInput } from "./generation.ts";
 
 const pageSize = 12;
 const defaultPath = fileURLToPath(new URL("../../data/meme/data.db", import.meta.url));
@@ -105,6 +106,12 @@ export function resolveMemeTrigger(
   message: string,
   context?: CatalogContext,
 ): { readonly key: string; readonly keyword: string; readonly text: string } | string | undefined {
+  const match = resolveTrigger(message, context);
+  if (!match || typeof match === "string") return match;
+  return { key: match.row.key, keyword: match.keyword, text: match.text };
+}
+
+function resolveTrigger(message: string, context?: CatalogContext, withParams = false) {
   const input = message.trim();
   return queryCatalog(context?.user_id, (db, hidden, forceSharp) => {
     if (forceSharp && !input.startsWith("#")) return;
@@ -130,8 +137,17 @@ export function resolveMemeTrigger(
 
     const text = candidate.slice(match.keyword.length).trim();
     if (!requireTextMatch(match.row, text)) return;
-    return { key: match.row.key, keyword: match.keyword, text };
+    const params = withParams
+      ? db.query<{ params: string }, [string]>("SELECT params FROM meme WHERE key = ?").get(visible.key)
+      : undefined;
+    return { ...match, text, params: params?.params };
   }, true);
+}
+
+export async function prepareMemeRequest(message: string, input: GenerationInput) {
+  const match = resolveTrigger(message, input, true);
+  if (!match || typeof match === "string") return match;
+  return buildGenerationBody(match.row.key, keywords(match.row.keyWords), match.text, match.params, input);
 }
 
 function details(key: string, context?: CatalogContext): string {

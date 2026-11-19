@@ -33,12 +33,16 @@ function list(value: unknown): string[] {
   }).filter(Boolean);
 }
 
-export function catalogPolicy(userId: number | undefined, forGeneration = false) {
+function configDirectory(): string {
   const directory = Bun.env.LOTUS_MEME_CONFIG_DIR;
   if (directory !== undefined && !statSync(directory).isDirectory()) throw new Error("无效的表情配置目录");
+  return directory ?? defaultDirectory;
+}
 
-  const meme = readConfig(directory ?? defaultDirectory, "meme.yaml");
-  const access = readConfig(directory ?? defaultDirectory, "access.yaml");
+export function catalogPolicy(userId: number | undefined, forGeneration = false) {
+  const directory = configDirectory();
+  const meme = readConfig(directory, "meme.yaml");
+  const access = readConfig(directory, "access.yaml");
   const enabled = flag(meme.enable, true);
   let allowed = true;
   if (flag(access.enable, false)) {
@@ -49,4 +53,25 @@ export function catalogPolicy(userId: number | undefined, forGeneration = false)
   }
   const hidden = flag(access.blackListEnable, false) ? list(access.blackList) : [];
   return { enabled, allowed, hidden, forceSharp: forGeneration && flag(meme.forceSharp, false) };
+}
+
+
+export function generationSettings() {
+  const directory = configDirectory();
+  const meme = readConfig(directory, "meme.yaml");
+  const protect = readConfig(directory, "protect.yaml");
+  const protection = flag(protect.enable, false);
+  const master = protection && flag(protect.master, false);
+  const users = protection && !master && flag(protect.userEnable, false);
+  const userList = typeof protect.user === "string" || typeof protect.user === "number"
+    ? [protect.user] : protect.user;
+  return {
+    imagesInMessage: flag(meme.imagesInMessage, true),
+    quotedImages: flag(meme.quotedImages, true),
+    useNickname: flag(meme.userName, false),
+    quote: flag(meme.reply, false),
+    master,
+    protectedUsers: users ? list(userList) : [],
+    protectedTemplates: protection ? list(protect.list) : [],
+  };
 }
