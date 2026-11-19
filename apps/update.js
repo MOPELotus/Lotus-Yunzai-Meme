@@ -10,20 +10,20 @@ import { meme } from './meme.js'
 export class update extends plugin {
   constructor () {
     super({
-      name: '清语表情:更新',
+      name: `${Version.Plugin_LogName} · 更新`,
       event: 'message',
       priority: -Infinity,
       rule: [
         {
-          reg: /^#?(?:清语)?(?:表情|meme(?:-plugin)?)插件(强制)?更新$/i,
+          reg: /^#?(?:(?:清语)?表情|表情合成|(?:清语)?meme(?:-plugin)?)插件(强制)?更新$/i,
           fnc: 'update'
         },
         {
-          reg: /^#?(?:清语)?(?:表情|meme(?:-plugin)?)(?:插件)?更新日志$/i,
+          reg: /^#?(?:(?:清语)?表情|表情合成|(?:清语)?meme(?:-plugin)?)(?:插件)?更新日志$/i,
           fnc: 'updateLog'
         },
         {
-          reg: /^#?(?:清语)?(?:表情|meme(?:-plugin)?)(强制)?更新(?:表情包|资源|数据)?$/i,
+          reg: /^#?(?:(?:清语)?表情|表情合成|(?:清语)?meme(?:-plugin)?)(强制)?更新(?:表情包|资源|数据)?$/i,
           fnc: 'updateRes'
         }
       ]
@@ -33,7 +33,7 @@ export class update extends plugin {
 
     if (Config.other.autoUpdateRes) {
       this.task.push({
-        name: '清语表情:表情包数据每日更新',
+        name: `${Version.Plugin_LogName} · 表情包数据每日更新`,
         cron: Config.other.autoUpdateResCron,
         fnc: async () => {
           await this.updateRes(null, true)
@@ -43,20 +43,20 @@ export class update extends plugin {
 
     this.e = {
       isMaster: true,
-      logFnc: '[清语表情]自动更新]',
+      logFnc: `${Version.Plugin_LogName} · 自动更新`,
       msg: `#更新${Version.Plugin_Name}`,
       reply: async (msg) => {
         const masters = Object.keys(Config.masterQQ)
         for (const master of masters) {
           if (master.toString().length > 11) {
-            logger.info(chalk.yellow(`[${Version.Plugin_AliasName}] 更新推送跳过 QQBot`))
+            logger.info(chalk.yellow(`${Version.Plugin_LogName} 更新推送跳过 QQBot`))
             continue
           }
           try {
             await Bot.pickFriend(master).sendMsg(msg)
             await Bot.sleep(2000)
           } catch (err) {
-            logger.error(`[${Version.Plugin_AliasName}] 向好友 ${master} 发送消息时出错：`, err)
+            logger.error(`${Version.Plugin_LogName} 向好友 ${master} 发送消息时出错：`, err)
           }
         }
       }
@@ -64,7 +64,7 @@ export class update extends plugin {
 
     if (Config.other.autoUpdate) {
       this.task.push({
-        name: '清语表情:自动更新',
+        name: `${Version.Plugin_LogName} · 自动更新`,
         cron: Config.other.autoUpdateCron,
         fnc: () => this.update(this.e)
       })

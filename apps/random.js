@@ -4,7 +4,7 @@ import { Meme, Utils } from '#models'
 export class random extends plugin {
   constructor () {
     super({
-      name: '清语表情:随机表情包',
+      name: `${Version.Plugin_LogName} · 随机表情包`,
       event: 'message',
       priority: -Infinity,
       rule: [
@@ -76,7 +76,7 @@ export class random extends plugin {
     } catch (error) {
       logger.error(error.message)
       if (Config.meme.errorReply) {
-        await e.reply(`[${Version.Plugin_AliasName}] 生成随机表情失败, 错误信息: ${error.message}`)
+        await e.reply(`${Version.Plugin_LogName} 生成随机表情失败, 错误信息: ${error.message}`)
       }
     }
   }

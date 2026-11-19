@@ -10,13 +10,13 @@ const sysCfgReg = () => {
   )
 
   const sortedKeys = keys.sort((a, b) => b.length - a.length)
-  return new RegExp(`^#清语表情设置\\s*(?:(${groupNames.join('|')}))?\\s*(?:(${sortedKeys.join('|')}))?\\s*(.*)`)
+  return new RegExp(`^#(?:(?:清语)?表情|表情合成)设置\\s*(?:(${groupNames.join('|')}))?\\s*(?:(${sortedKeys.join('|')}))?\\s*(.*)`)
 }
 
 export class setting extends plugin {
   constructor () {
     super({
-      name: '清语表情:设置',
+      name: `${Version.Plugin_LogName} · 设置`,
       event: 'message',
       priority: -Infinity,
       rule: [

@@ -33,10 +33,13 @@ test("旧资源更新命令按事务同步目录和预设", async () => {
   });
   const owner = { message_type: "private" as const, user_id: 10001, isMaster: false,
     isBotMaster: (userId: number) => userId === 10001 };
-  const update = (force = false) => module.fallback(`#清语表情${force ? "强制" : ""}更新资源`, owner);
+  const update = (force = false, name = "清语表情") =>
+    module.fallback(`#${name}${force ? "强制" : ""}更新资源`, owner);
   try {
     Bun.env.LOTUS_MEME_CONFIG_DIR = directory;
     Bun.env.LOTUS_MEME_DB = filename;
+    delete Bun.env.LOTUS_MEME_SERVER_URL;
+    expect(await update()).toBe("请先配置表情合成服务。");
     Bun.env.LOTUS_MEME_SERVER_URL = new URL("/fixture/", fixture.url).href;
 
     expect(await module.fallback("#清语表情更新资源", { ...owner, user_id: 10002 })).toContain("只有主人");
@@ -65,7 +68,7 @@ test("旧资源更新命令按事务同步目录和预设", async () => {
     expect(requests).toEqual(["/fixture/memes/keys", "/fixture/memes/new/info"]);
     expect(resolveMemeTrigger("#旧素材")).toBeDefined();
     expect(resolveMemeTrigger("#removed")).toBeUndefined();
-    expect(await update(true)).toContain("更新 2 项，移除 0 项");
+    expect(await update(true, "表情合成")).toContain("更新 2 项，移除 0 项");
     expect(resolveMemeTrigger("#新素材")).toMatchObject({ key: "ba_say" });
     expect(resolveMemeTrigger("#旧素材")).toBeUndefined();
     const snapshot = new Database(filename, { readonly: true });

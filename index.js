@@ -23,9 +23,9 @@ try {
 
 try {
   await Utils.Tools.init()
-  logger.info(chalk.bold.cyan(`[${Version.Plugin_AliasName}] 🎉 表情包数据初始化成功！`))
+  logger.info(chalk.bold.cyan(`${Version.Plugin_LogName} 🎉 表情包数据初始化成功！`))
 } catch (error) {
-  logger.error(chalk.bold.red(`[${Version.Plugin_AliasName}] 💥 表情包数据初始化失败！错误详情：${error.message}`))
+  logger.error(chalk.bold.red(`${Version.Plugin_LogName} 💥 表情包数据初始化失败！错误详情：${error.message}`))
 }
 
 try {
@@ -43,7 +43,7 @@ try {
         const loadTime = endModuleTime - startModuleTime
 
         logger.debug(
-          chalk.rgb(0, 255, 255)(`[${Version.Plugin_AliasName}]`) +
+          chalk.rgb(0, 255, 255)(`${Version.Plugin_LogName}`) +
           chalk.green(` 🚀 ${file.replace('.js', '')}`) +
           chalk.rgb(255, 223, 0)(` 加载时间: ${loadTime} ms`)
         )
@@ -99,7 +99,7 @@ try {
   )
 
   logger.info(
-    chalk.bold.rgb(255, 215, 0)(`✨ ${Version.Plugin_AliasName} `) +
+    chalk.bold.rgb(255, 215, 0)(`✨ ${Version.Plugin_LogName} `) +
     chalk.bold.rgb(255, 165, 0).italic(Version.Plugin_Version) +
     chalk.rgb(255, 215, 0).bold(' 载入成功 ^_^')
   )

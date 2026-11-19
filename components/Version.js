@@ -50,7 +50,10 @@ export const Version = {
     return Plugin_Name
   },
   get Plugin_AliasName () {
-    return '清语表情'
+    return '表情合成'
+  },
+  get Plugin_LogName () {
+    return `[meme] ${this.Plugin_AliasName}`
   },
   get Plugin_Version () {
     return pkg.version

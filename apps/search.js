@@ -4,7 +4,7 @@ import { Utils } from '#models'
 export class search extends plugin {
   constructor () {
     super({
-      name: '清语表情:搜索',
+      name: `${Version.Plugin_LogName} · 搜索`,
       event: 'message',
       priority: -Infinity,
       rule: [ {
@@ -50,8 +50,8 @@ export class search extends plugin {
       return true
 
     } catch (error) {
-      logger.error(`[${Version.Plugin_AliasName}] 搜索表情失败: ${error}`)
-      await e.reply(`[${Version.Plugin_AliasName}] 搜索表情失败，请稍后重试`, true)
+      logger.error(`${Version.Plugin_LogName} 搜索表情失败: ${error}`)
+      await e.reply(`${Version.Plugin_LogName} 搜索表情失败，请稍后重试`, true)
       return true
     }
   }

@@ -33,7 +33,7 @@ const sections = [
   ] satisfies Setting[] },
 ];
 
-const settingPrefix = "#清语表情设置";
+const settingCommand = /^#(?:(?:清语)?表情|表情合成)设置\s*/u;
 export interface SettingsContext {
   readonly isMaster?: boolean;
   readonly user_id?: number;
@@ -128,7 +128,7 @@ export function isMemeOwner(context: SettingsContext): boolean {
 }
 
 function memeSettings(argument: string, context: SettingsContext): string {
-  if (!isMemeOwner(context)) return "只有主人可以修改清语表情设置。";
+  if (!isMemeOwner(context)) return "只有主人可以修改表情合成设置。";
   try {
     const directory = configDirectory();
     const selected = sections.find((section) => argument.startsWith(section.title));
@@ -183,17 +183,18 @@ function memeSettings(argument: string, context: SettingsContext): string {
       return `${title}：${show(setting, next)}`;
     }
 
-    if (action) return "未找到该清语表情设置项。";
+    if (action) return "未找到该表情合成设置项。";
     return candidates.flatMap((section) => {
       const values = documentOf(snapshot(join(directory, section.file)).text).values;
       return [section.title, ...section.fields.map((field) =>
         `${field[0]}：${show(field, settingValue(field, values))}`)];
     }).join("\n");
   } catch {
-    return "无法读取或保存清语表情设置，请检查本地 YAML 配置。";
+    return "无法读取或保存表情合成设置，请检查本地 YAML 配置。";
   }
 }
 
 export function handleMemeSettings(message: string, context: SettingsContext): string | undefined {
-  if (message.startsWith(settingPrefix)) return memeSettings(message.slice(settingPrefix.length).trim(), context);
+  const match = settingCommand.exec(message);
+  if (match) return memeSettings(message.slice(match[0].length).trim(), context);
 }

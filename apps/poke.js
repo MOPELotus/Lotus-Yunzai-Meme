@@ -6,7 +6,7 @@ const pokeCoolDownMap = new Map()
 export class pokeRandomMeme extends plugin {
   constructor() {
     super({
-      name: '清语表情:戳一戳随机表情包',
+      name: `${Version.Plugin_LogName} · 戳一戳随机表情包`,
       event: 'notice.*.poke',
       priority: -Infinity,
       rule: [
@@ -72,7 +72,7 @@ export class pokeRandomMeme extends plugin {
       if (!allMemeKeys || allMemeKeys.length === 0) {
         logger.warn('未找到可用的表情包')
         if (Config.meme.errorReply) {
-          await e.reply(`[${Version.Plugin_AliasName}] 未找到可用的表情包`)
+          await e.reply(`${Version.Plugin_LogName} 未找到可用的表情包`)
         }
         return false
       }
@@ -95,7 +95,7 @@ export class pokeRandomMeme extends plugin {
       if (avatarRelatedKeys.length === 0) {
         logger.warn('未找到仅需头像的表情包')
         if (Config.meme.errorReply) {
-          await e.reply(`[${Version.Plugin_AliasName}] 未找到仅需头像的表情包`)
+          await e.reply(`${Version.Plugin_LogName} 未找到仅需头像的表情包`)
         }
         return false
       }
@@ -163,7 +163,7 @@ export class pokeRandomMeme extends plugin {
       if (!success) {
         logger.info(`尝试${attemptedCount}个头像表情均失败`)
         if (Config.meme.errorReply) {
-          await e.reply(`[${Version.Plugin_AliasName}] 戳一戳表情生成失败`)
+          await e.reply(`${Version.Plugin_LogName} 戳一戳表情生成失败`)
         }
       }
 
@@ -172,7 +172,7 @@ export class pokeRandomMeme extends plugin {
       logger.error(error.stack)
       
       if (Config.meme.errorReply) {
-        await e.reply(`[${Version.Plugin_AliasName}] 戳一戳表情生成出错: ${error.message}`)
+        await e.reply(`${Version.Plugin_LogName} 戳一戳表情生成出错: ${error.message}`)
       }
     }
 

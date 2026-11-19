@@ -25,7 +25,7 @@ presetRegExp = await createRegex(() => Utils.Tools.getAllKeyWords('preset'))
 export class meme extends plugin {
   constructor () {
     super({
-      name: '清语表情:表情包生成',
+      name: `${Version.Plugin_LogName} · 表情包生成`,
       event: 'message',
       priority: -Infinity,
       rule: []
@@ -109,7 +109,7 @@ export class meme extends plugin {
       (await Utils.Tools.isBlacklisted(matchedKeyword))
     ) {
       logger.info(
-        `[清语表情] 该表情 "${matchedKeyword}" 在禁用列表中，跳过生成`
+        `${Version.Plugin_LogName} 该表情 "${matchedKeyword}" 在禁用列表中，跳过生成`
       )
       return false
     }
@@ -147,7 +147,7 @@ export class meme extends plugin {
       (Config.access.mode === 1 && Config.access.userBlackList.includes(userId))
     ) {
       logger.info(
-        `[${Version.Plugin_AliasName}] 用户 ${userId} 没有权限，跳过生成`
+        `${Version.Plugin_LogName} 用户 ${userId} 没有权限，跳过生成`
       )
       return false
     }
@@ -178,7 +178,7 @@ export class meme extends plugin {
       logger.error(error.message)
       if (Config.meme.errorReply) {
         await e.reply(
-          `[${Version.Plugin_AliasName}] 生成表情失败, 错误信息: ${error.message}`
+          `${Version.Plugin_LogName} 生成表情失败, 错误信息: ${error.message}`
         )
       }
       return false

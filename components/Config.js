@@ -76,7 +76,7 @@ class Cfg {
       delete this.config[key]
       this.config[key] = new YamlReader(file).jsonData
 
-      logger.mark(`[清语表情][修改配置文件][${type}][${name}]`)
+      logger.mark(`${Version.Plugin_LogName} [修改配置文件][${type}][${name}]`)
 
       const changes = this.findDifference(oldConfig, this.config[key])
       for (const key in changes) {

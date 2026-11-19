@@ -1,10 +1,10 @@
-import { Config, Render } from '#components'
+import { Config, Render, Version } from '#components'
 import { Utils } from '#models'
 
 export class stats extends plugin {
   constructor () {
     super({
-      name: '清语表情:统计',
+      name: `${Version.Plugin_LogName} · 统计`,
       event: 'message',
       priority: -Infinity,
       rule: [

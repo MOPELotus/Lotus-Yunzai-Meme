@@ -1,10 +1,10 @@
-import { Config } from '#components'
+import { Config, Version } from '#components'
 import { Utils } from '#models'
 
 export class info extends plugin {
   constructor () {
     super({
-      name: '清语表情:表情包详情',
+      name: `${Version.Plugin_LogName} · 表情包详情`,
       event: 'message',
       priority: -Infinity,
       rule: [

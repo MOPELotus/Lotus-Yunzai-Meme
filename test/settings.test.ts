@@ -24,12 +24,13 @@ test("旧清语设置命令可安全更新隔离 YAML 并即时生效", async ()
     }
     expect(await module.fallback("#清语表情设置强制触发关闭", { ...owner, isDelegated: true })).toContain("只有主人");
     expect(await settings("强制触发关闭", user)).toContain("只有主人");
-    expect(await module.fallback("#清语表情设置强制触发关闭", user)).toContain("只有主人");
+    expect(await module.fallback("#表情合成设置强制触发关闭", user)).toBe("只有主人可以修改表情合成设置。");
     expect(await readFile(meme, "utf8")).toBe(source);
     expect(await settings("强制触发", owner)).toBe("强制触发：开启");
+    expect(await module.fallback("#表情设置 强制触发", owner)).toBe("强制触发：开启");
     expect(await readFile(meme, "utf8")).toBe(source);
 
-    expect(await module.fallback("#清语表情设置表情设置 强制触发关闭", owner)).toBe("强制触发：关闭");
+    expect(await module.fallback("#表情合成设置表情设置 强制触发关闭", owner)).toBe("强制触发：关闭");
     expect(catalogPolicy(10001, true).forceSharp).toBe(false);
     expect(await readFile(meme, "utf8")).toContain("# 保留旧注释");
     expect(await readFile(meme, "utf8")).toContain("# 前缀设置");

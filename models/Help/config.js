@@ -2,7 +2,7 @@ import { Version } from '#components'
 
 export const Cfg = {
   title: `${Version.Plugin_AliasName}帮助`,
-  subTitle: Version.Plugin_Name,
+  subTitle: 'Lotus-Yunzai / meme',
   columnCount: 3,
   colWidth: 265,
   theme: 'all',

@@ -20,9 +20,9 @@ const sequelize = new Sequelize({
 /** 测试连接 */
 try {
   await sequelize.authenticate()
-  logger.debug(chalk.bold.cyan(`[${Version.Plugin_AliasName}] 数据库连接成功`))
+  logger.debug(chalk.bold.cyan(`${Version.Plugin_LogName} 数据库连接成功`))
 } catch (error) {
-  logger.error(chalk.bold.cyan(`[${Version.Plugin_AliasName}] 数据库连接失败: ${error}`))
+  logger.error(chalk.bold.cyan(`${Version.Plugin_LogName} 数据库连接失败: ${error}`))
 }
 
 export {

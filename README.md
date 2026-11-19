@@ -1,77 +1,11 @@
-# <h1 align="center">清语表情</h1>
+# Lotus-Yunzai 表情合成
 
-<div align="center">
-<img src="https://api.wuliya.cn/api/count?name=meme-plugin&type=img&theme=gelbooru" alt="清语表情">
+Lotus-Yunzai 的内置 `meme` 模块。支持 `#表情列表`、`#表情详情` 和关键词合成。机器人主人可使用 `#表情合成设置`、`#表情合成更新资源`，旧命令也可继续使用。
 
-<a href="https://github.com/ClarityJS/meme-plugin"><img src="https://img.shields.io/badge/Github-清语表情-black?style=flat-square&logo=github" alt="Github"></a><a href="https://gitee.com/Le-niao/Yunzai-Bot"><img src="https://img.shields.io/badge/云崽-v3.0.0-black?style=flat-square&logo=dependabot" alt="Yunzai"></a><a href="https://qm.qq.com/q/gBs8Ri3nIQ"><img src="https://img.shields.io/badge/group-272040396-blue" alt="Group"></a>
+迁移时将旧 SQLite 数据库和对应 YAML 配置的副本放入主仓的 `data/meme/data.db` 和 `data/meme/config/`。可用 `LOTUS_MEME_DB`、`LOTUS_MEME_CONFIG_DIR` 指定路径，通过 `server.yaml` 或 `LOTUS_MEME_SERVER_URL` 配置合成服务。
 
-<img alt="Star" src="https://badgen.net/github/stars/ClarityJS/meme-plugin"><img alt="Fork" src="https://badgen.net/github/forks/ClarityJS/meme-plugin"><img alt="Tag Version" src="https://badgen.net/github/tag/ClarityJS/meme-plugin"><img alt="Release" src="https://badgen.net/github/release/ClarityJS/meme-plugin/stable"><img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/ClarityJS/meme-plugin">
+## 上游与旧版入口
 
+本仓基于 ClarityJS 的 [清语表情](https://github.com/ClarityJS/meme-plugin) 及 [chinoyui 的续维护版本](https://github.com/chinoyui/meme-plugin/tree/39d3bd52daa4ad53d3b1586282cc1825bb66b996)，保留 Git 历史、原署名和 [GPL-3.0](LICENSE) 许可。
 
-</div>
-
-## Lotus-Yunzai
-
-作为 Lotus-Yunzai 的内置模块提供 `#表情列表 [页码]` 和 `#表情详情 <编号或关键词>`。将旧清语表情数据库的副本放在主仓 `data/meme/data.db`，也可用环境变量 `LOTUS_MEME_DB` 指定路径。目录查询以只读方式打开数据库。
-
-旧清语表情的 `meme.yaml` 和 `access.yaml` 可复制到主仓 `data/meme/config/`，也可通过 `LOTUS_MEME_CONFIG_DIR` 指定目录。目录指令读取模块开关、用户白名单或黑名单，以及按编号或关键词设置的禁用表情。启用用户名单后，目录指令需要来自能提供用户编号的会话。
-
-旧关键词触发可使用迁移目录下的 `server.yaml` 或 `LOTUS_MEME_SERVER_URL` 配置生成服务。可提交普通文字、当前消息及引用中的内嵌图片。引用查找由宿主提供，头像回填从固定 QQ CDN 获取。通过消息地址或资源编号获取的图片仍需适配器支持。
-
-生成时可传模板声明的专用参数，例如 `#number 2` 或 `-n 2`。`--circle` 等开关以各模板提供的参数为准。省略参数时沿用生成服务的默认值。
-
-本仓由 ClarityJS 的清语表情衍生，保留 GPL-3.0 许可及原有历史。Lotus-Yunzai 入口只使用 Bun 自带的 SQLite。
-
-`package.legacy.json` 保留上游发布版的依赖和模块别名，供旧云崽的 `index.js` 使用。Sequelize 和 sqlite3 用于旧数据库操作，Axios 和 Markdown 相关包供旧插件功能使用，ESLint 用于旧代码检查。在独立的旧云崽部署副本中使用本仓时，先运行 `cp package.legacy.json package.json`，再按下方上游说明安装依赖。
-
-## 介绍 📝
-`清语表情` 是一个 `Yunzai-Bot`的扩展插件，提供表情包合成等功能。
-雾公主已跑路不再进行任何维护
-皮皮自用版本
-安装即用内置api
-安装完成后先#清语更新表情资源、第一次更新会因为表情过多报错，多更新几次直到无报错即可
-
-如有问题请卸载
-
->[!TIP]
->皮皮自用api：https://meme.pippi.top/
-
-> [!WARNING]
-> 主体内容已完成，不再更新新内容，已跑路
-
-## 安装与更新 🔧
-
-### <code>Yunzai-Bot</code> 🚀
-
-```bash
-git clone --depth=1 https://github.com/chinoyui/meme-plugin ./plugins/meme-plugin/
-```
-</details>
-<details>
-<summary> 使用 <code>Release</code> 🔨</summary>
-
-**虽然此方式能够使用，不利于后续升级，故不推荐使用 🔔**
-</details>
-
-### <code>Karin</code> 🤖
-请前往 [Karin仓库](https://github.com/ClarityJS/karin-plugin-meme)
-
-### 安装依赖 📦
-```bash
-pnpm install --filter=meme-plugin
-```
-
-## 贡献者 👨‍💻👩‍💻
-
-<a href="https://github.com/ClarityJS/meme-plugin/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=ClarityJS/meme-plugin" />
-</a>
-
-![Alt](https://repobeats.axiom.co/api/embed/04d06e4e2d0cdfb7ef436a681dee7a2c83f199a6.svg "Repobeats analytics image")
-
-# 资源 📚
-
-- [Miao-Yunzai](https://github.com/yoimiya-kokomi/Miao-Yunzai) : 喵版 Yunzai [Gitee](https://gitee.com/yoimiya-kokomi/Miao-Yunzai) / [Github](https://github.com/yoimiya-kokomi/Miao-Yunzai)
-- [Yunzai-V3](https://github.com/yoimiya-kokomi/Yunzai-Bot) ：Yunzai V3 - 喵喵维护版（使用 icqq）
-- [Yunzai-V3](https://gitee.com/Le-niao/Yunzai-Bot) ：Yunzai V3 - 乐神原版（使用 oicq）
-- [meme-generator](https://github.com/MeetWq/meme-generator): 表情包生成器，用于制作各种沙雕表情包 ***本插件的来源***
+Lotus-Yunzai 从 `lotus.ts` 加载本模块。旧版云崽入口 `index.js` 及其 `apps/`、`components/`、`resources/` 仍随仓保留，其中的界面及定时任务由旧版宿主加载。需要在独立的旧版云崽部署使用时，先将 `package.legacy.json` 复制为 `package.json`，再安装其中的旧版依赖。

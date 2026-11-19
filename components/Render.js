@@ -29,7 +29,7 @@ export const Render = {
       sys: {
         scale: scale(params?.scale || 1)
       },
-      copyright: `${Version.Bot_Name}<span class="version"> ${Version.Bot_Version}</span> & ${Version.Plugin_Name}<span class="version"> ${Version.Plugin_Version}`,
+      copyright: `${Version.Bot_Name}<span class="version"> ${Version.Bot_Version}</span> & Lotus-Yunzai · ${Version.Plugin_AliasName}<span class="version"> ${Version.Plugin_Version}</span>`,
       pageGotoParams: {
         waitUntil: 'load',
         timeout: 60000

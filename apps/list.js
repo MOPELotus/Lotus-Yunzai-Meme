@@ -5,7 +5,7 @@ import chalk from 'chalk'
 export class list extends plugin {
     constructor() {
         super({
-            name: '清语表情:列表',
+            name: `${Version.Plugin_LogName} · 列表`,
             event: 'message',
             priority: -Infinity,
             rule: [{ reg: /^#?(?:(清语)?表情|meme(?:-plugin)?)列表$/i, fnc: 'list' }]
@@ -23,15 +23,15 @@ export class list extends plugin {
     static async init() {
         if (!Config.meme.enable) return;
         try {
-            logger.info(chalk.bold.magenta(`[${Version.Plugin_AliasName}] ⏳ 正在后台预加载表情列表...`));
+            logger.info(chalk.bold.magenta(`${Version.Plugin_LogName} ⏳ 正在后台预加载表情列表...`));
             
             await list.generateCache();
             
             if (list.cache.img) {
-                logger.info(chalk.bold.magenta(`[${Version.Plugin_AliasName}] 🎉 表情列表预加载完成，当前收录: ${list.cache.count}`));
+                logger.info(chalk.bold.magenta(`${Version.Plugin_LogName} 🎉 表情列表预加载完成，当前收录: ${list.cache.count}`));
             }
         } catch (e) {
-            logger.error(`[${Version.Plugin_AliasName}] 表情列表预加载失败`, e);
+            logger.error(`${Version.Plugin_LogName} 表情列表预加载失败`, e);
         }
     }
 
@@ -107,12 +107,12 @@ export class list extends plugin {
             }
 
             if (list.cache.keySignature !== '') {
-                await e.reply(`[${Version.Plugin_AliasName}] 表情已更新请耐心等待...`, true);
+                await e.reply(`${Version.Plugin_LogName} 表情已更新请耐心等待...`, true);
             }
             const img = await list.generateCache(keys);
 
             if (!img) {
-                await e.reply(`[${Version.Plugin_AliasName}]没有找到表情列表, 请使用[#表情更新], 稍后再试`, true);
+                await e.reply(`${Version.Plugin_LogName} 没有找到表情列表, 请使用[#表情更新], 稍后再试`, true);
                 return true;
             }
             await e.reply(img);

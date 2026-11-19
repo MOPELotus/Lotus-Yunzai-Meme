@@ -5,7 +5,7 @@ import { catalogPath, catalogVersion } from "./catalog-file.ts";
 import { generationServer } from "./catalog-policy.ts";
 import { isMemeOwner, type SettingsContext } from "./settings.ts";
 
-const command = /^#?(?:清语)?(?:表情|meme(?:-plugin)?)(强制)?更新(?:表情包|资源|数据)?$/iu;
+const command = /^#?(?:(?:清语)?表情|表情合成|(?:清语)?meme(?:-plugin)?)(强制)?更新(?:表情包|资源|数据)?$/iu;
 const maxResponseBytes = 4 * 1024 * 1024;
 const batchSize = 6;
 
@@ -86,7 +86,7 @@ function dataVersion(db: Database): number {
 
 async function updateCatalog(force: boolean): Promise<string> {
   const server = generationServer();
-  if (!server) return "请先配置清语表情生成服务。";
+  if (!server) return "请先配置表情合成服务。";
 
   const file = catalogPath();
   let db: Database | undefined;
