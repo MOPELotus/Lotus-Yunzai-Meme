@@ -33,7 +33,7 @@ function list(value: unknown): string[] {
   }).filter(Boolean);
 }
 
-function configDirectory(): string {
+export function configDirectory(): string {
   const directory = Bun.env.LOTUS_MEME_CONFIG_DIR;
   if (directory !== undefined && !statSync(directory).isDirectory()) throw new Error("无效的表情配置目录");
   return directory ?? defaultDirectory;

@@ -6,6 +6,8 @@ import { argsTypeFromParams, parseGenerationArgs, type PresetArgument } from "./
 import { buildGenerationBody, type GenerationInput } from "./generation.ts";
 import { generateMemeReply, type FallbackContext } from "./generate-reply.ts";
 
+import { handleMemeSettings } from "./settings.ts";
+
 const pageSize = 12;
 const defaultPath = fileURLToPath(new URL("../../data/meme/data.db", import.meta.url));
 
@@ -256,6 +258,8 @@ function details(key: string, context?: CatalogContext): string {
 
 export default {
   async fallback(message: string, context: FallbackContext) {
+    const setting = handleMemeSettings(message, context);
+    if (setting !== undefined) return setting;
     if (context.user_id === undefined || context.message_type === "terminal") return;
     let server: ReturnType<typeof generationServer>;
     try {

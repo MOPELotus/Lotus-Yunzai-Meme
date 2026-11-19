@@ -9,6 +9,7 @@ export interface FallbackContext {
   readonly message_type: "terminal" | "group" | "private";
   readonly user_id?: number;
   readonly isMaster: boolean;
+  readonly isDelegated?: boolean;
   readonly isBotMaster: (userId: number) => boolean;
   readonly message?: string | readonly InboundSegment[];
   readonly reply_id?: number | string;
