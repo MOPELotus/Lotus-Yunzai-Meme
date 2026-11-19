@@ -16,7 +16,7 @@
 
 旧清语表情的 `meme.yaml` 和 `access.yaml` 可复制到主仓 `data/meme/config/`，也可通过 `LOTUS_MEME_CONFIG_DIR` 指定目录。目录指令读取模块开关、用户白名单或黑名单，以及按编号或关键词设置的禁用表情。启用用户名单后，目录指令需要来自能提供用户编号的会话。
 
-旧关键词触发可使用迁移目录下的 `server.yaml` 或 `LOTUS_MEME_SERVER_URL` 配置生成服务。当前可提交普通文字和消息中内嵌的图片数据，引用素材及需要下载的头像和图片还需适配器提供。
+旧关键词触发可使用迁移目录下的 `server.yaml` 或 `LOTUS_MEME_SERVER_URL` 配置生成服务。可提交普通文字、当前消息及引用中的内嵌图片。引用查找由宿主提供，头像回填从固定 QQ CDN 获取。通过消息地址或资源编号获取的图片仍需适配器支持。
 
 本仓由 ClarityJS 的清语表情衍生，保留 GPL-3.0 许可及原有历史。Lotus-Yunzai 入口只使用 Bun 自带的 SQLite。
 

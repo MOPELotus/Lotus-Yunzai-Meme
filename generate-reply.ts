@@ -12,6 +12,7 @@ export interface FallbackContext {
   readonly isBotMaster: (userId: number) => boolean;
   readonly message?: string | readonly InboundSegment[];
   readonly reply_id?: number | string;
+  readonly lookupReply?: () => Promise<{ user_id: number; message: readonly InboundSegment[] } | undefined>;
   readonly sender?: Readonly<Record<string, unknown>>;
 }
 
@@ -43,8 +44,8 @@ function embeddedImage(segment: InboundSegment): Blob | undefined {
   if (type && bytes.byteLength <= maxImageBytes) return new Blob([bytes], { type });
 }
 
-async function readResult(response: Response): Promise<Uint8Array | undefined> {
-  if (!response.ok || !response.body || Number(response.headers.get("content-length")) > maxImageBytes) {
+async function readResult(response: Response, maxBytes = maxImageBytes): Promise<Uint8Array<ArrayBuffer> | undefined> {
+  if (!response.ok || !response.body || Number(response.headers.get("content-length")) > maxBytes) {
     await response.body?.cancel();
     return;
   }
@@ -56,7 +57,7 @@ async function readResult(response: Response): Promise<Uint8Array | undefined> {
     for (;;) {
       const chunk = await reader.read();
       if (chunk.done) break;
-      if (length + chunk.value.byteLength > maxImageBytes) {
+      if (length + chunk.value.byteLength > maxBytes) {
         await reader.cancel();
         return;
       }
@@ -75,6 +76,32 @@ async function readResult(response: Response): Promise<Uint8Array | undefined> {
   if (imageMime(image)) return image;
 }
 
+async function fetchAvatar(user: string): Promise<Blob | undefined> {
+  if (!/^[1-9]\d{0,15}$/u.test(user) || !Number.isSafeInteger(Number(user))) return;
+  const url = new URL("https://q1.qlogo.cn/g");
+  url.search = new URLSearchParams({ b: "qq", s: "0", nk: user }).toString();
+  try {
+    const bytes = await readResult(await fetch(url, {
+      redirect: "error",
+      signal: AbortSignal.timeout(3_000),
+    }), 512 * 1024);
+    if (bytes) return new Blob([bytes], { type: imageMime(bytes) });
+  } catch {
+    // The legacy image planner can use the remaining materials if one avatar fails.
+  }
+}
+
+function imagesIn(segments: readonly InboundSegment[]): Blob[] | undefined {
+  const images: Blob[] = [];
+  for (const part of segments) {
+    if (part.type !== "image") continue;
+    const image = embeddedImage(part);
+    if (!image) return;
+    images.push(image);
+  }
+  return images;
+}
+
 export async function generateMemeReply(
   context: FallbackContext,
   prepare: (input: GenerationInput) => Promise<PreparedRequest | string | undefined>,
@@ -87,26 +114,35 @@ export async function generateMemeReply(
   try {
     const settings = generationSettings();
     errorReply = settings.errorReply;
+    let quoted: GenerationInput["quoted"];
     if (settings.quotedImages && context.reply_id !== undefined) {
-      return errorReply ? "当前无法读取引用消息中的表情素材。" : undefined;
+      const source = await context.lookupReply?.();
+      if (!source) return errorReply ? "当前无法读取引用消息中的表情素材。" : undefined;
+      const images = imagesIn(source.message);
+      if (!images) return errorReply ? "当前无法读取引用消息中的表情图片。" : undefined;
+      quoted = { userId: source.user_id, images };
     }
-    const images: Blob[] = [];
-    const mentions: (string | number)[] = [];
+
     const segments: readonly InboundSegment[] = Array.isArray(context.message) ? context.message : [];
-    for (const part of segments) {
-      if (part.type === "at" && (typeof part.qq === "number" || typeof part.qq === "string")) {
-        mentions.push(part.qq);
-      } else if (part.type === "image" && settings.imagesInMessage) {
-        const image = embeddedImage(part);
-        if (!image) return errorReply ? "当前无法读取该表情图片素材。" : undefined;
-        images.push(image);
-      }
-    }
+    const images = settings.imagesInMessage ? imagesIn(segments) : [];
+    if (!images) return errorReply ? "当前无法读取该表情图片素材。" : undefined;
+    const mentions = segments.flatMap((part) =>
+      part.type === "at" && (typeof part.qq === "number" || typeof part.qq === "string") ? [part.qq] : []);
+    const avatars = new Map<string, Promise<Blob | undefined>>();
     const prepared = await prepare({
       user_id: userId,
       isMaster: context.isMaster,
       mentions,
       images,
+      hasMessageImage: segments.some((part) => part.type === "image"),
+      quoted,
+      avatar: (user) => {
+        const cached = avatars.get(user);
+        if (cached) return cached;
+        const pending = fetchAvatar(user);
+        avatars.set(user, pending);
+        return pending;
+      },
       isTargetMaster: (id) => Number.isSafeInteger(Number(id)) && context.isBotMaster(Number(id)),
       nickname: async (id) => {
         if (id !== String(userId)) return;

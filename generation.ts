@@ -5,6 +5,7 @@ export interface GenerationInput {
   readonly isMaster: boolean;
   readonly mentions?: readonly (number | string)[];
   readonly images?: readonly Blob[];
+  readonly hasMessageImage?: boolean;
   readonly quoted?: { readonly userId: number; readonly images?: readonly Blob[] };
   readonly avatar?: (user: string) => Promise<Blob | undefined>;
   readonly nickname?: (user: string) => Promise<string | undefined>;
@@ -37,7 +38,7 @@ async function assembleImages(
 ): Promise<Blob[] | string> {
   const ownImages = input.images ?? [];
   const quotedImages = settings.quotedImages && input.quoted ? [...(input.quoted.images ?? [])] : [];
-  if (settings.quotedImages && input.quoted && quotedImages.length === 0 && ownImages.length === 0) {
+  if (settings.quotedImages && input.quoted && quotedImages.length === 0 && !input.hasMessageImage && ownImages.length === 0) {
     const fallback = await input.avatar?.(String(input.quoted.userId));
     if (fallback) quotedImages.push(fallback);
   }

@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { expect, test } from "bun:test";
+import { expect, spyOn, test } from "bun:test";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -121,6 +121,62 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     expect(received?.getAll("texts")).toEqual(["前", "后"]);
     expect(await (received?.get("images") as Blob).bytes()).toEqual(Uint8Array.fromBase64(png));
     expect(count).toBe(1);
+
+    const sourceBytes = Uint8Array.fromBase64(png);
+    const tagged = (tag: number) => Uint8Array.from([...sourceBytes, tag]);
+    let lookups = 0;
+    const withQuotedImage = {
+      ...fallbackContext, reply_id: 42,
+      lookupReply: async () => {
+        lookups++;
+        return { user_id: 10004, message: [{ type: "image", file: tagged(42) }] };
+      },
+    };
+    expect(await module.fallback("#别名13 前 / 后", withQuotedImage)).toEqual(reply);
+    expect(lookups).toBe(1);
+    expect(await module.fallback("#别名13 前 / 后", {
+      ...withQuotedImage,
+      lookupReply: async () => ({ user_id: 10004, message: [
+        { type: "image", url: new URL("/elsewhere", fixture?.url).href },
+      ] }),
+    })).toContain("无法读取引用消息中的表情图片");
+    expect(redirectDestination).toBe(false);
+    const sentImages = async () => {
+      if (!received) throw new Error("没有收到表情生成请求");
+      return Promise.all(received.getAll("images").map((image) => (image as Blob).bytes()));
+    };
+    expect(await sentImages()).toEqual([tagged(42), sourceBytes]);
+
+    const fetchedAvatars: string[] = [];
+    const realFetch = globalThis.fetch.bind(globalThis);
+    const mockFetch = async (...[request, options]: Parameters<typeof fetch>) => {
+      const url = new URL(request instanceof Request ? request.url : request.toString());
+      if (url.origin === fixture?.url.origin) return realFetch(request, options);
+      if (url.origin !== "https://q1.qlogo.cn" || url.pathname !== "/g") {
+        throw new Error("不应访问外部地址");
+      }
+      const user = url.searchParams.get("nk") ?? "";
+      fetchedAvatars.push(user);
+      expect(options?.redirect).toBe("error");
+      return new Response(tagged(user === "10004" ? 44 : 43));
+    };
+    const intercept = spyOn(globalThis, "fetch").mockImplementation(Object.assign(mockFetch, {
+      preconnect: globalThis.fetch.preconnect,
+    }));
+    try {
+      const textOnly = { ...fallbackContext, message: [] };
+      expect(await module.fallback("#别名13 前 / 后", {
+        ...textOnly, reply_id: 42, lookupReply: async () => ({ user_id: 10004, message: [] }),
+      })).toEqual(reply);
+      expect(fetchedAvatars).toEqual(["10004"]);
+      expect(await sentImages()).toEqual([tagged(44)]);
+
+      expect(await module.fallback("#别名13 前 / 后", textOnly)).toEqual(reply);
+      expect(fetchedAvatars).toEqual(["10004", "10003"]);
+      expect(await sentImages()).toEqual([tagged(43)]);
+    } finally {
+      intercept.mockRestore();
+    }
 
     redirected = true;
     expect(await module.fallback("#别名13 前 / 后", fallbackContext)).toContain("表情生成失败");
