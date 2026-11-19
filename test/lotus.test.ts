@@ -1,6 +1,6 @@
 import { Database } from "bun:sqlite";
 import { expect, spyOn, test } from "bun:test";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import module, { prepareMemeRequest, resolveMemeTrigger } from "../lotus.ts";
@@ -254,6 +254,35 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     } finally {
       intercept.mockRestore();
     }
+
+    const beforePolicyChange = count;
+    const policyDuringLookup = join(directory, "access.yaml");
+    expect(await module.fallback("#别名13 前 / 后", {
+      ...withQuotedImage,
+      lookupReply: async () => {
+        await writeFile(policyDuringLookup, "enable: true\nmode: 0\nuserWhiteList: []\n");
+        return { user_id: 10004, message: [{ type: "image", file: tagged(42) }] };
+      },
+    })).toContain("无权");
+    expect(count).toBe(beforePolicyChange);
+    await writeFile(policyDuringLookup, "{}\n");
+
+    const original = join(directory, "original.db");
+    const replacement = join(directory, "replacement.db");
+    await writeFile(replacement, before);
+    const replaced = new Database(replacement);
+    replaced.run("DELETE FROM meme");
+    replaced.close();
+    expect(await module.fallback("#别名13 前 / 后", {
+      ...withQuotedImage,
+      lookupReply: async () => {
+        await rename(filename, original);
+        await rename(replacement, filename);
+        return { user_id: 10004, message: [{ type: "image", file: tagged(42) }] };
+      },
+    })).toBeUndefined();
+    expect(count).toBe(beforePolicyChange);
+    await rename(original, filename);
 
     redirected = true;
     expect(await module.fallback("#别名13 前 / 后", fallbackContext)).toContain("表情生成失败");

@@ -1,4 +1,5 @@
 import { Database } from "bun:sqlite";
+import { statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { catalogPolicy, generationServer } from "./catalog-policy.ts";
 import { argsTypeFromParams, parseGenerationArgs, type PresetArgument } from "./generation-args.ts";
@@ -43,11 +44,7 @@ function keywords(value: string): string[] {
   }
 }
 
-function queryCatalog<T>(
-  userId: number | undefined,
-  query: (db: Database, hidden: string, forceSharp: boolean) => T,
-  forGeneration = false,
-): T | string {
+function currentPolicy(userId: number | undefined, forGeneration = false) {
   let policy: ReturnType<typeof catalogPolicy>;
   try {
     policy = catalogPolicy(userId, forGeneration);
@@ -56,16 +53,41 @@ function queryCatalog<T>(
   }
   if (!policy.enabled) return "表情模块已停用。";
   if (!policy.allowed) return "当前用户无权使用表情模块。";
+  return policy;
+}
 
+function catalogPath(): string {
+  return Bun.env.LOTUS_MEME_DB || defaultPath;
+}
+
+function catalogVersion(): string {
+  const path = catalogPath();
+  const files = [path, `${path}-wal`, `${path}-journal`].map((file) => {
+    const stat = statSync(file, { bigint: true, throwIfNoEntry: false });
+    return stat ? [stat.dev, stat.ino, stat.size, stat.mtimeNs, stat.ctimeNs].join(":") : "";
+  });
+  return JSON.stringify([path, ...files]);
+}
+
+function withCatalog<T>(query: (db: Database) => T): T | string {
   let db: Database | undefined;
   try {
-    db = new Database(Bun.env.LOTUS_MEME_DB || defaultPath, { readonly: true });
-    return query(db, JSON.stringify(policy.hidden), policy.forceSharp);
+    db = new Database(catalogPath(), { readonly: true });
+    return query(db);
   } catch {
     return "无法读取表情目录，请检查 LOTUS_MEME_DB 和本机导入的旧数据库。";
   } finally {
     db?.close();
   }
+}
+
+function queryCatalog<T>(
+  userId: number | undefined,
+  query: (db: Database, hidden: string) => T,
+): T | string {
+  const policy = currentPolicy(userId);
+  if (typeof policy === "string") return policy;
+  return withCatalog((db) => query(db, JSON.stringify(policy.hidden)));
 }
 
 function list(argument: string, context?: CatalogContext): string {
@@ -98,14 +120,16 @@ function sameKeyword(left: string, right: string): boolean {
   return left.toLowerCase() === right.toLowerCase();
 }
 
-function requireTextMatch(row: CatalogDetails, text: string): boolean {
+function requireTextMatch(row: TriggerRow, text: string): boolean {
   if (row.min_texts !== 0 || row.max_texts !== 0 || !text) return true;
 
   return /^(@\s*\d+\s*)+$/u.test(text) || /^(#\S+\s+[^#]+(?:\s+#\S+\s+[^#]+)*)$/u.test(text);
 }
 
+type TriggerRow = Pick<CatalogDetails, "key" | "keyWords" | "min_texts" | "max_texts">;
+
 interface TriggerMatch {
-  readonly row: CatalogDetails;
+  readonly row: TriggerRow;
   readonly keyword: string;
   readonly preset?: PresetArgument;
 }
@@ -122,8 +146,8 @@ function legacyPresetKeyword(value: string): string | undefined {
 function findPreset(db: Database, input: string): TriggerMatch | undefined {
   if (!db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'preset'").get()) return;
 
-  const presets = db.query<CatalogDetails & { name: string; arg_name: string; arg_value: string }, []>(
-    `SELECT meme.key, keyWords, min_images, max_images, min_texts, max_texts,
+  const presets = db.query<TriggerRow & { name: string; arg_name: string; arg_value: string }, []>(
+    `SELECT meme.key, keyWords, min_texts, max_texts,
        preset.name, preset.arg_name, preset.arg_value
      FROM preset JOIN meme ON preset.key = meme.key
      ORDER BY preset.name, meme.key`,
@@ -149,14 +173,17 @@ export function resolveMemeTrigger(
 
 function resolveTrigger(message: string, context?: CatalogContext, withParams = false) {
   const input = message.trim();
-  return queryCatalog(context?.user_id, (db, hidden, forceSharp) => {
-    if (forceSharp && !input.startsWith("#")) return;
-    const candidate = input.startsWith("#") ? input.slice(1) : input;
-    if (!candidate) return;
+  const policy = currentPolicy(context?.user_id, true);
+  if (typeof policy === "string") return policy;
+  if (policy.forceSharp && !input.startsWith("#")) return;
+  const candidate = input.startsWith("#") ? input.slice(1) : input;
+  if (!candidate) return;
 
+  return withCatalog((db) => {
+    const version = withParams ? catalogVersion() : undefined;
     // Select the old keyword before checking whether its template is hidden, so
     // a disabled longer trigger cannot fall through to a shorter template.
-    const rows = db.query<CatalogDetails, []>(`SELECT ${detailsFields} FROM meme ORDER BY key`).all();
+    const rows = db.query<TriggerRow, []>("SELECT key, keyWords, min_texts, max_texts FROM meme ORDER BY key").all();
     let match: TriggerMatch | undefined;
     for (const row of rows) {
       for (const keyword of keywords(row.keyWords)) {
@@ -166,11 +193,11 @@ function resolveTrigger(message: string, context?: CatalogContext, withParams = 
     }
     match ??= findPreset(db, candidate);
     if (!match) return;
-    if (match.preset && (JSON.parse(hidden) as string[]).includes(match.keyword)) return;
+    if (match.preset && policy.hidden.includes(match.keyword)) return;
 
     const visible = db.query<{ key: string }, [string, string]>(
       `SELECT key ${visibleCatalog} AND key = ?`,
-    ).get(hidden, match.row.key);
+    ).get(JSON.stringify(policy.hidden), match.row.key);
     if (!visible) return;
 
     const text = candidate.slice(match.keyword.length).trim();
@@ -184,14 +211,20 @@ function resolveTrigger(message: string, context?: CatalogContext, withParams = 
       const args = parseGenerationArgs(argsTypeFromParams(params?.params), text.replace(/@\s*\d+/gu, "").trim());
       if (!args.found || args.text) return;
     }
-    return { ...match, text, params: params?.params };
-  }, true);
+    return { ...match, text, params: params?.params, version };
+  });
+}
+
+type ResolvedTrigger = Exclude<ReturnType<typeof resolveTrigger>, string | undefined>;
+
+function prepareResolvedRequest(match: ResolvedTrigger, input: GenerationInput) {
+  return buildGenerationBody(match.row.key, keywords(match.row.keyWords), match.text, match.params, input, match.preset);
 }
 
 export async function prepareMemeRequest(message: string, input: GenerationInput) {
   const match = resolveTrigger(message, input, true);
   if (!match || typeof match === "string") return match;
-  return buildGenerationBody(match.row.key, keywords(match.row.keyWords), match.text, match.params, input, match.preset);
+  return prepareResolvedRequest(match, input);
 }
 
 function details(key: string, context?: CatalogContext): string {
@@ -230,8 +263,19 @@ export default {
     } catch {
       return;
     }
-    if (!server || typeof resolveMemeTrigger(message, context) !== "object") return;
-    return generateMemeReply(context, (input) => prepareMemeRequest(message, input), server);
+    if (!server) return;
+    const match = resolveTrigger(message, context, true);
+    if (!match || typeof match === "string") return;
+    return generateMemeReply(context, async (input) => {
+      // Media lookup can yield while the local catalog or configuration changes.
+      if (match.version !== catalogVersion()) return prepareMemeRequest(message, input);
+      const policy = currentPolicy(input.user_id, true);
+      if (typeof policy === "string") return policy;
+      if (policy.forceSharp && !message.trimStart().startsWith("#")) return;
+      const names = [match.row.key, match.keyword, ...keywords(match.row.keyWords)];
+      if (names.some((name) => policy.hidden.includes(name))) return;
+      return prepareResolvedRequest(match, input);
+    }, server);
   },
   commands: {
     "#表情列表": list,
