@@ -144,6 +144,11 @@ export async function generateMemeReply(
         return pending;
       },
       isTargetMaster: (id) => Number.isSafeInteger(Number(id)) && context.isBotMaster(Number(id)),
+      gender: async (id) => {
+        if (id !== String(userId)) return;
+        const gender = context.sender?.sex;
+        if (gender === "male" || gender === "female") return gender;
+      },
       nickname: async (id) => {
         if (id !== String(userId)) return;
         const name = context.sender?.card || context.sender?.nickname;

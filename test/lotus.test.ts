@@ -24,6 +24,21 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     }
     db.run("UPDATE meme SET keyWords = ?, max_texts = 0 WHERE key = ?", [JSON.stringify(["只图", "a+b"]), "meme-12"]);
     db.run("UPDATE meme SET params = ? WHERE key = ?", [JSON.stringify({
+      min_images: 1, max_images: 2, min_texts: 0, max_texts: 0, args_type: {
+        args_model: { properties: {
+          user_infos: { type: "array" },
+          number: { type: "integer", default: 2 },
+          circle: { type: "boolean", default: false },
+          mode: { type: "string", enum: ["left", "right"], default: "left" },
+        } },
+        parser_options: [
+          { names: ["-n", "--number"], args: [{ name: "number" }] },
+          { names: ["--circle"], args: null, action: { type: 0, value: true } },
+          { names: ["--right"], args: null, dest: "mode", action: { type: 0, value: "right" } },
+        ],
+      },
+    }), "meme-12"]);
+    db.run("UPDATE meme SET params = ? WHERE key = ?", [JSON.stringify({
       min_images: 1, max_images: 4, min_texts: 2, max_texts: 3, default_texts: ["默认"], args_type: null,
     }), "meme-13"]);
     db.close();
@@ -46,6 +61,31 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     await writeFile(moduleConfig, "forceSharp: true\n");
     expect(resolveMemeTrigger("别名13 好耶")).toBeUndefined();
     expect(resolveMemeTrigger("#别名13 好耶")).toEqual({ key: "meme-13", keyword: "别名13", text: "好耶" });
+
+    const argumentInput = {
+      user_id: 10003, isMaster: false,
+      images: [new Blob(["fixture"])],
+      nickname: async () => "测试昵称",
+      gender: async () => "female" as const,
+    };
+    async function argsFor(message: string) {
+      const result = await prepareMemeRequest(message, argumentInput);
+      if (!result || typeof result === "string") throw new Error(String(result));
+      expect(result.body.getAll("texts")).toEqual([]);
+      return JSON.parse(String(result.body.get("args")));
+    }
+    expect(await argsFor("#只图")).toEqual({ user_infos: [{ name: "测试昵称", gender: "female" }] });
+    expect(await argsFor("#只图 #number 5 #circle false")).toEqual({
+      user_infos: [{ name: "测试昵称", gender: "female" }], number: 5, circle: false,
+    });
+    expect(await argsFor("#只图 -n -2 --circle --right")).toEqual({
+      user_infos: [{ name: "测试昵称", gender: "female" }], number: -2, circle: true, mode: "right",
+    });
+    expect(await prepareMemeRequest("#只图 --number", argumentInput)).toContain("缺少值");
+    expect(await prepareMemeRequest("#只图 #mode 中间", argumentInput)).toContain("值无效");
+    expect(await prepareMemeRequest("#只图 #user_infos user", argumentInput)).toContain("不支持参数");
+    expect(await prepareMemeRequest("#只图 -n 2 普通聊天", argumentInput)).toBeUndefined();
+    expect(await prepareMemeRequest("#只图 --unknown", argumentInput)).toBeUndefined();
 
     const protectConfig = join(directory, "protect.yaml");
     await writeFile(protectConfig, "enable: true\nmaster: true\nlist: [别名13]\n");

@@ -18,6 +18,8 @@
 
 旧关键词触发可使用迁移目录下的 `server.yaml` 或 `LOTUS_MEME_SERVER_URL` 配置生成服务。可提交普通文字、当前消息及引用中的内嵌图片。引用查找由宿主提供，头像回填从固定 QQ CDN 获取。通过消息地址或资源编号获取的图片仍需适配器支持。
 
+生成时可传模板声明的专用参数，例如 `#number 2` 或 `-n 2`。`--circle` 等开关以各模板提供的参数为准。省略参数时沿用生成服务的默认值。
+
 本仓由 ClarityJS 的清语表情衍生，保留 GPL-3.0 许可及原有历史。Lotus-Yunzai 入口只使用 Bun 自带的 SQLite。
 
 `package.legacy.json` 保留上游发布版的依赖和模块别名，供旧云崽的 `index.js` 使用。Sequelize 和 sqlite3 用于旧数据库操作，Axios 和 Markdown 相关包供旧插件功能使用，ESLint 用于旧代码检查。在独立的旧云崽部署副本中使用本仓时，先运行 `cp package.legacy.json package.json`，再按下方上游说明安装依赖。

@@ -1,4 +1,5 @@
 import { generationSettings } from "./catalog-policy.ts";
+import { parseGenerationArgs } from "./generation-args.ts";
 
 export interface GenerationInput {
   readonly user_id: number;
@@ -9,6 +10,7 @@ export interface GenerationInput {
   readonly quoted?: { readonly userId: number; readonly images?: readonly Blob[] };
   readonly avatar?: (user: string) => Promise<Blob | undefined>;
   readonly nickname?: (user: string) => Promise<string | undefined>;
+  readonly gender?: (user: string) => Promise<"male" | "female" | "unknown" | undefined>;
   readonly isTargetMaster?: (user: string) => boolean;
 }
 
@@ -82,15 +84,26 @@ export async function buildGenerationBody(
   } catch {
     return "无法读取表情生成配置或参数。";
   }
-  if (params.args_type != null) return "该表情需要专用参数。";
-
   const typedMentions = [...text.matchAll(/@\s*(\d+)/gu)].map((match) => match[1]!);
   const users = [...new Set([...(input.mentions ?? []).map(String), ...typedMentions])]
     .filter((id) => /^\d+$/u.test(id) && id !== String(input.quoted?.userId));
   const message = text.replace(/@\s*\d+/gu, "").trim();
-  const texts = message ? message.split("/").map((part) => part.trim()).slice(0, params.max_texts) : [];
+  const parsed = params.args_type == null ? undefined : parseGenerationArgs(params.args_type, message);
+  if (parsed?.issue) return parsed.issue;
+  const caption = parsed?.text ?? message;
+  const texts = caption ? caption.split("/").map((part) => part.trim()).slice(0, params.max_texts) : [];
   try {
     const body = new FormData();
+    const firstUser = users[0] ?? String(input.user_id);
+    let nickname: string | undefined;
+    if (parsed) {
+      nickname = await input.nickname?.(firstUser);
+      const gender = await input.gender?.(firstUser) ?? "unknown";
+      body.append("args", JSON.stringify({
+        user_infos: [{ name: nickname || "未知", gender }],
+        ...parsed.values,
+      }));
+    }
     if (params.max_images > 0) {
       const images = await assembleImages(key, aliases, users, params.min_images, params.max_images, input, settings);
       if (typeof images === "string") return images;
@@ -100,7 +113,7 @@ export async function buildGenerationBody(
 
     if (params.max_texts > 0) {
       if (!texts.length && settings.useNickname) {
-        texts.push(await input.nickname?.(users[0] ?? String(input.user_id)) || "未知");
+        texts.push(nickname || await input.nickname?.(firstUser) || "未知");
       }
       while (texts.length < params.min_texts && params.texts.length) {
         texts.push(params.texts[Math.floor(Math.random() * params.texts.length)]!);

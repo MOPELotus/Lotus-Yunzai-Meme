@@ -1,6 +1,7 @@
 import { Database } from "bun:sqlite";
 import { fileURLToPath } from "node:url";
 import { catalogPolicy, generationServer } from "./catalog-policy.ts";
+import { argsTypeFromParams, parseGenerationArgs } from "./generation-args.ts";
 import { buildGenerationBody, type GenerationInput } from "./generation.ts";
 import { generateMemeReply, type FallbackContext } from "./generate-reply.ts";
 
@@ -137,10 +138,16 @@ function resolveTrigger(message: string, context?: CatalogContext, withParams = 
     if (!visible) return;
 
     const text = candidate.slice(match.keyword.length).trim();
-    if (!requireTextMatch(match.row, text)) return;
-    const params = withParams
+    const textMatches = requireTextMatch(match.row, text);
+    const mayHaveFlags = !textMatches && /(?:^|\s)--?\w/u.test(text);
+    if (!textMatches && !mayHaveFlags) return;
+    const params = withParams || mayHaveFlags
       ? db.query<{ params: string }, [string]>("SELECT params FROM meme WHERE key = ?").get(visible.key)
       : undefined;
+    if (!textMatches) {
+      const args = parseGenerationArgs(argsTypeFromParams(params?.params), text.replace(/@\s*\d+/gu, "").trim());
+      if (!args.found || args.text) return;
+    }
     return { ...match, text, params: params?.params };
   }, true);
 }
