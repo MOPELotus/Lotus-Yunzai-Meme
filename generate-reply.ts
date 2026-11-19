@@ -18,8 +18,9 @@ export interface FallbackContext {
 }
 
 const maxImageBytes = 8 * 1024 * 1024;
+export const maxAvatarBytes = 512 * 1024;
 
-function imageMime(bytes: Uint8Array): string | undefined {
+export function imageMime(bytes: Uint8Array): string | undefined {
   const startsWith = (...prefix: number[]) => prefix.every((byte, index) => bytes[index] === byte);
   if (bytes.length >= 8 && startsWith(137, 80, 78, 71, 13, 10, 26, 10)) return "image/png";
   if (bytes.length >= 3 && startsWith(255, 216, 255)) return "image/jpeg";
@@ -77,15 +78,17 @@ async function readResult(response: Response, maxBytes = maxImageBytes): Promise
   if (imageMime(image)) return image;
 }
 
-async function fetchAvatar(user: string): Promise<Blob | undefined> {
-  if (!/^[1-9]\d{0,15}$/u.test(user) || !Number.isSafeInteger(Number(user))) return;
+export async function fetchAvatar(user: string, { size = 0, signal }:
+  { size?: 0 | 100; signal?: AbortSignal } = {}): Promise<Blob | undefined> {
+  if (signal?.aborted || !/^[1-9]\d{0,15}$/u.test(user) || !Number.isSafeInteger(Number(user))) return;
   const url = new URL("https://q1.qlogo.cn/g");
-  url.search = new URLSearchParams({ b: "qq", s: "0", nk: user }).toString();
+  url.search = new URLSearchParams({ b: "qq", s: String(size), nk: user }).toString();
   try {
+    const timeout = AbortSignal.timeout(3_000);
     const bytes = await readResult(await fetch(url, {
       redirect: "error",
-      signal: AbortSignal.timeout(3_000),
-    }), 512 * 1024);
+      signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+    }), maxAvatarBytes);
     if (bytes) return new Blob([bytes], { type: imageMime(bytes) });
   } catch {
     // The legacy image planner can use the remaining materials if one avatar fails.

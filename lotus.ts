@@ -8,6 +8,8 @@ import { generateMemeReply, type FallbackContext } from "./generate-reply.ts";
 import { handleMemeSettings } from "./settings.ts";
 import { handleCatalogUpdate } from "./catalog-update.ts";
 
+export { createProfileLikeImageRenderer } from "./profile-like-image.ts";
+
 const pageSize = 12;
 
 // A legacy disable entry may be a stored key or one of its keywords.
