@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import module from "../lotus.ts";
+import module, { resolveMemeTrigger } from "../lotus.ts";
 
 test("从旧 meme 表分页并查询详情，数据库保持不变", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-catalog-"));
@@ -20,6 +20,7 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     for (let index = 1; index <= 13; index++) {
       insert.run(`meme-${String(index).padStart(2, "0")}`, JSON.stringify(["表情", "样例", `别名${index}`]));
     }
+    db.run("UPDATE meme SET keyWords = ?, max_texts = 0 WHERE key = ?", [JSON.stringify(["只图", "a+b"]), "meme-12"]);
     db.close();
     const before = await readFile(filename);
 
@@ -30,6 +31,17 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     expect(module.commands["#表情列表"]("3")).toBe("表情目录共有 2 页。");
     expect(module.commands["#表情详情"]("meme-13")).toContain("图片：1–2 张");
     expect(module.commands["#表情详情"]("missing")).toContain("没有找到对应表情");
+    expect(module.commands["#表情详情"]("别名13")).toContain("表情 meme-13");
+    expect(module.commands["#表情详情"]("表情")).toContain("对应多个表情");
+    expect(resolveMemeTrigger("别名13 好耶")).toEqual({ key: "meme-13", keyword: "别名13", text: "好耶" });
+    expect(resolveMemeTrigger("#A+B @10001")).toEqual({ key: "meme-12", keyword: "a+b", text: "@10001" });
+    expect(resolveMemeTrigger("#只图普通聊天")).toBeUndefined();
+
+    const moduleConfig = join(directory, "meme.yaml");
+    await writeFile(moduleConfig, "forceSharp: true\n");
+    expect(resolveMemeTrigger("别名13 好耶")).toBeUndefined();
+    expect(resolveMemeTrigger("#别名13 好耶")).toEqual({ key: "meme-13", keyword: "别名13", text: "好耶" });
+
     const accessConfig = join(directory, "access.yaml");
     const whitelist = `enable: true
 mode: 0
@@ -46,6 +58,8 @@ blackList: ["meme-01", "别名13"]
     expect(list).not.toContain("meme-01");
     expect(list).not.toContain("meme-13");
     expect(module.commands["#表情详情"]("meme-13", user)).toContain("没有找到");
+    expect(module.commands["#表情详情"]("别名13", user)).toContain("没有找到");
+    expect(resolveMemeTrigger("#别名13 好耶", user)).toBeUndefined();
     expect(module.commands["#表情详情"]("meme-02", user)).toContain("图片：1–2 张");
 
     await writeFile(accessConfig, "enable: true\nmode: 1\nuserBlackList: [10001]\n");
@@ -53,7 +67,6 @@ blackList: ["meme-01", "别名13"]
     expect(module.commands["#表情列表"]("", { user_id: 10002 })).toContain("共 13 项");
     expect(module.commands["#表情列表"]("")).toContain("无权");
 
-    const moduleConfig = join(directory, "meme.yaml");
     await writeFile(moduleConfig, "enable: false\n");
     expect(module.commands["#表情列表"]("", { user_id: 10002 })).toBe("表情模块已停用。");
     await writeFile(moduleConfig, "enable: [\n");

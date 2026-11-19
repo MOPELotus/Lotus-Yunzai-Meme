@@ -40,10 +40,14 @@ function keywords(value: string): string[] {
   }
 }
 
-function queryCatalog(userId: number | undefined, query: (db: Database, hidden: string) => string): string {
+function queryCatalog<T>(
+  userId: number | undefined,
+  query: (db: Database, hidden: string, forceSharp: boolean) => T,
+  forGeneration = false,
+): T | string {
   let policy: ReturnType<typeof catalogPolicy>;
   try {
-    policy = catalogPolicy(userId);
+    policy = catalogPolicy(userId, forGeneration);
   } catch {
     return "无法读取表情配置，请检查 meme.yaml 和 access.yaml。";
   }
@@ -53,7 +57,7 @@ function queryCatalog(userId: number | undefined, query: (db: Database, hidden: 
   let db: Database | undefined;
   try {
     db = new Database(Bun.env.LOTUS_MEME_DB || defaultPath, { readonly: true });
-    return query(db, JSON.stringify(policy.hidden));
+    return query(db, JSON.stringify(policy.hidden), policy.forceSharp);
   } catch {
     return "无法读取表情目录，请检查 LOTUS_MEME_DB 和本机导入的旧数据库。";
   } finally {
@@ -85,13 +89,66 @@ function list(argument: string, context?: CatalogContext): string {
   })());
 }
 
+const detailsFields = "key, keyWords, min_images, max_images, min_texts, max_texts";
+
+function sameKeyword(left: string, right: string): boolean {
+  return left.toLowerCase() === right.toLowerCase();
+}
+
+function requireTextMatch(row: CatalogDetails, text: string): boolean {
+  if (row.min_texts !== 0 || row.max_texts !== 0 || !text) return true;
+
+  return /^(@\s*\d+\s*)+$/u.test(text) || /^(#\S+\s+[^#]+(?:\s+#\S+\s+[^#]+)*)$/u.test(text);
+}
+
+export function resolveMemeTrigger(
+  message: string,
+  context?: CatalogContext,
+): { readonly key: string; readonly keyword: string; readonly text: string } | string | undefined {
+  const input = message.trim();
+  return queryCatalog(context?.user_id, (db, hidden, forceSharp) => {
+    if (forceSharp && !input.startsWith("#")) return;
+    const candidate = input.startsWith("#") ? input.slice(1) : input;
+    if (!candidate) return;
+
+    // Select the old keyword before checking whether its template is hidden, so
+    // a disabled longer trigger cannot fall through to a shorter template.
+    const rows = db.query<CatalogDetails, []>(`SELECT ${detailsFields} FROM meme ORDER BY key`).all();
+    let match: { row: CatalogDetails; keyword: string } | undefined;
+    for (const row of rows) {
+      for (const keyword of keywords(row.keyWords)) {
+        if (keyword.length <= (match?.keyword.length ?? 0)) continue;
+        if (sameKeyword(candidate.slice(0, keyword.length), keyword)) match = { row, keyword };
+      }
+    }
+    if (!match) return;
+
+    const visible = db.query<{ key: string }, [string, string]>(
+      `SELECT key ${visibleCatalog} AND key = ?`,
+    ).get(hidden, match.row.key);
+    if (!visible) return;
+
+    const text = candidate.slice(match.keyword.length).trim();
+    if (!requireTextMatch(match.row, text)) return;
+    return { key: match.row.key, keyword: match.keyword, text };
+  }, true);
+}
+
 function details(key: string, context?: CatalogContext): string {
-  if (!key) return "用法：#表情详情 <编号>";
+  if (!key) return "用法：#表情详情 <编号或关键词>";
 
   return queryCatalog(context?.user_id, (db, hidden) => {
-    const row = db.query<CatalogDetails, [string, string]>(
-      `SELECT key, keyWords, min_images, max_images, min_texts, max_texts ${visibleCatalog} AND key = ?`,
+    let row = db.query<CatalogDetails, [string, string]>(
+      `SELECT ${detailsFields} ${visibleCatalog} AND key = ?`,
     ).get(hidden, key);
+    if (!row && !db.query("SELECT 1 FROM meme WHERE key = ?").get(key)) {
+      const known = db.query<CatalogDetails, [string]>(
+        `SELECT ${detailsFields} ${visibleCatalog} ORDER BY key`,
+      ).all(hidden);
+      const matches = known.filter((item) => keywords(item.keyWords).some((word) => sameKeyword(word, key)));
+      if (matches.length > 1) return "该关键词对应多个表情，请用编号查询。";
+      row = matches[0] ?? null;
+    }
     if (!row) return "没有找到对应表情，发送 #表情列表 查看编号。";
 
     const aliases = keywords(row.keyWords);

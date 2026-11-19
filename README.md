@@ -12,7 +12,7 @@
 
 ## Lotus-Yunzai
 
-作为 Lotus-Yunzai 的内置模块提供 `#表情列表 [页码]` 和 `#表情详情 <编号>`。将旧清语表情数据库的副本放在主仓 `data/meme/data.db`，也可用环境变量 `LOTUS_MEME_DB` 指定路径。目录查询以只读方式打开数据库。
+作为 Lotus-Yunzai 的内置模块提供 `#表情列表 [页码]` 和 `#表情详情 <编号或关键词>`。将旧清语表情数据库的副本放在主仓 `data/meme/data.db`，也可用环境变量 `LOTUS_MEME_DB` 指定路径。目录查询以只读方式打开数据库。
 
 旧清语表情的 `meme.yaml` 和 `access.yaml` 可复制到主仓 `data/meme/config/`，也可通过 `LOTUS_MEME_CONFIG_DIR` 指定目录。目录指令读取模块开关、用户白名单或黑名单，以及按编号或关键词设置的禁用表情。启用用户名单后，目录指令需要来自能提供用户编号的会话。
 

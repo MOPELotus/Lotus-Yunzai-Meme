@@ -33,7 +33,7 @@ function list(value: unknown): string[] {
   }).filter(Boolean);
 }
 
-export function catalogPolicy(userId: number | undefined) {
+export function catalogPolicy(userId: number | undefined, forGeneration = false) {
   const directory = Bun.env.LOTUS_MEME_CONFIG_DIR;
   if (directory !== undefined && !statSync(directory).isDirectory()) throw new Error("无效的表情配置目录");
 
@@ -48,5 +48,5 @@ export function catalogPolicy(userId: number | undefined) {
     allowed = userId !== undefined && users.includes(String(userId)) === (mode === 0);
   }
   const hidden = flag(access.blackListEnable, false) ? list(access.blackList) : [];
-  return { enabled, allowed, hidden };
+  return { enabled, allowed, hidden, forceSharp: forGeneration && flag(meme.forceSharp, false) };
 }
