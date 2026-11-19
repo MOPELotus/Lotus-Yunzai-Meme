@@ -91,11 +91,32 @@ async function fetchAvatar(user: string): Promise<Blob | undefined> {
   }
 }
 
-function imagesIn(segments: readonly InboundSegment[]): Blob[] | undefined {
+function qqImageUrl(value: unknown): URL | undefined {
+  if (typeof value !== "string" || value.length > 4096 || /[\\\s]/u.test(value)) return;
+  const url = URL.parse(value);
+  if (!url || url.protocol !== "https:" || url.username || url.password || url.port || url.hash) return;
+  const { hostname, pathname } = url;
+  if ((hostname === "multimedia.nt.qq.com.cn" && pathname === "/download") ||
+      (hostname === "gchat.qpic.cn" && (pathname === "/download" || pathname.startsWith("/gchatpic_new/"))) ||
+      (hostname === "c2cpicdw.qpic.cn" && pathname.startsWith("/offpic_new/"))) return url;
+}
+
+async function downloadImage(part: InboundSegment, signal: AbortSignal): Promise<Blob | undefined> {
+  const inline = embeddedImage(part);
+  if (inline) return inline;
+  const direct = qqImageUrl(part.url) ?? qqImageUrl(part.file);
+  const url = direct ?? (typeof part.getDownloadUrl === "function" && !signal.aborted
+    ? qqImageUrl(await part.getDownloadUrl()) : undefined);
+  if (!url || signal.aborted) return;
+  const bytes = await readResult(await fetch(url, { redirect: "error", signal }));
+  if (bytes) return new Blob([bytes], { type: imageMime(bytes) });
+}
+
+async function imagesIn(segments: readonly InboundSegment[], signal: AbortSignal): Promise<Blob[] | undefined> {
   const images: Blob[] = [];
   for (const part of segments) {
     if (part.type !== "image") continue;
-    const image = embeddedImage(part);
+    const image = await downloadImage(part, signal).catch(() => undefined);
     if (!image) return;
     images.push(image);
   }
@@ -114,17 +135,18 @@ export async function generateMemeReply(
   try {
     const settings = generationSettings();
     errorReply = settings.errorReply;
+    const mediaBudget = AbortSignal.timeout(8_000);
     let quoted: GenerationInput["quoted"];
     if (settings.quotedImages && context.reply_id !== undefined) {
       const source = await context.lookupReply?.();
       if (!source) return errorReply ? "当前无法读取引用消息中的表情素材。" : undefined;
-      const images = imagesIn(source.message);
+      const images = await imagesIn(source.message, mediaBudget);
       if (!images) return errorReply ? "当前无法读取引用消息中的表情图片。" : undefined;
       quoted = { userId: source.user_id, images };
     }
 
     const segments: readonly InboundSegment[] = Array.isArray(context.message) ? context.message : [];
-    const images = settings.imagesInMessage ? imagesIn(segments) : [];
+    const images = settings.imagesInMessage ? await imagesIn(segments, mediaBudget) : [];
     if (!images) return errorReply ? "当前无法读取该表情图片素材。" : undefined;
     const mentions = segments.flatMap((part) =>
       part.type === "at" && (typeof part.qq === "number" || typeof part.qq === "string") ? [part.qq] : []);

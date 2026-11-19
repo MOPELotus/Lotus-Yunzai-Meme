@@ -4,6 +4,7 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import module, { prepareMemeRequest, resolveMemeTrigger } from "../lotus.ts";
+import { generationServer } from "../catalog-policy.ts";
 
 test("从旧 meme 表分页并查询详情，数据库保持不变", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-catalog-"));
@@ -144,6 +145,10 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
       },
     });
     Bun.env.LOTUS_MEME_SERVER_URL = new URL("/fixture/", fixture.url).href;
+    const configuredFixture = Bun.env.LOTUS_MEME_SERVER_URL;
+    Bun.env.LOTUS_MEME_SERVER_URL = "http://meme:2233/internal/";
+    expect(generationServer()?.base.href).toBe("http://meme:2233/internal/");
+    Bun.env.LOTUS_MEME_SERVER_URL = configuredFixture;
     const fallbackContext = {
       message_type: "group" as const,
       user_id: 10003, isMaster: false, isBotMaster: () => false,
@@ -188,10 +193,19 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     expect(await sentImages()).toEqual([tagged(42), sourceBytes]);
 
     const fetchedAvatars: string[] = [];
+    const fetchedImages: string[] = [];
+    const signedImage = "https://multimedia.nt.qq.com.cn/download?appid=1406&fileid=ab%2Fcd&rkey=ef%2Bgh";
+    const oldPrivateImage = "https://c2cpicdw.qpic.cn/offpic_new/10004/clip/0";
     const realFetch = globalThis.fetch.bind(globalThis);
     const mockFetch = async (...[request, options]: Parameters<typeof fetch>) => {
       const url = new URL(request instanceof Request ? request.url : request.toString());
       if (url.origin === fixture?.url.origin) return realFetch(request, options);
+      if (url.href === signedImage || url.href === oldPrivateImage) {
+        fetchedImages.push(url.href);
+        expect(options?.redirect).toBe("error");
+        expect(options?.signal).toBeInstanceOf(AbortSignal);
+        return new Response(tagged(url.href === signedImage ? 45 : 46));
+      }
       if (url.origin !== "https://q1.qlogo.cn" || url.pathname !== "/g") {
         throw new Error("不应访问外部地址");
       }
@@ -214,6 +228,29 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
       expect(await module.fallback("#别名13 前 / 后", textOnly)).toEqual(reply);
       expect(fetchedAvatars).toEqual(["10004", "10003"]);
       expect(await sentImages()).toEqual([tagged(43)]);
+
+      expect(await module.fallback("#别名13 前 / 后", {
+        ...withQuotedImage,
+        lookupReply: async () => ({ user_id: 10004, message: [
+          { type: "image", file: "message.png", url: signedImage },
+        ] }),
+        message: [{ type: "image", resource_id: "from-milky", getDownloadUrl: async () => oldPrivateImage }],
+      })).toEqual(reply);
+      expect(fetchedImages).toEqual([signedImage, oldPrivateImage]);
+      expect(await sentImages()).toEqual([tagged(45), tagged(46)]);
+      for (const url of [
+        "http://multimedia.nt.qq.com.cn/download",
+        "https://multimedia.nt.qq.com.cn:8443/download",
+        "https://multimedia.nt.qq.com.cn.example.invalid/download",
+        "https://gchat.qpic.cn/other/path",
+        "https://name@gchat.qpic.cn/download",
+        "file:///tmp/image.png",
+      ]) {
+        expect(await module.fallback("#别名13 前 / 后", {
+          ...fallbackContext, message: [{ type: "image", url }],
+        })).toContain("无法读取");
+      }
+      expect(fetchedImages).toEqual([signedImage, oldPrivateImage]);
     } finally {
       intercept.mockRestore();
     }
