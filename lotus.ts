@@ -1,7 +1,8 @@
 import { Database } from "bun:sqlite";
 import { fileURLToPath } from "node:url";
-import { catalogPolicy } from "./catalog-policy.ts";
+import { catalogPolicy, generationServer } from "./catalog-policy.ts";
 import { buildGenerationBody, type GenerationInput } from "./generation.ts";
+import { generateMemeReply, type FallbackContext } from "./generate-reply.ts";
 
 const pageSize = 12;
 const defaultPath = fileURLToPath(new URL("../../data/meme/data.db", import.meta.url));
@@ -178,6 +179,17 @@ function details(key: string, context?: CatalogContext): string {
 }
 
 export default {
+  async fallback(message: string, context: FallbackContext) {
+    if (context.user_id === undefined || context.message_type === "terminal") return;
+    let server: ReturnType<typeof generationServer>;
+    try {
+      server = generationServer();
+    } catch {
+      return;
+    }
+    if (!server || typeof resolveMemeTrigger(message, context) !== "object") return;
+    return generateMemeReply(context, (input) => prepareMemeRequest(message, input), server);
+  },
   commands: {
     "#表情列表": list,
     "#表情详情": details,

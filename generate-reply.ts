@@ -1,0 +1,137 @@
+import { generationServer, generationSettings } from "./catalog-policy.ts";
+import type { GenerationInput } from "./generation.ts";
+
+type InboundSegment = Readonly<Record<string, unknown>> & { readonly type: string };
+type Image = { readonly type: "image"; readonly file: Uint8Array };
+type PreparedRequest = { readonly key: string; readonly body: FormData; readonly quote: boolean };
+
+export interface FallbackContext {
+  readonly message_type: "terminal" | "group" | "private";
+  readonly user_id?: number;
+  readonly isMaster: boolean;
+  readonly isBotMaster: (userId: number) => boolean;
+  readonly message?: string | readonly InboundSegment[];
+  readonly reply_id?: number | string;
+  readonly sender?: Readonly<Record<string, unknown>>;
+}
+
+const maxImageBytes = 8 * 1024 * 1024;
+
+function imageMime(bytes: Uint8Array): string | undefined {
+  const startsWith = (...prefix: number[]) => prefix.every((byte, index) => bytes[index] === byte);
+  if (bytes.length >= 8 && startsWith(137, 80, 78, 71, 13, 10, 26, 10)) return "image/png";
+  if (bytes.length >= 3 && startsWith(255, 216, 255)) return "image/jpeg";
+  if (bytes.length >= 6 && startsWith(71, 73, 70, 56) &&
+      (bytes[4] === 55 || bytes[4] === 57) && bytes[5] === 97) return "image/gif";
+  if (bytes.length >= 12 && startsWith(82, 73, 70, 70) &&
+      bytes[8] === 87 && bytes[9] === 69 && bytes[10] === 66 && bytes[11] === 80) return "image/webp";
+}
+
+function embeddedImage(segment: InboundSegment): Blob | undefined {
+  const value = segment.file ?? segment.url;
+  let bytes: Uint8Array<ArrayBuffer>;
+  if (value instanceof Uint8Array && value.byteLength <= maxImageBytes) {
+    bytes = new Uint8Array(value);
+  } else if (typeof value === "string") {
+    const match = /^(?:base64:\/\/|data:image\/(?:png|jpeg|gif|webp);base64,)([A-Za-z0-9+/]+={0,2})$/u.exec(value);
+    const encoded = match?.[1];
+    if (!encoded || encoded.length > Math.ceil(maxImageBytes / 3) * 4 ||
+        encoded.length % 4 !== 0) return;
+    bytes = Uint8Array.fromBase64(encoded);
+  } else return;
+  const type = imageMime(bytes);
+  if (type && bytes.byteLength <= maxImageBytes) return new Blob([bytes], { type });
+}
+
+async function readResult(response: Response): Promise<Uint8Array | undefined> {
+  if (!response.ok || !response.body || Number(response.headers.get("content-length")) > maxImageBytes) {
+    await response.body?.cancel();
+    return;
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let length = 0;
+  try {
+    for (;;) {
+      const chunk = await reader.read();
+      if (chunk.done) break;
+      if (length + chunk.value.byteLength > maxImageBytes) {
+        await reader.cancel();
+        return;
+      }
+      chunks.push(chunk.value);
+      length += chunk.value.byteLength;
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const image = new Uint8Array(length);
+  let offset = 0;
+  for (const chunk of chunks) {
+    image.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  if (imageMime(image)) return image;
+}
+
+export async function generateMemeReply(
+  context: FallbackContext,
+  prepare: (input: GenerationInput) => Promise<PreparedRequest | string | undefined>,
+  server: NonNullable<ReturnType<typeof generationServer>>,
+): Promise<Image | { type: "quoted"; message: Image } | string | undefined> {
+  const userId = context.user_id;
+  if (userId === undefined) return;
+
+  let errorReply = true;
+  try {
+    const settings = generationSettings();
+    errorReply = settings.errorReply;
+    if (settings.quotedImages && context.reply_id !== undefined) {
+      return errorReply ? "当前无法读取引用消息中的表情素材。" : undefined;
+    }
+    const images: Blob[] = [];
+    const mentions: (string | number)[] = [];
+    const segments: readonly InboundSegment[] = Array.isArray(context.message) ? context.message : [];
+    for (const part of segments) {
+      if (part.type === "at" && (typeof part.qq === "number" || typeof part.qq === "string")) {
+        mentions.push(part.qq);
+      } else if (part.type === "image" && settings.imagesInMessage) {
+        const image = embeddedImage(part);
+        if (!image) return errorReply ? "当前无法读取该表情图片素材。" : undefined;
+        images.push(image);
+      }
+    }
+    const prepared = await prepare({
+      user_id: userId,
+      isMaster: context.isMaster,
+      mentions,
+      images,
+      isTargetMaster: (id) => Number.isSafeInteger(Number(id)) && context.isBotMaster(Number(id)),
+      nickname: async (id) => {
+        if (id !== String(userId)) return;
+        const name = context.sender?.card || context.sender?.nickname;
+        return typeof name === "string" ? name : undefined;
+      },
+    });
+    if (!prepared || typeof prepared === "string") return errorReply ? prepared : undefined;
+
+    if (prepared.key === "." || prepared.key === "..") return;
+    const endpoint = new URL(server.base);
+    endpoint.pathname = `${endpoint.pathname.replace(/\/+$/u, "")}/memes/${encodeURIComponent(prepared.key)}/`;
+    const result = await fetch(endpoint, {
+      method: "POST",
+      body: prepared.body,
+      redirect: "error",
+      signal: AbortSignal.timeout(server.timeout),
+    });
+    const bytes = await readResult(result);
+    if (bytes) {
+      const message: Image = { type: "image", file: bytes };
+      return prepared.quote ? { type: "quoted", message } : message;
+    }
+  } catch {
+    // Backend and media errors can contain connection details. Keep the reply local.
+  }
+  return errorReply ? "表情生成失败，请稍后再试。" : undefined;
+}

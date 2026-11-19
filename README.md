@@ -16,6 +16,8 @@
 
 旧清语表情的 `meme.yaml` 和 `access.yaml` 可复制到主仓 `data/meme/config/`，也可通过 `LOTUS_MEME_CONFIG_DIR` 指定目录。目录指令读取模块开关、用户白名单或黑名单，以及按编号或关键词设置的禁用表情。启用用户名单后，目录指令需要来自能提供用户编号的会话。
 
+旧关键词触发可使用迁移目录下的 `server.yaml` 或 `LOTUS_MEME_SERVER_URL` 配置生成服务。当前可提交普通文字和消息中内嵌的图片数据，引用素材及需要下载的头像和图片还需适配器提供。
+
 本仓由 ClarityJS 的清语表情衍生，保留 GPL-3.0 许可及原有历史。Lotus-Yunzai 入口只使用 Bun 自带的 SQLite。
 
 `package.legacy.json` 保留上游发布版的依赖和模块别名，供旧云崽的 `index.js` 使用。Sequelize 和 sqlite3 用于旧数据库操作，Axios 和 Markdown 相关包供旧插件功能使用，ESLint 用于旧代码检查。在独立的旧云崽部署副本中使用本仓时，先运行 `cp package.legacy.json package.json`，再按下方上游说明安装依赖。

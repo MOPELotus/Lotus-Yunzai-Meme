@@ -10,6 +10,8 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
   const filename = join(directory, "data.db");
   const previousPath = Bun.env.LOTUS_MEME_DB;
   const previousConfiguration = Bun.env.LOTUS_MEME_CONFIG_DIR;
+  const previousServer = Bun.env.LOTUS_MEME_SERVER_URL;
+  let fixture: ReturnType<typeof Bun.serve> | undefined;
   try {
     const db = new Database(filename);
     db.run(`CREATE TABLE meme (
@@ -80,6 +82,50 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
       "10003", "10002",
     ]);
 
+    const png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1sAAAAASUVORK5CYII=";
+    let received: FormData | undefined;
+    let count = 0;
+    let redirected = false;
+    let redirectDestination = false;
+    fixture = Bun.serve({
+      hostname: "127.0.0.1", port: 0,
+      async fetch(request) {
+        const url = new URL(request.url);
+        if (url.pathname === "/elsewhere") {
+          redirectDestination = true;
+          return new Response();
+        }
+        expect(request.method).toBe("POST");
+        expect(url.pathname).toBe("/fixture/memes/meme-13/");
+        received = await request.formData();
+        count++;
+        if (redirected) return new Response(null, { status: 307, headers: { Location: "/elsewhere" } });
+        return new Response(Uint8Array.fromBase64(png), { headers: { "content-type": "image/png" } });
+      },
+    });
+    Bun.env.LOTUS_MEME_SERVER_URL = new URL("/fixture/", fixture.url).href;
+    const fallbackContext = {
+      message_type: "group" as const,
+      user_id: 10003, isMaster: false, isBotMaster: () => false,
+      message: [{ type: "image", file: `base64://${png}` }],
+    };
+    expect(await module.fallback("别名13 前 / 后", fallbackContext)).toBeUndefined();
+    expect(await module.fallback("#别名13 前 / 后", {
+      ...fallbackContext, message: [{ type: "image", url: new URL("/elsewhere", fixture.url).href }],
+    })).toContain("无法读取");
+    expect(await module.fallback("#别名13 前 / 后", { ...fallbackContext, reply_id: 42 })).toContain("引用消息");
+    expect(count).toBe(0);
+    expect(redirectDestination).toBe(false);
+    const reply = await module.fallback("#别名13 前 / 后", fallbackContext);
+    expect(reply).toEqual({ type: "quoted", message: { type: "image", file: Uint8Array.fromBase64(png) } });
+    expect(received?.getAll("texts")).toEqual(["前", "后"]);
+    expect(await (received?.get("images") as Blob).bytes()).toEqual(Uint8Array.fromBase64(png));
+    expect(count).toBe(1);
+
+    redirected = true;
+    expect(await module.fallback("#别名13 前 / 后", fallbackContext)).toContain("表情生成失败");
+    expect(redirectDestination).toBe(false);
+
     const accessConfig = join(directory, "access.yaml");
     const whitelist = `enable: true
 mode: 0
@@ -111,6 +157,9 @@ blackList: ["meme-01", "别名13"]
     expect(module.commands["#表情详情"]("meme-02", { user_id: 10002 })).toContain("无法读取表情配置");
     expect(await readFile(filename)).toEqual(before);
   } finally {
+    await fixture?.stop(true);
+    if (previousServer === undefined) delete Bun.env.LOTUS_MEME_SERVER_URL;
+    else Bun.env.LOTUS_MEME_SERVER_URL = previousServer;
     if (previousPath === undefined) delete Bun.env.LOTUS_MEME_DB;
     else Bun.env.LOTUS_MEME_DB = previousPath;
     if (previousConfiguration === undefined) delete Bun.env.LOTUS_MEME_CONFIG_DIR;

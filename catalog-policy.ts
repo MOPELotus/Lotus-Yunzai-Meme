@@ -70,8 +70,26 @@ export function generationSettings() {
     quotedImages: flag(meme.quotedImages, true),
     useNickname: flag(meme.userName, false),
     quote: flag(meme.reply, false),
+    errorReply: flag(meme.errorReply, true),
     master,
     protectedUsers: users ? list(userList) : [],
     protectedTemplates: protection ? list(protect.list) : [],
   };
+}
+
+
+export function generationServer() {
+  const settings = readConfig(configDirectory(), "server.yaml");
+  const value = Bun.env.LOTUS_MEME_SERVER_URL ?? settings.url;
+  if (value === undefined || value === null || value === "") return;
+  if (typeof value !== "string") throw new Error("无效的表情服务地址");
+  const base = new URL(value);
+  const local = ["127.0.0.1", "[::1]", "localhost"].includes(base.hostname);
+  if ((base.protocol !== "https:" && !(local && base.protocol === "http:")) ||
+      base.username || base.password || base.search || base.hash) throw new Error("无效的表情服务地址");
+  const timeout = settings.timeout ?? 5;
+  if (typeof timeout !== "number" || !Number.isFinite(timeout) || timeout <= 0 || timeout > 120) {
+    throw new Error("无效的表情服务请求超时");
+  }
+  return { base, timeout: Math.ceil(timeout * 1_000) };
 }
