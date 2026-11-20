@@ -8,7 +8,7 @@
     "entry": "./lotus.ts"
   },
   "dependencies": {
-    "skia-canvas": "3.0.8",
+    "skia-canvas": "4.0.1",
     "yaml": "2.9.1"
   }
 }
