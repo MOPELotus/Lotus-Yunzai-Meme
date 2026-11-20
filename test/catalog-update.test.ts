@@ -13,15 +13,21 @@ test("旧资源更新命令按事务同步目录和预设", async () => {
   let keys = ["ba_say", "removed"];
   let fail = false;
   let word = "旧素材";
+  let gate: { readonly started: ReturnType<typeof Promise.withResolvers<void>>;
+    readonly release: ReturnType<typeof Promise.withResolvers<void>> } | undefined;
   const fixture = Bun.serve({
     hostname: "127.0.0.1", port: 0,
-    fetch(request) {
+    async fetch(request) {
       const path = new URL(request.url).pathname;
       requests.push(path);
       if (path === "/fixture/memes/keys") return Response.json(keys);
       const match = /^\/fixture\/memes\/([^/]+)\/info$/u.exec(path);
       const key = match?.[1];
       if (!key || !keys.includes(key) || fail && key === "new") return new Response(null, { status: 503 });
+      if (gate && key === "new") {
+        gate.started.resolve();
+        await gate.release.promise;
+      }
       return Response.json({
         key, keywords: [key === "ba_say" ? word : key], tags: [],
         params_type: {
@@ -65,6 +71,15 @@ test("旧资源更新命令按事务同步目录和预设", async () => {
     expect(await readFile(filename)).toEqual(beforeFailure);
 
     fail = false;
+    gate = { started: Promise.withResolvers<void>(), release: Promise.withResolvers<void>() };
+    const pending = update();
+    await gate.started.promise;
+    Bun.env.LOTUS_MEME_SERVER_URL = new URL("/new-provider/", fixture.url).href;
+    gate.release.resolve();
+    expect(await pending).toContain("更新失败");
+    expect(await readFile(filename)).toEqual(beforeFailure);
+    Bun.env.LOTUS_MEME_SERVER_URL = new URL("/fixture/", fixture.url).href;
+    gate = undefined;
     word = "新素材";
     requests.length = 0;
     expect(await update(false, "表情")).toContain("更新 1 项，移除 1 项");

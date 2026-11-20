@@ -92,3 +92,15 @@ export function generationServer() {
   }
   return { base, timeout: Math.ceil(timeout * 1_000) };
 }
+
+export function catalogRefreshSchedule(): string | undefined {
+  const settings = readConfig(configDirectory(), "other.yaml");
+  if (!flag(settings.autoUpdateRes, true)) return;
+  const cron = settings.autoUpdateResCron ?? "0 0 2 * * ?";
+  if (typeof cron !== "string") throw new Error("无效的表情目录更新时间");
+  const fields = cron.trim().split(/\s+/u);
+  if (fields.length === 5) fields.unshift("0");
+  if (fields.length !== 6) throw new Error("无效的表情目录更新时间");
+  for (const index of [3, 5]) if (fields[index] === "?") fields[index] = "*";
+  return fields.join(" ");
+}

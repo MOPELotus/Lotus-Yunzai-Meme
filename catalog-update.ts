@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import { existsSync, mkdirSync } from "node:fs";
+import { existsSync, linkSync, mkdirSync, rmSync } from "node:fs";
 import { dirname } from "node:path";
 import { catalogPath, catalogVersion } from "./catalog-file.ts";
 import { generationServer } from "./catalog-policy.ts";
@@ -22,19 +22,21 @@ const createTables = `
   );`;
 
 type Server = NonNullable<ReturnType<typeof generationServer>>;
+type Presets = typeof import("./models/Meme/preset.js").preset;
 
 function record(value: unknown): Record<string, unknown> {
   if (typeof value !== "object" || value === null || Array.isArray(value)) throw new Error();
   return value as Record<string, unknown>;
 }
 
-async function fetchJSON(server: Server, route: string): Promise<unknown> {
+async function fetchJSON(server: Server, route: string, signal?: AbortSignal): Promise<unknown> {
   const url = new URL(server.base);
   url.pathname = `${url.pathname.replace(/\/+$/u, "")}/memes/${route}`;
+  const timeout = AbortSignal.timeout(server.timeout);
   const response = await fetch(url, {
     redirect: "error",
     headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(server.timeout),
+    signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
   });
   if (!response.ok || !response.body || Number(response.headers.get("content-length")) > maxResponseBytes) {
     await response.body?.cancel();
@@ -84,19 +86,73 @@ function dataVersion(db: Database): number {
   return db.query<{ data_version: number }, []>("PRAGMA data_version").get()!.data_version;
 }
 
-async function updateCatalog(force: boolean): Promise<string> {
+function hasTable(db: Database, name: string) {
+  return db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = ?").get(name) !== null;
+}
+
+function catalogKeys(db: Database) {
+  return new Set(hasTable(db, "meme") ? db.query<{ key: string }, []>("SELECT key FROM meme").all().map(({ key }) => key) : []);
+}
+
+function addPresets(db: Database, keys: ReadonlySet<string>, presets: Presets, now: string) {
+  const insert = db.query(`INSERT INTO preset(name,key,arg_name,arg_value,createdAt,updatedAt)
+    VALUES (?,?,?,?,?,?) ON CONFLICT(name) DO NOTHING`);
+  let count = 0;
+  for (const item of presets) {
+    if (keys.has(item.key)) {
+      count += insert.run(JSON.stringify(item.name), item.key, item.arg_name, String(item.arg_value), now, now).changes;
+    }
+  }
+  return count;
+}
+
+async function initializeCatalog(signal: AbortSignal): Promise<string | undefined> {
+  signal.throwIfAborted();
+  const file = catalogPath();
+  if (existsSync(file)) {
+    const current = new Database(file, { readonly: true, strict: true });
+    let empty: boolean;
+    try {
+      empty = !hasTable(current, "meme") || !current.query("SELECT 1 FROM meme LIMIT 1").get();
+      if (!empty && hasTable(current, "preset") && current.query("SELECT 1 FROM preset LIMIT 1").get()) return;
+    } finally {
+      current.close();
+    }
+    if (!empty) {
+      const { preset } = await import("./models/Meme/preset.js");
+      signal.throwIfAborted();
+      if (file !== catalogPath()) return;
+      const db = new Database(file, { strict: true, create: false });
+      try {
+        db.transaction(() => {
+          // A manual or rolled-back process may have already restored presets.
+          if (hasTable(db, "preset") && db.query("SELECT 1 FROM preset LIMIT 1").get()) return;
+          db.exec(createTables);
+          addPresets(db, catalogKeys(db), preset, new Date().toISOString());
+        }).immediate();
+      } finally {
+        db.close();
+      }
+      return;
+    }
+  }
+  if (generationServer()) return updateCatalog(true, signal);
+}
+
+async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<string> {
+  signal?.throwIfAborted();
   const server = generationServer();
   if (!server) return "请先配置表情合成服务。";
 
   const file = catalogPath();
   let db: Database | undefined;
+  let stagedFile: string | undefined;
   try {
-    if (existsSync(file)) db = new Database(file, { strict: true });
+    if (existsSync(file)) db = new Database(file, { strict: true, create: false });
     const initial = db && dataVersion(db);
-    const table = db?.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'meme'").get();
-    const kept = new Set(table ? db!.query<{ key: string }, []>("SELECT key FROM meme").all().map(({ key }) => key) : []);
+    const kept = db ? catalogKeys(db) : new Set<string>();
     const version = catalogVersion(file);
-    const result = await fetchJSON(server, "keys");
+    const result = await fetchJSON(server, "keys", signal);
     if (!Array.isArray(result) || !result.length || result.some((key) => !safeKey(key))) throw new Error();
     const remote = new Set<string>(result);
     const required = [...remote].filter((key) => force || !kept.has(key));
@@ -104,16 +160,21 @@ async function updateCatalog(force: boolean): Promise<string> {
     const entries: ReturnType<typeof entryFor>[] = [];
     for (let start = 0; start < required.length; start += batchSize) {
       const pending = required.slice(start, start + batchSize).map(async (key) =>
-        entryFor(key, await fetchJSON(server, `${encodeURIComponent(key)}/info`)));
+        entryFor(key, await fetchJSON(server, `${encodeURIComponent(key)}/info`, signal)));
       const batch = await Promise.allSettled(pending);
       if (batch.some((entry) => entry.status === "rejected")) throw new Error();
       for (const entry of batch) if (entry.status === "fulfilled") entries.push(entry.value);
     }
     const { preset } = await import("./models/Meme/preset.js");
-    if (file !== catalogPath() || version !== catalogVersion(file)) throw new Error();
+    signal?.throwIfAborted();
+    if (file !== catalogPath() || version !== catalogVersion(file) || generationServer()?.base.href !== server.base.href) throw new Error();
 
     mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
-    const target = db ??= new Database(file, { create: true, strict: true });
+    if (!db) {
+      stagedFile = `${file}.${crypto.randomUUID()}.tmp`;
+      db = new Database(stagedFile, { create: true, strict: true });
+    }
+    const target = db;
     const now = new Date().toISOString();
     const added = target.transaction(() => {
       if (initial !== undefined && dataVersion(target) !== initial) throw new Error();
@@ -130,31 +191,41 @@ async function updateCatalog(force: boolean): Promise<string> {
       const drop = target.query("DELETE FROM meme WHERE key = ?");
       for (const key of removed) drop.run(key);
 
-      const addPreset = target.query(`INSERT INTO preset(name,key,arg_name,arg_value,createdAt,updatedAt)
-        VALUES (?,?,?,?,?,?) ON CONFLICT(name) DO NOTHING`);
-      let count = 0;
-      for (const item of preset) {
-        if (remote.has(item.key)) {
-          count += addPreset.run(JSON.stringify(item.name), item.key, item.arg_name, String(item.arg_value), now, now).changes;
-        }
-      }
-      return count;
+      return addPresets(target, remote, preset, now);
     }).immediate();
+    if (stagedFile) {
+      target.close();
+      db = undefined;
+      linkSync(stagedFile, file);
+    }
     return `表情包数据更新完成，更新 ${entries.length} 项，移除 ${removed.length} 项，补齐预设 ${added} 项。`;
   } finally {
     db?.close();
+    if (stagedFile) rmSync(stagedFile, { force: true });
   }
 }
 
-let updating = false;
+let refreshing: Promise<string | undefined> | undefined;
 
-export function handleCatalogUpdate(message: string, context: SettingsContext): Promise<string> | string | undefined {
+function runRefresh<T extends string | undefined>(run: () => Promise<T>): Promise<T> {
+  const pending = run().finally(() => { refreshing = undefined; });
+  refreshing = pending;
+  return pending;
+}
+
+export function runAutomaticCatalogRefresh(signal: AbortSignal, startup = false) {
+  if (refreshing) return refreshing.then(() => undefined, () => undefined);
+  return runRefresh(async () => {
+    if (startup) return initializeCatalog(signal);
+    if (generationServer()) return updateCatalog(false, signal);
+  });
+}
+
+export function handleCatalogUpdate(message: string, context: SettingsContext, signal?: AbortSignal): Promise<string> | string | undefined {
   const match = command.exec(message.trim());
   if (!match) return;
   if (!isMemeOwner(context)) return "只有主人才能更新表情包数据";
-  if (updating) return "表情包数据更新中。";
-  updating = true;
-  return updateCatalog(match[1] !== undefined)
-    .catch(() => "表情包数据更新失败，旧目录仍可使用。")
-    .finally(() => { updating = false; });
+  if (refreshing) return "表情包数据更新中。";
+  return runRefresh(() => updateCatalog(match[1] !== undefined, signal))
+    .catch(() => "表情包数据更新失败，旧目录仍可使用。");
 }

@@ -7,6 +7,7 @@ import { generateMemeReply, type FallbackContext } from "./generate-reply.ts";
 
 import { handleMemeSettings } from "./settings.ts";
 import { handleCatalogUpdate } from "./catalog-update.ts";
+import { startCatalogRuntime, type MemeRuntime } from "./catalog-runtime.ts";
 
 export { createProfileLikeImageRenderer } from "./profile-like-image.ts";
 
@@ -244,35 +245,51 @@ function details(key: string, context?: CatalogContext): string {
   });
 }
 
-export default {
-  async fallback(message: string, context: FallbackContext) {
-    const setting = handleMemeSettings(message, context);
-    if (setting !== undefined) return setting;
-    const update = handleCatalogUpdate(message, context);
-    if (update !== undefined) return update;
-    if (context.user_id === undefined || context.message_type === "terminal") return;
-    let server: ReturnType<typeof generationServer>;
-    try {
-      server = generationServer();
-    } catch {
-      return;
-    }
-    if (!server) return;
-    const match = resolveTrigger(message, context, true);
-    if (!match || typeof match === "string") return;
-    return generateMemeReply(context, async (input) => {
-      // Media lookup can yield while the local catalog or configuration changes.
-      if (match.version !== catalogVersion()) return prepareMemeRequest(message, input);
-      const policy = currentPolicy(input.user_id, true);
-      if (typeof policy === "string") return policy;
-      if (policy.forceSharp && !message.trimStart().startsWith("#")) return;
-      const names = [match.row.key, match.keyword, ...keywords(match.row.keyWords)];
-      if (names.some((name) => policy.hidden.includes(name))) return;
-      return prepareResolvedRequest(match, input);
-    }, server);
-  },
-  commands: {
-    "#表情列表": list,
-    "#表情详情": details,
-  },
-};
+function createMemeCommands(signal?: AbortSignal) {
+  return {
+    fallback: (message: string, context: FallbackContext) => memeFallback(message, context, signal),
+    commands: { "#表情列表": list, "#表情详情": details },
+  };
+}
+
+async function memeFallback(message: string, context: FallbackContext, signal?: AbortSignal) {
+  const setting = handleMemeSettings(message, context);
+  if (setting !== undefined) return setting;
+  const update = handleCatalogUpdate(message, context, signal);
+  if (update !== undefined) return update;
+  if (context.user_id === undefined || context.message_type === "terminal") return;
+  let server: ReturnType<typeof generationServer>;
+  try {
+    server = generationServer();
+  } catch {
+    return;
+  }
+  if (!server) return;
+  const match = resolveTrigger(message, context, true);
+  if (!match || typeof match === "string") return;
+  return generateMemeReply(context, async (input) => {
+    // Media lookup can yield while the local catalog or configuration changes.
+    if (match.version !== catalogVersion()) return prepareMemeRequest(message, input);
+    const policy = currentPolicy(input.user_id, true);
+    if (typeof policy === "string") return policy;
+    if (policy.forceSharp && !message.trimStart().startsWith("#")) return;
+    const names = [match.row.key, match.keyword, ...keywords(match.row.keyWords)];
+    if (names.some((name) => policy.hidden.includes(name))) return;
+    return prepareResolvedRequest(match, input);
+  }, server);
+}
+
+export default createMemeCommands();
+
+export function createModule({ signal, memeRuntime }: { readonly signal: AbortSignal; readonly memeRuntime?: MemeRuntime }) {
+  const lifecycle = new AbortController();
+  const active = AbortSignal.any([signal, lifecycle.signal]);
+  const stop = memeRuntime && startCatalogRuntime(memeRuntime, active);
+  return {
+    ...createMemeCommands(active),
+    async dispose() {
+      lifecycle.abort();
+      await stop?.();
+    },
+  };
+}
