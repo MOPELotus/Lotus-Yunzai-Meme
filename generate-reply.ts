@@ -1,5 +1,7 @@
+import { catalogPath } from "./catalog-file.ts";
 import { generationServer, generationSettings } from "./catalog-policy.ts";
 import type { GenerationInput } from "./generation.ts";
+import { recordMemeUsage } from "./usage.ts";
 
 type InboundSegment = Readonly<Record<string, unknown>> & { readonly type: string };
 type Image = { readonly type: "image"; readonly file: Uint8Array };
@@ -190,6 +192,7 @@ export async function generateMemeReply(
     if (!prepared || typeof prepared === "string") return errorReply ? prepared : undefined;
 
     if (prepared.key === "." || prepared.key === "..") return;
+    const catalog = catalogPath();
     const endpoint = new URL(server.base);
     endpoint.pathname = `${endpoint.pathname.replace(/\/+$/u, "")}/memes/${encodeURIComponent(prepared.key)}/`;
     const result = await fetch(endpoint, {
@@ -200,6 +203,11 @@ export async function generateMemeReply(
     });
     const bytes = await readResult(result);
     if (bytes) {
+      try {
+        recordMemeUsage(prepared.key, catalog);
+      } catch {
+        console.warn("[meme] 无法记录表情调用次数。");
+      }
       const image: Image = { type: "image", file: bytes };
       const message: GenerationMessage = prepared.summary ? [prepared.summary, image] : image;
       return prepared.quote ? { type: "quoted", message } : message;

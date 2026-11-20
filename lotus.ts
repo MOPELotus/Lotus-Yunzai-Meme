@@ -8,12 +8,14 @@ import { generateMemeReply, type FallbackContext } from "./generate-reply.ts";
 import { handleMemeSettings } from "./settings.ts";
 import { handleCatalogUpdate } from "./catalog-update.ts";
 import { startCatalogRuntime, type MemeRuntime } from "./catalog-runtime.ts";
+import { readMemeUsage } from "./usage.ts";
 
 export { createProfileLikeImageRenderer } from "./profile-like-image.ts";
 
 const pageSize = 12;
 const catalogSearch = /^#?(?:表情(?:合成)?|meme)搜索([^\r\n]*)$/iu;
 const randomMemeCommand = /^#?(?:表情|meme)?随机(?:表情|meme)包?$/iu;
+const usageCommand = /^#?(?:表情|meme)(?:调用)?统计$/iu;
 
 // A legacy disable entry may be a stored key or one of its keywords.
 const visibleCatalog = `FROM meme
@@ -295,16 +297,50 @@ async function prepareRandomMeme(message: string, input: GenerationInput) {
   };
 }
 
+async function usageReport(context: CatalogContext) {
+  const report = queryCatalog(context.user_id, (db, hidden) => {
+    const counts = readMemeUsage(db);
+    if (counts.size === 0) return;
+    const total = [...counts.values()].reduce((sum, count) => sum + count, 0);
+    const rows = db.query<CatalogRow, [string]>(`SELECT key, keyWords ${visibleCatalog} ORDER BY key`).all(hidden)
+      .flatMap(({ key, keyWords }) => {
+        const aliases = keywords(keyWords);
+        const count = counts.get(key);
+        return count === undefined || aliases.length === 0 ? [] : [{ keywords: aliases.join(", "), count }];
+      }).sort((left, right) => right.count - left.count);
+    return { total, rows };
+  });
+  if (typeof report === "string") return report;
+  if (!report) return "当前没有统计数据";
+  try {
+    const { renderUsageCard } = await import("./usage-card.ts");
+    const images: { type: "image"; file: Uint8Array }[] = [];
+    const perCard = 100;
+    for (let offset = 0; offset < Math.max(1, report.rows.length); offset += perCard) {
+      const result = await renderUsageCard(report.total, report.rows.slice(offset, offset + perCard));
+      images.push({ type: "image", file: result.png });
+    }
+    return images.length === 1 ? images[0]! : { type: "forward" as const, nodes: images.map((image) => [image]) };
+  } catch {
+    return "表情调用统计图片生成失败，请稍后重试。";
+  }
+}
+
 function createMemeCommands(signal?: AbortSignal) {
   return {
     fallback: (message: string, context: FallbackContext) => memeFallback(message, context, signal),
-    commands: { "#表情列表": list, "#表情详情": details, "#表情搜索": search },
+    commands: {
+      "#表情列表": list, "#表情详情": details, "#表情搜索": search,
+      "#表情统计": (_argument: string, context: CatalogContext) => usageReport(context),
+    },
   };
 }
 
 async function memeFallback(message: string, context: FallbackContext, signal?: AbortSignal) {
-  const searchMatch = catalogSearch.exec(message.trim());
+  const input = message.trim();
+  const searchMatch = catalogSearch.exec(input);
   if (searchMatch) return search(searchMatch[1] ?? "", context);
+  if (usageCommand.test(input)) return usageReport(context);
   const setting = handleMemeSettings(message, context);
   if (setting !== undefined) return setting;
   const update = handleCatalogUpdate(message, context, signal);
@@ -317,7 +353,6 @@ async function memeFallback(message: string, context: FallbackContext, signal?: 
     return;
   }
   if (!server) return;
-  const input = message.trim();
   if (randomMemeCommand.test(input)) {
     const policy = currentPolicy(context.user_id, true);
     if (typeof policy === "string") return policy;

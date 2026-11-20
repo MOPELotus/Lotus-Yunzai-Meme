@@ -77,6 +77,10 @@ export function generationSettings() {
   };
 }
 
+export function memeUsageEnabled() {
+  return flag(readConfig(configDirectory(), "stat.yaml").enable, true);
+}
+
 
 export function generationServer() {
   const settings = readConfig(configDirectory(), "server.yaml");
