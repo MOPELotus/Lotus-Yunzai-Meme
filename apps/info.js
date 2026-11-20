@@ -9,7 +9,7 @@ export class info extends plugin {
       priority: -Infinity,
       rule: [
         {
-          reg: /^#?(?:(清语)?表情|meme(?:-plugin)?)\s*详情\s*(.+?)$/i,
+          reg: /^#?(?:表情|meme)\s*详情\s*(.+?)$/i,
           fnc: 'info'
         }
       ]

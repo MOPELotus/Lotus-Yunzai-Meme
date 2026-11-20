@@ -15,15 +15,15 @@ export class update extends plugin {
       priority: -Infinity,
       rule: [
         {
-          reg: /^#?(?:(?:清语)?表情|表情合成|(?:清语)?meme(?:-plugin)?)插件(强制)?更新$/i,
+          reg: /^#?(?:表情(?:合成)?|meme)插件(强制)?更新$/i,
           fnc: 'update'
         },
         {
-          reg: /^#?(?:(?:清语)?表情|表情合成|(?:清语)?meme(?:-plugin)?)(?:插件)?更新日志$/i,
+          reg: /^#?(?:表情(?:合成)?|meme)(?:插件)?更新日志$/i,
           fnc: 'updateLog'
         },
         {
-          reg: /^#?(?:(?:清语)?表情|表情合成|(?:清语)?meme(?:-plugin)?)(强制)?更新(?:表情包|资源|数据)?$/i,
+          reg: /^#?(?:表情(?:合成)?|meme)(强制)?更新(?:表情包|资源|数据)?$/i,
           fnc: 'updateRes'
         }
       ]

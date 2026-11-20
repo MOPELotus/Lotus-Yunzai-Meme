@@ -8,7 +8,7 @@ export class list extends plugin {
             name: `${Version.Plugin_LogName} · 列表`,
             event: 'message',
             priority: -Infinity,
-            rule: [{ reg: /^#?(?:(清语)?表情|meme(?:-plugin)?)列表$/i, fnc: 'list' }]
+            rule: [{ reg: /^#?(?:表情|meme)列表$/i, fnc: 'list' }]
         });
     }
 

@@ -10,7 +10,7 @@ const sysCfgReg = () => {
   )
 
   const sortedKeys = keys.sort((a, b) => b.length - a.length)
-  return new RegExp(`^#(?:(?:清语)?表情|表情合成)设置\\s*(?:(${groupNames.join('|')}))?\\s*(?:(${sortedKeys.join('|')}))?\\s*(.*)`)
+  return new RegExp(`^#表情(?:合成)?设置\\s*(?:(${groupNames.join('|')}))?\\s*(?:(${sortedKeys.join('|')}))?\\s*(.*)`)
 }
 
 export class setting extends plugin {

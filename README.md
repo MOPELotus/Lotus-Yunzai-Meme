@@ -1,6 +1,6 @@
 # Lotus-Yunzai 表情合成
 
-Lotus-Yunzai 的内置 `meme` 模块。支持 `#表情列表`、`#表情详情` 和关键词合成。机器人主人可使用 `#表情合成设置`、`#表情合成更新资源`，旧命令也可继续使用。
+Lotus-Yunzai 的内置 `meme` 模块。支持 `#表情列表`、`#表情详情` 和关键词合成。机器人主人可使用 `#表情合成设置`（简写 `#表情设置`）和 `#表情合成更新资源`。
 
 迁移时将旧 SQLite 数据库和对应 YAML 配置的副本放入主仓的 `data/meme/data.db` 和 `data/meme/config/`。可用 `LOTUS_MEME_DB`、`LOTUS_MEME_CONFIG_DIR` 指定路径，通过 `server.yaml` 或 `LOTUS_MEME_SERVER_URL` 配置合成服务。
 

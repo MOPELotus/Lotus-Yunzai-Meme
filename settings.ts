@@ -33,7 +33,7 @@ const sections = [
   ] satisfies Setting[] },
 ];
 
-const settingCommand = /^#(?:(?:清语)?表情|表情合成)设置\s*/u;
+const settingCommand = /^#表情(?:合成)?设置\s*/u;
 export interface SettingsContext {
   readonly isMaster?: boolean;
   readonly user_id?: number;

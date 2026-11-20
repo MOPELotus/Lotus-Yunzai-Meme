@@ -33,7 +33,7 @@ test("旧资源更新命令按事务同步目录和预设", async () => {
   });
   const owner = { message_type: "private" as const, user_id: 10001, isMaster: false,
     isBotMaster: (userId: number) => userId === 10001 };
-  const update = (force = false, name = "清语表情") =>
+  const update = (force = false, name = "表情合成") =>
     module.fallback(`#${name}${force ? "强制" : ""}更新资源`, owner);
   try {
     Bun.env.LOTUS_MEME_CONFIG_DIR = directory;
@@ -42,8 +42,11 @@ test("旧资源更新命令按事务同步目录和预设", async () => {
     expect(await update()).toBe("请先配置表情合成服务。");
     Bun.env.LOTUS_MEME_SERVER_URL = new URL("/fixture/", fixture.url).href;
 
-    expect(await module.fallback("#清语表情更新资源", { ...owner, user_id: 10002 })).toContain("只有主人");
-    expect(await module.fallback("#清语表情更新资源", { ...owner, isDelegated: true })).toContain("只有主人");
+    for (const former of ["#清语表情更新资源", "#meme-plugin强制更新资源", "#清语meme更新数据"]) {
+      expect(await module.fallback(former, owner)).toBeUndefined();
+    }
+    expect(await module.fallback("#表情合成更新资源", { ...owner, user_id: 10002 })).toContain("只有主人");
+    expect(await module.fallback("#表情合成更新资源", { ...owner, isDelegated: true })).toContain("只有主人");
     expect(requests).toEqual([]);
     expect(await update()).toContain("更新 2 项，移除 0 项");
     expect(resolveMemeTrigger("#旧素材")).toMatchObject({ key: "ba_say" });
@@ -64,11 +67,11 @@ test("旧资源更新命令按事务同步目录和预设", async () => {
     fail = false;
     word = "新素材";
     requests.length = 0;
-    expect(await update()).toContain("更新 1 项，移除 1 项");
+    expect(await update(false, "表情")).toContain("更新 1 项，移除 1 项");
     expect(requests).toEqual(["/fixture/memes/keys", "/fixture/memes/new/info"]);
     expect(resolveMemeTrigger("#旧素材")).toBeDefined();
     expect(resolveMemeTrigger("#removed")).toBeUndefined();
-    expect(await update(true, "表情合成")).toContain("更新 2 项，移除 0 项");
+    expect(await update(true, "meme")).toContain("更新 2 项，移除 0 项");
     expect(resolveMemeTrigger("#新素材")).toMatchObject({ key: "ba_say" });
     expect(resolveMemeTrigger("#旧素材")).toBeUndefined();
     const snapshot = new Database(filename, { readonly: true });

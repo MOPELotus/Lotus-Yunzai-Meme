@@ -6,7 +6,7 @@ import { catalogPolicy, generationSettings } from "../catalog-policy.ts";
 import module from "../lotus.ts";
 import { buildGenerationBody } from "../generation.ts";
 
-test("旧清语设置命令可安全更新隔离 YAML 并即时生效", async () => {
+test("表情设置命令可安全更新旧 YAML 并即时生效", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-settings-"));
   const previous = Bun.env.LOTUS_MEME_CONFIG_DIR;
   try {
@@ -20,9 +20,10 @@ test("旧清语设置命令可安全更新隔离 YAML 并即时生效", async ()
     const user = { ...owner, isMaster: false };
     const milkyOwner = { ...user, isBotMaster: (id: number) => id === 10001 };
     function settings(argument: string, actor: Parameters<typeof module.fallback>[1]) {
-      return module.fallback("#清语表情设置 " + argument, actor);
+      return module.fallback("#表情合成设置 " + argument, actor);
     }
-    expect(await module.fallback("#清语表情设置强制触发关闭", { ...owner, isDelegated: true })).toContain("只有主人");
+    expect(await module.fallback("#清语表情设置强制触发关闭", owner)).toBeUndefined();
+    expect(await settings("强制触发关闭", { ...owner, isDelegated: true })).toContain("只有主人");
     expect(await settings("强制触发关闭", user)).toContain("只有主人");
     expect(await module.fallback("#表情合成设置强制触发关闭", user)).toBe("只有主人可以修改表情合成设置。");
     expect(await readFile(meme, "utf8")).toBe(source);
