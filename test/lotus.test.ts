@@ -6,6 +6,89 @@ import { join } from "node:path";
 import module, { prepareMemeRequest, resolveMemeTrigger } from "../lotus.ts";
 import { generationServer } from "../catalog-policy.ts";
 
+test("旧随机表情仅选择可用的单图或单文本模板，并沿普通生成发送说明和图片", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "lotus-meme-random-"));
+  const filename = join(directory, "data.db");
+  const environment = {
+    LOTUS_MEME_DB: Bun.env.LOTUS_MEME_DB,
+    LOTUS_MEME_CONFIG_DIR: Bun.env.LOTUS_MEME_CONFIG_DIR,
+    LOTUS_MEME_SERVER_URL: Bun.env.LOTUS_MEME_SERVER_URL,
+  };
+  const png = Uint8Array.fromBase64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1sAAAAASUVORK5CYII=");
+  const requests: { path: string; texts: FormDataEntryValue[]; image?: Uint8Array }[] = [];
+  let fail = false;
+  const server = Bun.serve({
+    port: 0, hostname: "127.0.0.1",
+    async fetch(request) {
+      const form = await request.formData();
+      const image = form.get("images");
+      requests.push({ path: new URL(request.url).pathname, texts: form.getAll("texts"),
+        image: image instanceof Blob ? await image.bytes() : undefined });
+      return fail ? new Response(null, { status: 503 }) : new Response(png);
+    },
+  });
+  try {
+    const db = new Database(filename);
+    db.run(`CREATE TABLE meme (key TEXT PRIMARY KEY, keyWords TEXT, min_images INTEGER, max_images INTEGER,
+      min_texts INTEGER, max_texts INTEGER, params TEXT, defText TEXT)`);
+    const insert = db.query("INSERT INTO meme VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    for (const [key, images, texts, defaults] of [
+      ["selected", 1, 1, ["默认文字"]], ["blocked-key", 1, 1, ["禁用"]],
+      ["blocked-alias", 1, 1, ["禁用"]], ["no-default", 1, 1, null],
+      ["too-complex", 2, 2, ["多图"]],
+    ] as const) {
+      insert.run(key, JSON.stringify([`关键词-${key}`]), images, images, texts, texts,
+        JSON.stringify({ min_images: images, max_images: images, min_texts: texts, max_texts: texts, default_texts: defaults }),
+        JSON.stringify(defaults));
+    }
+    db.close();
+    const before = await readFile(filename);
+    Bun.env.LOTUS_MEME_DB = filename;
+    Bun.env.LOTUS_MEME_CONFIG_DIR = directory;
+    Bun.env.LOTUS_MEME_SERVER_URL = server.url.href;
+    const access = join(directory, "access.yaml");
+    const meme = join(directory, "meme.yaml");
+    const hidden = "blackListEnable: true\nblackList: [blocked-key, 关键词-blocked-alias]\n";
+    await writeFile(access, hidden);
+    await writeFile(meme, "forceSharp: true\nreply: true\n");
+    const input = {
+      message_type: "group" as const, user_id: 10001, isMaster: false, isBotMaster: () => false,
+      reply_id: 42,
+      lookupReply: async () => ({ user_id: 10002, message: [{ type: "image", file: png }] }),
+    };
+    expect(await module.fallback("随机表情包", input)).toBeUndefined();
+    expect(await module.fallback("#表情随机表情包", input)).toEqual({
+      type: "quoted",
+      message: ["本次随机表情信息如下\n表情的名称：selected\n表情的别名：[关键词-selected]\n", { type: "image", file: png }],
+    });
+    expect(requests).toEqual([{ path: "/memes/selected/", texts: ["默认文字"], image: png }]);
+
+    expect(await module.fallback("#随机meme", {
+      ...input, lookupReply: async () => {
+        await writeFile(access, hidden + "enable: true\nmode: 0\nuserWhiteList: []\n");
+        return input.lookupReply();
+      },
+    })).toContain("无权");
+    expect(requests).toHaveLength(1);
+    await writeFile(access, "blackListEnable: true\nblackList: [selected, blocked-key, 关键词-blocked-alias]\n");
+    expect(await module.fallback("#随机表情", input)).toContain("未找到可用");
+    expect(requests).toHaveLength(1);
+    await writeFile(access, hidden);
+    await writeFile(meme, "errorReply: false\n");
+    fail = true;
+    expect(await module.fallback("#随机表情", input)).toBeUndefined();
+    expect(requests).toHaveLength(2);
+    expect(await readFile(filename)).toEqual(before);
+  } finally {
+    await server.stop(true);
+    for (const [key, value] of Object.entries(environment)) {
+      if (value === undefined) delete Bun.env[key];
+      else Bun.env[key] = value;
+    }
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test("从旧 meme 表分页并查询详情，数据库保持不变", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-catalog-"));
   const filename = join(directory, "data.db");

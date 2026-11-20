@@ -3,7 +3,13 @@ import type { GenerationInput } from "./generation.ts";
 
 type InboundSegment = Readonly<Record<string, unknown>> & { readonly type: string };
 type Image = { readonly type: "image"; readonly file: Uint8Array };
-type PreparedRequest = { readonly key: string; readonly body: FormData; readonly quote: boolean };
+type GenerationMessage = Image | readonly [string, Image];
+type PreparedRequest = {
+  readonly key: string;
+  readonly body: FormData;
+  readonly quote: boolean;
+  readonly summary?: string;
+};
 
 export interface FallbackContext {
   readonly message_type: "terminal" | "group" | "private";
@@ -131,7 +137,7 @@ export async function generateMemeReply(
   context: FallbackContext,
   prepare: (input: GenerationInput) => Promise<PreparedRequest | string | undefined>,
   server: NonNullable<ReturnType<typeof generationServer>>,
-): Promise<Image | { type: "quoted"; message: Image } | string | undefined> {
+): Promise<GenerationMessage | { type: "quoted"; message: GenerationMessage } | string | undefined> {
   const userId = context.user_id;
   if (userId === undefined) return;
 
@@ -194,7 +200,8 @@ export async function generateMemeReply(
     });
     const bytes = await readResult(result);
     if (bytes) {
-      const message: Image = { type: "image", file: bytes };
+      const image: Image = { type: "image", file: bytes };
+      const message: GenerationMessage = prepared.summary ? [prepared.summary, image] : image;
       return prepared.quote ? { type: "quoted", message } : message;
     }
   } catch {

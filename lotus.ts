@@ -13,6 +13,7 @@ export { createProfileLikeImageRenderer } from "./profile-like-image.ts";
 
 const pageSize = 12;
 const catalogSearch = /^#?(?:表情(?:合成)?|meme)搜索([^\r\n]*)$/iu;
+const randomMemeCommand = /^#?(?:表情|meme)?随机(?:表情|meme)包?$/iu;
 
 // A legacy disable entry may be a stored key or one of its keywords.
 const visibleCatalog = `FROM meme
@@ -263,6 +264,37 @@ function search(argument: string, context?: CatalogContext) {
   return { type: "forward" as const, nodes };
 }
 
+async function prepareRandomMeme(message: string, input: GenerationInput) {
+  const policy = currentPolicy(input.user_id, true);
+  if (typeof policy === "string") return policy;
+  if (policy.forceSharp && !message.startsWith("#")) return;
+
+  const row = withCatalog((db) => {
+    const hasLegacyDefaults = db.query<{ name: string }, []>("PRAGMA table_info(meme)").all()
+      .some(({ name }) => name.toLowerCase() === "deftext");
+    const defaults = hasLegacyDefaults
+      ? "json_array_length(CASE WHEN json_valid(defText) THEN defText END)"
+      : "json_array_length(CASE WHEN json_valid(params) THEN params END, '$.default_texts')";
+    return db.query<CatalogRow & { params: string }, [string]>(`
+      SELECT key, keyWords, params ${visibleCatalog}
+      AND ((min_texts = 1 AND max_texts = 1) OR (min_images = 1 AND max_images = 1))
+      AND json_valid(params)
+      AND ${defaults} > 0
+      ORDER BY random() LIMIT 1
+    `).get(JSON.stringify(policy.hidden));
+  });
+  if (typeof row === "string") return row;
+  if (!row) return "未找到可用的随机表情。";
+
+  const aliases = keywords(row.keyWords);
+  const prepared = await buildGenerationBody(row.key, aliases, "", row.params, input);
+  if (typeof prepared === "string") return prepared;
+  return {
+    ...prepared,
+    summary: `本次随机表情信息如下\n表情的名称：${row.key}\n表情的别名：${aliases.map((word) => `[${word}]`).join(" ") || "[无]"}\n`,
+  };
+}
+
 function createMemeCommands(signal?: AbortSignal) {
   return {
     fallback: (message: string, context: FallbackContext) => memeFallback(message, context, signal),
@@ -285,6 +317,13 @@ async function memeFallback(message: string, context: FallbackContext, signal?: 
     return;
   }
   if (!server) return;
+  const input = message.trim();
+  if (randomMemeCommand.test(input)) {
+    const policy = currentPolicy(context.user_id, true);
+    if (typeof policy === "string") return policy;
+    if (policy.forceSharp && !input.startsWith("#")) return;
+    return generateMemeReply(context, (media) => prepareRandomMeme(input, media), server);
+  }
   const match = resolveTrigger(message, context, true);
   if (!match || typeof match === "string") return;
   return generateMemeReply(context, async (input) => {
