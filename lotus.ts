@@ -12,6 +12,7 @@ import { startCatalogRuntime, type MemeRuntime } from "./catalog-runtime.ts";
 export { createProfileLikeImageRenderer } from "./profile-like-image.ts";
 
 const pageSize = 12;
+const catalogSearch = /^#?(?:表情(?:合成)?|meme)搜索([^\r\n]*)$/iu;
 
 // A legacy disable entry may be a stored key or one of its keywords.
 const visibleCatalog = `FROM meme
@@ -245,14 +246,33 @@ function details(key: string, context?: CatalogContext): string {
   });
 }
 
+function search(argument: string, context?: CatalogContext) {
+  const keyword = argument.trim().toLowerCase();
+  if (!keyword) return "用法：#表情搜索 <关键词>";
+  const matches = queryCatalog(context?.user_id, (db, hidden) => {
+    const rows = db.query<Pick<CatalogRow, "keyWords">, [string]>(`SELECT keyWords ${visibleCatalog}`).all(hidden);
+    return [...new Set(rows.flatMap((row) => keywords(row.keyWords)).filter((word) => word.toLowerCase().includes(keyword)))].sort();
+  });
+  if (typeof matches === "string") return matches;
+  if (!matches.length) return "没有找到匹配的表情关键词。";
+  const lines = matches.map((word, index) => `${index + 1}. ${word}`);
+  const text = (lines: readonly string[]) => [{ type: "text" as const, text: lines.join("\n") }];
+  if (lines.length <= 30) return { type: "quoted" as const, message: text(lines) };
+  const nodes = [text([`表情搜索 · ${lines.length} 个关键词`])];
+  for (let index = 0; index < lines.length; index += 30) nodes.push(text(lines.slice(index, index + 30)));
+  return { type: "forward" as const, nodes };
+}
+
 function createMemeCommands(signal?: AbortSignal) {
   return {
     fallback: (message: string, context: FallbackContext) => memeFallback(message, context, signal),
-    commands: { "#表情列表": list, "#表情详情": details },
+    commands: { "#表情列表": list, "#表情详情": details, "#表情搜索": search },
   };
 }
 
 async function memeFallback(message: string, context: FallbackContext, signal?: AbortSignal) {
+  const searchMatch = catalogSearch.exec(message.trim());
+  if (searchMatch) return search(searchMatch[1] ?? "", context);
   const setting = handleMemeSettings(message, context);
   if (setting !== undefined) return setting;
   const update = handleCatalogUpdate(message, context, signal);

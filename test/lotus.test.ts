@@ -21,7 +21,8 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     )`);
     const insert = db.query("INSERT INTO meme VALUES (?, ?, 1, 2, 0, 1, NULL)");
     for (let index = 1; index <= 13; index++) {
-      insert.run(`meme-${String(index).padStart(2, "0")}`, JSON.stringify(["表情", "样例", `别名${index}`]));
+      insert.run(`meme-${String(index).padStart(2, "0")}`, JSON.stringify(["表情", "样例", `别名${index}`,
+        `${index}组合甲`, `${index}组合乙`, `${index}组合丙`]));
     }
     db.run("UPDATE meme SET keyWords = ?, max_texts = 0 WHERE key = ?", [JSON.stringify(["只图", "a+b"]), "meme-12"]);
     db.run("UPDATE meme SET params = ? WHERE key = ?", [JSON.stringify({
@@ -54,6 +55,24 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     expect(module.commands["#表情详情"]("missing")).toContain("没有找到对应表情");
     expect(module.commands["#表情详情"]("别名13")).toContain("表情 meme-13");
     expect(module.commands["#表情详情"]("表情")).toContain("对应多个表情");
+    const search = module.commands["#表情搜索"];
+    const found = { type: "quoted" as const, message: [{ type: "text" as const, text: "1. a+b" }] };
+    expect(search("A+")).toEqual(found);
+    expect(search("表情")).toEqual({ type: "quoted", message: [{ type: "text", text: "1. 表情" }] });
+    expect(search("组合")).toMatchObject({ type: "forward", nodes: [[{ text: "表情搜索 · 36 个关键词" }],
+      [{ text: expect.stringContaining("30. ") }], [{ text: expect.stringContaining("36. ") }]] });
+    expect(search("missing")).toContain("没有找到");
+    expect(search("")).toContain("用法");
+    const searchContext = { message_type: "group" as const, user_id: 10003, isMaster: false, isBotMaster: () => false };
+    expect(await module.fallback("#表情搜索A+", searchContext)).toEqual(found);
+    expect(await module.fallback("#清语表情搜索A+", searchContext)).toBeUndefined();
+    const access = join(directory, "access.yaml");
+    await writeFile(access, 'blackListEnable: true\nblackList: ["a+b"]\n');
+    expect(search("A+")).toContain("没有找到");
+    await writeFile(access, "enable: true\nmode: 0\nuserWhiteList: [10001]\n");
+    expect(search("A+", searchContext)).toContain("无权");
+    expect(search("A+", { user_id: 10001 })).toEqual(found);
+    await rm(access);
     expect(resolveMemeTrigger("别名13 好耶")).toEqual({ key: "meme-13", keyword: "别名13", text: "好耶" });
     expect(resolveMemeTrigger("#A+B @10001")).toEqual({ key: "meme-12", keyword: "a+b", text: "@10001" });
     expect(resolveMemeTrigger("#只图普通聊天")).toBeUndefined();
