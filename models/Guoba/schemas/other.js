@@ -47,8 +47,8 @@ export default [
   },
   {
     field: 'other.hijackRes',
-    label: '劫持土块表情包',
+    label: '接管外部表情入口',
     component: 'Switch',
-    bottomHelpMessage: '是否开启劫持土块表情包'
+    bottomHelpMessage: '由表情合成处理兼容的外部表情入口'
   }
 ]

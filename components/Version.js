@@ -47,6 +47,7 @@ export const Version = {
     return Plugin_Path
   },
   get Plugin_Name () {
+    // 独立 V3 宿主按目录名识别更新目标、面板插件和渲染缓存。
     return Plugin_Name
   },
   get Plugin_AliasName () {
