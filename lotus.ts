@@ -1,5 +1,6 @@
 import { Database } from "bun:sqlite";
-import type { CatalogCardRow, CatalogPngRenderer } from "./catalog-card.ts";
+import type { CatalogCardRow } from "./catalog-card.ts";
+import type { LoadMemeInfoCard } from "./info-card-runtime.ts";
 import { catalogPath, catalogVersion } from "./catalog-file.ts";
 import { catalogPolicy, generationServer } from "./catalog-policy.ts";
 import { argsTypeFromParams, parseGenerationArgs, type PresetArgument } from "./generation-args.ts";
@@ -138,12 +139,12 @@ function requireTextMatch(row: TriggerRow, text: string): boolean {
   return /^(@\s*\d+\s*)+$/u.test(text) || /^(#\S+\s+[^#]+(?:\s+#\S+\s+[^#]+)*)$/u.test(text);
 }
 
-function illustratedCatalog(render?: CatalogPngRenderer, signal?: AbortSignal) {
+function illustratedCatalog(loadInfoCard?: LoadMemeInfoCard, signal?: AbortSignal) {
   let rendered: { signature: string; cards: Promise<{ type: "image"; file: Uint8Array }[]> } | undefined;
 
   async function pictures(argument: string, context?: CatalogContext) {
     if (signal?.aborted) return;
-    if (!render) return list(argument, context);
+    if (!loadInfoCard) return list(argument, context);
     const policy = currentPolicy(context?.user_id);
     if (typeof policy === "string") return policy;
     try {
@@ -166,10 +167,11 @@ function illustratedCatalog(render?: CatalogPngRenderer, signal?: AbortSignal) {
         if (!rows.length) return list(argument, context);
         const cards = (async () => {
           const { renderCatalogCard, rowsPerCatalogCard } = await import("./catalog-card.ts");
+          const info = await loadInfoCard();
           const replies: { type: "image"; file: Uint8Array }[] = [];
           for (let offset = 0; offset < rows.length; offset += rowsPerCatalogCard) {
             signal?.throwIfAborted();
-            const { png } = await renderCatalogCard(rows.slice(offset, offset + rowsPerCatalogCard), offset, rows.length, render);
+            const { png } = await renderCatalogCard(rows.slice(offset, offset + rowsPerCatalogCard), offset, rows.length, info);
             replies.push({ type: "image", file: png });
           }
           return replies;
@@ -190,7 +192,7 @@ function illustratedCatalog(render?: CatalogPngRenderer, signal?: AbortSignal) {
     }
   }
 
-  return (argument: string, context?: CatalogContext) => !render || argument.trim()
+  return (argument: string, context?: CatalogContext) => !loadInfoCard || argument.trim()
     ? list(argument, context) : pictures(argument, context);
 }
 
@@ -420,7 +422,7 @@ function selectPokeTemplates(hidden: readonly string[]) {
   `).all(JSON.stringify(hidden)).map(row => ({ key: row.key, aliases: keywords(row.keyWords), params: row.params })));
 }
 
-async function usageReport(context: CatalogContext) {
+async function usageReport(context: CatalogContext, loadInfoCard?: LoadMemeInfoCard) {
   const report = queryCatalog(context.user_id, (db, hidden) => {
     const counts = readMemeUsage(db);
     if (counts.size === 0) return;
@@ -435,12 +437,22 @@ async function usageReport(context: CatalogContext) {
   });
   if (typeof report === "string") return report;
   if (!report) return "当前没有统计数据";
+  if (!loadInfoCard) {
+    const heading = `表情调用总次数：${report.total}`;
+    const lines = report.rows.map(({ keywords, count }) => `${keywords} · ${count} 次`);
+    if (lines.length <= 30) return [heading, ...lines].join("\n");
+    const nodes = [[{ type: "text" as const, text: heading }]];
+    for (let offset = 0; offset < lines.length; offset += 30) {
+      nodes.push([{ type: "text", text: lines.slice(offset, offset + 30).join("\n") }]);
+    }
+    return { type: "forward" as const, nodes };
+  }
   try {
-    const { renderUsageCard } = await import("./usage-card.ts");
+    const [{ renderUsageCard }, info] = await Promise.all([import("./usage-card.ts"), loadInfoCard()]);
     const images: { type: "image"; file: Uint8Array }[] = [];
     const perCard = 100;
     for (let offset = 0; offset < Math.max(1, report.rows.length); offset += perCard) {
-      const result = await renderUsageCard(report.total, report.rows.slice(offset, offset + perCard));
+      const result = await renderUsageCard(report.total, report.rows.slice(offset, offset + perCard), info);
       images.push({ type: "image", file: result.png });
     }
     return images.length === 1 ? images[0]! : { type: "forward" as const, nodes: images.map((image) => [image]) };
@@ -449,26 +461,26 @@ async function usageReport(context: CatalogContext) {
   }
 }
 
-function createMemeCommands(signal?: AbortSignal, renderCatalogPng?: CatalogPngRenderer) {
-  const listCatalog = illustratedCatalog(renderCatalogPng, signal);
+function createMemeCommands(signal?: AbortSignal, loadInfoCard?: LoadMemeInfoCard) {
+  const listCatalog = illustratedCatalog(loadInfoCard, signal);
   return {
-    fallback: (message: string, context: FallbackContext) => memeFallback(message, context, listCatalog, signal),
+    fallback: (message: string, context: FallbackContext) => memeFallback(message, context, listCatalog, signal, loadInfoCard),
     commands: {
       "#表情列表": listCatalog, "#表情详情": (argument: string, context?: CatalogContext) => details(argument, context, signal), "#表情搜索": search,
-      "#表情统计": (_argument: string, context: CatalogContext) => usageReport(context),
+      "#表情统计": (_argument: string, context: CatalogContext) => usageReport(context, loadInfoCard),
     },
   };
 }
 
 async function memeFallback(message: string, context: FallbackContext, listCatalog: ReturnType<typeof illustratedCatalog>,
-  signal?: AbortSignal) {
+  signal?: AbortSignal, loadInfoCard?: LoadMemeInfoCard) {
   const input = message.trim();
   if (catalogList.test(input)) return listCatalog("", context);
   const detailMatch = catalogDetail.exec(input);
   if (detailMatch) return details(detailMatch[1] ?? "", context, signal);
   const searchMatch = catalogSearch.exec(input);
   if (searchMatch) return search(searchMatch[1] ?? "", context);
-  if (usageCommand.test(input)) return usageReport(context);
+  if (usageCommand.test(input)) return usageReport(context, loadInfoCard);
   const setting = handleMemeSettings(message, context);
   if (setting !== undefined) return setting;
   const update = handleCatalogUpdate(message, context, signal);
@@ -508,7 +520,7 @@ export function createModule({ signal, memeRuntime }: { readonly signal: AbortSi
   const active = AbortSignal.any([signal, lifecycle.signal]);
   const stop = memeRuntime && startCatalogRuntime(memeRuntime, active);
   return {
-    ...createMemeCommands(active, memeRuntime?.renderCatalogPng),
+    ...createMemeCommands(active, memeRuntime?.loadInfoCard),
     handlePoke: createMemePokeHandler(active, selectPokeTemplates),
     async dispose() {
       lifecycle.abort();
