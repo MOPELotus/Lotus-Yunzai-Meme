@@ -10,7 +10,7 @@ const padding = 10;
 const size = 16;
 const leading = 22;
 
-export function renderUsageCard(total: number, rows: readonly UsageRow[], info: MemeInfoCard) {
+export function renderUsageCard(total: number, rows: readonly UsageRow[], info: MemeInfoCard, scale: 2 | 4 = 4) {
   const { renderInfoCard, measureInfoText, drawInfoText, infoCardColors } = info;
   return renderInfoCard({ title: "表情合成统计", metadata: `表情调用总次数：${total}`, width: 1152 },
     ({ x, y, width, measure }) => {
@@ -46,5 +46,5 @@ export function renderUsageCard(total: number, rows: readonly UsageRow[], info: 
           }
         },
       };
-    });
+    }, { scale, allowHalfScale: scale === 4 });
 }

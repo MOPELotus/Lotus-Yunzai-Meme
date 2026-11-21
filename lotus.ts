@@ -40,6 +40,7 @@ const visibleCatalog = `FROM meme
 
 interface CatalogContext {
   readonly user_id?: number;
+  readonly inlineImageByteLimit?: number;
 }
 
 interface CatalogRow {
@@ -442,7 +443,7 @@ async function usageReport(context: CatalogContext, loadInfoCard?: LoadMemeInfoC
   });
   if (typeof report === "string") return report;
   if (!report) return "当前没有统计数据";
-  if (!loadInfoCard) {
+  const textReport = () => {
     const heading = `表情调用总次数：${report.total}`;
     const lines = report.rows.map(({ keywords, count }) => `${keywords} · ${count} 次`);
     if (lines.length <= 30) return [heading, ...lines].join("\n");
@@ -451,13 +452,20 @@ async function usageReport(context: CatalogContext, loadInfoCard?: LoadMemeInfoC
       nodes.push([{ type: "text", text: lines.slice(offset, offset + 30).join("\n") }]);
     }
     return { type: "forward" as const, nodes };
-  }
+  };
+  if (!loadInfoCard) return textReport();
   try {
     const [{ renderUsageCard }, info] = await Promise.all([import("./usage-card.ts"), loadInfoCard()]);
     const images: { type: "image"; file: Uint8Array }[] = [];
     const perCard = 100;
+    const limit = context.inlineImageByteLimit ?? Infinity;
     for (let offset = 0; offset < Math.max(1, report.rows.length); offset += perCard) {
-      const result = await renderUsageCard(report.total, report.rows.slice(offset, offset + perCard), info);
+      const rows = report.rows.slice(offset, offset + perCard);
+      let result = await renderUsageCard(report.total, rows, info);
+      if (result.png.byteLength > limit && result.reducedScaleReason === undefined) {
+        result = await renderUsageCard(report.total, rows, info, 2);
+      }
+      if (result.png.byteLength > limit) return textReport();
       images.push({ type: "image", file: result.png });
     }
     return images.length === 1 ? images[0]! : { type: "forward" as const, nodes: images.map((image) => [image]) };

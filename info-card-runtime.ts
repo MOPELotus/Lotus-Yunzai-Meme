@@ -16,7 +16,7 @@ export interface MemeInfoCard {
   renderInfoCard(header: { readonly title: string; readonly metadata?: string; readonly width?: number },
     buildBody: (layout: { readonly x: number; readonly y: number; readonly width: number; readonly measure: Context }) =>
       { readonly height: number; draw(ctx: Context): void },
-    options?: { readonly scale?: number; readonly allowHalfScale?: boolean }): Promise<{ readonly png: Uint8Array }>;
+    options?: { readonly scale?: number; readonly allowHalfScale?: boolean }): Promise<{ readonly png: Uint8Array; readonly reducedScaleReason?: string }>;
 }
 
 export type LoadMemeInfoCard = () => Promise<MemeInfoCard>;
