@@ -8,7 +8,8 @@ import { buildGenerationBody, type GenerationInput } from "./generation.ts";
 import { generateMemeReply, requestMemePreview, type FallbackContext } from "./generate-reply.ts";
 
 import { handleMemeSettings, isMemeOwner } from "./settings.ts";
-import { helpReference, presentMemeReference, versionReference } from "./reference-card.ts";
+import { helpReference, presentMemeReference } from "./reference-card.ts";
+import { presentMemeVersion } from "./version-card.ts";
 import { handleCatalogUpdate } from "./catalog-update.ts";
 import { startCatalogRuntime, type MemeRuntime } from "./catalog-runtime.ts";
 import { readMemeUsage } from "./usage.ts";
@@ -474,8 +475,8 @@ function createMemeCommands(signal?: AbortSignal, loadInfoCard?: LoadMemeInfoCar
       "#表情统计": (_argument: string, context: CatalogContext) => usageReport(context, loadInfoCard),
       "#表情帮助": (argument: string, context: FallbackContext) => argument.trim() ? "用法：#表情帮助。" :
         presentMemeReference(helpReference(isMemeOwner(context)), loadInfoCard, signal),
-      "#表情版本": (argument: string) => argument.trim() ? "用法：#表情版本。" :
-        presentMemeReference(versionReference(), loadInfoCard, signal),
+      "#表情版本": (argument: string, context?: Pick<FallbackContext, "inlineImageByteLimit">) =>
+        argument.trim() ? "用法：#表情版本。" : presentMemeVersion(loadInfoCard, signal, context?.inlineImageByteLimit),
     },
   };
 }
@@ -490,7 +491,7 @@ async function memeFallback(message: string, context: FallbackContext, listCatal
   if (searchMatch) return search(searchMatch[1] ?? "", context);
   if (usageCommand.test(input)) return usageReport(context, loadInfoCard);
   if (helpCommand.test(input)) return presentMemeReference(helpReference(isMemeOwner(context)), loadInfoCard, signal);
-  if (versionCommand.test(input)) return presentMemeReference(versionReference(), loadInfoCard, signal);
+  if (versionCommand.test(input)) return presentMemeVersion(loadInfoCard, signal, context.inlineImageByteLimit);
   const packageUpdate = packageUpdateCommand.exec(input);
   if (packageUpdate) return isMemeOwner(context)
     ? `请发送 #${packageUpdate[1] ?? ""}更新 meme，使用宿主更新表情模块。` : "只有主人可以更新表情模块。";

@@ -16,6 +16,7 @@ type PreparedRequest = {
 export interface FallbackContext {
   readonly message_type: "terminal" | "group" | "private";
   readonly user_id?: number;
+  readonly inlineImageByteLimit?: number;
   readonly isMaster: boolean;
   readonly isDelegated?: boolean;
   readonly isBotMaster: (userId: number) => boolean;

@@ -1,4 +1,3 @@
-import version from "./package.json";
 import type { LoadMemeInfoCard, MemeInfoCard } from "./info-card-runtime.ts";
 
 export interface ReferenceGroup {
@@ -35,20 +34,6 @@ export function helpReference(owner: boolean): MemeReference {
     ],
   });
   return { title: "表情帮助", groups };
-}
-
-export function versionReference(): MemeReference {
-  return {
-    title: "表情版本",
-    subtitle: `模块版本 ${version.version}`,
-    groups: [{
-      title: "模块信息",
-      entries: [
-        { title: "Lotus-Yunzai · 表情合成", detail: "支持表情列表、详情预览、合成、统计和戳一戳触发。" },
-        { title: "#更新日志 meme", detail: "查看宿主当前固定版本的更新记录。" },
-      ],
-    }],
-  };
 }
 
 let helpIcons: Promise<import("skia-canvas").Image | undefined> | undefined;
