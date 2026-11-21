@@ -2,9 +2,11 @@ import { expect, test } from "bun:test";
 import { mkdtemp, readFile, rm, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { catalogPolicy, generationSettings } from "../catalog-policy.ts";
+import { fileURLToPath } from "node:url";
+import { catalogPolicy, catalogRefreshSchedule, configDirectory, generationServer, generationSettings } from "../catalog-policy.ts";
 import module from "../lotus.ts";
 import { buildGenerationBody } from "../generation.ts";
+import { supportGuoba } from "../settings.ts";
 
 test("表情设置命令可安全更新旧 YAML 并即时生效", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-settings-"));
@@ -102,6 +104,79 @@ list: []
   } finally {
     if (previous === undefined) delete Bun.env.LOTUS_MEME_CONFIG_DIR;
     else Bun.env.LOTUS_MEME_CONFIG_DIR = previous;
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目录优先级", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "lotus-meme-guoba-"));
+  const previousDirectory = Bun.env.LOTUS_MEME_CONFIG_DIR;
+  const previousServer = Bun.env.LOTUS_MEME_SERVER_URL;
+  const Result = { ok: () => ({ ok: true }), error: (_message: string, status: number) => ({ ok: false, status }) };
+  try {
+    delete Bun.env.LOTUS_MEME_CONFIG_DIR;
+    expect(configDirectory()).toBe(fileURLToPath(new URL("../../../data/meme/config/", import.meta.url)));
+    Bun.env.LOTUS_MEME_CONFIG_DIR = directory;
+    Bun.env.LOTUS_MEME_SERVER_URL = "http://127.0.0.1:1/env";
+    expect(configDirectory()).toBe(directory);
+
+    const original = {
+      meme: "\uFEFF# 原表情设置\r\nenable: false\r\nreply: false # 原引用\r\ncache: true\r\ncustom: {flag:keep}\r\n",
+      access: "# 保留紧凑流式样式\r\n{enable: true, mode: 0, userWhiteList: [10001], custom: keep,}\r\n",
+      protect: "# 老配置保存一个 QQ\nuser: 10002\n",
+      server: "url: 'http://127.0.0.1:1/saved' # 本地值\ntimeout: 5\nretry: 4\n",
+      other: "autoUpdateRes: true\nautoUpdateResCron: '0 0 2 * * ?'\nautoUpdate: false\n",
+    };
+    const path = (file: string) => join(directory, file + ".yaml");
+    const read = (file: string) => readFile(path(file), "utf8");
+    await Promise.all(Object.entries(original).map(([file, text]) => writeFile(path(file), text, { mode: 0o640 })));
+    const { configInfo: form } = supportGuoba();
+    const fields = form.schemas.flatMap(schema => "field" in schema ? [schema.field] : []);
+    expect(fields).toHaveLength(23);
+    for (const field of ["meme.cache", "meme.pokeEnable", "server.retry", "other.autoUpdate", "other.hijackRes", "other.renderScale"]) {
+      expect(fields).not.toContain(field);
+    }
+    expect(form.getConfigData()).toMatchObject({
+      meme: { enable: false, reply: false, imagesInMessage: true },
+      access: { mode: 0, userWhiteList: [10001] }, protect: { user: [10002] },
+      server: { url: "http://127.0.0.1:1/saved", timeout: 5 }, stat: { enable: true },
+    });
+    expect(generationServer()?.base.href).toBe("http://127.0.0.1:1/env");
+
+    expect(form.setConfigData({ "meme.reply": true, "access.mode": 1, "protect.user": [], "server.timeout": 999 }, {
+      Result, changedFields: ["meme.reply", "access.mode"],
+    })).toEqual({ ok: true });
+    expect(await read("meme")).toBe(original.meme.replace("reply: false", "reply: true"));
+    expect(await read("access")).toBe(original.access.replace("mode: 0", "mode: 1"));
+    expect(generationSettings().quote).toBe(true);
+    expect(catalogPolicy(10001).allowed).toBe(true);
+    expect((await stat(path("meme"))).mode & 0o777).toBe(0o640);
+    for (const file of ["protect", "server", "other"] as const) expect(await read(file)).toBe(original[file]);
+
+    for (const invalid of [
+      { "meme.cache": false }, { "protect.user": ["bad-id"] }, { "access.mode": 7 },
+      { "server.timeout": 0 }, { "server.url": "http://user@127.0.0.1/" },
+      { "other.autoUpdateResCron": "0 0 99 * * *" }, { "other.autoUpdateResCron": "tomorrow" },
+    ]) {
+      expect(form.setConfigData({ "meme.reply": false, ...invalid }, { Result })).toEqual({ ok: false, status: 422 });
+    }
+    expect(await read("meme")).toBe(original.meme.replace("reply: false", "reply: true"));
+    expect(await read("server")).toBe(original.server);
+    expect(await read("other")).toBe(original.other);
+
+    expect(form.setConfigData({ "other.autoUpdateResCron": "*/15 * * * ?", "stat.enable": false }, { Result })).toEqual({ ok: true });
+    expect(catalogRefreshSchedule()).toBe("0 */15 * * * *");
+    expect(form.getConfigData().stat).toEqual({ enable: false });
+    expect(form.setConfigData({ "protect.user": [10002, "10003"] }, { Result })).toEqual({ ok: true });
+    expect(await read("protect")).toBe(original.protect.replace("user: 10002", 'user: [10002,"10003"]'));
+    await writeFile(path("stat"), "enable: [\n");
+    expect(() => form.setConfigData({ "meme.reply": false, "stat.enable": true }, { Result })).toThrow();
+    expect(await read("meme")).toBe(original.meme.replace("reply: false", "reply: true"));
+  } finally {
+    if (previousDirectory === undefined) delete Bun.env.LOTUS_MEME_CONFIG_DIR;
+    else Bun.env.LOTUS_MEME_CONFIG_DIR = previousDirectory;
+    if (previousServer === undefined) delete Bun.env.LOTUS_MEME_SERVER_URL;
+    else Bun.env.LOTUS_MEME_SERVER_URL = previousServer;
     await rm(directory, { recursive: true, force: true });
   }
 });

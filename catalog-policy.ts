@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const defaultDirectory = fileURLToPath(new URL("../../data/meme/config/", import.meta.url));
 
-function readConfig(directory: string, filename: string): Record<string, unknown> {
+export function readConfig(directory: string, filename: string): Record<string, unknown> {
   let source: string;
   try {
     source = readFileSync(join(directory, filename), "utf8");
@@ -82,14 +82,19 @@ export function memeUsageEnabled() {
 }
 
 
-export function generationServer() {
-  const settings = readConfig(configDirectory(), "server.yaml");
-  const value = Bun.env.LOTUS_MEME_SERVER_URL ?? settings.url;
-  if (value === undefined || value === null || value === "") return;
+export function parseGenerationServerUrl(value: unknown): URL {
   if (typeof value !== "string") throw new Error("无效的表情服务地址");
   const base = new URL(value);
   if ((base.protocol !== "https:" && base.protocol !== "http:") ||
       base.username || base.password || base.search || base.hash) throw new Error("无效的表情服务地址");
+  return base;
+}
+
+export function generationServer() {
+  const settings = readConfig(configDirectory(), "server.yaml");
+  const value = Bun.env.LOTUS_MEME_SERVER_URL ?? settings.url;
+  if (value === undefined || value === null || value === "") return;
+  const base = parseGenerationServerUrl(value);
   const timeout = settings.timeout ?? 5;
   if (typeof timeout !== "number" || !Number.isFinite(timeout) || timeout <= 0 || timeout > 120) {
     throw new Error("无效的表情服务请求超时");
@@ -100,7 +105,10 @@ export function generationServer() {
 export function catalogRefreshSchedule(): string | undefined {
   const settings = readConfig(configDirectory(), "other.yaml");
   if (!flag(settings.autoUpdateRes, true)) return;
-  const cron = settings.autoUpdateResCron ?? "0 0 2 * * ?";
+  return normalizeCatalogCron(settings.autoUpdateResCron ?? "0 0 2 * * ?");
+}
+
+export function normalizeCatalogCron(cron: unknown): string {
   if (typeof cron !== "string") throw new Error("无效的表情目录更新时间");
   const fields = cron.trim().split(/\s+/u);
   if (fields.length === 5) fields.unshift("0");

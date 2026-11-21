@@ -2,10 +2,12 @@ import { chmodSync, chownSync, closeSync, constants, fstatSync, fsyncSync, mkdir
   openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { isDeepStrictEqual } from "node:util";
-import { isSeq, parseDocument } from "yaml";
-import { configDirectory } from "./catalog-policy.ts";
+import { Job } from "node-schedule";
+import { isMap, isSeq, parseDocument } from "yaml";
+import { configDirectory, normalizeCatalogCron, parseGenerationServerUrl, readConfig } from "./catalog-policy.ts";
 
 type Setting = readonly [title: string, key: string, type: "toggle" | "mode" | "users" | "templates", fallback: unknown];
+type PanelSetting = Setting | readonly [title: string, key: string, type: "url" | "seconds" | "cron", fallback: string | number];
 const sections = [
   { title: "表情设置", file: "meme.yaml", fields: [
     ["默认表情", "enable", "toggle", true],
@@ -31,6 +33,17 @@ const sections = [
     ["主人保护", "master", "toggle", false],
     ["用户保护", "userEnable", "toggle", false],
   ] satisfies Setting[] },
+];
+
+const panelSections: readonly { title: string; file: string; fields: readonly PanelSetting[] }[] = [
+  { title: "服务设置", file: "server.yaml", fields: [
+    ["服务地址", "url", "url", ""], ["请求超时（秒）", "timeout", "seconds", 5],
+  ] },
+  ...sections,
+  { title: "表情统计设置", file: "stat.yaml", fields: [["表情统计", "enable", "toggle", true]] },
+  { title: "目录更新设置", file: "other.yaml", fields: [
+    ["自动更新资源", "autoUpdateRes", "toggle", true], ["自动更新 Cron", "autoUpdateResCron", "cron", "0 0 2 * * ?"],
+  ] },
 ];
 
 const settingCommand = /^#表情(?:合成)?设置\s*/u;
@@ -61,9 +74,9 @@ function snapshot(file: string) {
 
 function documentOf(text: string) {
   const document = parseDocument(text, { merge: true, strict: true, uniqueKeys: true });
-  const persisted: unknown = Bun.YAML.parse(text);
+  const persisted: unknown = Bun.YAML.parse(text) ?? {};
   if (document.errors.length || typeof persisted !== "object" || persisted === null || Array.isArray(persisted) ||
-      !isDeepStrictEqual(document.toJS(), persisted)) throw new Error();
+      !isDeepStrictEqual(document.toJS() ?? {}, persisted)) throw new Error();
   return { document, values: persisted as Record<string, unknown> };
 }
 
@@ -100,11 +113,155 @@ function rewrite(
   }
 }
 
-function settingValue(setting: Setting, values: Record<string, unknown>): unknown {
+function settingValue(setting: PanelSetting, values: Record<string, unknown>): unknown {
   const value = values[setting[1]] ?? setting[3];
   // Older protection files can store a single QQ number instead of a sequence.
   if (setting[1] === "user" && (typeof value === "string" || typeof value === "number")) return [value];
   return value;
+}
+
+function panelField(group: string, [label, key, type]: PanelSetting) {
+  const field = `${group}.${key}`;
+  switch (type) {
+    case "toggle": return { label, field, component: "Switch",
+      ...(field === "other.autoUpdateRes" && { bottomHelpMessage: "重启后重新登记定时任务。" }) };
+    case "mode": return { label, field, component: "Select", componentProps: { options: [
+      { label: "白名单", value: 0 }, { label: "黑名单", value: 1 },
+    ] } };
+    case "users":
+    case "templates": return { label, field, component: "Select", componentProps: { mode: "tags" } };
+    case "url": return { label, field, component: "Input", bottomHelpMessage: "环境变量 LOTUS_MEME_SERVER_URL 优先。" };
+    case "seconds": return { label, field, component: "InputNumber", componentProps: { min: 0, max: 120 } };
+    case "cron": return { label, field, component: "EasyCron", bottomHelpMessage: "重启后按新时间更新目录。" };
+  }
+}
+
+function panelValue(type: PanelSetting[2], value: unknown) {
+  switch (type) {
+    case "toggle": if (typeof value === "boolean") return value; break;
+    case "mode": if (value === 0 || value === 1) return value; break;
+    case "users":
+    case "templates": {
+      if (!Array.isArray(value) || !value.every(item => typeof item === "string" || Number.isSafeInteger(item))) break;
+      const entries = value.map(item => typeof item === "string" ? item.trim() : item as number);
+      if (type === "templates" ? entries.every(item => item !== "") :
+        entries.every(item => /^[1-9]\d*$/u.test(String(item)) && Number.isSafeInteger(Number(item)))) return entries;
+      break;
+    }
+    case "url": {
+      if (typeof value !== "string") break;
+      const url = value.trim();
+      if (url) parseGenerationServerUrl(url);
+      return url;
+    }
+    case "seconds": {
+      const number = typeof value === "string" && value.trim() !== "" ? Number(value) : value;
+      if (typeof number === "number" && Number.isFinite(number) && number > 0 && number <= 120) return number;
+      break;
+    }
+    case "cron": {
+      const cron = normalizeCatalogCron(value);
+      const job: Job & { readonly isOneTimeJob?: boolean } = new Job(() => {});
+      try {
+        if (job.schedule(cron) && !job.isOneTimeJob) return (value as string).trim();
+      } finally {
+        job.cancel();
+      }
+      break;
+    }
+  }
+  throw new Error("无效的表情设置");
+}
+
+function panelYaml(text: string, { document, values }: ReturnType<typeof documentOf>, updates: ReadonlyMap<string, unknown>) {
+  const root = document.contents;
+  const items = [...updates].map(([key, value]) => [key, JSON.stringify(value)] as const);
+  const edits: { start: number; end: number; value: string }[] = [];
+  if (isMap(root) || root === null) {
+    const additions: string[] = [];
+    for (const [key, value] of items) {
+      const node = root?.get(key, true);
+      if (node === undefined) {
+        additions.push(`${key}: ${value}`);
+        continue;
+      }
+      if (!node?.range) throw new Error();
+      const [start, end] = node.range;
+      const gap = start === end && text[start - 1] === ":" ? " " : "";
+      const following = start === end && text[start] === "#" ? " " : "";
+      const eol = /(?:\r?\n)+$/u.exec(text.slice(start, end))?.[0] ?? "";
+      edits.push({ start, end, value: `${gap}${value}${following}${eol}` });
+    }
+    if (additions.length) {
+      if (root?.flow && root.range) {
+        const start = root.range[0] + 1;
+        edits.push({ start, end: start, value: additions.join(", ") + (root.items.length ? ", " : "") });
+      } else {
+        const start = root?.range?.[1] ?? document.range?.[1] ?? text.length;
+        const eol = /\r?\n/u.exec(text)?.[0] ?? "\n";
+        const before = text.slice(0, start).replace(/^\uFEFF/u, "");
+        edits.unshift({ start, end: start, value: (before && !before.endsWith("\n") ? eol : "") + additions.join(eol) + eol });
+      }
+    }
+  } else if (root.range) {
+    const [start, end] = root.range;
+    edits.push({ start, end, value: `{${items.map(([key, value]) => `${key}: ${value}`).join(", ")}}` });
+  } else {
+    throw new Error();
+  }
+  const output = edits.sort((left, right) => right.start - left.start || right.end - left.end)
+    .reduce((source, { start, end, value }) => source.slice(0, start) + value + source.slice(end), text);
+  if (!isDeepStrictEqual(documentOf(output).values, { ...values, ...Object.fromEntries(updates) })) throw new Error();
+  return output;
+}
+
+export function supportGuoba() {
+  const fields = new Map<string, { file: string; setting: PanelSetting }>(panelSections.flatMap(({ file, fields }) => fields.map(setting => [
+    `${file.slice(0, -5)}.${setting[1]}`, { file, setting },
+  ] as const)));
+  return {
+    pluginInfo: { name: "meme", title: "表情合成", isV3: true, isV2: false },
+    configInfo: {
+      schemas: panelSections.flatMap(({ title, file, fields }) => [
+        { label: title, component: "SOFT_GROUP_BEGIN" }, ...fields.map(setting => panelField(file.slice(0, -5), setting)),
+      ]),
+      getConfigData() {
+        const directory = configDirectory();
+        return Object.fromEntries(panelSections.map(({ file, fields }) => {
+          const values = readConfig(directory, file);
+          return [file.slice(0, -5), Object.fromEntries(fields.map(setting => [setting[1], settingValue(setting, values)]))];
+        }));
+      },
+      setConfigData(data: Record<string, unknown>, { Result, changedFields }: {
+        Result: { ok(): unknown; error(message: string, status: number): unknown }; changedFields?: readonly string[];
+      }) {
+        const patches = new Map<string, Map<string, unknown>>();
+        try {
+          for (const name of changedFields ?? Object.keys(data)) {
+            const entry = fields.get(name);
+            if (!entry || !Object.hasOwn(data, name)) throw new Error();
+            const { file, setting } = entry;
+            const patch = patches.get(file) ?? new Map();
+            patch.set(setting[1], panelValue(setting[2], data[name]));
+            patches.set(file, patch);
+          }
+        } catch {
+          return Result.error("表情配置包含未知字段或无效值。", 422);
+        }
+
+        const directory = configDirectory();
+        const writes = [...patches].flatMap(([file, updates]) => {
+          const path = join(directory, file);
+          const previous = snapshot(path);
+          const current = documentOf(previous.text);
+          for (const [key, value] of updates) if (isDeepStrictEqual(current.values[key], value)) updates.delete(key);
+          return updates.size ? [{ path, previous, yaml: panelYaml(previous.text, current, updates) }] : [];
+        });
+        for (const { path, previous, yaml } of writes) rewrite(directory, path, previous, yaml);
+        return Result.ok();
+      },
+    },
+  };
 }
 
 function show(setting: Setting, value: unknown): string {
