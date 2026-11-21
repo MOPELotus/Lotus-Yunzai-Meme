@@ -107,6 +107,10 @@ export function parseGenerationServerUrl(value: unknown): URL {
   return base;
 }
 
+export function safeCatalogKey(value: unknown): value is string {
+  return typeof value === "string" && value !== "." && value !== ".." && /^[^/\\\s\x00-\x1f]{1,255}$/u.test(value);
+}
+
 export function generationServer() {
   const settings = readConfig(configDirectory(), "server.yaml");
   const value = Bun.env.LOTUS_MEME_SERVER_URL ?? settings.url;

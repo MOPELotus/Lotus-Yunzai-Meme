@@ -1,5 +1,5 @@
 import { catalogPath } from "./catalog-file.ts";
-import { generationServer, generationSettings } from "./catalog-policy.ts";
+import { generationServer, generationSettings, safeCatalogKey } from "./catalog-policy.ts";
 import type { GenerationInput } from "./generation.ts";
 import { recordMemeUsage } from "./usage.ts";
 
@@ -115,6 +115,24 @@ export async function requestMemeImage(
   return readResult(await fetch(endpoint, {
     method: "POST", body, redirect: "error", signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
   }));
+}
+
+export async function requestMemePreview(
+  key: string, server: NonNullable<ReturnType<typeof generationServer>>, signal?: AbortSignal,
+) {
+  if (!safeCatalogKey(key) || signal?.aborted) return;
+  const endpoint = new URL(server.base);
+  endpoint.pathname = `${endpoint.pathname.replace(/\/+$/u, "")}/memes/${encodeURIComponent(key)}/preview`;
+  const timeout = AbortSignal.timeout(server.timeout);
+  try {
+    const bytes = await readResult(await fetch(endpoint, {
+      redirect: "error", credentials: "omit", referrerPolicy: "no-referrer",
+      signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+    }));
+    if (!signal?.aborted) return bytes;
+  } catch {
+    // The local metadata is still available when the preview service cannot reply.
+  }
 }
 
 export function recordGeneratedMeme(key: string, catalog: string) {

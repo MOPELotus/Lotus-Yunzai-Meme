@@ -2,7 +2,7 @@ import { Database } from "bun:sqlite";
 import { existsSync, linkSync, mkdirSync, rmSync } from "node:fs";
 import { dirname } from "node:path";
 import { catalogPath, catalogVersion } from "./catalog-file.ts";
-import { generationServer } from "./catalog-policy.ts";
+import { generationServer, safeCatalogKey } from "./catalog-policy.ts";
 import { isMemeOwner, type SettingsContext } from "./settings.ts";
 
 const command = /^#?(?:表情(?:合成)?|meme)(强制)?更新(?:表情包|资源|数据)?$/iu;
@@ -59,10 +59,6 @@ async function fetchJSON(server: Server, route: string, signal?: AbortSignal): P
     await reader.cancel().catch(() => undefined);
     reader.releaseLock();
   }
-}
-
-function safeKey(value: unknown): value is string {
-  return typeof value === "string" && value !== "." && value !== ".." && /^[^/\\\s\x00-\x1f]{1,255}$/u.test(value);
 }
 
 function entryFor(key: string, value: unknown) {
@@ -153,7 +149,7 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
     const kept = db ? catalogKeys(db) : new Set<string>();
     const version = catalogVersion(file);
     const result = await fetchJSON(server, "keys", signal);
-    if (!Array.isArray(result) || !result.length || result.some((key) => !safeKey(key))) throw new Error();
+    if (!Array.isArray(result) || !result.length || result.some((key) => !safeCatalogKey(key))) throw new Error();
     const remote = new Set<string>(result);
     const required = [...remote].filter((key) => force || !kept.has(key));
     const removed = [...kept].filter((key) => !remote.has(key));

@@ -1,9 +1,10 @@
 import { Database } from "bun:sqlite";
+import type { CatalogCardRow, CatalogPngRenderer } from "./catalog-card.ts";
 import { catalogPath, catalogVersion } from "./catalog-file.ts";
 import { catalogPolicy, generationServer } from "./catalog-policy.ts";
 import { argsTypeFromParams, parseGenerationArgs, type PresetArgument } from "./generation-args.ts";
 import { buildGenerationBody, type GenerationInput } from "./generation.ts";
-import { generateMemeReply, type FallbackContext } from "./generate-reply.ts";
+import { generateMemeReply, requestMemePreview, type FallbackContext } from "./generate-reply.ts";
 
 import { handleMemeSettings } from "./settings.ts";
 import { handleCatalogUpdate } from "./catalog-update.ts";
@@ -15,6 +16,8 @@ export { createProfileLikeImageRenderer } from "./profile-like-image.ts";
 export type { MemePokeContext } from "./poke.ts";
 
 const pageSize = 12;
+const catalogList = /^#?(?:表情(?:合成)?|meme)列表$/iu;
+const catalogDetail = /^#?(?:表情(?:合成)?|meme)\s*详情\s*([^\r\n]+)$/iu;
 const catalogSearch = /^#?(?:表情(?:合成)?|meme)搜索([^\r\n]*)$/iu;
 const randomMemeCommand = /^#?(?:表情|meme)?随机(?:表情|meme)包?$/iu;
 const usageCommand = /^#?(?:表情|meme)(?:调用)?统计$/iu;
@@ -43,15 +46,28 @@ interface CatalogDetails extends CatalogRow {
   max_images: number;
   min_texts: number;
   max_texts: number;
+  params?: string;
+  defText?: string;
+  args_type?: string;
+  info?: string;
+  tags?: string;
+}
+
+function json(value: string | undefined): unknown {
+  if (!value) return;
+  try { return JSON.parse(value); } catch { return; }
+}
+
+function stringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((part): part is string => typeof part === "string") : [];
 }
 
 function keywords(value: string): string[] {
-  try {
-    const parsed: unknown = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed.filter((word) => typeof word === "string") : [];
-  } catch {
-    return [];
-  }
+  return stringArray(json(value));
+}
+
+function record(value: unknown): Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value) ? value as Record<string, unknown> : {};
 }
 
 function currentPolicy(userId: number | undefined, forGeneration = false) {
@@ -111,7 +127,6 @@ function list(argument: string, context?: CatalogContext): string {
   })());
 }
 
-const detailsFields = "key, keyWords, min_images, max_images, min_texts, max_texts";
 
 function sameKeyword(left: string, right: string): boolean {
   return left.toLowerCase() === right.toLowerCase();
@@ -121,6 +136,62 @@ function requireTextMatch(row: TriggerRow, text: string): boolean {
   if (row.min_texts !== 0 || row.max_texts !== 0 || !text) return true;
 
   return /^(@\s*\d+\s*)+$/u.test(text) || /^(#\S+\s+[^#]+(?:\s+#\S+\s+[^#]+)*)$/u.test(text);
+}
+
+function illustratedCatalog(render?: CatalogPngRenderer, signal?: AbortSignal) {
+  let rendered: { signature: string; cards: Promise<{ type: "image"; file: Uint8Array }[]> } | undefined;
+
+  async function pictures(argument: string, context?: CatalogContext) {
+    if (signal?.aborted) return;
+    if (!render) return list(argument, context);
+    const policy = currentPolicy(context?.user_id);
+    if (typeof policy === "string") return policy;
+    try {
+      const version = catalogVersion();
+      const hidden = JSON.stringify(policy.hidden);
+      const signature = JSON.stringify([version, hidden]);
+      if (!rendered || rendered.signature !== signature) {
+        const rows = withCatalog((db) => db.query<CatalogDetails, [string]>(
+          `SELECT * ${visibleCatalog} ORDER BY key`,
+        ).all(hidden).flatMap((item): CatalogCardRow[] => {
+          const keyword = keywords(item.keyWords)[0];
+          if (!keyword) return [];
+          const types: CatalogCardRow["types"][number][] = [];
+          if (item.min_texts > 0) types.push("text");
+          if (item.min_images > 0) types.push("image");
+          if ((argsTypeFromParams(item.params) ?? json(item.args_type)) != null) types.push("arg");
+          return [{ keyword, types }];
+        }));
+        if (typeof rows === "string") return rows;
+        if (!rows.length) return list(argument, context);
+        const cards = (async () => {
+          const { renderCatalogCard, rowsPerCatalogCard } = await import("./catalog-card.ts");
+          const replies: { type: "image"; file: Uint8Array }[] = [];
+          for (let offset = 0; offset < rows.length; offset += rowsPerCatalogCard) {
+            signal?.throwIfAborted();
+            const { png } = await renderCatalogCard(rows.slice(offset, offset + rowsPerCatalogCard), offset, rows.length, render);
+            replies.push({ type: "image", file: png });
+          }
+          return replies;
+        })();
+        rendered = { signature, cards };
+        void cards.catch(() => { if (rendered?.cards === cards) rendered = undefined; });
+      }
+      const cards = await rendered.cards;
+      if (signal?.aborted) return;
+      const current = currentPolicy(context?.user_id);
+      if (typeof current === "string") return current;
+      if (catalogVersion() !== version || JSON.stringify(current.hidden) !== hidden) {
+        return "表情目录已更新，请重新查看列表。";
+      }
+      return cards.length === 1 ? cards[0] : { type: "forward" as const, nodes: cards, batchSize: 2 };
+    } catch {
+      if (!signal?.aborted) return list(argument, context);
+    }
+  }
+
+  return (argument: string, context?: CatalogContext) => !render || argument.trim()
+    ? list(argument, context) : pictures(argument, context);
 }
 
 type TriggerRow = Pick<CatalogDetails, "key" | "keyWords" | "min_texts" | "max_texts">;
@@ -224,31 +295,72 @@ export async function prepareMemeRequest(message: string, input: GenerationInput
   return prepareResolvedRequest(match, input);
 }
 
-function details(key: string, context?: CatalogContext): string {
+async function details(argument: string, context?: CatalogContext, signal?: AbortSignal) {
+  const key = argument.trim();
   if (!key) return "用法：#表情详情 <编号或关键词>";
+  if (signal?.aborted) return;
 
-  return queryCatalog(context?.user_id, (db, hidden) => {
+  let version: string;
+  try { version = catalogVersion(); } catch { return "无法读取表情目录，请检查本机导入的旧数据库。"; }
+  const entry = queryCatalog(context?.user_id, (db, hidden) => {
     let row = db.query<CatalogDetails, [string, string]>(
-      `SELECT ${detailsFields} ${visibleCatalog} AND key = ?`,
+      `SELECT * ${visibleCatalog} AND key = ?`,
     ).get(hidden, key);
     if (!row && !db.query("SELECT 1 FROM meme WHERE key = ?").get(key)) {
-      const known = db.query<CatalogDetails, [string]>(
-        `SELECT ${detailsFields} ${visibleCatalog} ORDER BY key`,
-      ).all(hidden);
+      const known = db.query<CatalogDetails, [string]>(`SELECT * ${visibleCatalog} ORDER BY key`).all(hidden);
       const matches = known.filter((item) => keywords(item.keyWords).some((word) => sameKeyword(word, key)));
       if (matches.length > 1) return "该关键词对应多个表情，请用编号查询。";
       row = matches[0] ?? null;
     }
     if (!row) return "没有找到对应表情，发送 #表情列表 查看编号。";
 
+    const params = record(json(row.params));
     const aliases = keywords(row.keyWords);
-    return [
-      `表情 ${row.key}`,
-      ...(aliases.length ? [`关键词：${aliases.join("、")}`] : []),
-      `图片：${row.min_images}–${row.max_images} 张`,
-      `文字：${row.min_texts}–${row.max_texts} 段`,
-    ].join("\n");
+    const defaults = stringArray(json(row.defText) ?? params.default_texts);
+    const tags = stringArray(json(row.tags) ?? record(json(row.info)).tags);
+    const args = record(record(record(params.args_type ?? json(row.args_type)).args_model).properties);
+    const options = Object.entries(args).flatMap(([name, field]) => {
+      if (name === "user_infos") return [];
+      const { description } = record(field);
+      return [typeof description === "string" && description.trim() ? `[${name}: ${description}]` : `[${name}]`];
+    });
+    const hasPresets = db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'preset'").get();
+    const disabled = new Set(keywords(hidden));
+    const presets = !hasPresets ? [] : db.query<{ name: string }, [string]>("SELECT name FROM preset WHERE key = ? ORDER BY rowid")
+      .all(row.key).flatMap(({ name }) => legacyPresetKeyword(name) ?? []).filter(name => !disabled.has(name));
+    return { row, aliases, defaults, tags, options, presets };
   });
+  if (typeof entry === "string") return entry;
+  const { row, aliases, defaults, tags, options, presets } = entry;
+  const format = (values: readonly string[]) => values.length ? values.map(value => `[${value}]`).join(" ") : "[无]";
+  const text = [
+    `表情 ${row.key}`,
+    `关键词：${format(aliases)}`,
+    `图片：${row.min_images}–${row.max_images} 张`,
+    `文字：${row.min_texts}–${row.max_texts} 段`,
+    `默认文本：${format(defaults)}`,
+    `标签：${format(tags)}`,
+    ...(options.length ? [`可选参数：${options.join(" ")}`] : []),
+    `参数命令：${format(presets)}`,
+    "预览图片：",
+  ].join("\n");
+  const failure = `${text}\n预览图片加载失败`;
+  let server: ReturnType<typeof generationServer>;
+  try { server = generationServer(); } catch { return failure; }
+  if (!server) return failure;
+  const preview = await requestMemePreview(row.key, server, signal);
+  if (signal?.aborted) return;
+  const policy = currentPolicy(context?.user_id);
+  if (typeof policy === "string") return policy;
+  if ([row.key, ...aliases].some(name => policy.hidden.includes(name))) return "没有找到对应表情，发送 #表情列表 查看编号。";
+  try {
+    if (version !== catalogVersion()) return "表情目录已更新，请重新查看详情。";
+    if (server.base.href !== generationServer()?.base.href) return failure;
+  } catch { return failure; }
+  return {
+    type: "quoted" as const,
+    message: preview ? [text + "\n", { type: "image" as const, file: preview }] : failure,
+  };
 }
 
 function search(argument: string, context?: CatalogContext) {
@@ -337,18 +449,23 @@ async function usageReport(context: CatalogContext) {
   }
 }
 
-function createMemeCommands(signal?: AbortSignal) {
+function createMemeCommands(signal?: AbortSignal, renderCatalogPng?: CatalogPngRenderer) {
+  const listCatalog = illustratedCatalog(renderCatalogPng, signal);
   return {
-    fallback: (message: string, context: FallbackContext) => memeFallback(message, context, signal),
+    fallback: (message: string, context: FallbackContext) => memeFallback(message, context, listCatalog, signal),
     commands: {
-      "#表情列表": list, "#表情详情": details, "#表情搜索": search,
+      "#表情列表": listCatalog, "#表情详情": (argument: string, context?: CatalogContext) => details(argument, context, signal), "#表情搜索": search,
       "#表情统计": (_argument: string, context: CatalogContext) => usageReport(context),
     },
   };
 }
 
-async function memeFallback(message: string, context: FallbackContext, signal?: AbortSignal) {
+async function memeFallback(message: string, context: FallbackContext, listCatalog: ReturnType<typeof illustratedCatalog>,
+  signal?: AbortSignal) {
   const input = message.trim();
+  if (catalogList.test(input)) return listCatalog("", context);
+  const detailMatch = catalogDetail.exec(input);
+  if (detailMatch) return details(detailMatch[1] ?? "", context, signal);
   const searchMatch = catalogSearch.exec(input);
   if (searchMatch) return search(searchMatch[1] ?? "", context);
   if (usageCommand.test(input)) return usageReport(context);
@@ -391,7 +508,7 @@ export function createModule({ signal, memeRuntime }: { readonly signal: AbortSi
   const active = AbortSignal.any([signal, lifecycle.signal]);
   const stop = memeRuntime && startCatalogRuntime(memeRuntime, active);
   return {
-    ...createMemeCommands(active),
+    ...createMemeCommands(active, memeRuntime?.renderCatalogPng),
     handlePoke: createMemePokeHandler(active, selectPokeTemplates),
     async dispose() {
       lifecycle.abort();

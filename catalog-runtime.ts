@@ -1,7 +1,9 @@
+import type { CatalogPngRenderer } from "./catalog-card.ts";
 import { catalogRefreshSchedule } from "./catalog-policy.ts";
 import { runAutomaticCatalogRefresh } from "./catalog-update.ts";
 
 export interface MemeRuntime {
+  readonly renderCatalogPng?: CatalogPngRenderer;
   whenReady(start: () => void): () => void;
   registerTask(cron: string, run: () => Promise<void>): () => void | Promise<void>;
 }
