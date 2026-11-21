@@ -9,6 +9,7 @@ import { join } from "node:path";
 import { fetchAvatar, imageMime, maxAvatarBytes } from "./generate-reply.ts";
 
 type Outcome = "success" | "failure";
+const renderScale = 4;
 
 interface Options {
   /** Path to the operator's original yenai resources/memes directory. */
@@ -83,11 +84,14 @@ async function compose(avatar: Uint8Array, { family, art }: Template,
   const { Canvas, loadImage } = await import("skia-canvas");
   const [face, frame] = await Promise.all([loadImage(Buffer.from(avatar)), loadImage(art)]);
   if (signal?.aborted || !face.width || !face.height || face.width > 4096 || face.height > 4096) return;
-  const canvas = family === "ganyu" ? new Canvas(700, 598) : new Canvas(frame.width, frame.height);
+  const width = family === "ganyu" ? 700 : frame.width;
+  const height = family === "ganyu" ? 598 : frame.height;
+  const canvas = new Canvas(width * renderScale, height * renderScale);
   const ctx = canvas.getContext("2d");
+  ctx.scale(renderScale, renderScale);
   // The Jimp renderer encoded a JPEG with black beneath transparent pixels.
   ctx.fillStyle = "#000";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, width, height);
   if (family === "ganyu") {
     ctx.drawImage(face, 425, 327, 235, 235);
     ctx.drawImage(frame, 0, 0);

@@ -9,6 +9,7 @@ export interface UsageRow {
 }
 
 const width = 1152;
+const renderScale = 4;
 const columns = 5;
 const gap = 16;
 const gridPadding = 17;
@@ -104,7 +105,8 @@ export async function renderUsageCard(total: number, rows: readonly UsageRow[], 
     Math.max(0, cardRows.length - 1) * gap;
   const cardBottom = gridY + gridHeight + 21;
   const height = cardBottom + 51;
-  return renderPng(width, height, (ctx) => {
+  return renderPng(width * renderScale, height * renderScale, (ctx) => {
+    ctx.scale(renderScale, renderScale);
     const cover = Math.max(width / backdrop.width, height / backdrop.height);
     const backdropWidth = backdrop.width * cover;
     const backdropHeight = backdrop.height * cover;

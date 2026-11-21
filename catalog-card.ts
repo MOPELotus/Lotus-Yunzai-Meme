@@ -14,6 +14,7 @@ export type CatalogPngRenderer = (
 ) => Promise<{ readonly png: Uint8Array }>;
 
 const width = 1440;
+const renderScale = 4;
 const headerX = 152;
 const headerWidth = 1136;
 const columnX = 168;
@@ -86,8 +87,10 @@ export async function renderCatalogCard(
     return { entries, height: 2 * columnPadding + entries.reduce((sum, item) => sum + item.height + itemGap, 0) };
   });
   const contentBottom = columnY + Math.max(0, ...columns.map(column => column.height));
-  return render(width, contentBottom + 78, (ctx) => {
-    cover(ctx, background, contentBottom + 78);
+  const height = contentBottom + 78;
+  return render(width * renderScale, height * renderScale, (ctx) => {
+    ctx.scale(renderScale, renderScale);
+    cover(ctx, background, height);
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
     ctx.save();
