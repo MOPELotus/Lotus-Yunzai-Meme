@@ -22,7 +22,7 @@ const createTables = `
   );`;
 
 type Server = NonNullable<ReturnType<typeof generationServer>>;
-type Presets = typeof import("./models/Meme/preset.js").preset;
+type Presets = typeof import("./models/Meme/preset.ts").preset;
 
 function record(value: unknown): Record<string, unknown> {
   if (typeof value !== "object" || value === null || Array.isArray(value)) throw new Error();
@@ -115,7 +115,7 @@ async function initializeCatalog(signal: AbortSignal): Promise<string | undefine
       current.close();
     }
     if (!empty) {
-      const { preset } = await import("./models/Meme/preset.js");
+      const { preset } = await import("./models/Meme/preset.ts");
       signal.throwIfAborted();
       if (file !== catalogPath()) return;
       const db = new Database(file, { strict: true, create: false });
@@ -161,7 +161,7 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
       if (batch.some((entry) => entry.status === "rejected")) throw new Error();
       for (const entry of batch) if (entry.status === "fulfilled") entries.push(entry.value);
     }
-    const { preset } = await import("./models/Meme/preset.js");
+    const { preset } = await import("./models/Meme/preset.ts");
     signal?.throwIfAborted();
     if (file !== catalogPath() || version !== catalogVersion(file) || generationServer()?.base.href !== server.base.href) throw new Error();
 
