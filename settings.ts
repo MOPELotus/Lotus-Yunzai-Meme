@@ -4,9 +4,11 @@ import { join } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import { Job } from "node-schedule";
 import { isMap, isSeq, parseDocument } from "yaml";
-import { configDirectory, normalizeCatalogCron, parseGenerationServerUrl, readConfig } from "./catalog-policy.ts";
+import { configDirectory, defaultPokeCooldown, defaultPokeProbability, maxPokeCooldown, maxPokeProbability,
+  normalizeCatalogCron, parseGenerationServerUrl, readConfig } from "./catalog-policy.ts";
 
-type Setting = readonly [title: string, key: string, type: "toggle" | "mode" | "users" | "templates", fallback: unknown];
+type Setting = readonly [title: string, key: string,
+  type: "toggle" | "mode" | "users" | "templates" | "percentage" | "cooldown", fallback: unknown];
 type PanelSetting = Setting | readonly [title: string, key: string, type: "url" | "seconds" | "cron", fallback: string | number];
 const sections = [
   { title: "表情设置", file: "meme.yaml", fields: [
@@ -17,6 +19,9 @@ const sections = [
     ["消息图片", "imagesInMessage", "toggle", true],
     ["引用图片", "quotedImages", "toggle", true],
     ["错误回复", "errorReply", "toggle", true],
+    ["戳一戳表情", "pokeEnable", "toggle", false],
+    ["戳一戳触发概率", "pokeProbability", "percentage", defaultPokeProbability],
+    ["戳一戳冷却时间", "pokeLimit", "cooldown", defaultPokeCooldown],
   ] satisfies Setting[] },
   { title: "名单设置", file: "access.yaml", fields: [
     ["名单限制", "enable", "toggle", false],
@@ -132,6 +137,10 @@ function panelField(group: string, [label, key, type]: PanelSetting) {
     case "templates": return { label, field, component: "Select", componentProps: { mode: "tags" } };
     case "url": return { label, field, component: "Input", bottomHelpMessage: "环境变量 LOTUS_MEME_SERVER_URL 优先。" };
     case "seconds": return { label, field, component: "InputNumber", componentProps: { min: 0, max: 120 } };
+    case "percentage":
+    case "cooldown": return { label, field, component: "InputNumber",
+      componentProps: { min: 0, max: type === "percentage" ? maxPokeProbability : maxPokeCooldown, precision: 0 },
+      bottomHelpMessage: type === "percentage" ? "单位为百分比，0 表示不触发。" : "单位为秒，0 表示不等待冷却。" };
     case "cron": return { label, field, component: "EasyCron", bottomHelpMessage: "重启后按新时间更新目录。" };
   }
 }
@@ -157,6 +166,12 @@ function panelValue(type: PanelSetting[2], value: unknown) {
     case "seconds": {
       const number = typeof value === "string" && value.trim() !== "" ? Number(value) : value;
       if (typeof number === "number" && Number.isFinite(number) && number > 0 && number <= 120) return number;
+      break;
+    }
+    case "percentage":
+    case "cooldown": {
+      if (typeof value === "number" && Number.isSafeInteger(value) && value >= 0 &&
+          value <= (type === "percentage" ? maxPokeProbability : maxPokeCooldown)) return value;
       break;
     }
     case "cron": {
@@ -267,6 +282,8 @@ export function supportGuoba() {
 function show(setting: Setting, value: unknown): string {
   if (setting[2] === "toggle") return value === true ? "开启" : "关闭";
   if (setting[2] === "mode") return value === 1 ? "黑名单" : "白名单";
+  if (setting[2] === "percentage") return `${value}%`;
+  if (setting[2] === "cooldown") return `${value} 秒`;
   return Array.isArray(value) && value.length ? value.map(String).join("、") : "空";
 }
 
@@ -308,6 +325,11 @@ function memeSettings(argument: string, context: SettingsContext): string {
         document.set(key, next);
       } else if (type === "mode") {
         if (value !== "0" && value !== "1") return "名单模式使用 0（白名单）或 1（黑名单）。";
+        next = Number(value);
+        document.set(key, next);
+      } else if (type === "percentage" || type === "cooldown") {
+        const max = type === "percentage" ? maxPokeProbability : maxPokeCooldown;
+        if (!/^\d+$/u.test(value) || Number(value) > max) return `请填写 0 至 ${max} 的整数。`;
         next = Number(value);
         document.set(key, next);
       } else {

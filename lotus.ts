@@ -9,8 +9,10 @@ import { handleMemeSettings } from "./settings.ts";
 import { handleCatalogUpdate } from "./catalog-update.ts";
 import { startCatalogRuntime, type MemeRuntime } from "./catalog-runtime.ts";
 import { readMemeUsage } from "./usage.ts";
+import { createMemePokeHandler } from "./poke.ts";
 
 export { createProfileLikeImageRenderer } from "./profile-like-image.ts";
+export type { MemePokeContext } from "./poke.ts";
 
 const pageSize = 12;
 const catalogSearch = /^#?(?:表情(?:合成)?|meme)搜索([^\r\n]*)$/iu;
@@ -297,6 +299,15 @@ async function prepareRandomMeme(message: string, input: GenerationInput) {
   };
 }
 
+function selectPokeTemplates(hidden: readonly string[]) {
+  return withCatalog(db => db.query<CatalogRow & { params: string }, [string]>(`
+    SELECT key, keyWords, params ${visibleCatalog}
+    AND min_images = 1 AND max_images = 1 AND min_texts = 0 AND max_texts = 0
+    AND json_valid(params)
+    ORDER BY random() LIMIT 2
+  `).all(JSON.stringify(hidden)).map(row => ({ key: row.key, aliases: keywords(row.keyWords), params: row.params })));
+}
+
 async function usageReport(context: CatalogContext) {
   const report = queryCatalog(context.user_id, (db, hidden) => {
     const counts = readMemeUsage(db);
@@ -381,6 +392,7 @@ export function createModule({ signal, memeRuntime }: { readonly signal: AbortSi
   const stop = memeRuntime && startCatalogRuntime(memeRuntime, active);
   return {
     ...createMemeCommands(active),
+    handlePoke: createMemePokeHandler(active, selectPokeTemplates),
     async dispose() {
       lifecycle.abort();
       await stop?.();

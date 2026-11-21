@@ -103,6 +103,28 @@ export async function fetchAvatar(user: string, { size = 0, signal }:
   }
 }
 
+export async function requestMemeImage(
+  { key, body }: Pick<PreparedRequest, "key" | "body">,
+  server: NonNullable<ReturnType<typeof generationServer>>,
+  signal?: AbortSignal,
+) {
+  if (key === "." || key === ".." || signal?.aborted) return;
+  const endpoint = new URL(server.base);
+  endpoint.pathname = `${endpoint.pathname.replace(/\/+$/u, "")}/memes/${encodeURIComponent(key)}/`;
+  const timeout = AbortSignal.timeout(server.timeout);
+  return readResult(await fetch(endpoint, {
+    method: "POST", body, redirect: "error", signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+  }));
+}
+
+export function recordGeneratedMeme(key: string, catalog: string) {
+  try {
+    recordMemeUsage(key, catalog);
+  } catch {
+    console.warn("[meme] 无法记录表情调用次数。");
+  }
+}
+
 function qqImageUrl(value: unknown): URL | undefined {
   if (typeof value !== "string" || value.length > 4096 || /[\\\s]/u.test(value)) return;
   const url = URL.parse(value);
@@ -193,21 +215,9 @@ export async function generateMemeReply(
 
     if (prepared.key === "." || prepared.key === "..") return;
     const catalog = catalogPath();
-    const endpoint = new URL(server.base);
-    endpoint.pathname = `${endpoint.pathname.replace(/\/+$/u, "")}/memes/${encodeURIComponent(prepared.key)}/`;
-    const result = await fetch(endpoint, {
-      method: "POST",
-      body: prepared.body,
-      redirect: "error",
-      signal: AbortSignal.timeout(server.timeout),
-    });
-    const bytes = await readResult(result);
+    const bytes = await requestMemeImage(prepared, server);
     if (bytes) {
-      try {
-        recordMemeUsage(prepared.key, catalog);
-      } catch {
-        console.warn("[meme] 无法记录表情调用次数。");
-      }
+      recordGeneratedMeme(prepared.key, catalog);
       const image: Image = { type: "image", file: bytes };
       const message: GenerationMessage = prepared.summary ? [prepared.summary, image] : image;
       return prepared.quote ? { type: "quoted", message } : message;

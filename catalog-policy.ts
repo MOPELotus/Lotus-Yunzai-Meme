@@ -55,6 +55,23 @@ export function catalogPolicy(userId: number | undefined, forGeneration = false)
   return { enabled, allowed, hidden, forceSharp: forGeneration && flag(meme.forceSharp, false) };
 }
 
+export const defaultPokeProbability = 50;
+export const defaultPokeCooldown = 20;
+export const maxPokeProbability = 100;
+export const maxPokeCooldown = 3_600;
+
+export function pokeSettings() {
+  const meme = readConfig(configDirectory(), "meme.yaml");
+  const enabled = flag(meme.pokeEnable, false);
+  const probability = meme.pokeProbability ?? defaultPokeProbability;
+  const cooldown = meme.pokeLimit ?? defaultPokeCooldown;
+  if (typeof probability !== "number" || !Number.isSafeInteger(probability) || probability < 0 || probability > maxPokeProbability ||
+      typeof cooldown !== "number" || !Number.isSafeInteger(cooldown) || cooldown < 0 || cooldown > maxPokeCooldown) {
+    throw new Error("无效的表情戳一戳配置");
+  }
+  return { enabled, probability, cooldown, errorReply: flag(meme.errorReply, true) };
+}
+
 
 export function generationSettings() {
   const directory = configDirectory();
