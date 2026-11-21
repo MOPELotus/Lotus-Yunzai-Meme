@@ -4,6 +4,7 @@ export interface MemeInfoCard {
   readonly infoCardColors: {
     readonly gold: string;
     readonly tile: string;
+    readonly muted: string;
   };
   drawInfoText(ctx: Context, rows: readonly string[], x: number, y: number, options: {
     readonly size: number;

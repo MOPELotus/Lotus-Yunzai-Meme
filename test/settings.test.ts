@@ -92,6 +92,20 @@ list: []
       enable: true, master: true, userEnable: true, user: ["10003"], list: ["旧关键词"], 保留字段: "原样",
     });
 
+    expect(await settings("戳一戳触发开启", milkyOwner)).toBe("戳一戳表情：开启");
+    expect(await settings("统计设置表情统计关闭", milkyOwner)).toBe("表情统计：关闭");
+    expect(await settings("其他设置自动更新资源关闭", milkyOwner)).toContain("重启后");
+    expect(await settings("服务设置 超时时间9", milkyOwner)).toBe("请求超时（秒）：9 秒");
+    expect(await settings("服务设置 自定义地址https://example.test/meme/", milkyOwner)).toBe("服务地址：已配置");
+    expect(Bun.YAML.parse(await readFile(join(directory, "server.yaml"), "utf8"))).toEqual({
+      timeout: 9, url: "https://example.test/meme/",
+    });
+    const overview = await settings("", milkyOwner);
+    expect(overview).toContain("用户白名单：已配置 1 项");
+    expect(overview).not.toContain("10002");
+    expect(overview).not.toContain("https://example.test");
+    expect(await settings("服务设置 自定义地址清除", milkyOwner)).toBe("服务地址：未配置");
+
     await writeFile(meme, "forceSharp: [\n");
     expect(await settings("强制触发关闭", owner)).toContain("无法读取或保存");
     expect(await readFile(meme, "utf8")).toBe("forceSharp: [\n");

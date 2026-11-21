@@ -7,7 +7,8 @@ import { argsTypeFromParams, parseGenerationArgs, type PresetArgument } from "./
 import { buildGenerationBody, type GenerationInput } from "./generation.ts";
 import { generateMemeReply, requestMemePreview, type FallbackContext } from "./generate-reply.ts";
 
-import { handleMemeSettings } from "./settings.ts";
+import { handleMemeSettings, isMemeOwner } from "./settings.ts";
+import { helpReference, presentMemeReference, versionReference } from "./reference-card.ts";
 import { handleCatalogUpdate } from "./catalog-update.ts";
 import { startCatalogRuntime, type MemeRuntime } from "./catalog-runtime.ts";
 import { readMemeUsage } from "./usage.ts";
@@ -21,6 +22,9 @@ const catalogList = /^#?(?:表情(?:合成)?|meme)列表$/iu;
 const catalogDetail = /^#?(?:表情(?:合成)?|meme)\s*详情\s*([^\r\n]+)$/iu;
 const catalogSearch = /^#?(?:表情(?:合成)?|meme)搜索([^\r\n]*)$/iu;
 const randomMemeCommand = /^#?(?:表情|meme)?随机(?:表情|meme)包?$/iu;
+const helpCommand = /^#?(?:表情(?:合成)?|meme)(?:命令|帮助|菜单|help|说明|功能|指令|使用说明)$/iu;
+const versionCommand = /^#?(?:表情(?:合成)?|meme)(?:版本|版本信息|version|versioninfo|(?:插件)?更新日志)$/iu;
+const packageUpdateCommand = /^#?(?:表情(?:合成)?|meme)插件(强制)?更新$/iu;
 const usageCommand = /^#?(?:表情|meme)(?:调用)?统计$/iu;
 
 // A legacy disable entry may be a stored key or one of its keywords.
@@ -468,6 +472,10 @@ function createMemeCommands(signal?: AbortSignal, loadInfoCard?: LoadMemeInfoCar
     commands: {
       "#表情列表": listCatalog, "#表情详情": (argument: string, context?: CatalogContext) => details(argument, context, signal), "#表情搜索": search,
       "#表情统计": (_argument: string, context: CatalogContext) => usageReport(context, loadInfoCard),
+      "#表情帮助": (argument: string, context: FallbackContext) => argument.trim() ? "用法：#表情帮助。" :
+        presentMemeReference(helpReference(isMemeOwner(context)), loadInfoCard, signal),
+      "#表情版本": (argument: string) => argument.trim() ? "用法：#表情版本。" :
+        presentMemeReference(versionReference(), loadInfoCard, signal),
     },
   };
 }
@@ -481,8 +489,13 @@ async function memeFallback(message: string, context: FallbackContext, listCatal
   const searchMatch = catalogSearch.exec(input);
   if (searchMatch) return search(searchMatch[1] ?? "", context);
   if (usageCommand.test(input)) return usageReport(context, loadInfoCard);
-  const setting = handleMemeSettings(message, context);
-  if (setting !== undefined) return setting;
+  if (helpCommand.test(input)) return presentMemeReference(helpReference(isMemeOwner(context)), loadInfoCard, signal);
+  if (versionCommand.test(input)) return presentMemeReference(versionReference(), loadInfoCard, signal);
+  const packageUpdate = packageUpdateCommand.exec(input);
+  if (packageUpdate) return isMemeOwner(context)
+    ? `请发送 #${packageUpdate[1] ?? ""}更新 meme，使用宿主更新表情模块。` : "只有主人可以更新表情模块。";
+  const setting = handleMemeSettings(input, context);
+  if (setting !== undefined) return typeof setting === "string" ? setting : presentMemeReference(setting, loadInfoCard, signal);
   const update = handleCatalogUpdate(message, context, signal);
   if (update !== undefined) return update;
   if (context.user_id === undefined || context.message_type === "terminal") return;

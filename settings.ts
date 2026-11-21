@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import { Job } from "node-schedule";
 import { isMap, isSeq, parseDocument } from "yaml";
+import type { MemeReference } from "./reference-card.ts";
 import { configDirectory, defaultPokeCooldown, defaultPokeProbability, maxPokeCooldown, maxPokeProbability,
   normalizeCatalogCron, parseGenerationServerUrl, readConfig } from "./catalog-policy.ts";
 
@@ -279,11 +280,13 @@ export function supportGuoba() {
   };
 }
 
-function show(setting: Setting, value: unknown): string {
+function show(setting: PanelSetting, value: unknown): string {
   if (setting[2] === "toggle") return value === true ? "开启" : "关闭";
   if (setting[2] === "mode") return value === 1 ? "黑名单" : "白名单";
   if (setting[2] === "percentage") return `${value}%`;
-  if (setting[2] === "cooldown") return `${value} 秒`;
+  if (setting[2] === "cooldown" || setting[2] === "seconds") return `${value} 秒`;
+  if (setting[2] === "url") return value ? "已配置" : "未配置";
+  if (setting[2] === "cron") return typeof value === "string" ? value : "未配置";
   return Array.isArray(value) && value.length ? value.map(String).join("、") : "空";
 }
 
@@ -301,15 +304,22 @@ export function isMemeOwner(context: SettingsContext): boolean {
     (context.user_id !== undefined && context.isBotMaster?.(context.user_id) === true));
 }
 
-function memeSettings(argument: string, context: SettingsContext): string {
+function memeSettings(argument: string, context: SettingsContext): string | MemeReference {
   if (!isMemeOwner(context)) return "只有主人可以修改表情合成设置。";
   try {
     const directory = configDirectory();
-    const selected = sections.find((section) => argument.startsWith(section.title));
-    const action = selected ? argument.slice(selected.title.length).trimStart() : argument;
-    const candidates = selected ? [selected] : sections;
+    const normalized = argument.replace(/^(统计设置|其他设置)/u,
+      (name) => name === "统计设置" ? "表情统计设置" : "目录更新设置");
+    const selected = panelSections.find((section) => normalized.startsWith(section.title));
+    const action = (selected ? normalized.slice(selected.title.length).trimStart() : normalized)
+      .replace(/^(戳一戳触发)(?!概率)/u, "戳一戳表情")
+      .replace(/^自定义地址/u, "服务地址")
+      .replace(/^(超时时间|请求超时(?!（秒）))/u, "请求超时（秒）");
+    const candidates = selected ? [selected] : panelSections;
     for (const section of candidates) {
-      const setting = section.fields.find(([title]) => action.startsWith(title));
+      // Some field names are prefixes of longer fields (e.g. 表情保护 and 表情保护列表).
+      const setting = section.fields.filter(([title]) => action.startsWith(title))
+        .sort(([left], [right]) => right.length - left.length)[0];
       if (!setting) continue;
       const [title, key, type] = setting;
       const value = action.slice(title.length).trim();
@@ -331,6 +341,10 @@ function memeSettings(argument: string, context: SettingsContext): string {
         const max = type === "percentage" ? maxPokeProbability : maxPokeCooldown;
         if (!/^\d+$/u.test(value) || Number(value) > max) return `请填写 0 至 ${max} 的整数。`;
         next = Number(value);
+        document.set(key, next);
+      } else if (type === "url" || type === "seconds" || type === "cron") {
+        try { next = panelValue(type, type === "url" && value === "清除" ? "" : value); }
+        catch { return `${title}格式无效。`; }
         document.set(key, next);
       } else {
         const change = /^(添加|删除)\s*(.*)$/u.exec(value);
@@ -359,21 +373,27 @@ function memeSettings(argument: string, context: SettingsContext): string {
         if (!isDeepStrictEqual(written, { ...values, [key]: next })) throw new Error();
         rewrite(directory, path, previous, yaml);
       }
-      return `${title}：${show(setting, next)}`;
+      const restart = section.file === "other.yaml" ? "（重启后重新登记定时任务。）" : "";
+      return `${title}：${show(setting, next)}${restart}`;
     }
 
     if (action) return "未找到该表情合成设置项。";
-    return candidates.flatMap((section) => {
+    const groups = candidates.map((section) => {
       const values = documentOf(snapshot(join(directory, section.file)).text).values;
-      return [section.title, ...section.fields.map((field) =>
-        `${field[0]}：${show(field, settingValue(field, values))}`)];
-    }).join("\n");
+      const entries = section.fields.map((field) => {
+        const value = settingValue(field, values);
+        const detail = Array.isArray(value) ? (value.length ? `已配置 ${value.length} 项` : "未配置") : show(field, value);
+        return { title: field[0], detail };
+      });
+      return { title: section.title, entries };
+    });
+    return { title: "表情合成设置", view: "settings", groups };
   } catch {
     return "无法读取或保存表情合成设置，请检查本地 YAML 配置。";
   }
 }
 
-export function handleMemeSettings(message: string, context: SettingsContext): string | undefined {
+export function handleMemeSettings(message: string, context: SettingsContext): string | MemeReference | undefined {
   const match = settingCommand.exec(message);
   if (match) return memeSettings(message.slice(match[0].length).trim(), context);
 }
