@@ -3,6 +3,7 @@
   "version": "1.18.0",
   "author": "ClarityJS",
   "type": "module",
+  "exports": "./lotus.ts",
   "private": true,
   "lotusYunzai": {
     "entry": "./lotus.ts"
