@@ -9,13 +9,13 @@ import { join } from "node:path";
 import { fetchAvatar, imageMime, maxAvatarBytes } from "./generate-reply.ts";
 
 type Outcome = "success" | "failure";
-const renderScale = 4;
 
 interface Options {
   /** Path to the operator's original yenai resources/memes directory. */
   readonly directory: string;
   readonly signal?: AbortSignal;
   readonly random?: () => number;
+  readonly rasterScale?: 1 | 4;
 }
 
 // Original files verified against the selected yenai revision. No artwork is distributed here.
@@ -78,7 +78,7 @@ async function readTemplate(outcome: Outcome, { directory, signal, random = Math
   }
 }
 
-async function compose(avatar: Uint8Array, { family, art }: Template,
+async function compose(avatar: Uint8Array, { family, art }: Template, renderScale: 1 | 4,
   signal?: AbortSignal): Promise<Uint8Array | undefined> {
   if (signal?.aborted || avatar.byteLength > maxAvatarBytes || !imageMime(avatar)) return;
   const { Canvas, loadImage } = await import("skia-canvas");
@@ -119,20 +119,20 @@ export async function renderProfileLikeImage(avatar: Uint8Array, outcome: Outcom
   options: Options): Promise<Uint8Array | undefined> {
   try {
     const template = await readTemplate(outcome, options);
-    if (template) return await compose(avatar, template, options.signal);
+    if (template) return await compose(avatar, template, options.rasterScale ?? 4, options.signal);
   } catch {
     // Missing artwork or failed decode leaves the surrounding command's text reply intact.
   }
 }
 
 /** Use the same fixed QQ avatar transport as the ordinary meme commands. */
-export function createProfileLikeImageRenderer(directory: string) {
+export function createProfileLikeImageRenderer(directory: string, rasterScale: 1 | 4 = 4) {
   return async (userId: number, outcome: Outcome, signal?: AbortSignal): Promise<Uint8Array | undefined> => {
     try {
       const template = await readTemplate(outcome, { directory, signal });
       if (!template || signal?.aborted) return;
       const avatar = await fetchAvatar(String(userId), { size: 100, signal });
-      if (avatar && !signal?.aborted) return await compose(new Uint8Array(await avatar.arrayBuffer()), template, signal);
+      if (avatar && !signal?.aborted) return await compose(new Uint8Array(await avatar.arrayBuffer()), template, rasterScale, signal);
     } catch {
       // The surrounding command can still return its text reply.
     }
