@@ -22,8 +22,17 @@ export function renderUsageCard(total: number, rows: readonly UsageRow[], info: 
           const badge = `${count} 次`;
           measureInfoText(measure, badge, cellWidth, size);
           const badgeWidth = measure.measureText(badge).width;
-          const lines = measureInfoText(measure, keywords, cellWidth - badgeWidth - 3 * padding, size);
-          return { badge, lines };
+          const keywordWidth = cellWidth - badgeWidth - 3 * padding;
+          // A separator belongs to the end of its alias, even when that alias wraps.
+          const lines = measureInfoText(measure, keywords, keywordWidth - measure.measureText(",").width, size);
+          for (let index = 1; index < lines.length; index++) {
+            if (!lines[index]!.trimStart().startsWith(",")) continue;
+            const previous = lines[index - 1]!.trimEnd();
+            if (measure.measureText(previous + ",").width > keywordWidth) continue;
+            lines[index - 1] = previous + ",";
+            lines[index] = lines[index]!.trimStart().slice(1).trimStart();
+          }
+          return { badge, lines: lines.filter(Boolean) };
         });
         grid.push({ cells, height: 2 * padding + Math.max(...cells.map(({ lines }) => lines.length * leading)) });
       }
