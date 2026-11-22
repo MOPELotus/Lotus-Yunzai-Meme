@@ -92,8 +92,15 @@ async function compose(avatar: Uint8Array, { family, art }: Template,
   // The Jimp renderer encoded a JPEG with black beneath transparent pixels.
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, width, height);
+  const crop = Math.min(face.width, face.height);
+  const cropX = (face.width - crop) / 2;
+  const cropY = (face.height - crop) / 2;
+  function coverAvatar(x: number, y: number, size: number) {
+    ctx.drawImage(face, cropX, cropY, crop, crop, x, y, size, size);
+  }
+
   if (family === "ganyu") {
-    ctx.drawImage(face, 425, 327, 235, 235);
+    coverAvatar(425, 327, 235);
     ctx.drawImage(frame, 0, 0);
   } else {
     ctx.drawImage(frame, 0, 0);
@@ -101,7 +108,7 @@ async function compose(avatar: Uint8Array, { family, art }: Template,
     ctx.beginPath();
     ctx.arc(x + 50, y + 50, 50, 0, 2 * Math.PI);
     ctx.clip();
-    ctx.drawImage(face, x, y, 100, 100);
+    coverAvatar(x, y, 100);
   }
   const jpeg = await canvas.toBuffer("jpeg", { quality: 1 });
   if (!signal?.aborted) return jpeg;
