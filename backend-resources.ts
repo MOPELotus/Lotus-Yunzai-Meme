@@ -60,14 +60,19 @@ export function createMemeResources(directory: string, lifetime: AbortSignal) {
   }
 
   async function prepare(type: "fonts" | "images", path: string) {
-    if (path.split("/").some((part) => !part || part === "." || part === ".." || /[\\:\x00-\x1f]/u.test(part))) {
+    const parts = path.split("/");
+    if (parts.some((part) => !part || part === "." || part === ".." || /[\\:\x00-\x1f]/u.test(part))) {
       throw new Error("无效的表情资源路径");
     }
-    if (type === "images" && isExcludedMemeTemplate(path.split("/")[0])) throw new Error(excludedMemeTemplateMessage);
+    const [source, packageName, folder, template] = parts;
+    const extraSource = source === "anyliew" || source === "python";
+    const key = source === "anyliew" && packageName === "emoji" ? folder :
+      source === "python" && packageName === "meme_generator" && folder === "memes" ? template : source;
+    if (type === "images" && isExcludedMemeTemplate(key)) throw new Error(excludedMemeTemplateMessage);
     lifetime.throwIfAborted();
     const filename = `${type}/${path}`;
     const extra = extraMemeAssets.get(filename);
-    if (type === "images" && path.startsWith("anyliew/") && !extra) {
+    if (type === "images" && extraSource && !extra) {
       throw new Error(`表情资源清单缺少 ${filename}`);
     }
     let task = pending.get(filename);

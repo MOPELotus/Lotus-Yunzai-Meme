@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { createManagedMemeBackend } from "../backend-lifecycle.ts";
 import { generationServer, sameGenerationServer } from "../catalog-policy.ts";
 import type { MemeTemplate } from "../builtin-template.ts";
+import { excludedMemeTemplateMessage } from "../template-policy.ts";
 
 test("内置表情在就绪后直接生成，排除项不会注册或读取资源，显式远端和停止生效", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-builtin-"));
@@ -23,7 +24,10 @@ test("内置表情在就绪后直接生成，排除项不会注册或读取资�
       expect(texts).toEqual(["文字"]);
       expect(args).toEqual({ circle: true });
       expect(context.signal.aborted).toBe(false);
-      await expect(context.imageAsset("jinhsi/01.png")).rejects.toThrow();
+      for (const path of ["jinhsi/01.png", "anyliew/emoji/jinhsi/images/01.png", "python/meme_generator/memes/jinhsi/images/01.png"]) {
+        await expect(context.imageAsset(path)).rejects.toThrow(excludedMemeTemplateMessage);
+      }
+      await expect(context.imageAsset("python/meme_generator/memes/allowed/images/missing.png")).rejects.toThrow("表情资源清单缺少");
       await expect(context.imageAsset("../outside.png")).rejects.toThrow("无效的表情资源路径");
       called++;
       return unchanged;

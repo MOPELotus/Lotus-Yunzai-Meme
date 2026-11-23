@@ -11,6 +11,7 @@ import { overlayMemeTemplates } from "./overlays.ts";
 import { pat, rub } from "./pat-rub.ts";
 import { perspectiveMemeTemplates } from "./perspective.ts";
 import { petpet } from "./petpet.ts";
+import { pythonOverlayMemeTemplates } from "./python-overlay-animation.ts";
 import { staticMemeTemplates } from "./static-layouts.ts";
 import { textSignMemeTemplates } from "./text-signs.ts";
 import { textSpeechMemeTemplates } from "./text-speech.ts";
@@ -33,4 +34,5 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...perspectiveMemeTemplates,
   ...fixedAvatarAnimations,
   ...textSpeechMemeTemplates,
+  ...pythonOverlayMemeTemplates,
 ];

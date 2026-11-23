@@ -1,4 +1,5 @@
 import { anyliewFixedAnimationAssets } from "./backend-fixed-animation-assets.ts";
+import { pythonOverlayAssets } from "./backend-python-overlay-assets.ts";
 
 // Only assets used by registered templates are individually pinned.
 const anyliewRevision = "33bf418ac2ccd416be70faf9a13e97befb7703a8";
@@ -62,6 +63,7 @@ const anyliewAssets = [
   ...anyliewFixedAnimationAssets,
 ];
 
-export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map(
-  anyliewAssets.map(([path, digest]) => [`images/anyliew/${path}`, { path, digest, sources: anyliewBase }]),
-);
+export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map([
+  ...anyliewAssets.map(([path, digest]) => [`images/anyliew/${path}`, { path, digest, sources: anyliewBase }] as const),
+  ...pythonOverlayAssets,
+]);
