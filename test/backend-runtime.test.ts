@@ -29,7 +29,7 @@ test("内置表情在就绪后直接生成，排除项不会注册或读取资�
       for (const path of ["jinhsi/01.png", "anyliew/emoji/jinhsi/images/01.png", "python/meme_generator/memes/jinhsi/images/01.png"]) {
         await expect(context.imageAsset(path)).rejects.toThrow(excludedMemeTemplateMessage);
       }
-      await expect(context.imageAsset("python/meme_generator/memes/allowed/images/missing.png")).rejects.toThrow("表情资源清单缺少");
+      await expect(context.imageAsset("python/meme_generator/memes/allowed/images/missing.png")).rejects.toThrow("素材清单缺少");
       await expect(context.imageAsset("../outside.png")).rejects.toThrow("无效的表情资源路径");
       called++;
       return unchanged;
@@ -78,6 +78,35 @@ test("内置表情在就绪后直接生成，排除项不会注册或读取资�
     else Bun.env.LOTUS_MEME_CONFIG_DIR = previousConfig;
     if (previousServer === undefined) delete Bun.env.LOTUS_MEME_SERVER_URL;
     else Bun.env.LOTUS_MEME_SERVER_URL = previousServer;
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("宿主尚未发出就绪通知时，第一次本机命令仍会生成目录", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "lotus-meme-first-command-"));
+  const config = join(directory, "config");
+  await mkdir(config);
+  const env = ["LOTUS_MEME_CONFIG_DIR", "LOTUS_MEME_DB"] as const;
+  const previous = env.map(name => Bun.env[name]);
+  Bun.env.LOTUS_MEME_CONFIG_DIR = config;
+  Bun.env.LOTUS_MEME_DB = join(directory, "meme.db");
+  const { createModule } = await import("../lotus.ts");
+  const host = createModule({ signal: new AbortController().signal });
+  try {
+    expect(memeProvider()).toBeUndefined();
+    expect(await Bun.file(Bun.env.LOTUS_MEME_DB).exists()).toBe(false);
+    const result = await host.fallback("#表情搜索 红温", {
+      message_type: "private", user_id: 100, isMaster: true, isBotMaster: () => true,
+    });
+    expect(result).toEqual({ type: "quoted", message: [{ type: "text", text: "1. 红温" }] });
+    expect(await Bun.file(Bun.env.LOTUS_MEME_DB).exists()).toBe(true);
+    expect(await memeProvider()?.keys()).toContain("flush");
+  } finally {
+    await host.dispose();
+    env.forEach((name, index) => {
+      if (previous[index] === undefined) delete Bun.env[name];
+      else Bun.env[name] = previous[index];
+    });
     await rm(directory, { recursive: true, force: true });
   }
 });

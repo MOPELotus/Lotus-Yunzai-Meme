@@ -547,15 +547,27 @@ function withReadyCatalog<T>(context: CatalogContext | undefined, signal: AbortS
   return pending ? pending.then(() => signal?.aborted ? undefined : read()) : read();
 }
 
-function createMemeCommands(signal?: AbortSignal, loadInfoCard?: LoadMemeInfoCard) {
+function afterMemeBackend<T>(ensure: (() => void | Promise<void>) | undefined, run: () => T): T | Promise<Awaited<T>> {
+  const pending = ensure?.();
+  if (!pending) return run();
+  return (async (): Promise<Awaited<T>> => {
+    await pending;
+    return await run();
+  })();
+}
+
+function createMemeCommands(signal?: AbortSignal, loadInfoCard?: LoadMemeInfoCard, ensure?: () => void | Promise<void>) {
   const listCatalog = illustratedCatalog(loadInfoCard, signal);
+  const readCatalog = <T>(context: CatalogContext | undefined, read: () => T) =>
+    afterMemeBackend(ensure, () => withReadyCatalog(context, signal, read));
   return {
-    fallback: (message: string, context: FallbackContext) => memeFallback(message, context, listCatalog, signal, loadInfoCard),
+    fallback: (message: string, context: FallbackContext) =>
+      afterMemeBackend(ensure, () => memeFallback(message, context, listCatalog, signal, loadInfoCard)),
     commands: {
-      "#表情列表": (argument: string, context?: CatalogContext) => withReadyCatalog(context, signal, () => listCatalog(argument, context)),
-      "#表情详情": (argument: string, context?: CatalogContext) => withReadyCatalog(context, signal, () => details(argument, context, signal)),
-      "#表情搜索": (argument: string, context?: CatalogContext) => withReadyCatalog(context, signal, () => search(argument, context)),
-      "#表情统计": (_argument: string, context: CatalogContext) => withReadyCatalog(context, signal, () => usageReport(context, loadInfoCard)),
+      "#表情列表": (argument: string, context?: CatalogContext) => readCatalog(context, () => listCatalog(argument, context)),
+      "#表情详情": (argument: string, context?: CatalogContext) => readCatalog(context, () => details(argument, context, signal)),
+      "#表情搜索": (argument: string, context?: CatalogContext) => readCatalog(context, () => search(argument, context)),
+      "#表情统计": (_argument: string, context: CatalogContext) => readCatalog(context, () => usageReport(context, loadInfoCard)),
       "#表情帮助": (argument: string, context: FallbackContext) => argument.trim() ? "用法：#表情帮助。" :
         presentMemeReference(helpReference(isMemeOwner(context)), loadInfoCard, signal),
       "#表情版本": (argument: string, context?: Pick<FallbackContext, "inlineImageByteLimit">) =>
@@ -624,9 +636,19 @@ export function createModule({ signal, memeRuntime }: { readonly signal: AbortSi
   const active = AbortSignal.any([signal, lifecycle.signal]);
   const backend = createLocalMemeBackend(active);
   const stop = memeRuntime && startCatalogRuntime(memeRuntime, active, backend);
+  const poke = createMemePokeHandler(active, selectPokeTemplates);
+  function ensure() {
+    if (active.aborted) return;
+    try {
+      if (memeProvider()) return;
+    } catch {
+      return;
+    }
+    return backend.ensure();
+  }
   return {
-    ...createMemeCommands(active, memeRuntime?.loadInfoCard),
-    handlePoke: createMemePokeHandler(active, selectPokeTemplates),
+    ...createMemeCommands(active, memeRuntime?.loadInfoCard, ensure),
+    handlePoke: (input: Parameters<typeof poke>[0]) => afterMemeBackend(ensure, () => poke(input)),
     async dispose() {
       lifecycle.abort();
       await Promise.all([stop?.(), backend.dispose()]);

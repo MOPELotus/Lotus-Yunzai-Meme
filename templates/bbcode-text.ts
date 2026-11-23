@@ -44,6 +44,15 @@ interface Paragraph {
   readonly spans: Span[];
 }
 
+export interface MemeTextFamilies {
+  readonly regular: string;
+  readonly bold?: string;
+  readonly italic?: string;
+  readonly boldItalic?: string;
+  readonly cjk: string;
+  readonly boldCjk?: string;
+}
+
 function validColor(value: string) {
   return colors.has(value) || /^#[\da-f]{6}$/iu.test(value);
 }
@@ -108,15 +117,22 @@ export function googleLogoText(text: string): readonly Paragraph[] {
   }) }];
 }
 
-function font(span: Span) {
+function font(span: Span, families?: MemeTextFamilies) {
+  const latin = families && (span.bold
+    ? (span.italic ? families.boldItalic : families.bold)
+    : (span.italic ? families.italic : families.regular));
+  const cjk = span.bold ? families?.boldCjk || families?.cjk : families?.cjk;
+  const preferred = [span.family, latin || families?.regular, cjk].filter(Boolean).map(name => JSON.stringify(name));
   return `${span.italic ? "italic " : ""}${span.bold ? "bold " : ""}${span.size}px ` +
-    (span.family ? JSON.stringify(span.family) + ", " : "") + fallbackFamilies;
+    [...preferred, fallbackFamilies].join(", ");
 }
 
-function fontGroups(spans: readonly Span[]) {
+type ResolveFont = (span: Span) => string;
+
+function fontGroups(spans: readonly Span[], resolveFont: ResolveFont) {
   const groups: { font: string; spans: Span[] }[] = [];
   for (const span of spans) {
-    const family = font(span);
+    const family = resolveFont(span);
     const previous = groups.at(-1);
     if (previous?.font === family) previous.spans.push(span);
     else groups.push({ font: family, spans: [span] });
@@ -147,22 +163,24 @@ function advance(draw: CanvasRenderingContext2D, text: string, keepTrailingSpace
   return draw.measureText(text).width;
 }
 
-function wrappedSpans(draw: CanvasRenderingContext2D, spans: readonly Span[], maxWidth?: number): (readonly Span[])[] {
+function wrappedSpans(draw: CanvasRenderingContext2D, spans: readonly Span[], resolveFont: ResolveFont,
+  maxWidth?: number): (readonly Span[])[] {
   if (!spans.length) return [];
   const text = spans.map(span => span.text).join("");
   if (!maxWidth) return [spans];
-  const firstFont = font(spans[0]!);
-  if (spans.every(span => font(span) === firstFont)) {
+  const firstFont = resolveFont(spans[0]!);
+  if (spans.every(span => resolveFont(span) === firstFont)) {
     draw.font = firstFont;
     return draw.measureText(text, maxWidth).lines.map(({ startIndex, endIndex }, index, lines) =>
       sliceSpans(spans, startIndex, index === lines.length - 1 ? text.length : endIndex));
   }
   const naturalBreaks = [...words.segment(text)].map(item => item.index).slice(1).concat(text.length);
   const characterBreaks = [...graphemes.segment(text)].map(item => item.index).slice(1).concat(text.length);
-  const measured = (start: number, end: number) => fontGroups(sliceSpans(spans, start, end)).reduce((sum, group, index, all) => {
-    draw.font = group.font;
-    return sum + advance(draw, group.spans.map(span => span.text).join(""), index < all.length - 1);
-  }, 0);
+  const measured = (start: number, end: number) => fontGroups(sliceSpans(spans, start, end), resolveFont)
+    .reduce((sum, group, index, all) => {
+      draw.font = group.font;
+      return sum + advance(draw, group.spans.map(span => span.text).join(""), index < all.length - 1);
+    }, 0);
   const lines: Span[][] = [];
   let start = 0;
   while (start < text.length) {
@@ -209,10 +227,10 @@ function textDirections(spans: readonly Span[]) {
   return blocks;
 }
 
-function measureLine(draw: CanvasRenderingContext2D, spans: readonly Span[]) {
+function measureLine(draw: CanvasRenderingContext2D, spans: readonly Span[], resolveFont: ResolveFont) {
   let width = 0, ascent = 0, descent = 0;
   const runs: DrawRun[] = [];
-  const groups = fontGroups(spans);
+  const groups = fontGroups(spans, resolveFont);
   for (const [groupIndex, group] of groups.entries()) {
     draw.font = group.font;
     const whole = group.spans.map(span => span.text).join("");
@@ -264,14 +282,15 @@ function measureLine(draw: CanvasRenderingContext2D, spans: readonly Span[]) {
   return { width, ascent, height: Math.round(ascent + descent), runs };
 }
 
-export function layoutMemeText(paragraphs: readonly Paragraph[], wrapWidth?: number) {
+export function layoutMemeText(paragraphs: readonly Paragraph[], wrapWidth?: number, families?: MemeTextFamilies) {
   const measure = new Canvas(1, 1).getContext("2d");
   measure.textWrap = true;
   measure.textBaseline = "alphabetic";
+  const resolveFont: ResolveFont = span => font(span, families);
   function layout(width?: number) {
     return paragraphs.map(paragraph => ({
       alignment: paragraph.alignment,
-      lines: wrappedSpans(measure, paragraph.spans, width).map(line => measureLine(measure, line)),
+      lines: wrappedSpans(measure, paragraph.spans, resolveFont, width).map(line => measureLine(measure, line, resolveFont)),
     }));
   }
   const initial = layout(wrapWidth);

@@ -1,8 +1,7 @@
-import { join } from "node:path";
-import { createMemeResources } from "./backend-resources.ts";
+import { createBundledMemeResources } from "./backend-builtin-assets.ts";
 import type { MemeTemplate, MemeTemplateInput } from "./builtin-template.ts";
 import {
-  configDirectory, publishMemeProvider, safeCatalogKey, type LocalMemeProvider,
+  publishMemeProvider, safeCatalogKey, type LocalMemeProvider,
 } from "./catalog-policy.ts";
 import { isExcludedMemeTemplate } from "./template-policy.ts";
 
@@ -76,7 +75,7 @@ export function createLocalMemeBackend(signal: AbortSignal, entries?: readonly M
     if (active.aborted || withdraw) return;
     const registry = buildRegistry(selected);
     if (!registry.size) return;
-    const resources = createMemeResources(join(configDirectory(), "..", "backend", "resources"), active);
+    const resources = createBundledMemeResources(active);
     const keys = [...registry.keys()];
     const catalogIdentity = `lotus-skia:local:${Bun.hash(JSON.stringify([...registry.values()].map(({ info }) => info))).toString(16)}`;
     const provider = {

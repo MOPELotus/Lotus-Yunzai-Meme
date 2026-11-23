@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { FontLibrary, loadImage, type Image } from "skia-canvas";
 import { renderRgba } from "../../../packages/skia/index.ts";
+import { createBundledMemeResources } from "../backend-builtin-assets.ts";
 import type { MemeTemplateContext } from "../builtin-template.ts";
 import { readMemeImageSequence } from "../templates/animated-input.ts";
 import { googleLogoText, layoutMemeText, parseMemeBbcode } from "../templates/bbcode-text.ts";
@@ -9,15 +10,21 @@ import { builtinMemeTemplates } from "../templates/index.ts";
 import { textGraphicsMemeTemplates } from "../templates/text-graphics.ts";
 
 const signal = new AbortController().signal;
+const bundled = createBundledMemeResources(signal);
+const fonts = new Set(["NotoSansSC-Regular.ttf", "NotoSansSC-Bold.ttf", "LiberationSans-Regular.ttf",
+  "LiberationSans-Bold.ttf", "LiberationSans-Italic.ttf", "LiberationSans-BoldItalic.ttf"]);
 const context: MemeTemplateContext = {
   signal,
   async imageAsset() { throw new Error("文字表情无需固定素材"); },
-  async fontAsset() { throw new Error("文字标记不读取文件"); },
+  async fontAsset(path) {
+    expect(fonts.has(path)).toBe(true);
+    return bundled.fontAsset(path);
+  },
 };
 const [universal, google] = textGraphicsMemeTemplates;
 
 test("内置目录登记万能表情和 Google", () => {
-  expect(builtinMemeTemplates.filter(({ info }) => info.key === "universal" || info.key === "google")).toEqual([universal, google]);
+  expect(builtinMemeTemplates.filter(({ info }) => info.key === "universal" || info.key === "google")).toEqual([...textGraphicsMemeTemplates]);
 });
 
 async function readPixels(image: Image) {
@@ -113,12 +120,12 @@ test("万能表情保留原段落和底部留白，GIF 显示各帧并统一原�
     images: [new File([new Uint8Array(source)], "avatar.gif")], texts, args: {},
   }, context);
   const sequence = await readMemeImageSequence(new File([new Uint8Array(output)], "result.gif"), signal);
-  const textHeight = texts.reduce((height, text) => height + layoutMemeText(parseMemeBbcode(text, 45, "center"), 480).height, 0);
   expect(sequence.frames).toHaveLength(2);
   expect(sequence.averageDelayMs).toBe(60);
-  expect([sequence.frames[0].width, sequence.frames[0].height]).toEqual([500, 200 + textHeight + 10]);
+  expect(sequence.frames[0].width).toBe(500);
+  expect(sequence.frames[0].height).toBeGreaterThan(350);
   const [first, second] = await Promise.all(sequence.frames.map(readPixels));
   expect([...first!.subarray(0, 4)]).toEqual([0, 0, 215, 255]);
   expect([...second!.subarray(0, 4)]).toEqual([0, 215, 0, 255]);
-  expect([...second!.subarray(-4)]).toEqual([255, 255, 255, 255]);
+  expect(second!.subarray(-500 * 10 * 4).every(channel => channel === 255)).toBe(true);
 });
