@@ -11,9 +11,9 @@ import { encodeMemeGif } from "../templates/gif.ts";
 
 const signal = new AbortController().signal;
 
-test("默认本机目录注册全部三十七项且只接入固定上游帧的白名单", () => {
+test("默认本机目录注册全部三十九项且只接入固定上游帧的白名单", () => {
   const selected = new Set(fixedAvatarAnimations.map(({ info }) => info.key));
-  expect(selected.size).toBe(37);
+  expect(selected.size).toBe(39);
   expect(builtinMemeTemplates.filter(({ info }) => selected.has(info.key))).toEqual([...fixedAvatarAnimations]);
   for (const [path, digest] of anyliewFixedAnimationAssets) {
     expect(extraMemeAssets.get(`images/anyliew/${path}`)).toMatchObject({ path, digest });
@@ -21,13 +21,13 @@ test("默认本机目录注册全部三十七项且只接入固定上游帧的�
   expect(extraMemeAssets.has("images/anyliew/emoji/kurogames_start/images/1.png")).toBeFalse();
 });
 
-async function foreground(color: string) {
-  const { rgba } = await renderRgba(300, 220, draw => {
+async function foreground(color: string, width = 300, height = 220) {
+  const { rgba } = await renderRgba(width, height, draw => {
     draw.fillStyle = color;
     draw.fillRect(0, 0, 12, 12);
     draw.fillRect(29, 60, 6, 6);
   });
-  return Buffer.from(encodeMemeGif(300, 220, [{ rgba, delayMs: 30 }], signal));
+  return Buffer.from(encodeMemeGif(width, height, [{ rgba, delayMs: 30 }], signal));
 }
 
 function inputGif() {
@@ -110,7 +110,7 @@ test("逐项保留固定动画的原关键词、参数和资产路径，并输�
   ] as const;
 
   const input = { images: [inputGif()], texts: [], args: {} };
-  expect(fixedAvatarAnimations.map(({ info }) => info.key)).toEqual(cases.map(([key]) => key));
+  expect(fixedAvatarAnimations.slice(0, cases.length).map(({ info }) => info.key)).toEqual(cases.map(([key]) => key));
   for (const [key, keywords, frames, delay] of cases) {
     const template = fixedAvatarAnimations.find(item => item.info.key === key)!;
     expect(template.info.keywords).toEqual(keywords);
@@ -183,3 +183,94 @@ test("来财保留重复帧停顿，桃乐丝敲逐帧使用原坐标和尺寸",
   expect(await pixels(frames[1]!, sample)).toEqual([[255, 0, 0, 255], [0, 0, 0, 0], [0, 0, 0, 0]]);
   expect(await pixels(frames[2]!, sample)).toEqual([[255, 0, 0, 255], [0, 0, 255, 255], [0, 0, 0, 0]]);
 });
+
+function longTemplate(key: string) {
+  const template = fixedAvatarAnimations.find(item => item.info.key === key)!;
+  const prefix = `emoji/${key}/images/`;
+  const paths = [...anyliewFixedAnimationAssets.keys()].filter(path => path.startsWith(prefix)).map(path => `anyliew/${path}`);
+  return { template, paths };
+}
+
+test("电弧和血条按旧停顿调度指定源帧，最多并行八张并单次重试", async () => {
+  const [light, dark] = await Promise.all([foreground("#fff", 224, 224), foreground("#111", 224, 224)]);
+  const cases = [["electric_arc", ["电弧"], 293, 89], ["health_bar", ["血条", "HP", "hp"], 435, 108]] as const;
+  const input = { images: [inputGif()], texts: [], args: {} };
+  for (const [key, keywords, sourceCount, visibleFrames] of cases) {
+    const { template, paths } = longTemplate(key);
+    expect(template.info.keywords).toEqual(keywords);
+    expect(paths).toHaveLength(visibleFrames);
+    const requested = new Set<string>();
+    let inFlight = 0;
+    let peak = 0;
+    let retries = 0;
+    const output = await template.render(input, {
+      ...mockContext([], []),
+      async imageAsset(path) {
+        const index = paths.indexOf(path);
+        expect(index).toBeGreaterThanOrEqual(0);
+        requested.add(path);
+        inFlight++;
+        peak = Math.max(peak, inFlight);
+        try {
+          await Bun.sleep(index % 2 ? 1 : 3);
+          if (index === 2 && retries++ === 0) throw new Error("模拟一次下载中断");
+          return index % 2 ? light : dark;
+        } finally {
+          inFlight--;
+        }
+      },
+    });
+    const sequence = await readMemeImageSequence(new File([new Uint8Array(output)], "long.gif"), signal);
+    expect(peak).toBe(8);
+    expect(retries).toBe(2);
+    expect([...requested]).toEqual(paths);
+    expect(sequence.frames).toHaveLength(visibleFrames);
+    expect(sequence.averageDelayMs).toBe(sourceCount * 30 / visibleFrames);
+    expect(await pixels(sequence.frames[0], [[0, 0]])).toEqual([[17, 17, 17, 255]]);
+    expect(await pixels(sequence.frames[1]!, [[0, 0]])).toEqual([[255, 255, 255, 255]]);
+  }
+}, 15_000);
+
+test("取消长动画后不继续拉取已经排队窗口之外的帧", async () => {
+  const { template, paths } = longTemplate("health_bar");
+  const image = await foreground("#fff", 224, 224);
+  const controller = new AbortController();
+  const requested: string[] = [];
+  const result = template.render({ images: [inputGif()], texts: [], args: {} }, {
+    ...mockContext([], []),
+    signal: controller.signal,
+    async imageAsset(path) {
+      requested.push(path);
+      if (requested.length === 5) controller.abort(new Error("取消测试"));
+      return image;
+    },
+  });
+  await expect(result).rejects.toThrow("取消测试");
+  expect(requested).toEqual(paths.slice(0, 5));
+});
+
+test("长动画超过发送预算时整体等比缩小，保留有区别的帧和原总时长", async () => {
+  const { template, paths } = longTemplate("electric_arc");
+  const side = 280;
+  const rgba = new Uint8Array(side * side * 4);
+  let random = 104729;
+  for (let offset = 0; offset < rgba.length; offset += 4) {
+    random = (Math.imul(random, 1664525) + 1013904223) >>> 0;
+    const color = random >>> 24;
+    rgba.set([color, color ^ 173, color ^ 95, 255], offset);
+  }
+  const first = Buffer.from(encodeMemeGif(side, side, [{ rgba, delayMs: 30 }], signal));
+  const changed = rgba[0]! ^ 255;
+  rgba.set([changed, changed ^ 173, changed ^ 95, 255], 0);
+  const second = Buffer.from(encodeMemeGif(side, side, [{ rgba, delayMs: 30 }], signal));
+  const output = await template.render({ images: [inputGif()], texts: [], args: {} }, {
+    ...mockContext([], []),
+    async imageAsset(path) { return paths.indexOf(path) % 2 ? second : first; },
+  });
+  const result = await readMemeImageSequence(new File([new Uint8Array(output)], "scaled.gif"), signal);
+  expect(output.byteLength).toBeLessThanOrEqual(8 * 1024 * 1024);
+  expect(result.frames[0].width).toBeLessThan(side);
+  expect(result.frames[0].width).toBe(result.frames[0].height);
+  expect(result.frames).toHaveLength(89);
+  expect(result.averageDelayMs).toBe(293 * 30 / 89);
+}, 20_000);

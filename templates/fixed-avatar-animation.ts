@@ -2,11 +2,12 @@ import { loadImage, type Image, type CanvasRenderingContext2D } from "skia-canva
 import { renderRgba } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeFirstImage } from "./animated-input.ts";
-import { assertMemeGifDimensions, encodeMemeGif } from "./gif.ts";
+import { assertMemeGifDimensions, encodeMemeGif, MemeGifByteLimitError } from "./gif.ts";
 import { previewImage } from "./template-layout.ts";
 
 type Position = readonly [left: number, top: number];
 type Size = readonly [width: number, height: number];
+const maxSendBytes = 8 * 1024 * 1024;
 
 interface FixedAvatarAnimation {
   readonly key: string;
@@ -16,6 +17,8 @@ interface FixedAvatarAnimation {
   readonly positions: Position | readonly Position[];
   readonly sizes: Size | readonly Size[];
   readonly frames: number;
+  // Counts of byte-identical consecutive source PNGs, before GIF encoding.
+  readonly sourceHolds?: readonly number[];
   readonly crop?: true;
 }
 
@@ -278,6 +281,31 @@ const specs: readonly FixedAvatarAnimation[] = [
     positions: [[78, 96], [78, 96], [80, 97], [88, 96], [85, 94], [85, 94], [78, 96]],
     sizes: [110, 110],
   },
+  {
+    key: "electric_arc", keywords: ["电弧"], frames: 293, delayMs: 30,
+    sourceHolds: [
+      3, 4, 3, 3, 4, 3, 3, 3, 4, 3, 3, 4, 3, 3, 4, 3, 3, 3,
+      4, 3, 3, 4, 3, 3, 4, 3, 3, 3, 4, 3, 3, 4, 3, 3, 4, 3,
+      3, 3, 4, 3, 3, 4, 3, 3, 4, 3, 3, 3, 4, 3, 3, 4, 3, 3,
+      4, 3, 3, 3, 4, 3, 3, 4, 3, 3, 4, 3, 3, 3, 4, 3, 3, 4,
+      3, 3, 4, 3, 3, 3, 4, 3, 3, 4, 3, 3, 4, 3, 3, 3, 3,
+    ],
+    positions: [25, 25],
+    sizes: [180, 180],
+  },
+  {
+    key: "health_bar", keywords: ["血条", "HP", "hp"], frames: 435, delayMs: 30,
+    sourceHolds: [
+      17, 3, 3, 3, 4, 3, 3, 4, 3, 3, 4, 3, 3, 3, 4, 3, 3, 4,
+      3, 3, 37, 3, 3, 3, 4, 3, 3, 4, 3, 3, 4, 3, 3, 3, 4, 3,
+      3, 4, 3, 23, 3, 4, 3, 3, 4, 3, 3, 3, 4, 3, 3, 4, 3, 3,
+      4, 3, 3, 3, 4, 3, 3, 4, 3, 3, 4, 3, 3, 3, 4, 3, 3, 4,
+      3, 16, 4, 3, 3, 4, 3, 3, 4, 3, 3, 3, 4, 3, 3, 4, 3, 3,
+      4, 3, 3, 3, 4, 3, 3, 4, 3, 3, 4, 3, 3, 3, 4, 3, 3, 3,
+    ],
+    positions: [7, 10],
+    sizes: [210, 210],
+  },
 ];
 
 function at<T extends Size>(values: T | readonly T[], index: number): T {
@@ -327,9 +355,48 @@ function blendFixedArt(avatar: Buffer, art: Buffer) {
 
 const params = { min_images: 1, max_images: 1, min_texts: 0, max_texts: 0, default_texts: [], args_type: null };
 
-function createTemplate({ key, keywords, tags, delayMs, positions, sizes, frames, crop }: FixedAvatarAnimation): MemeTemplate {
-  const readFrame = (index: number, context: MemeTemplateContext) =>
-    context.imageAsset(`anyliew/emoji/${key}/images/${index + 1}.png`).then(loadImage);
+async function* orderedFrames(
+  count: number, first: Image, lookahead: number, read: (index: number) => Promise<Image>, signal: AbortSignal,
+) {
+  type Loaded = { image: Image } | { error: unknown };
+  const pending: Promise<Loaded>[] = [];
+  let next = 1;
+  for (let index = 0; index < count; index++) {
+    signal.throwIfAborted();
+    while (next < count && pending.length < lookahead) {
+      signal.throwIfAborted();
+      pending.push(read(next++).then(image => ({ image }), error => ({ error })));
+    }
+    const loaded = index === 0 ? { image: first } : await pending.shift()!;
+    signal.throwIfAborted();
+    if ("error" in loaded) throw loaded.error;
+    yield { index, foreground: loaded.image };
+  }
+}
+
+function createTemplate({ key, keywords, tags, delayMs, positions, sizes, frames, sourceHolds, crop }: FixedAvatarAnimation): MemeTemplate {
+  const longAnimation = sourceHolds !== undefined;
+  const fixedPlacement = typeof positions[0] === "number" && typeof sizes[0] === "number";
+  const holds = sourceHolds ?? Array<number>(frames).fill(1);
+  let sourceIndex = 0;
+  const offsets = holds.map(hold => {
+    const current = sourceIndex;
+    sourceIndex += hold;
+    return current;
+  });
+
+  async function readFrame(index: number, context: MemeTemplateContext) {
+    const path = `anyliew/emoji/${key}/images/${offsets[index]! + 1}.png`;
+    let bytes: Buffer;
+    try {
+      bytes = await context.imageAsset(path);
+    } catch (error) {
+      if (!longAnimation) throw error;
+      context.signal.throwIfAborted();
+      bytes = await context.imageAsset(path);
+    }
+    return loadImage(bytes);
+  }
 
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
     if (input.images.length !== 1 || input.texts.length) throw new Error("这个表情需要一张图片。");
@@ -337,24 +404,52 @@ function createTemplate({ key, keywords, tags, delayMs, positions, sizes, frames
     const { signal } = context;
     signal.throwIfAborted();
     const [avatar, first] = await Promise.all([readMemeFirstImage(input.images[0]!, signal), readFrame(0, context)]);
-    const { width, height } = first;
-    assertMemeGifDimensions(width, height, frames);
-    const rendered = [];
-    for (let index = 0; index < frames; index++) {
+    const { width: sourceWidth, height: sourceHeight } = first;
+    let width = sourceWidth;
+    let height = sourceHeight;
+    for (;;) {
       signal.throwIfAborted();
-      const foreground = index === 0 ? first : await readFrame(index, context);
-      if (foreground.width !== width || foreground.height !== height) throw new Error(`表情模板 ${key} 的帧尺寸不一致。`);
-      const avatarLayer = await renderRgba(width, height, canvas => placeAvatar(canvas, avatar, at(positions, index), at(sizes, index), crop ?? false));
-      const artLayer = await renderRgba(width, height, canvas => canvas.drawImage(foreground, 0, 0));
-      const rgba = blendFixedArt(avatarLayer.rgba, artLayer.rgba);
-      const previous = rendered.at(-1);
-      if (previous?.rgba.equals(rgba)) {
-        previous.delayMs += delayMs;
-      } else {
-        rendered.push({ rgba, delayMs });
+      const rendered = await drawFrames(width, height);
+      try {
+        const gif = encodeMemeGif(width, height, rendered, signal);
+        if (!longAnimation || gif.byteLength <= maxSendBytes) return gif;
+      } catch (error) {
+        if (!longAnimation || !(error instanceof MemeGifByteLimitError) || width + height === 2) throw error;
       }
+      width = Math.max(1, Math.floor(width * 0.9));
+      height = Math.max(1, Math.floor(height * 0.9));
     }
-    return encodeMemeGif(width, height, rendered, signal);
+
+    async function drawFrames(width: number, height: number) {
+      assertMemeGifDimensions(width, height, frames);
+      const read = (index: number) => readFrame(index, context);
+      const rendered: { rgba: Buffer; delayMs: number }[] = [];
+      let avatarLayer: Buffer | undefined;
+      const scaleX = width / sourceWidth, scaleY = height / sourceHeight;
+      for await (const { index, foreground } of orderedFrames(holds.length, first, longAnimation ? 8 : 1, read, signal)) {
+        if (foreground.width !== sourceWidth || foreground.height !== sourceHeight) {
+          throw new Error(`表情模板 ${key} 的帧尺寸不一致。`);
+        }
+        if (!avatarLayer || !fixedPlacement) {
+          const offset = offsets[index]!;
+          avatarLayer = (await renderRgba(width, height, canvas => {
+            canvas.scale(scaleX, scaleY);
+            placeAvatar(canvas, avatar, at(positions, offset), at(sizes, offset), crop ?? false);
+          })).rgba;
+        }
+        const { rgba: art } = await renderRgba(width, height, canvas => {
+          canvas.scale(scaleX, scaleY);
+          canvas.imageSmoothingQuality = "high";
+          canvas.drawImage(foreground, 0, 0);
+        });
+        const rgba = blendFixedArt(avatarLayer, art);
+        const duration = delayMs * holds[index]!;
+        const previous = rendered.at(-1);
+        if (previous?.rgba.equals(rgba)) previous.delayMs += duration;
+        else rendered.push({ rgba, delayMs: duration });
+      }
+      return rendered;
+    }
   }
 
   return {
