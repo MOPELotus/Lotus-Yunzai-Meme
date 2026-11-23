@@ -40,6 +40,20 @@ export interface AnyLiewAvatarScene {
 const genshin = ["米哈游", "原神"] as const;
 
 const scenes: readonly AnyLiewAvatarScene[] = [
+  { key: "mixue_jasmine_milk_green", keywords: ["茉莉奶绿"], count: 2, layers: [
+    { image: 1, box: [218, 458, 100, 85] },
+    { image: 0, box: [452, 395, 100, 85] },
+  ] },
+  { key: "mixue_stick_beaten_fresh_orange", keywords: ["棒打鲜橙"], count: 2, layers: [
+    { image: 1, box: [272, 569, 160, 135] },
+    { image: 0, box: [580, 432, 160, 135] },
+  ] },
+  { key: "kfc_thursday", keywords: ["星期四", "疯狂星期四"], count: 1, above: true, animatedInput: true, jpegOutput: true, layers: [
+    { image: 0, box: [775, 390, 450, 450], circle: true },
+  ] },
+  { key: "kfc", keywords: ["kfc", "KFC", "肯德基"], count: 1, above: true, animatedInput: true, layers: [
+    { image: 0, box: [65, 65, 500, 500], circle: true, angle: 15 },
+  ] },
   { key: "shipborne_laser_weapons", keywords: ["舰载激光武器"], count: 1, animatedInput: true, layers: [
     { image: 0, box: [118, 212, 167, 167] },
     { image: 0, box: [572, 918, 73, 73] },

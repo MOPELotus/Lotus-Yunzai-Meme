@@ -30,4 +30,8 @@ export const anyliewStaticAvatarAssets = [
   ["emoji/mihoyo_kuki_shinobu_who/images/0.png", "bd993488e8ab5b49e6156679435e1c93ab5a5fa985a97e50969a0f00a85efa3c"],
   ["emoji/mihoyo_liuwei_dinner/images/0.png", "2b30bac1ef11d1d1f7669e1211a794ce45c51adcb99495c9a3e36e21d9d89e7d"],
   ["emoji/new_goodnews/images/0.png", "534afeed1a536d0f4e9d52eb8a60b8dd09688cbad4473c644650fedc2acd2670"],
+  ["emoji/kfc/images/0.png", "3d1dd4c185ce1c89893e3b7a45b0095c16acfecb38051ec08ab57cbbbde76a8f"],
+  ["emoji/kfc_thursday/images/0.png", "f87b60acac836870a51145430d26426b03d1b5de674c7f0cad035fd41644c832"],
+  ["emoji/mixue_jasmine_milk_green/images/0.png", "594093ea37ebf6ec0bbd7820b935cc71d00462751cfe096035175b0de3a403e4"],
+  ["emoji/mixue_stick_beaten_fresh_orange/images/0.png", "b71c3ec4e6b77cb31f4454f3508e168d277bbc1ecf4dcba1be64bfb0307b3a7a"],
 ] as const;

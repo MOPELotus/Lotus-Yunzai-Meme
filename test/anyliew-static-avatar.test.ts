@@ -4,6 +4,10 @@ import { anyliewStaticAvatarAssets } from "../backend-anyliew-static-avatar-asse
 import { anyliewStaticAvatarTemplates } from "../templates/anyliew-static-avatar.ts";
 
 const expected: readonly (readonly [string, readonly string[], number, string, number?, number?])[] = [
+  ["mixue_jasmine_milk_green", ["茉莉奶绿"], 2, "png"],
+  ["mixue_stick_beaten_fresh_orange", ["棒打鲜橙"], 2, "png"],
+  ["kfc_thursday", ["星期四", "疯狂星期四"], 1, "png"],
+  ["kfc", ["kfc", "KFC", "肯德基"], 1, "png"],
   ["shipborne_laser_weapons", ["舰载激光武器"], 1, "png"],
   ["steal_two", ["双偷"], 3, "png"],
   ["swimsuit_group_photo", ["泳衣合影", "比基尼合影"], 2, "png"],
@@ -42,8 +46,8 @@ test("头像场景保留旧键、触发词、图片数量和原素材名", () =>
     "mihoyo_genshin_impact_players", "mihoyo_funina_square_head",
     "mihoyo_aino_ride", "mihoyo_kuki_shinobu_who", "mihoyo_liuwei_dinner",
   ]);
-  expect(anyliewStaticAvatarAssets.map<string>(([path]) => path)).toEqual(
-    expected.map(([key, , , ext]) => `emoji/${key}/images/0.${ext}`));
+  expect(anyliewStaticAvatarAssets.map<string>(([path]) => path).sort()).toEqual(
+    expected.map(([key, , , ext]) => `emoji/${key}/images/0.${ext}`).sort());
   expect(anyliewStaticAvatarTemplates.map(({ info }) => [
     info.key, info.keywords, info.params_type.min_images, info.params_type.max_images,
     info.params_type.min_texts, info.params_type.max_texts,

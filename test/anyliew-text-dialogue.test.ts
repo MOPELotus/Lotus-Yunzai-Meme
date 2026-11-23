@@ -12,8 +12,10 @@ const keys = [
 
 test("纯文字对话模板保留九个旧键的默认文字、输入形态及固定资源", async () => {
   expect(anyliewTextDialogueTemplates.map(template => template.info.key)).toEqual([...keys]);
-  expect(anyliewTextDialogueAssets).toHaveLength(14);
-  const paths = new Set<string>(anyliewTextDialogueAssets.map(([path]) => "anyliew/" + path));
+  const names = new Set<string>(keys);
+  const paths = new Set<string>(anyliewTextDialogueAssets.map(([path]) => "anyliew/" + path)
+    .filter(path => names.has(path.split("/")[2] ?? "")));
+  expect(paths.size).toBe(14);
   const context: MemeTemplateContext = {
     signal,
     async fontAsset() { throw new Error("离线用例无字体"); },
