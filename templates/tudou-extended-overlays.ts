@@ -287,4 +287,18 @@ export const tudouExtendedOverlays: readonly TudouComposition[] = [
       ],
     }],
   },
+  {
+    // MemeCrafters/meme-generator-contrib 8547f2e5718bfbb3328d700fe2c21d2ec5962500.
+    key: "lash", keywords: ["鞭笞", "鞭打", "鞭挞", "鞭策"], avatars: 2, viewport: [120, 120], frames: 9, delayMs: 50,
+    layers: [
+      { source: 0, mode: "cover-circle", poses: [
+        [84, 25, 22, 22], [87, 23, 22, 22], [87, 27, 22, 22], [86, 28, 22, 22], [62, 26, 22, 22],
+        [59, 28, 22, 22], [76, 20, 22, 22], [85, 24, 22, 22], [80, 23, 22, 22],
+      ] },
+      { source: 1, mode: "cover-circle", angle: 30, poses: [
+        [12, 69, 22, 22], [15, 66, 22, 22], [14, 67, 22, 22], [15, 66, 22, 22], [17, 67, 22, 22],
+        [14, 63, 22, 22], [21, 56, 22, 22], [15, 62, 22, 22], [17, 69, 22, 22],
+      ] },
+    ],
+  },
 ];

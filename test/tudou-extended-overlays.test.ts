@@ -8,8 +8,8 @@ import { tudouExtendedOverlayTemplates } from "../templates/tudou-layered-animat
 
 const signal = new AbortController().signal;
 
-test("23 款 Tudou 动图均注册一次并打包原始的 780 张有效素材", async () => {
-  expect(tudouExtendedOverlayTemplates).toHaveLength(23);
+test("24 款旧版动图均注册一次并打包原始的 789 张有效素材", async () => {
+  expect(tudouExtendedOverlayTemplates).toHaveLength(24);
   const manifest = await Bun.file(new URL("../resources/builtin/manifest.json", import.meta.url)).json() as { files: Record<string, string> };
   let frameCount = 0;
   for (const [i, scene] of tudouExtendedOverlays.entries()) {
@@ -19,12 +19,13 @@ test("23 款 Tudou 动图均注册一次并打包原始的 780 张有效素材",
       frameCount++;
     }
   }
-  expect(frameCount).toBe(780);
+  expect(frameCount).toBe(789);
   const scene = (key: string) => tudouExtendedOverlays.find(entry => entry.key === key)!;
   expect(scene("daobao").layers[0]!.visible).toEqual([[0, 81]]);
   expect(scene("guan_bingxiang").layers[0]!.visible).toEqual([[0, 55]]);
   expect(scene("wanhuo").layers[0]!.visible).toEqual([[0, 17]]);
   expect(scene("zizuozuo").frames).toBe(25);
+  expect(scene("lash").keywords).toEqual(["鞭笞", "鞭打", "鞭挞", "鞭策"]);
   expect(scene("zhuwu").frames).toBe(44);
   const dancers = builtinMemeTemplates.filter(template => template.info.keywords.includes("跳舞")).map(template => template.info.key).sort();
   expect(dancers).toContain("stickman_dancing");

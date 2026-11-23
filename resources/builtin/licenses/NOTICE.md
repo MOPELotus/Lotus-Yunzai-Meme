@@ -11,3 +11,5 @@
 
 - Glow Sans SC Normal Heavy 0.93 的字体版权声明为 © 2021 Project Welai。参见 [Glow Sans 字体许可](https://github.com/welai/glow-sans/blob/81d8993ef84a1a475cc7e971d8bd2d9dd81d351c/OFL.txt)。
 - Noto Serif SC Regular 1.001 的字体版权声明为 © 2017 Adobe Systems Incorporated。参见 [Noto CJK Serif 字体许可](https://github.com/notofonts/noto-cjk/blob/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Serif/LICENSE)。
+
+- 鞭笞（lash）沿用 [MemeCrafters 扩展模板的原素材和构图](https://github.com/MemeCrafters/meme-generator-contrib/tree/8547f2e5718bfbb3328d700fe2c21d2ec5962500/memes/lash)，该版本的 [MIT 许可](https://github.com/MemeCrafters/meme-generator-contrib/blob/8547f2e5718bfbb3328d700fe2c21d2ec5962500/LICENSE)与[随仓保留的许可正文](../../../LICENSE-Tudou)一致。
