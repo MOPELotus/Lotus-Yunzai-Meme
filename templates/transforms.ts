@@ -3,8 +3,8 @@
 import type { CanvasRenderingContext2D, Image } from "skia-canvas";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeImageSequence, type MemeImageSequence } from "./animated-input.ts";
-import { encodeMemeGif } from "./gif.ts";
-import { drawFittedText, jpg, previewImage, registerFont, rgbaFrame } from "./template-layout.ts";
+import { assertMemeGifDimensions, encodeMemeGif } from "./gif.ts";
+import { drawFittedText, jpg, previewImage, registerFont, rgbaFrame, rgbaFrameDimensions } from "./template-layout.ts";
 
 const flatWidth = 500;
 const captionHeight = 80;
@@ -28,17 +28,14 @@ export async function renderTransformSequence(sequence: MemeImageSequence, width
     draw(canvas, sequence.frames[0]);
   }, signal);
 
-  if (width < 1 || height < 1 || width > 4096 || height > 4096 || sequence.frames.length > 200 ||
-      width * height * sequence.frames.length > 24_000_000) throw new RangeError("表情动图的尺寸或帧数超限。");
+  const { width: frameWidth, height: frameHeight } = rgbaFrameDimensions(width, height);
+  assertMemeGifDimensions(frameWidth, frameHeight, sequence.frames.length);
   const frames = [];
   // The old single-image animation draws each input frame once and uses the mean duration.
   const delayMs = Math.floor(sequence.averageDelayMs / 10) * 10;
-  let frameWidth = 0, frameHeight = 0;
   for (const frame of sequence.frames) {
     signal.throwIfAborted();
     const rendered = await rgbaFrame(width, height, target => draw(target, frame), signal);
-    frameWidth = rendered.width;
-    frameHeight = rendered.height;
     frames.push({ rgba: rendered.rgba, delayMs });
   }
   return encodeMemeGif(frameWidth, frameHeight, frames, signal);

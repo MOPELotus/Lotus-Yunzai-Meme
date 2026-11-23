@@ -101,9 +101,13 @@ export async function jpg(width: number, height: number, draw: Draw, signal: Abo
   return content;
 }
 
-export async function rgbaFrame(width: number, height: number, draw: Draw, signal: AbortSignal) {
+export function rgbaFrameDimensions(width: number, height: number) {
   const scale = nativeImageRasterScale() / 4;
-  const rasterWidth = Math.ceil(width * scale), rasterHeight = Math.ceil(height * scale);
+  return { width: Math.ceil(width * scale), height: Math.ceil(height * scale), scale };
+}
+
+export async function rgbaFrame(width: number, height: number, draw: Draw, signal: AbortSignal) {
+  const { width: rasterWidth, height: rasterHeight, scale } = rgbaFrameDimensions(width, height);
   signal.throwIfAborted();
   const rendered = await renderRgba(rasterWidth, rasterHeight, (context) => {
     context.scale(scale, scale);
