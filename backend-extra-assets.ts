@@ -9,6 +9,7 @@ import { anyliewDialogueAssets } from "./backend-dialogue-assets.ts";
 import { anyliewFixedAnimationAssets } from "./backend-fixed-animation-assets.ts";
 import { flushAssets } from "./backend-flush-assets.ts";
 import { pythonOverlayAssets } from "./backend-python-overlay-assets.ts";
+import { legacyTextOverlayAssets } from "./backend-legacy-text-overlay-assets.ts";
 import { jumpSoldAssets } from "./backend-jump-sold-assets.ts";
 import { anyliewRectangleOverlayAssets } from "./backend-rectangle-overlay-assets.ts";
 import { anyliewShortAnimationAssets } from "./backend-short-animation-assets.ts";
@@ -92,6 +93,7 @@ const anyliewAssets = [
 export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map([
   ...anyliewAssets.map(([path, digest]) => [`images/anyliew/${path}`, { path, digest, sources: anyliewBase }] as const),
   ...pythonOverlayAssets,
+  ...legacyTextOverlayAssets,
   ...flushAssets,
   ...jumpSoldAssets,
   ...tudouShortAnimationAssets,

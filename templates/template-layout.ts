@@ -49,11 +49,12 @@ export function paper(context: CanvasRenderingContext2D, width: number, height: 
 
 export function drawFittedText(context: CanvasRenderingContext2D, box: Box, text: string, font: string,
   minimum: number, maximum: number, alignment: "left" | "center" | "right" = "center", fill = "#000",
-  { wrap = true, stroke, vertical = "center", paragraphMetrics = false }: {
+  { wrap = true, stroke, vertical = "center", paragraphMetrics = false, blockAlignment }: {
     readonly wrap?: boolean;
     readonly stroke?: readonly [color: string, ratio: number];
     readonly vertical?: "top" | "center" | "bottom";
     readonly paragraphMetrics?: boolean;
+    readonly blockAlignment?: "left" | "center" | "right";
   } = {}) {
   const [left, top, right, bottom] = box;
   const width = right - left, height = bottom - top;
@@ -76,7 +77,10 @@ export function drawFittedText(context: CanvasRenderingContext2D, box: Box, text
       const contentHeight = paragraphMetrics ? Math.round(contentBottom - contentTop) : contentBottom - contentTop;
       const contentFits = paragraphMetrics ? metrics.width <= width : lines.every(line => line.width <= width);
       if (contentHeight <= height && contentFits) {
-        const x = alignment === "left" ? left : alignment === "right" ? right : (left + right) / 2;
+        const anchor = alignment === "left" ? 0 : alignment === "right" ? 1 : 0.5;
+        const textWidth = blockAlignment ? Math.max(...lines.map(line => line.width)) : width;
+        const blockOffset = blockAlignment === "center" ? (width - textWidth) / 2 : blockAlignment === "right" ? width - textWidth : 0;
+        const x = left + blockOffset + textWidth * anchor;
         const limit = height - contentHeight;
         const offset = vertical === "top" ? 0 : vertical === "bottom" ? limit : limit / 2;
         const y = top + offset - contentTop;
