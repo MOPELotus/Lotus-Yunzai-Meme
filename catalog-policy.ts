@@ -113,16 +113,64 @@ export function safeCatalogKey(value: unknown): value is string {
   return typeof value === "string" && value !== "." && value !== ".." && /^[^/\\\s\x00-\x1f]{1,255}$/u.test(value);
 }
 
-export function generationServer() {
+export interface LegacyMemeServer {
+  readonly base: URL;
+  readonly timeout: number;
+  readonly protocol: "legacy";
+}
+
+export interface NativeMemeServer {
+  readonly timeout: number;
+  readonly protocol: "native";
+  readonly catalogIdentity: string;
+  keys(signal?: AbortSignal): Promise<readonly string[]>;
+  info(key: string, signal?: AbortSignal): Promise<unknown>;
+  generate(key: string, body: FormData, signal?: AbortSignal): Promise<Uint8Array<ArrayBuffer> | undefined>;
+  preview(key: string, signal?: AbortSignal): Promise<Uint8Array<ArrayBuffer> | undefined>;
+}
+
+let readyManagedServer: Omit<NativeMemeServer, "timeout" | "protocol"> | undefined;
+
+export function publishManagedMemeServer(server: NonNullable<typeof readyManagedServer>) {
+  readyManagedServer = server;
+  return () => {
+    if (readyManagedServer === server) readyManagedServer = undefined;
+  };
+}
+
+function serverSettings() {
   const settings = readConfig(configDirectory(), "server.yaml");
-  const value = Bun.env.LOTUS_MEME_SERVER_URL ?? settings.url;
-  if (value === undefined || value === null || value === "") return;
-  const base = parseGenerationServerUrl(value);
+  const explicitUrl = Bun.env.LOTUS_MEME_SERVER_URL;
+  const mode = settings.backend ?? "auto";
+  if (mode !== "auto" && mode !== "managed" && mode !== "remote") throw new Error("无效的表情服务运行方式");
+  const url = explicitUrl ?? settings.url;
+  const hasUrl = url !== undefined && url !== null && url !== "";
+  const base = hasUrl && (mode !== "managed" || explicitUrl !== undefined) ? parseGenerationServerUrl(url) : undefined;
+  const managed = explicitUrl === undefined && (mode === "managed" || (mode === "auto" && !base));
   const timeout = settings.timeout ?? 5;
   if (typeof timeout !== "number" || !Number.isFinite(timeout) || timeout <= 0 || timeout > 120) {
     throw new Error("无效的表情服务请求超时");
   }
-  return { base, timeout: Math.ceil(timeout * 1_000) };
+  return { managed, base, timeout: Math.ceil(timeout * 1_000) };
+}
+
+export function usesManagedMemeServer() {
+  return serverSettings().managed;
+}
+
+export function generationServer(): LegacyMemeServer | NativeMemeServer | undefined {
+  const { managed, base, timeout } = serverSettings();
+  if (managed) return readyManagedServer && { ...readyManagedServer, timeout, protocol: "native" };
+  if (base) return { base, timeout, protocol: "legacy" };
+}
+
+export function sameGenerationServer(
+  first: LegacyMemeServer | NativeMemeServer | undefined,
+  second: LegacyMemeServer | NativeMemeServer | undefined,
+): boolean {
+  if (first?.protocol === "native") return second?.protocol === "native" && first.generate === second.generate;
+  if (first?.protocol === "legacy") return second?.protocol === "legacy" && first.base.href === second.base.href;
+  return second === undefined;
 }
 
 export function catalogRefreshSchedule(): string | undefined {

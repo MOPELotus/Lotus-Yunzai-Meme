@@ -2,8 +2,10 @@ import { Database } from "bun:sqlite";
 import { existsSync, linkSync, mkdirSync, rmSync } from "node:fs";
 import { dirname } from "node:path";
 import { catalogPath, catalogVersion } from "./catalog-file.ts";
-import { generationServer, safeCatalogKey } from "./catalog-policy.ts";
+import { generationServer, safeCatalogKey, sameGenerationServer } from "./catalog-policy.ts";
 import { isMemeOwner, type SettingsContext } from "./settings.ts";
+import { keepMemeCatalogDenials, scanMemeCatalogExclusions } from "./catalog-exclusions.ts";
+import { isExcludedMemeTemplate } from "./template-policy.ts";
 
 const command = /^#?(?:表情(?:合成)?|meme)(强制)?更新(?:表情包|资源|数据)?$/iu;
 const maxResponseBytes = 4 * 1024 * 1024;
@@ -29,7 +31,7 @@ function record(value: unknown): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
-async function fetchJSON(server: Server, route: string, signal?: AbortSignal): Promise<unknown> {
+async function fetchJSON(server: Extract<Server, { protocol: "legacy" }>, route: string, signal?: AbortSignal): Promise<unknown> {
   const url = new URL(server.base);
   url.pathname = `${url.pathname.replace(/\/+$/u, "")}/memes/${route}`;
   const timeout = AbortSignal.timeout(server.timeout);
@@ -64,6 +66,7 @@ async function fetchJSON(server: Server, route: string, signal?: AbortSignal): P
 function entryFor(key: string, value: unknown) {
   const info = record(value);
   if (info.key !== undefined && info.key !== key) throw new Error();
+  if (isExcludedMemeTemplate(key, Array.isArray(info.tags) ? info.tags : [info.tags])) return;
   if (!Array.isArray(info.keywords) || info.keywords.some((word) => typeof word !== "string")) throw new Error();
   const params = record(info.params_type);
   const { min_texts, max_texts, min_images, max_images } = params;
@@ -90,6 +93,25 @@ function catalogKeys(db: Database) {
   return new Set(hasTable(db, "meme") ? db.query<{ key: string }, []>("SELECT key FROM meme").all().map(({ key }) => key) : []);
 }
 
+function dropTemplates(db: Database, keys: Iterable<string>, excluded: ReadonlySet<string>) {
+  const drop = db.query("DELETE FROM meme WHERE key = ?");
+  const dropPreset = hasTable(db, "preset") ? db.query("DELETE FROM preset WHERE key = ?") : undefined;
+  for (const key of keys) {
+    if (excluded.has(key)) dropPreset?.run(key);
+    drop.run(key);
+  }
+}
+
+function nativeCatalogIdentity(server: Server | undefined) {
+  return server?.protocol === "native" ? server.catalogIdentity : undefined;
+}
+
+function storedCatalogIdentity(db: Database) {
+  if (hasTable(db, "lotus_catalog_provider")) {
+    return db.query<{ identity: string }, []>("SELECT identity FROM lotus_catalog_provider WHERE id = 1").get()?.identity;
+  }
+}
+
 function addPresets(db: Database, keys: ReadonlySet<string>, presets: Presets, now: string) {
   const insert = db.query(`INSERT INTO preset(name,key,arg_name,arg_value,createdAt,updatedAt)
     VALUES (?,?,?,?,?,?) ON CONFLICT(name) DO NOTHING`);
@@ -105,23 +127,37 @@ function addPresets(db: Database, keys: ReadonlySet<string>, presets: Presets, n
 async function initializeCatalog(signal: AbortSignal): Promise<string | undefined> {
   signal.throwIfAborted();
   const file = catalogPath();
+  const server = generationServer();
+  const identity = nativeCatalogIdentity(server);
+  let providerChanged = false;
   if (existsSync(file)) {
     const current = new Database(file, { readonly: true, strict: true });
     let empty: boolean;
+    let hadTemplates: boolean;
     try {
-      empty = !hasTable(current, "meme") || !current.query("SELECT 1 FROM meme LIMIT 1").get();
-      if (!empty && hasTable(current, "preset") && current.query("SELECT 1 FROM preset LIMIT 1").get()) return;
+      const keys = catalogKeys(current);
+      const excluded = scanMemeCatalogExclusions(current).keys;
+      providerChanged = !!server && storedCatalogIdentity(current) !== identity;
+      hadTemplates = keys.size > 0;
+      empty = keys.size === excluded.size;
+      if (!providerChanged && !empty && !excluded.size && hasTable(current, "preset") &&
+          current.query("SELECT 1 FROM preset LIMIT 1").get()) return;
     } finally {
       current.close();
     }
-    if (!empty) {
+    if (hadTemplates) {
       const { preset } = await import("./models/Meme/preset.ts");
       signal.throwIfAborted();
       if (file !== catalogPath()) return;
       const db = new Database(file, { strict: true, create: false });
       try {
         db.transaction(() => {
-          // A manual or rolled-back process may have already restored presets.
+          // Recheck the copied catalog inside the write transaction.
+          const excluded = scanMemeCatalogExclusions(db).keys;
+          if (excluded.size) {
+            keepMemeCatalogDenials(db, excluded);
+            dropTemplates(db, excluded, excluded);
+          }
           if (hasTable(db, "preset") && db.query("SELECT 1 FROM preset LIMIT 1").get()) return;
           db.exec(createTables);
           addPresets(db, catalogKeys(db), preset, new Date().toISOString());
@@ -129,10 +165,10 @@ async function initializeCatalog(signal: AbortSignal): Promise<string | undefine
       } finally {
         db.close();
       }
-      return;
+      if (!empty && !providerChanged) return;
     }
   }
-  if (generationServer()) return updateCatalog(true, signal);
+  if (server) return updateCatalog(true, signal);
 }
 
 async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<string> {
@@ -147,23 +183,38 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
     if (existsSync(file)) db = new Database(file, { strict: true, create: false });
     const initial = db && dataVersion(db);
     const kept = db ? catalogKeys(db) : new Set<string>();
+    const excluded = db ? scanMemeCatalogExclusions(db).keys : new Set<string>();
     const version = catalogVersion(file);
-    const result = await fetchJSON(server, "keys", signal);
+    const identity = nativeCatalogIdentity(server);
+    const sourceChanged = (db && storedCatalogIdentity(db)) !== identity;
+    const result = await (server.protocol === "native" ? server.keys(signal) : fetchJSON(server, "keys", signal));
     if (!Array.isArray(result) || !result.length || result.some((key) => !safeCatalogKey(key))) throw new Error();
-    const remote = new Set<string>(result);
-    const required = [...remote].filter((key) => force || !kept.has(key));
-    const removed = [...kept].filter((key) => !remote.has(key));
-    const entries: ReturnType<typeof entryFor>[] = [];
+    const remote = new Set<string>();
+    for (const key of result) {
+      if (isExcludedMemeTemplate(key)) excluded.add(key);
+      else remote.add(key);
+    }
+    const required = [...remote].filter((key) => force || sourceChanged || !kept.has(key) || excluded.has(key));
+    const entries: NonNullable<ReturnType<typeof entryFor>>[] = [];
     for (let start = 0; start < required.length; start += batchSize) {
-      const pending = required.slice(start, start + batchSize).map(async (key) =>
-        entryFor(key, await fetchJSON(server, `${encodeURIComponent(key)}/info`, signal)));
+      const pending = required.slice(start, start + batchSize).map(async (key) => ({
+        key, row: entryFor(key, await (server.protocol === "native" ? server.info(key, signal) :
+          fetchJSON(server, `${encodeURIComponent(key)}/info`, signal))),
+      }));
       const batch = await Promise.allSettled(pending);
       if (batch.some((entry) => entry.status === "rejected")) throw new Error();
-      for (const entry of batch) if (entry.status === "fulfilled") entries.push(entry.value);
+      for (const entry of batch) if (entry.status === "fulfilled") {
+        if (entry.value.row) entries.push(entry.value.row);
+        else {
+          excluded.add(entry.value.key);
+          remote.delete(entry.value.key);
+        }
+      }
     }
+    const removed = [...kept].filter((key) => !remote.has(key));
     const { preset } = await import("./models/Meme/preset.ts");
     signal?.throwIfAborted();
-    if (file !== catalogPath() || version !== catalogVersion(file) || generationServer()?.base.href !== server.base.href) throw new Error();
+    if (file !== catalogPath() || version !== catalogVersion(file) || !sameGenerationServer(server, generationServer())) throw new Error();
 
     mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
     if (!db) {
@@ -184,8 +235,14 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
           max_images=excluded.max_images,defText=excluded.defText,args_type=excluded.args_type,tags=excluded.tags,
           updatedAt=excluded.updatedAt`);
       for (const row of entries) put.run({ ...row, now });
-      const drop = target.query("DELETE FROM meme WHERE key = ?");
-      for (const key of removed) drop.run(key);
+      dropTemplates(target, removed, excluded);
+      keepMemeCatalogDenials(target, excluded, entries.map(({ key }) => key));
+      if (identity) {
+        target.exec("CREATE TABLE IF NOT EXISTS lotus_catalog_provider (id INTEGER PRIMARY KEY, identity TEXT NOT NULL)");
+        target.query("INSERT OR REPLACE INTO lotus_catalog_provider VALUES (1, ?)").run(identity);
+      } else if (hasTable(target, "lotus_catalog_provider")) {
+        target.exec("DELETE FROM lotus_catalog_provider");
+      }
 
       return addPresets(target, remote, preset, now);
     }).immediate();

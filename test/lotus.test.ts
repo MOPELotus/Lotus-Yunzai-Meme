@@ -249,7 +249,7 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     Bun.env.LOTUS_MEME_SERVER_URL = new URL("/fixture/", fixture.url).href;
     const configuredFixture = Bun.env.LOTUS_MEME_SERVER_URL;
     Bun.env.LOTUS_MEME_SERVER_URL = "http://meme:2233/internal/";
-    expect(generationServer()?.base.href).toBe("http://meme:2233/internal/");
+    expect(generationServer()).toMatchObject({ protocol: "legacy", base: new URL("http://meme:2233/internal/") });
     Bun.env.LOTUS_MEME_SERVER_URL = configuredFixture;
     const fallbackContext = {
       message_type: "group" as const,

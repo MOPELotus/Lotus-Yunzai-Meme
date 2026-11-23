@@ -9,6 +9,7 @@
     "entry": "./lotus.ts"
   },
   "dependencies": {
+    "@lotus-yunzai/skia": "workspace:*",
     "node-schedule": "2.1.2",
     "skia-canvas": "4.0.1",
     "yaml": "2.9.1"

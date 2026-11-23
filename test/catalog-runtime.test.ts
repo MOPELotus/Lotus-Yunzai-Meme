@@ -70,6 +70,7 @@ test("就绪后补空目录，按旧设定增量同步且故障保留原目录",
     const stale = new Database(file);
     stale.exec("DROP TABLE preset");
     stale.close();
+    await writeFile(join(root, "server.yaml"), "backend: remote\n");
     module = createModule({ signal: new AbortController().signal, memeRuntime: runtime });
     delete Bun.env.LOTUS_MEME_SERVER_URL;
     activate!();

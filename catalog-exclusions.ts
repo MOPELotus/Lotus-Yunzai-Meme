@@ -1,6 +1,6 @@
 import { Database } from "bun:sqlite";
 import { catalogPath, catalogVersion } from "./catalog-file.ts";
-import { isExcludedMemeTemplate, isRetiredMemeAlias } from "./template-policy.ts";
+import { isCorrectedLegacyMemeTag, isExcludedMemeTemplate, isRetiredMemeAlias } from "./template-policy.ts";
 
 function json(source: string | null): unknown {
   if (source === null) return;
@@ -11,34 +11,65 @@ function tags(value: unknown): readonly unknown[] {
   return Array.isArray(value) ? value : typeof value === "string" ? [value] : [];
 }
 
+const limitColumns = ["min_images", "max_images", "min_texts", "max_texts"] as const;
+
+function record(value: unknown) {
+  if (typeof value === "object" && value !== null && !Array.isArray(value)) return value as Record<string, unknown>;
+}
+
+type CatalogMetadata = {
+  key: string; tags: string | null; info: string | null; keyWords: string | null; params: string | null;
+} & Record<typeof limitColumns[number], number | null>;
+
+function matchesCorrectedArchive(row: CatalogMetadata, info: Record<string, unknown> | undefined, keywordList: unknown,
+  storedTags: readonly unknown[], infoTags: readonly unknown[]) {
+  const limits = limitColumns.map(name => row[name]);
+  const knownTags = storedTags.length ? storedTags : infoTags;
+  if (!isCorrectedLegacyMemeTag(row.key, keywordList, limits, knownTags)) return false;
+
+  const rawParams = json(row.params);
+  if (row.params !== null && (!record(rawParams) || !matchesLimits(rawParams))) return false;
+  if (info?.key !== undefined && info.key !== row.key) return false;
+  if (info?.params_type !== undefined && !matchesLimits(info.params_type)) return false;
+  if (info?.keywords !== undefined && !isCorrectedLegacyMemeTag(row.key, info.keywords, limits, knownTags)) return false;
+  return !infoTags.length || isCorrectedLegacyMemeTag(row.key, keywordList, limits, infoTags);
+
+  function matchesLimits(value: unknown) {
+    const input = record(value);
+    return !!input && limitColumns.every((name, index) => input[name] === limits[index]);
+  }
+}
+
 export function scanMemeCatalogExclusions(db: Database) {
   const columns = db.query<{ name: string }, []>("PRAGMA table_info(meme)").all();
   const names = new Set(columns.map(column => column.name.toLowerCase()));
   const keys = new Set<string>();
   const normalizedKeys = new Set<string>();
   const aliases = new Set<string>();
+  const correctedArchiveKeys = new Set<string>();
   if (names.has("key")) {
-    const rows = db.query<{ key: string; tags: string | null; info: string | null; keyWords: string | null }, []>(
-      `SELECT key, ${names.has("tags") ? "tags" : "NULL AS tags"},
-        ${names.has("info") ? "info" : "NULL AS info"},
-        ${names.has("keywords") ? "keyWords" : "NULL AS keyWords"} FROM meme`,
-    ).all();
+    const fields = (["tags", "info", "keyWords", "params", ...limitColumns] as const)
+      .map(field => names.has(field.toLowerCase()) ? field : `NULL AS ${field}`);
+    const rows = db.query<CatalogMetadata, []>(`SELECT key, ${fields.join(", ")} FROM meme`).all();
     for (const row of rows) {
       if (typeof row.key !== "string") continue;
-      const info = json(row.info);
-      const infoTags = typeof info === "object" && info !== null && "tags" in info ? info.tags : undefined;
-      if (isExcludedMemeTemplate(row.key, [...tags(json(row.tags) ?? row.tags), ...tags(infoTags)])) {
+      const info = record(json(row.info));
+      const storedTags = tags(json(row.tags) ?? row.tags);
+      const infoTags = tags(info?.tags);
+      const keywords = json(row.keyWords);
+      const denied = isExcludedMemeTemplate(row.key, [...storedTags, ...infoTags]);
+      if (denied && !matchesCorrectedArchive(row, info, keywords, storedTags, infoTags)) {
         keys.add(row.key);
         normalizedKeys.add(row.key.normalize("NFKC").trim().toLowerCase());
       } else {
-        const keywords = json(row.keyWords);
+        if (denied) correctedArchiveKeys.add(row.key);
         if (Array.isArray(keywords)) for (const keyword of keywords) {
           if (typeof keyword === "string" && isRetiredMemeAlias(keyword)) aliases.add(keyword.normalize("NFKC").trim().toLowerCase());
         }
       }
     }
   }
-  return { keys, normalizedKeys, aliases };
+  return { keys, normalizedKeys, aliases, correctedArchiveKeys };
 }
 
 const denialTable = "lotus_catalog_denied_keys";
@@ -64,6 +95,7 @@ export function memeCatalogExclusions(db: Database) {
   if (hasDenials(db)) {
     const recorded = db.query<{ key: string }, []>(`SELECT key FROM ${denialTable}`).all();
     for (const { key } of recorded) {
+      if (result.correctedArchiveKeys.has(key)) continue;
       result.keys.add(key);
       result.normalizedKeys.add(key.normalize("NFKC").trim().toLowerCase());
     }
@@ -86,7 +118,7 @@ function currentCatalogExclusions() {
 }
 
 export function isExcludedMemeCatalogKey(key: string) {
-  return isExcludedMemeTemplate(key) || currentCatalogExclusions()?.keys.has(key) === true;
+  return isExcludedMemeTemplate(key) || currentCatalogExclusions()?.normalizedKeys.has(key.normalize("NFKC").trim().toLowerCase()) === true;
 }
 
 export function isExcludedMemeName(name: string) {

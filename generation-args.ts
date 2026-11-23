@@ -21,7 +21,7 @@ function optionsFor(schema: Fields, properties: Fields) {
     const action = record(option.action);
     const dest = typeof option.dest === "string" ? option.dest
       : args.length === 1 ? record(args[0]).name
-      : option.names.find((name) => typeof name === "string" && /^--\w/u.test(name))?.slice(2);
+      : option.names.find((name) => typeof name === "string" && /^--[\p{L}\p{N}_]/u.test(name))?.slice(2);
     if (typeof dest !== "string" || dest === "user_infos" || !Object.hasOwn(properties, dest)) continue;
     if (args.length === 0 && (action.type !== 0 ||
         !["string", "number", "boolean"].includes(typeof action.value))) continue;
@@ -29,7 +29,8 @@ function optionsFor(schema: Fields, properties: Fields) {
     const parsed: ParserOption = args.length === 0
       ? { dest, value: action.value as Argument } : { dest };
     for (const name of option.names) {
-      if (typeof name === "string" && /^--?\w/u.test(name)) options.set(name, parsed);
+      if (typeof name === "string" && (/^--?[\p{L}\p{N}_]/u.test(name) ||
+          parsed.value !== undefined && /^\p{Script=Han}+$/u.test(name))) options.set(name, parsed);
     }
   }
   return options;
@@ -42,9 +43,12 @@ function asType(raw: Argument, property: unknown): Argument | undefined {
     case "string":
       result = String(raw);
       break;
-    case "integer": {
-      const value = /^[-+]?\d+$/u.test(String(raw)) ? Number(raw) : NaN;
-      if (Number.isSafeInteger(value) &&
+    case "integer":
+    case "number": {
+      const integer = schema.type === "integer";
+      const syntax = integer ? /^[+-]?\d+$/u : /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/iu;
+      const value = syntax.test(String(raw)) ? Number(raw) : NaN;
+      if ((integer ? Number.isSafeInteger(value) : Number.isFinite(value)) &&
           (typeof schema.minimum !== "number" || value >= schema.minimum) &&
           (typeof schema.maximum !== "number" || value <= schema.maximum)) result = value;
       break;
@@ -109,7 +113,7 @@ export function parseGenerationArgs(argsType: unknown, input: string, preset?: P
       continue;
     }
     const next = tokens[i + 1];
-    if (!next || flags.has(next[0]) || /^--?[a-z]/iu.test(next[0])) {
+    if (!next || flags.has(next[0]) || /^--?\p{L}/u.test(next[0])) {
       issue ??= `表情参数 ${option.dest} 缺少值。`;
       continue;
     }

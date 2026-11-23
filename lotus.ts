@@ -2,7 +2,7 @@ import { Database } from "bun:sqlite";
 import type { CatalogCardRow } from "./catalog-card.ts";
 import type { LoadMemeInfoCard } from "./info-card-runtime.ts";
 import { catalogPath, catalogVersion } from "./catalog-file.ts";
-import { catalogPolicy, generationServer } from "./catalog-policy.ts";
+import { catalogPolicy, generationServer, sameGenerationServer } from "./catalog-policy.ts";
 import { argsTypeFromParams, parseGenerationArgs, type PresetArgument } from "./generation-args.ts";
 import { buildGenerationBody, type GenerationInput } from "./generation.ts";
 import { generateMemeReply, requestMemePreview, type FallbackContext } from "./generate-reply.ts";
@@ -14,6 +14,10 @@ import { handleCatalogUpdate } from "./catalog-update.ts";
 import { startCatalogRuntime, type MemeRuntime } from "./catalog-runtime.ts";
 import { readMemeUsage } from "./usage.ts";
 import { createMemePokeHandler } from "./poke.ts";
+import { memeCatalogExclusions } from "./catalog-exclusions.ts";
+import { excludedMemeTemplateMessage, isExcludedMemeTemplate } from "./template-policy.ts";
+import { createManagedMemeBackend } from "./backend-lifecycle.ts";
+import type { MemeTemplateShortcut } from "./builtin-template.ts";
 
 export { createProfileLikeImageRenderer } from "./profile-like-image.ts";
 export type { MemePokeContext } from "./poke.ts";
@@ -29,9 +33,11 @@ const packageUpdateCommand = /^#?(?:表情(?:合成)?|meme)插件(强制)?更新
 const usageCommand = /^#?(?:表情|meme)(?:调用)?统计$/iu;
 
 // A legacy disable entry may be a stored key or one of its keywords.
-const visibleCatalog = `FROM meme
-  WHERE NOT EXISTS (
-    SELECT 1 FROM json_each(?) AS disabled
+const retainedTemplates = `meme.key NOT IN (SELECT value FROM json_each(?1, '$.excluded'))`;
+const retainedCatalog = `FROM meme WHERE ${retainedTemplates}`;
+const visibleCatalog = `${retainedCatalog}
+  AND NOT EXISTS (
+    SELECT 1 FROM json_each(?1, '$.hidden') AS disabled
     WHERE disabled.value = meme.key
        OR disabled.value IN (
          SELECT value FROM json_each(CASE WHEN json_valid(meme.keyWords) THEN meme.keyWords ELSE '[]' END)
@@ -101,28 +107,32 @@ function withCatalog<T>(query: (db: Database) => T): T | string {
   }
 }
 
+function catalogFilters(db: Database, hidden: readonly string[]) {
+  return JSON.stringify({ excluded: [...memeCatalogExclusions(db).keys], hidden });
+}
+
 function queryCatalog<T>(
   userId: number | undefined,
-  query: (db: Database, hidden: string) => T,
+  query: (db: Database, filters: string, hidden: readonly string[]) => T,
 ): T | string {
   const policy = currentPolicy(userId);
   if (typeof policy === "string") return policy;
-  return withCatalog((db) => query(db, JSON.stringify(policy.hidden)));
+  return withCatalog((db) => query(db, catalogFilters(db, policy.hidden), policy.hidden));
 }
 
 function list(argument: string, context?: CatalogContext): string {
   const page = Number(argument || "1");
   if (!Number.isSafeInteger(page) || page < 1) return "用法：#表情列表 [页码]";
 
-  return queryCatalog(context?.user_id, (db, hidden) => db.transaction(() => {
-    const { total } = db.query<{ total: number }, [string]>(`SELECT COUNT(*) AS total ${visibleCatalog}`).get(hidden)!;
+  return queryCatalog(context?.user_id, (db, filters) => db.transaction(() => {
+    const { total } = db.query<{ total: number }, [string]>(`SELECT COUNT(*) AS total ${visibleCatalog}`).get(filters)!;
     if (total === 0) return "表情目录为空。";
     const pages = Math.ceil(total / pageSize);
     if (page > pages) return `表情目录共有 ${pages} 页。`;
 
     const rows = db.query<CatalogRow, [string, number, number]>(
       `SELECT key, keyWords ${visibleCatalog} ORDER BY key LIMIT ? OFFSET ?`,
-    ).all(hidden, pageSize, (page - 1) * pageSize);
+    ).all(filters, pageSize, (page - 1) * pageSize);
     return [
       `表情列表 ${page}/${pages}（共 ${total} 项）`,
       ...rows.map((row) => {
@@ -160,7 +170,7 @@ function illustratedCatalog(loadInfoCard?: LoadMemeInfoCard, signal?: AbortSigna
       if (!rendered || rendered.signature !== signature) {
         const rows = withCatalog((db) => db.query<CatalogDetails, [string]>(
           `SELECT * ${visibleCatalog} ORDER BY key`,
-        ).all(hidden).flatMap((item): CatalogCardRow[] => {
+        ).all(catalogFilters(db, policy.hidden)).flatMap((item): CatalogCardRow[] => {
           const keyword = keywords(item.keyWords)[0];
           if (!keyword) return [];
           const types: CatalogCardRow["types"][number][] = [];
@@ -208,6 +218,7 @@ interface TriggerMatch {
   readonly row: TriggerRow;
   readonly keyword: string;
   readonly preset?: PresetArgument;
+  readonly shortcut?: MemeTemplateShortcut;
 }
 
 function legacyPresetKeyword(value: string): string | undefined {
@@ -219,15 +230,15 @@ function legacyPresetKeyword(value: string): string | undefined {
   }
 }
 
-function findPreset(db: Database, input: string): TriggerMatch | undefined {
+function findPreset(db: Database, input: string, filters: string): TriggerMatch | undefined {
   if (!db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'preset'").get()) return;
 
-  const presets = db.query<TriggerRow & { name: string; arg_name: string; arg_value: string }, []>(
+  const presets = db.query<TriggerRow & { name: string; arg_name: string; arg_value: string }, [string]>(
     `SELECT meme.key, keyWords, min_texts, max_texts,
        preset.name, preset.arg_name, preset.arg_value
-     FROM preset JOIN meme ON preset.key = meme.key
+     FROM preset JOIN meme ON preset.key = meme.key WHERE ${retainedTemplates}
      ORDER BY preset.name, meme.key`,
-  ).all();
+  ).all(filters);
   let match: TriggerMatch | undefined;
   for (const row of presets) {
     const keyword = legacyPresetKeyword(row.name);
@@ -236,6 +247,24 @@ function findPreset(db: Database, input: string): TriggerMatch | undefined {
     match = { row, keyword, preset: { name: row.arg_name, value: row.arg_value } };
   }
   return match;
+}
+
+function nativeCatalogShortcuts(db: Database): boolean {
+  return !!db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'lotus_catalog_provider'").get() &&
+    !!db.query("SELECT 1 FROM lotus_catalog_provider WHERE id = 1 AND identity LIKE 'lotus-skia:%'").get();
+}
+
+function readShortcuts(info: string | undefined): MemeTemplateShortcut[] {
+  const { shortcuts } = record(json(info));
+  return Array.isArray(shortcuts) ? shortcuts.flatMap((entry): MemeTemplateShortcut[] => {
+    const { key, args, humanized } = record(entry);
+    if (typeof key !== "string" || !key.trim() || key !== key.trim()) return [];
+    return [{ key, args: stringArray(args), ...(typeof humanized === "string" && { humanized }) }];
+  }) : [];
+}
+
+function shortcutArgs(shortcut: MemeTemplateShortcut | undefined): string {
+  return (shortcut?.args ?? []).map((arg) => /[\s"']/u.test(arg) ? JSON.stringify(arg) : arg).join(" ");
 }
 
 export function resolveMemeTrigger(
@@ -257,9 +286,12 @@ function resolveTrigger(message: string, context?: CatalogContext, withParams = 
 
   return withCatalog((db) => {
     const version = withParams ? catalogVersion() : undefined;
+    const filters = catalogFilters(db, policy.hidden);
     // Select the old keyword before checking whether its template is hidden, so
     // a disabled longer trigger cannot fall through to a shorter template.
-    const rows = db.query<TriggerRow, []>("SELECT key, keyWords, min_texts, max_texts FROM meme ORDER BY key").all();
+    const rows = db.query<TriggerRow, [string]>(
+      `SELECT key, keyWords, min_texts, max_texts ${retainedCatalog} ORDER BY key`,
+    ).all(filters);
     let match: TriggerMatch | undefined;
     for (const row of rows) {
       for (const keyword of keywords(row.keyWords)) {
@@ -267,18 +299,32 @@ function resolveTrigger(message: string, context?: CatalogContext, withParams = 
         if (sameKeyword(candidate.slice(0, keyword.length), keyword)) match = { row, keyword };
       }
     }
-    match ??= findPreset(db, candidate);
+    if (nativeCatalogShortcuts(db)) {
+      const withShortcuts = db.query<TriggerRow & { info: string }, [string]>(
+        `SELECT key, keyWords, min_texts, max_texts, info ${retainedCatalog}
+          AND json_type(CASE WHEN json_valid(info) THEN info ELSE '{}' END, '$.shortcuts') = 'array' ORDER BY key`,
+      ).all(filters);
+      for (const row of withShortcuts) {
+        for (const shortcut of readShortcuts(row.info)) {
+          if (shortcut.key.length <= (match?.keyword.length ?? 0)) continue;
+          if (sameKeyword(candidate.slice(0, shortcut.key.length), shortcut.key)) {
+            match = { row, keyword: shortcut.key, shortcut };
+          }
+        }
+      }
+    }
+    match ??= findPreset(db, candidate, filters);
     if (!match) return;
-    if (match.preset && policy.hidden.includes(match.keyword)) return;
+    if ((match.preset || match.shortcut) && policy.hidden.includes(match.keyword)) return;
 
     const visible = db.query<{ key: string }, [string, string]>(
       `SELECT key ${visibleCatalog} AND key = ?`,
-    ).get(JSON.stringify(policy.hidden), match.row.key);
+    ).get(filters, match.row.key);
     if (!visible) return;
 
     const text = candidate.slice(match.keyword.length).trim();
     const textMatches = requireTextMatch(match.row, text);
-    const mayHaveFlags = !textMatches && /(?:^|\s)--?\w/u.test(text);
+    const mayHaveFlags = !textMatches && /(?:^|\s)--?[\p{L}\p{N}_]/u.test(text);
     if (!textMatches && !mayHaveFlags) return;
     const params = withParams || mayHaveFlags
       ? db.query<{ params: string }, [string]>("SELECT params FROM meme WHERE key = ?").get(visible.key)
@@ -294,7 +340,9 @@ function resolveTrigger(message: string, context?: CatalogContext, withParams = 
 type ResolvedTrigger = Exclude<ReturnType<typeof resolveTrigger>, string | undefined>;
 
 function prepareResolvedRequest(match: ResolvedTrigger, input: GenerationInput) {
-  return buildGenerationBody(match.row.key, keywords(match.row.keyWords), match.text, match.params, input, match.preset);
+  const args = shortcutArgs(match.shortcut);
+  const text = args ? `${match.text} ${args}`.trim() : match.text;
+  return buildGenerationBody(match.row.key, keywords(match.row.keyWords), text, match.params, input, match.preset);
 }
 
 export async function prepareMemeRequest(message: string, input: GenerationInput) {
@@ -307,25 +355,27 @@ async function details(argument: string, context?: CatalogContext, signal?: Abor
   const key = argument.trim();
   if (!key) return "用法：#表情详情 <编号或关键词>";
   if (signal?.aborted) return;
+  if (isExcludedMemeTemplate(key)) return excludedMemeTemplateMessage;
 
   let version: string;
   try { version = catalogVersion(); } catch { return "无法读取表情目录，请检查本机导入的旧数据库。"; }
-  const entry = queryCatalog(context?.user_id, (db, hidden) => {
+  const entry = queryCatalog(context?.user_id, (db, filters, hidden) => {
     let row = db.query<CatalogDetails, [string, string]>(
       `SELECT * ${visibleCatalog} AND key = ?`,
-    ).get(hidden, key);
+    ).get(filters, key);
     if (!row && !db.query("SELECT 1 FROM meme WHERE key = ?").get(key)) {
-      const known = db.query<CatalogDetails, [string]>(`SELECT * ${visibleCatalog} ORDER BY key`).all(hidden);
+      const known = db.query<CatalogDetails, [string]>(`SELECT * ${visibleCatalog} ORDER BY key`).all(filters);
       const matches = known.filter((item) => keywords(item.keyWords).some((word) => sameKeyword(word, key)));
       if (matches.length > 1) return "该关键词对应多个表情，请用编号查询。";
       row = matches[0] ?? null;
     }
-    if (!row) return "没有找到对应表情，发送 #表情列表 查看编号。";
+    if (!row) return excludedMemeTemplateMessage;
 
     const params = record(json(row.params));
     const aliases = keywords(row.keyWords);
     const defaults = stringArray(json(row.defText) ?? params.default_texts);
-    const tags = stringArray(json(row.tags) ?? record(json(row.info)).tags);
+    const tags = memeCatalogExclusions(db).correctedArchiveKeys.has(row.key)
+      ? [] : stringArray(json(row.tags) ?? record(json(row.info)).tags);
     const args = record(record(record(params.args_type ?? json(row.args_type)).args_model).properties);
     const options = Object.entries(args).flatMap(([name, field]) => {
       if (name === "user_infos") return [];
@@ -333,10 +383,12 @@ async function details(argument: string, context?: CatalogContext, signal?: Abor
       return [typeof description === "string" && description.trim() ? `[${name}: ${description}]` : `[${name}]`];
     });
     const hasPresets = db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'preset'").get();
-    const disabled = new Set(keywords(hidden));
+    const disabled = new Set(hidden);
     const presets = !hasPresets ? [] : db.query<{ name: string }, [string]>("SELECT name FROM preset WHERE key = ? ORDER BY rowid")
       .all(row.key).flatMap(({ name }) => legacyPresetKeyword(name) ?? []).filter(name => !disabled.has(name));
-    return { row, aliases, defaults, tags, options, presets };
+    const shortcuts = nativeCatalogShortcuts(db) ? readShortcuts(row.info)
+      .filter(({ key }) => !disabled.has(key)).map(({ key, humanized }) => humanized || key) : [];
+    return { row, aliases, defaults, tags, options, presets: [...new Set([...presets, ...shortcuts])] };
   });
   if (typeof entry === "string") return entry;
   const { row, aliases, defaults, tags, options, presets } = entry;
@@ -360,10 +412,10 @@ async function details(argument: string, context?: CatalogContext, signal?: Abor
   if (signal?.aborted) return;
   const policy = currentPolicy(context?.user_id);
   if (typeof policy === "string") return policy;
-  if ([row.key, ...aliases].some(name => policy.hidden.includes(name))) return "没有找到对应表情，发送 #表情列表 查看编号。";
+  if ([row.key, ...aliases].some(name => policy.hidden.includes(name))) return excludedMemeTemplateMessage;
   try {
     if (version !== catalogVersion()) return "表情目录已更新，请重新查看详情。";
-    if (server.base.href !== generationServer()?.base.href) return failure;
+    if (!sameGenerationServer(server, generationServer())) return failure;
   } catch { return failure; }
   return {
     type: "quoted" as const,
@@ -374,8 +426,8 @@ async function details(argument: string, context?: CatalogContext, signal?: Abor
 function search(argument: string, context?: CatalogContext) {
   const keyword = argument.trim().toLowerCase();
   if (!keyword) return "用法：#表情搜索 <关键词>";
-  const matches = queryCatalog(context?.user_id, (db, hidden) => {
-    const rows = db.query<Pick<CatalogRow, "keyWords">, [string]>(`SELECT keyWords ${visibleCatalog}`).all(hidden);
+  const matches = queryCatalog(context?.user_id, (db, filters) => {
+    const rows = db.query<Pick<CatalogRow, "keyWords">, [string]>(`SELECT keyWords ${visibleCatalog}`).all(filters);
     return [...new Set(rows.flatMap((row) => keywords(row.keyWords)).filter((word) => word.toLowerCase().includes(keyword)))].sort();
   });
   if (typeof matches === "string") return matches;
@@ -405,7 +457,7 @@ async function prepareRandomMeme(message: string, input: GenerationInput) {
       AND json_valid(params)
       AND ${defaults} > 0
       ORDER BY random() LIMIT 1
-    `).get(JSON.stringify(policy.hidden));
+    `).get(catalogFilters(db, policy.hidden));
   });
   if (typeof row === "string") return row;
   if (!row) return "未找到可用的随机表情。";
@@ -425,15 +477,19 @@ function selectPokeTemplates(hidden: readonly string[]) {
     AND min_images = 1 AND max_images = 1 AND min_texts = 0 AND max_texts = 0
     AND json_valid(params)
     ORDER BY random() LIMIT 2
-  `).all(JSON.stringify(hidden)).map(row => ({ key: row.key, aliases: keywords(row.keyWords), params: row.params })));
+  `).all(catalogFilters(db, hidden)).map(row => ({ key: row.key, aliases: keywords(row.keyWords), params: row.params })));
 }
 
 async function usageReport(context: CatalogContext, loadInfoCard?: LoadMemeInfoCard) {
-  const report = queryCatalog(context.user_id, (db, hidden) => {
+  const report = queryCatalog(context.user_id, (db, filters) => {
     const counts = readMemeUsage(db);
+    const denied = memeCatalogExclusions(db).keys;
+    for (const key of counts.keys()) {
+      if (denied.has(key) || isExcludedMemeTemplate(key)) counts.delete(key);
+    }
     if (counts.size === 0) return;
     const total = [...counts.values()].reduce((sum, count) => sum + count, 0);
-    const rows = db.query<CatalogRow, [string]>(`SELECT key, keyWords ${visibleCatalog} ORDER BY key`).all(hidden)
+    const rows = db.query<CatalogRow, [string]>(`SELECT key, keyWords ${visibleCatalog} ORDER BY key`).all(filters)
       .flatMap(({ key, keyWords }) => {
         const aliases = keywords(keyWords);
         const count = counts.get(key);
@@ -519,7 +575,7 @@ async function memeFallback(message: string, context: FallbackContext, listCatal
     const policy = currentPolicy(context.user_id, true);
     if (typeof policy === "string") return policy;
     if (policy.forceSharp && !input.startsWith("#")) return;
-    return generateMemeReply(context, (media) => prepareRandomMeme(input, media), server);
+    return generateMemeReply(context, (media) => prepareRandomMeme(input, media), server, signal);
   }
   const match = resolveTrigger(message, context, true);
   if (!match || typeof match === "string") return;
@@ -532,7 +588,7 @@ async function memeFallback(message: string, context: FallbackContext, listCatal
     const names = [match.row.key, match.keyword, ...keywords(match.row.keyWords)];
     if (names.some((name) => policy.hidden.includes(name))) return;
     return prepareResolvedRequest(match, input);
-  }, server);
+  }, server, signal);
 }
 
 export default createMemeCommands();
@@ -540,13 +596,14 @@ export default createMemeCommands();
 export function createModule({ signal, memeRuntime }: { readonly signal: AbortSignal; readonly memeRuntime?: MemeRuntime }) {
   const lifecycle = new AbortController();
   const active = AbortSignal.any([signal, lifecycle.signal]);
-  const stop = memeRuntime && startCatalogRuntime(memeRuntime, active);
+  const backend = createManagedMemeBackend(active);
+  const stop = memeRuntime && startCatalogRuntime(memeRuntime, active, backend);
   return {
     ...createMemeCommands(active, memeRuntime?.loadInfoCard),
     handlePoke: createMemePokeHandler(active, selectPokeTemplates),
     async dispose() {
       lifecycle.abort();
-      await stop?.();
+      await Promise.all([stop?.(), backend.dispose()]);
     },
   };
 }

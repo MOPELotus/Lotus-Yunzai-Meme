@@ -1,11 +1,13 @@
 import { catalogPath } from "./catalog-file.ts";
-import { generationServer, generationSettings, safeCatalogKey } from "./catalog-policy.ts";
+import { isExcludedMemeCatalogKey } from "./catalog-exclusions.ts";
+import { type generationServer, generationSettings, safeCatalogKey } from "./catalog-policy.ts";
 import type { GenerationInput } from "./generation.ts";
 import { recordMemeUsage } from "./usage.ts";
 
 type InboundSegment = Readonly<Record<string, unknown>> & { readonly type: string };
 type Image = { readonly type: "image"; readonly file: Uint8Array };
 type GenerationMessage = Image | readonly [string, Image];
+type Server = NonNullable<ReturnType<typeof generationServer>>;
 type PreparedRequest = {
   readonly key: string;
   readonly body: FormData;
@@ -89,6 +91,16 @@ async function readResult(response: Response, maxBytes = maxImageBytes): Promise
   if (imageMime(image)) return image;
 }
 
+function requestSignal(timeout: number, signal?: AbortSignal) {
+  const expires = AbortSignal.timeout(timeout);
+  return signal ? AbortSignal.any([signal, expires]) : expires;
+}
+
+function nativeImage(bytes: Uint8Array<ArrayBuffer> | undefined, key: string, signal: AbortSignal) {
+  if (!signal.aborted && !isExcludedMemeCatalogKey(key) && bytes instanceof Uint8Array &&
+      bytes.byteLength <= maxImageBytes && imageMime(bytes)) return bytes;
+}
+
 export async function fetchAvatar(user: string, { size = 0, signal, cache = false }:
   { size?: 0 | 100; signal?: AbortSignal; cache?: boolean } = {}): Promise<Blob | undefined> {
   if (signal?.aborted || !/^[1-9]\d{0,15}$/u.test(user) || !Number.isSafeInteger(Number(user))) return;
@@ -123,29 +135,31 @@ export async function fetchAvatar(user: string, { size = 0, signal, cache = fals
 
 export async function requestMemeImage(
   { key, body }: Pick<PreparedRequest, "key" | "body">,
-  server: NonNullable<ReturnType<typeof generationServer>>,
+  server: Server,
   signal?: AbortSignal,
 ) {
-  if (key === "." || key === ".." || signal?.aborted) return;
+  if (!safeCatalogKey(key) || isExcludedMemeCatalogKey(key) || signal?.aborted) return;
+  const active = requestSignal(server.timeout, signal);
+  if (server.protocol === "native") return nativeImage(await server.generate(key, body, active), key, active);
   const endpoint = new URL(server.base);
   endpoint.pathname = `${endpoint.pathname.replace(/\/+$/u, "")}/memes/${encodeURIComponent(key)}/`;
-  const timeout = AbortSignal.timeout(server.timeout);
   return readResult(await fetch(endpoint, {
-    method: "POST", body, redirect: "error", signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+    method: "POST", body, redirect: "error", signal: active,
   }));
 }
 
 export async function requestMemePreview(
-  key: string, server: NonNullable<ReturnType<typeof generationServer>>, signal?: AbortSignal,
+  key: string, server: Server, signal?: AbortSignal,
 ) {
-  if (!safeCatalogKey(key) || signal?.aborted) return;
-  const endpoint = new URL(server.base);
-  endpoint.pathname = `${endpoint.pathname.replace(/\/+$/u, "")}/memes/${encodeURIComponent(key)}/preview`;
-  const timeout = AbortSignal.timeout(server.timeout);
+  if (!safeCatalogKey(key) || isExcludedMemeCatalogKey(key) || signal?.aborted) return;
   try {
+    const active = requestSignal(server.timeout, signal);
+    if (server.protocol === "native") return nativeImage(await server.preview(key, active), key, active);
+    const endpoint = new URL(server.base);
+    endpoint.pathname = `${endpoint.pathname.replace(/\/+$/u, "")}/memes/${encodeURIComponent(key)}/preview`;
     const bytes = await readResult(await fetch(endpoint, {
       redirect: "error", credentials: "omit", referrerPolicy: "no-referrer",
-      signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+      signal: active,
     }));
     if (!signal?.aborted) return bytes;
   } catch {
@@ -196,27 +210,32 @@ async function imagesIn(segments: readonly InboundSegment[], signal: AbortSignal
 export async function generateMemeReply(
   context: FallbackContext,
   prepare: (input: GenerationInput) => Promise<PreparedRequest | string | undefined>,
-  server: NonNullable<ReturnType<typeof generationServer>>,
+  server: Server,
+  signal?: AbortSignal,
 ): Promise<GenerationMessage | { type: "quoted"; message: GenerationMessage } | string | undefined> {
   const userId = context.user_id;
-  if (userId === undefined) return;
+  if (userId === undefined || signal?.aborted) return;
 
   let errorReply = true;
   try {
     const settings = generationSettings();
     errorReply = settings.errorReply;
-    const mediaBudget = AbortSignal.timeout(8_000);
+    const timeout = AbortSignal.timeout(8_000);
+    const mediaBudget = signal ? AbortSignal.any([signal, timeout]) : timeout;
     let quoted: GenerationInput["quoted"];
     if (settings.quotedImages && context.reply_id !== undefined) {
       const source = await context.lookupReply?.();
+      if (signal?.aborted) return;
       if (!source) return errorReply ? "当前无法读取引用消息中的表情素材。" : undefined;
       const images = await imagesIn(source.message, mediaBudget);
+      if (signal?.aborted) return;
       if (!images) return errorReply ? "当前无法读取引用消息中的表情图片。" : undefined;
       quoted = { userId: source.user_id, images };
     }
 
     const segments: readonly InboundSegment[] = Array.isArray(context.message) ? context.message : [];
     const images = settings.imagesInMessage ? await imagesIn(segments, mediaBudget) : [];
+    if (signal?.aborted) return;
     if (!images) return errorReply ? "当前无法读取该表情图片素材。" : undefined;
     const mentions = segments.flatMap((part) =>
       part.type === "at" && (typeof part.qq === "number" || typeof part.qq === "string") ? [part.qq] : []);
@@ -247,12 +266,13 @@ export async function generateMemeReply(
         return typeof name === "string" ? name : undefined;
       },
     });
+    if (signal?.aborted) return;
     if (!prepared || typeof prepared === "string") return errorReply ? prepared : undefined;
 
-    if (prepared.key === "." || prepared.key === "..") return;
+    if (isExcludedMemeCatalogKey(prepared.key)) return;
     const catalog = catalogPath();
-    const bytes = await requestMemeImage(prepared, server);
-    if (bytes) {
+    const bytes = await requestMemeImage(prepared, server, signal);
+    if (bytes && !signal?.aborted) {
       recordGeneratedMeme(prepared.key, catalog);
       const image: Image = { type: "image", file: bytes };
       const message: GenerationMessage = prepared.summary ? [prepared.summary, image] : image;
@@ -261,5 +281,5 @@ export async function generateMemeReply(
   } catch {
     // Backend and media errors can contain connection details. Keep the reply local.
   }
-  return errorReply ? "表情生成失败，请稍后再试。" : undefined;
+  return errorReply && !signal?.aborted ? "表情生成失败，请稍后再试。" : undefined;
 }

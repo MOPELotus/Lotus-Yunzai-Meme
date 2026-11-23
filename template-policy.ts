@@ -129,6 +129,28 @@ const originTags = new Set([
   "战双", "戰雙", "战双帕弥什", "戰雙帕彌什", "punishinggrayraven", "pgr", "パニシンググレイレイヴン",
   "战场双马尾", "戰場雙馬尾", "twintailsbattleground",
 ]);
+
+// Match the metadata of these audited legacy records when reading an old SQLite catalog.
+// A new registry entry with the same ID must still pass the normal origin-tag check.
+const legacyTagCorrections = new Map<string, readonly [keywords: readonly string[], limits: readonly number[]]>([
+  ["acacia_anan_holdsign", [["安安举牌", "夏目安安举牌"], [0, 0, 1, 1]]],
+  ["admission_letter", [["录取通知书"], [0, 0, 1, 1]]],
+  ["cinderella_eat", [["灰姑娘吃"], [1, 1, 0, 0]]],
+  ["clownish", [["滑稽"], [1, 1, 0, 0]]],
+  ["xiluo_disgust", [["希罗嫌弃", "二阶堂希罗嫌弃"], [1, 1, 0, 1]]],
+  ["xueli_think", [["雪莉想", "雪梨想", "橘雪莉想"], [1, 1, 0, 1]]],
+]);
+
+export function isCorrectedLegacyMemeTag(
+  key: string, keywords: unknown, limits: readonly unknown[], tags: readonly unknown[],
+): boolean {
+  const known = legacyTagCorrections.get(key);
+  return !!known && tags.length === 1 && tags[0] === "鸣潮" &&
+    Array.isArray(keywords) && known[0].length === keywords.length &&
+    known[0].every((keyword, index) => keyword === keywords[index]) &&
+    known[1].length === limits.length && known[1].every((limit, index) => limit === limits[index]);
+}
+
 // Leave ordinary phrases available to unrelated templates, e.g. “安慰” and “猫抓”.
 const retiredAliases = new Set([
   "仇远", "今汐", "今汐吃", "今汐坐", "今汐小笼包", "傻椿举牌", "傻椿照片",
@@ -148,7 +170,7 @@ const retiredAliases = new Set([
   "鸣潮男",
 ]);
 
-export const excludedMemeTemplateMessage = "该表情模板未收录。";
+export const excludedMemeTemplateMessage = "没有找到对应表情，发送 #表情列表 查看编号。";
 
 function normalize(value: string) {
   return value.normalize("NFKC").trim().toLowerCase();
