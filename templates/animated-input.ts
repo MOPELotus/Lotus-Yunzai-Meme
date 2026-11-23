@@ -9,6 +9,7 @@ interface Frame {
   readonly delayMs?: number;
   readonly dispose: "keep" | "background" | "previous";
   readonly replace?: boolean;
+  readonly disposalBackground?: string | null;
 }
 
 interface Animation {
@@ -60,10 +61,18 @@ function gifAnimation(bytes: Buffer): Animation {
   const palette = bytes.subarray(13, globalTableEnd);
   let position = globalTableEnd;
   let control: Buffer | undefined;
+  let firstTransparent = false;
+  let background: string | undefined;
   const frames: Frame[] = [];
+  function paletteColor(colorIndex: number, colors: Buffer) {
+    if (!colors.length) return;
+    const index = colorIndex * 3 < colors.length ? colorIndex * 3 : 0;
+    const [r, g, b] = colors.subarray(index, index + 3);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
   while (position < bytes.length) {
     const marker = bytes[position]!;
-    if (marker === 0x3b) return { width, height, frames };
+    if (marker === 0x3b) return { width, height, frames, background };
     if (marker === 0x21) {
       const end = skipSubBlocks(bytes, position + 2);
       if (bytes[position + 1] === 0xf9) {
@@ -86,11 +95,22 @@ function gifAnimation(bytes: Buffer): Animation {
     frameHeader.writeUInt16LE(frameHeight, 8);
     image.writeUInt32LE(0, 1);
     const disposal = (control?.[3] ?? 0) >> 2 & 7;
+    const transparency = control && (control[3]! & 1) ? control[6] : undefined;
+    const colors = frameFlags & 0x80 ? bytes.subarray(position + 10, imageData) : palette;
+    if (!frames.length) {
+      firstTransparent = transparency !== undefined;
+      if (!firstTransparent) background = paletteColor(header[11]!, colors);
+    }
+    // An opaque first frame keeps the old decoder in RGB mode. Later GIF
+    // delta frames may have a transparent palette index as an optimization.
+    const disposalBackground = disposal !== 2 ? undefined : firstTransparent && transparency !== undefined
+      ? null : paletteColor(transparency ?? header[11]!, colors);
     frames.push({
       bytes: Buffer.concat([frameHeader, palette, control ?? Buffer.alloc(0), image, bytes.subarray(position + 10, end), GIF_TRAILER]),
       left, top, width: frameWidth, height: frameHeight,
       delayMs: control ? control.readUInt16LE(4) * 10 : undefined,
       dispose: disposal === 2 ? "background" : disposal === 3 ? "previous" : "keep",
+      disposalBackground,
     });
     control = undefined;
     position = end;
@@ -191,15 +211,15 @@ export async function readMemeImageSequence(file: File, signal: AbortSignal, tim
   const result: Image[] = [];
   let totalDelay = 0;
 
-  function clear(left: number, top: number, width: number, height: number) {
+  function clear(left: number, top: number, width: number, height: number, fill: string | null | undefined) {
     context.clearRect(left, top, width, height);
-    if (background) {
-      context.fillStyle = background;
+    if (fill) {
+      context.fillStyle = fill;
       context.fillRect(left, top, width, height);
     }
   }
 
-  clear(0, 0, width, height);
+  clear(0, 0, width, height, background);
   for (const frame of frames) {
     signal.throwIfAborted();
     const image = await loadImage(frame.bytes);
@@ -210,7 +230,10 @@ export async function readMemeImageSequence(file: File, signal: AbortSignal, tim
     context.drawImage(image, frame.left, frame.top);
     result.push(await loadImage(await canvas.png));
     totalDelay += frame.delayMs ?? (keepsShortDelay ? DEFAULT_GIF_DURATION_MS : 0);
-    if (frame.dispose === "background") clear(frame.left, frame.top, frame.width, frame.height);
+    if (frame.dispose === "background") {
+      clear(frame.left, frame.top, frame.width, frame.height,
+        frame.disposalBackground === undefined ? background : frame.disposalBackground);
+    }
     if (previous) context.putImageData(previous, frame.left, frame.top);
   }
   const average = totalDelay / frames.length;

@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { Canvas } from "skia-canvas";
 import { alignMemeLoop, readMemeImageSequence } from "../templates/animated-input.ts";
 import { assertMemeGifDimensions, encodeMemeGif } from "../templates/gif.ts";
 
@@ -57,4 +58,24 @@ test("旧 100 帧上限只限制补循环，已编码 101 帧仍可解码", asyn
   expect(decoded.averageDelayMs).toBe(200);
   expect(alignMemeLoop(decoded, 5, 60)).toHaveLength(100);
   expect(alignMemeLoop(decoded, 5, 60, 200)).toHaveLength(200);
+});
+
+test("GIF 的置背景帧遵循原始不透明画布或透明背景", async () => {
+  // The two 5×3 fixtures have optimized delta frames with different palette entries.
+  const opaqueGif = "R0lGODlhBQADAIEAAP////8AAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQIBQAAACwAAAAABQADAAAICQADABhIsGDBgAAh+QQJBwADACwAAAAABQADAIH///8AgAAAAAAAAAAICwABCBwIIADBgQEBACH5BAkJAAIALAAAAAAFAAMAgf///wAA/wAAAAAAAAgJAAEIHEiQYICAADs=";
+  const transparentGif = "R0lGODlhBQADAIEAAAAAAP8AAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJBQAAACwAAAAABQADAAAICQADABhIsGDBgAAh+QQJBwAAACwAAAAABQADAIEAAAAAgAAAAAAAAAAICwABCBwIIADBgQEBACH5BAkJAAAALAAAAAAFAAMAgQAAAAAA/wAAAAAAAAgJAAEIHEiQYICAADs=";
+  for (const [fixture, background] of [[opaqueGif, [255, 255, 255, 255]], [transparentGif, [0, 0, 0, 0]]] as const) {
+    const { frames, averageDelayMs } = await readGif(Buffer.from(fixture, "base64"));
+    expect(frames).toHaveLength(3);
+    expect(averageDelayMs).toBe(70);
+    const expected = [[0, 0, [255, 0, 0, 255]], [2, 1, [0, 128, 0, 255]], [4, 2, [0, 0, 255, 255]]] as const;
+    const draw = new Canvas(5, 3).getContext("2d");
+    for (const [index, image] of frames.entries()) {
+      draw.clearRect(0, 0, 5, 3);
+      draw.drawImage(image, 0, 0);
+      for (const [probe, [x, y, color]] of expected.entries()) {
+        expect(Array.from(draw.getImageData(x, y, 1, 1).data)).toEqual([...(probe === index ? color : background)]);
+      }
+    }
+  }
 });
