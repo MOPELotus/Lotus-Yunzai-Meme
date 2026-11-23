@@ -3,13 +3,14 @@
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeFirstImage } from "./animated-input.ts";
-import { jpg, paper } from "./template-layout.ts";
+import { drawFittedText, jpg, paper, registerFont } from "./template-layout.ts";
 import { readTransformSource, renderTransformSequence, transformPreviewInput } from "./transforms.ts";
 
 const imageOnly = { min_images: 1, max_images: 1, min_texts: 0, max_texts: 0, default_texts: [], args_type: null };
 
 function cropAvatar(
   draw: CanvasRenderingContext2D, image: Image, left: number, top: number, width: number, height: number,
+  vertical: "north" | "center" = "north",
 ) {
   const ratio = Math.max(width / image.width, height / image.height);
   const scaledWidth = Math.max(width, Math.trunc(image.width * ratio));
@@ -20,7 +21,7 @@ function cropAvatar(
   draw.clip();
   draw.imageSmoothingQuality = "high";
   draw.drawImage(image, left + Math.trunc((width - scaledWidth) / 2),
-    top, scaledWidth, scaledHeight);
+    vertical === "north" ? top : top + Math.trunc((height - scaledHeight) / 2), scaledWidth, scaledHeight);
   draw.restore();
 }
 
@@ -59,9 +60,22 @@ async function addChaos(input: MemeTemplateInput, context: MemeTemplateContext) 
   }, context.signal);
 }
 
+async function alike(input: MemeTemplateInput, context: MemeTemplateContext) {
+  const [sequence, font] = await Promise.all([
+    readTransformSource(input, context.signal), registerFont(context),
+  ]);
+  return renderTransformSequence(sequence, 470, 180, (draw, image) => {
+    paper(draw, 470, 180);
+    drawFittedText(draw, [10, 10, 185, 140], "你怎么跟", font, 30, 40, "right");
+    drawFittedText(draw, [365, 10, 460, 140], "一样", font, 30, 40, "left");
+    cropAvatar(draw, image, 200, 15, 150, 150, "center");
+  }, context.signal);
+}
+
 export const legacySceneMemeTemplates: readonly MemeTemplate[] = [
   { key: "painter", keywords: ["小画家"], tags: ["米哈游", "崩坏3", "格蕾修"], render: painter },
   { key: "add_chaos", keywords: ["添乱", "给社会添乱"], render: addChaos },
+  { key: "alike", keywords: ["一样"], render: alike },
 ].map(({ key, keywords, tags, render }) => ({
   info: { key, keywords, tags, params_type: imageOnly },
   render,
