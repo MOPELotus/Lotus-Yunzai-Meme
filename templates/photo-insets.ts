@@ -28,7 +28,7 @@ const specs: readonly PhotoTemplate[] = [
   { key: "you_dont_get", keywords: ["你不懂啦"], tags: ["猫猫虫", "咖波"], slots: [[217, 181, 142, 139]] },
   { key: "daynight", keywords: ["白天黑夜", "白天晚上"], slots: [[349, 0, 333, 360], [349, 361, 333, 360]], replaceArt: true },
   // Tudou's 2022 welcome registration puts the first GIF image over the photo and saves a static JPEG.
-  { key: "huanying", keywords: ["欢迎"], slots: [[77, 164, 150, 122]], assetPath: tudouWelcomePath },
+  { key: "huanying", keywords: ["欢迎", "欢迎新人"], slots: [[77, 164, 150, 122]], assetPath: tudouWelcomePath },
 ];
 
 function coverImage(image: Image, [left, top, width, height]: Inset, replaceArt: boolean): Draw {

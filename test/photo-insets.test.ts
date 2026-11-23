@@ -87,9 +87,9 @@ test("白天黑夜保留双图输入顺序和分隔，透明输入替换原图�
   expect(pixel(220, 360)[1]).toBeGreaterThan(130);
 });
 
-test("欢迎取模板 GIF 的首帧，以旧图片槽输出白底 JPEG 并避免欢迎新人重名", async () => {
+test("欢迎保留两个旧目录别名，取模板 GIF 首帧输出白底 JPEG", async () => {
   const template = photoInsetMemeTemplates.find(item => item.info.key === "huanying")!;
-  expect(template.info).toMatchObject({ keywords: ["欢迎"], params_type: { min_images: 1, max_images: 1 } });
+  expect(template.info).toMatchObject({ keywords: ["欢迎", "欢迎新人"], params_type: { min_images: 1, max_images: 1 } });
   const avatar = await raster(220, 65, draw => {
     draw.fillStyle = "#ef2020";
     draw.fillRect(0, 0, 220, 65);
