@@ -14,6 +14,7 @@ import { jumpSoldMemeTemplates } from "./jump-sold.ts";
 import { shortAvatarAnimations } from "./short-avatar-animation.ts";
 import { tudouShortAnimations } from "./tudou-short-animation.ts";
 import { hug, kiss } from "./kiss-hug.ts";
+import { legacyBadgeTemplates } from "./legacy-badges.ts";
 import { legacySceneMemeTemplates } from "./legacy-scene.ts";
 import { mirrorFlashMemeTemplates } from "./mirror-flash.ts";
 import { motionMemeTemplates } from "./motion.ts";
@@ -59,6 +60,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...anyliewSignTemplates,
   ...anyliewTextDialogueTemplates,
   ...legacySceneMemeTemplates,
+  ...legacyBadgeTemplates,
   ...textSignMemeTemplates,
   ...perspectiveMemeTemplates,
   ...fixedAvatarAnimations,

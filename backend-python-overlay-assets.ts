@@ -1,4 +1,4 @@
-// These legacy assets were never published in the Rust v0.2.3 manifest.
+// These legacy assets are absent from, or differ in, the Rust v0.2.3 manifest.
 const revision = "619fa10518fc2eca4fa1053af37f0a00a839f062";
 const sources = [
   `https://raw.githubusercontent.com/MemeCrafters/meme-generator/${revision}/`,
@@ -53,6 +53,7 @@ const textBackgrounds = {
 const pythonArts = [
   ...playFrames.map((digest, index) => [`meme_generator/memes/play/images/${index}.png`, digest] as const),
   ...Object.entries(textBackgrounds).map(([key, digest]) => [`meme_generator/memes/${key}/images/0.png`, digest] as const),
+  ["meme_generator/memes/mihoyo/images/logo.png", "dfae8c9ac643b3f935e3c6c5bb61e5613e3e020befd881bb5099bef098247322"],
 ];
 
 export const pythonOverlayAssets = pythonArts.map(([path, digest]) =>
