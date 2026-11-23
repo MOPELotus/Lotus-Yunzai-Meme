@@ -18,6 +18,7 @@ import { basicImageMemeTemplates } from "./basic-image-transforms.ts";
 import { captionOverlayMemeTemplates } from "./caption-overlays.ts";
 import { classicAvatarMemeTemplates } from "./classic-avatar-animations.ts";
 import { classicLayeredMemeTemplates } from "./classic-layered-animations.ts";
+import { croppedPhotoTemplates } from "./cropped-photo-templates.ts";
 import { dianzhongdian } from "./dianzhongdian.ts";
 import { fixedAvatarAnimations } from "./fixed-avatar-animation.ts";
 import { largeSourceAnimations } from "./large-source-animations.ts";
@@ -106,6 +107,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...jumpSoldMemeTemplates,
   ...shortAvatarAnimations,
   ...localCanvasAnimations,
+  ...croppedPhotoTemplates,
   ...twoLayerAvatarAnimations,
   ...tudouShortAnimations,
   ...tudouPortraitAnimations,

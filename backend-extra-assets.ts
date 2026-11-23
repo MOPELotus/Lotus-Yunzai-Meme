@@ -1,3 +1,4 @@
+import { croppedPhotoAssets } from "./backend-cropped-photo-assets.ts";
 import { legacyFixedPoseAssets } from "./backend-legacy-fixed-pose-assets.ts";
 import { anyliewSignAssets } from "./backend-anyliew-sign-assets.ts";
 import { anyliewLargeAvatarAssets } from "./backend-anyliew-large-avatar-assets.ts";
@@ -104,6 +105,7 @@ export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map<stri
   ...anyliewAssets.map(([path, digest]) => [`images/anyliew/${path}`, { path, digest, sources: anyliewBase }] as const),
   anyliewDeerHelpAsset,
   ...pythonOverlayAssets,
+  ...croppedPhotoAssets,
   ...legacyTextOverlayAssets,
   ...flushAssets,
   ...jumpSoldAssets,
