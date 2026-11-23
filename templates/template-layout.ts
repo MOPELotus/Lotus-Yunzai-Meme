@@ -11,6 +11,15 @@ const maxStaticPixels = 12_000_000;
 const normalFont = "LotusMemeNotoRegular";
 const boldFont = "LotusMemeNotoBold";
 const registeredFonts = new Map<string, Promise<void>>();
+const openTypefaces = new Map<string, readonly [file: string, family: string]>([
+  ["FZSEJW.ttf", ["ZCOOLKuaiLe-Regular.ttf", "LotusMemeKuaiLe"]],
+  ["FZKATJW.ttf", ["ZCOOLKuaiLe-Regular.ttf", "LotusMemeKuaiLe"]],
+  ["FZSJ-QINGCRJ.ttf", ["LXGWWenKaiLite-Regular.ttf", "LotusMemeWenKai"]],
+  ["FZXS14.ttf", ["FusionPixel12pxSC.ttf", "LotusMemeFusionPixel"]],
+  ["PangMenZhengDao-Cu.ttf", ["MaShanZheng-Regular.ttf", "LotusMemeMaShan"]],
+  ["consola.ttf", ["CascadiaMono.ttf", "LotusMemeCascadiaMono"]],
+  ["Aller_Bd.ttf", ["Lato-Bold.ttf", "LotusMemeLatoBold"]],
+]);
 
 export function registerFont(context: MemeTemplateContext, bold = false) {
   return registerMemeTypeface(context, bold ? "NotoSansSC-Bold.ttf" : "NotoSansSC-Regular.ttf",
@@ -18,27 +27,28 @@ export function registerFont(context: MemeTemplateContext, bold = false) {
 }
 
 export async function registerMemeTypeface(context: MemeTemplateContext, asset: string, family: string) {
-  if (!registeredFonts.has(family)) {
-    const data = context.fontAsset(asset);
+  const [filename, registeredFamily] = openTypefaces.get(asset) ?? [asset, family];
+  if (!registeredFonts.has(registeredFamily)) {
+    const data = context.fontAsset(filename);
     const request = (async () => {
       const bytes = await data;
       const directory = await mkdtemp(join(tmpdir(), "lotus-meme-font-"));
       try {
         const file = join(directory, "font.ttf");
         await writeFile(file, bytes, { mode: 0o600 });
-        if (!FontLibrary.use(family, file).length) throw new Error("表情字体无法加载。");
+        if (!FontLibrary.use(registeredFamily, file).length) throw new Error("表情字体无法加载。");
       } finally {
         await rm(directory, { recursive: true, force: true });
       }
     })().catch((error) => {
-      registeredFonts.delete(family);
+      registeredFonts.delete(registeredFamily);
       throw error;
     });
-    registeredFonts.set(family, request);
+    registeredFonts.set(registeredFamily, request);
   }
-  await registeredFonts.get(family);
+  await registeredFonts.get(registeredFamily);
   context.signal.throwIfAborted();
-  return family;
+  return registeredFamily;
 }
 
 export function paper(context: CanvasRenderingContext2D, width: number, height: number) {

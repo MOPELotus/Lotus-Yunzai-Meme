@@ -14,6 +14,10 @@ const askWidth = 640;
 const askGradientHeight = 150;
 const asciiWidth = 150;
 const asciiFontSize = 15;
+// Consolas at 15 px in the original renderer. Keep its grid when using an open typeface.
+const asciiAdvance = 8.2470703125;
+const asciiLineHeight = 18;
+const asciiBaseline = 12.421875;
 const asciiRamp = `@@$$&B88QMMGW##EE93SPPDOOU**==()+^,"--''.  `;
 const maxRasterSide = 8192;
 
@@ -110,27 +114,26 @@ async function renderCharpic(input: MemeTemplateInput, context: MemeTemplateCont
   const measure = new Canvas(1, 1).getContext("2d");
   const font = `${asciiFontSize}px ${family}`;
   measure.font = font;
-  const metrics = measure.measureText("@");
-  const firstLine = metrics.lines[0]!;
-  const lineHeight = Math.round(firstLine.descent - firstLine.ascent);
+  const widthScale = asciiAdvance / measure.measureText("@").width;
   const source = sequence.frames[0];
   const height = Math.floor(source.height * asciiWidth / source.width);
-  const rows = Math.round(height * metrics.width / lineHeight);
-  const outputWidth = Math.ceil(measure.measureText("@".repeat(asciiWidth)).width);
-  const outputHeight = lineHeight * rows;
+  const rows = Math.round(height * asciiAdvance / asciiLineHeight);
+  const outputWidth = Math.ceil(asciiWidth * asciiAdvance);
+  const outputHeight = asciiLineHeight * rows;
   if (!rows || outputHeight > maxRasterSide) throw new MemeTemplateFeedback("表情原图长宽比超限。");
   return renderTransformSequence(sequence, outputWidth, outputHeight, async (canvas, picture) => {
     const greys = await greyscale(picture, rows, signal);
     canvas.font = font;
     canvas.textBaseline = "alphabetic";
     canvas.fillStyle = "black";
+    canvas.scale(widthScale, 1);
     for (let row = 0; row < rows; row++) {
       let text = "";
       for (let column = 0; column < asciiWidth; column++) {
         const grey = greys[(row * asciiWidth + column) * 4]!;
         text += grey ? asciiRamp[Math.floor(asciiRamp.length * grey / 256)]! : " ";
       }
-      canvas.fillText(text, 0, row * lineHeight - firstLine.ascent);
+      canvas.fillText(text, 0, row * asciiLineHeight + asciiBaseline);
     }
   }, signal);
 }

@@ -43,7 +43,7 @@ test("流萤举牌按编号读取原素材，越界回原提示且不请求资�
   };
   const input = { images: [], texts: ["你好"], args: { number: 21 } };
   await expect(firefly.render(input, context)).rejects.toThrow("fixture");
-  expect(requests).toEqual(["firefly_holdsign/21.png", "FZSEJW.ttf"]);
+  expect(requests).toEqual(["firefly_holdsign/21.png", "ZCOOLKuaiLe-Regular.ttf"]);
   requests.length = 0;
   await expect(firefly.render({ ...input, args: { number: -1 } }, context)).rejects.toBeInstanceOf(MemeTemplateFeedback);
   expect(requests).toEqual([]);

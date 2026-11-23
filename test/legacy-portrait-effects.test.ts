@@ -1,4 +1,7 @@
 import { expect, test } from "bun:test";
+import { loadImage } from "skia-canvas";
+import { renderExactPng } from "../../../packages/skia/index.ts";
+import { createBundledMemeResources } from "../backend-builtin-assets.ts";
 import type { MemeTemplateContext } from "../builtin-template.ts";
 import { legacyPortraitEffectTemplates } from "../templates/legacy-portrait-effects.ts";
 
@@ -33,4 +36,27 @@ test("问问缺名字时回提示，旧用户资料可代替显式名字", async
   await expect(ask.render({ images, texts: [], args: {} }, context)).rejects.toThrow("文字或昵称数量不足");
   await expect(ask.render({ images, texts: [], args: { user_infos: [{ name: "旧昵称", gender: "male" }] } }, context))
     .rejects.toThrow(canceled);
+});
+
+test("字符画使用随包开放字体并保持原 150 列的输出尺寸", async () => {
+  const signal = AbortSignal.timeout(5_000);
+  const resources = createBundledMemeResources(signal);
+  const fontReads: string[] = [];
+  const picture = await renderExactPng(24, 22, draw => {
+    draw.fillStyle = "#4079ad";
+    draw.fillRect(0, 0, 24, 22);
+  });
+  const image = new File([new Uint8Array(picture.png)], "avatar.png", { type: "image/png" });
+  const bytes = await charpic.render({ images: [image], texts: [], args: {} }, {
+    signal,
+    ...resources,
+    async fontAsset(name) {
+      fontReads.push(name);
+      return resources.fontAsset(name);
+    },
+  });
+  const rendered = await loadImage(Buffer.from(bytes));
+  expect(rendered.width).toBe(1238);
+  expect(rendered.height).toBe(1134);
+  expect(fontReads).toEqual(["CascadiaMono.ttf"]);
 });

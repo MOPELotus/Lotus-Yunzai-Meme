@@ -1,6 +1,31 @@
 {
   "format": 1,
   "files": {
+    "fonts/CascadiaMono.ttf": {
+      "digest": "78864a1b4d03767a44731454a6f24c6b7d6e93fb5f62932860eb02e409cd50cb",
+      "source": "https://raw.githubusercontent.com/google/fonts/06bfe0d62a98375cb09c942fa18e68bd32cff057/",
+      "originalPath": "ofl/cascadiamono/CascadiaMono[wght].ttf",
+      "license": "OFL-1.1"
+    },
+    "fonts/FusionPixel12pxSC.ttf": {
+      "digest": "7e93fedda2c55bb37badb2262aaf43b08e3cb5976a0e3de2d90986ce59fe902e",
+      "source": "https://raw.githubusercontent.com/TakWolf/fusion-pixel-font/a38a5de9cc099ce28da3cab9f9411aa83cc7a3e9/",
+      "originalPath": "fusion-pixel-font-12px-proportional-ttf-v2026.11.10.zip/fusion-pixel-12px-proportional-zh_hans.ttf",
+      "license": "OFL-1.1",
+      "distribution": "https://github.com/TakWolf/fusion-pixel-font/releases/download/v2026.11.10/fusion-pixel-font-12px-proportional-ttf-v2026.11.10.zip"
+    },
+    "fonts/LXGWWenKaiLite-Regular.ttf": {
+      "digest": "f799a538a3355877e597a0ae04050e897932c9ae7689eb9227c2953c5dd549ea",
+      "source": "https://raw.githubusercontent.com/lxgw/LxgwWenKai-Lite/f87f49eb22d8c87d48982c2a19414e21a0b3ce0b/",
+      "originalPath": "fonts/TTF/LXGWWenKaiLite-Regular.ttf",
+      "license": "OFL-1.1"
+    },
+    "fonts/Lato-Bold.ttf": {
+      "digest": "8a0aace75d33794eece4b28187bfc1df0bbd2888b5d8a56e01788c8d65d16be1",
+      "source": "https://raw.githubusercontent.com/google/fonts/06bfe0d62a98375cb09c942fa18e68bd32cff057/",
+      "originalPath": "ofl/lato/Lato-Bold.ttf",
+      "license": "OFL-1.1"
+    },
     "fonts/LiberationSans-Bold.ttf": {
       "digest": "3973aa5054fb467dd5627245d3dc82e37bf16fe075756156a570455871351582",
       "source": "https://raw.githubusercontent.com/liberationfonts/liberation-fonts/4b0192046158094654e865245832c66d2104219e/",
@@ -29,6 +54,12 @@
       "license": "OFL-1.1",
       "distribution": "https://archive.ubuntu.com/ubuntu/pool/main/f/fonts-liberation/fonts-liberation_2.1.5-3_all.deb"
     },
+    "fonts/MaShanZheng-Regular.ttf": {
+      "digest": "6d2546bb189c732a8ca29af9e22457b152387d158aa459e4ac2ce1e51788b7fb",
+      "source": "https://raw.githubusercontent.com/google/fonts/06bfe0d62a98375cb09c942fa18e68bd32cff057/",
+      "originalPath": "ofl/mashanzheng/MaShanZheng-Regular.ttf",
+      "license": "OFL-1.1"
+    },
     "fonts/NotoColorEmoji.ttf": {
       "digest": "39ee3c587e10e89669b9ff32703261d10d5f9c4dd5ad147b6b5a1c5200591817",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
@@ -45,6 +76,12 @@
       "digest": "ae82f4e2a55e1316a55bcc1d05e9555ce08d8bda07e893b486896b626fd852ff",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "fonts/NotoSansSC-Regular.ttf",
+      "license": "OFL-1.1"
+    },
+    "fonts/ZCOOLKuaiLe-Regular.ttf": {
+      "digest": "812a6fc1fe54b6d73a419245c32dfeba8aa33104d5be90d1cf6af082007cb71d",
+      "source": "https://raw.githubusercontent.com/google/fonts/06bfe0d62a98375cb09c942fa18e68bd32cff057/",
+      "originalPath": "ofl/zcoolkuaile/ZCOOLKuaiLe-Regular.ttf",
       "license": "OFL-1.1"
     },
     "images/ace_attorney_dialog/bubble.png": {

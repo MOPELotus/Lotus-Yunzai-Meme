@@ -7,3 +7,4 @@
 - Noto Sans SC Regular、Bold 2.004-H2 的版权声明为 © 2014–2021 Adobe，保留字体名 Source。参见 [Noto CJK 的许可原文](https://github.com/notofonts/noto-cjk/blob/main/Sans/LICENSE)。
 - Noto Color Emoji 2.047 的版权声明为 Copyright 2022 Google Inc.。参见 [该字体构建版本的许可原文](https://github.com/googlefonts/noto-emoji/blob/6c211821b8442ab3683a502f9a79b2034293fced/fonts/LICENSE)。
 - Liberation Sans Regular、Bold、Italic、Bold Italic 2.1.5 的版权声明为 © 2010 Google Corporation（保留字体名 Arimo、Tinos、Cousine）及 © 2012 Red Hat, Inc.（保留字体名 Liberation）。构建字节来自 Ubuntu Noble `fonts-liberation` 版本 `1:2.1.5-3`，可按来源索引校验。参见 [Liberation Fonts 的许可原文](https://github.com/liberationfonts/liberation-fonts/blob/4b0192046158094654e865245832c66d2104219e/LICENSE)。
+- Cascadia Mono、ZCOOL KuaiLe、Ma Shan Zheng、Lato、霞鹜文楷 Lite 和融合像素字体以此目录的各自许可与版权声明为准。融合像素发布包中的 Ark Pixel、Cubic 11 和 Galmuri 许可声明一并保留。
