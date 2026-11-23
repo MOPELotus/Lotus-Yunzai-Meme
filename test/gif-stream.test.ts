@@ -30,7 +30,8 @@ test("大图走独立预算，增加同步编码的上限仍不允许", () => {
   expect(() => assertMemeGifDimensions(810, 810, 68)).toThrow(RangeError);
   expect(() => assertMemeGifStreamDimensions(810, 810, 68)).not.toThrow();
   expect(() => assertMemeGifStreamDimensions(815, 500, 77)).not.toThrow();
-  expect(() => assertMemeGifStreamDimensions(1000, 1000, 65)).toThrow(RangeError);
+  expect(() => assertMemeGifStreamDimensions(1024, 1024, 64)).not.toThrow();
+  expect(() => assertMemeGifStreamDimensions(1024, 1024, 65)).toThrow(RangeError);
 });
 
 test("流式编码拒绝无效帧并在信号取消后停止读取生产者", async () => {
