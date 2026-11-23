@@ -13,7 +13,6 @@ import { presentMemeVersion } from "./version-card.ts";
 import { handleCatalogUpdate, prepareLocalCatalog } from "./catalog-update.ts";
 import { startCatalogRuntime, type MemeRuntime } from "./catalog-runtime.ts";
 import { readMemeUsage } from "./usage.ts";
-import { createMemePokeHandler } from "./poke.ts";
 import { memeCatalogExclusions } from "./catalog-exclusions.ts";
 import { excludedMemeTemplateMessage, isExcludedMemeTemplate } from "./template-policy.ts";
 import { createLocalMemeBackend, matchesLocalMemeTrigger, nativeShortcutPattern } from "./backend-lifecycle.ts";
@@ -21,7 +20,6 @@ import { matchFixedShortcut } from "./legacy-caption-shortcuts.ts";
 import type { MemeTemplateShortcut } from "./builtin-template.ts";
 
 export { createProfileLikeImageRenderer } from "./profile-like-image.ts";
-export type { MemePokeContext } from "./poke.ts";
 
 const pageSize = 12;
 const catalogList = /^#?(?:表情(?:合成)?|meme)列表$/iu;
@@ -486,15 +484,6 @@ async function prepareRandomMeme(message: string, input: GenerationInput) {
   };
 }
 
-function selectPokeTemplates(hidden: readonly string[]) {
-  return withCatalog(db => db.query<CatalogRow & { params: string }, [string]>(`
-    SELECT key, keyWords, params ${visibleCatalog}
-    AND min_images = 1 AND max_images = 1 AND min_texts = 0 AND max_texts = 0
-    AND json_valid(params)
-    ORDER BY random() LIMIT 2
-  `).all(catalogFilters(db, hidden)).map(row => ({ key: row.key, aliases: keywords(row.keyWords), params: row.params })));
-}
-
 async function usageReport(context: CatalogContext, loadInfoCard?: LoadMemeInfoCard) {
   const report = queryCatalog(context.user_id, (db, filters) => {
     const counts = readMemeUsage(db);
@@ -640,7 +629,6 @@ export function createModule({ signal, memeRuntime }: { readonly signal: AbortSi
   const active = AbortSignal.any([signal, lifecycle.signal]);
   const backend = createLocalMemeBackend(active);
   const stop = memeRuntime && startCatalogRuntime(memeRuntime, active, backend);
-  const poke = createMemePokeHandler(active, selectPokeTemplates);
   function ensure() {
     if (active.aborted) return;
     try {
@@ -652,7 +640,6 @@ export function createModule({ signal, memeRuntime }: { readonly signal: AbortSi
   }
   return {
     ...createMemeCommands(active, memeRuntime?.loadInfoCard, ensure),
-    handlePoke: (input: Parameters<typeof poke>[0]) => afterMemeBackend(ensure, () => poke(input)),
     async dispose() {
       lifecycle.abort();
       await Promise.all([stop?.(), backend.dispose()]);

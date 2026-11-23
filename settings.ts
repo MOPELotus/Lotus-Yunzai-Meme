@@ -4,12 +4,11 @@ import { join } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import { isMap, isSeq, parseDocument } from "yaml";
 import type { MemeReference } from "./reference-card.ts";
-import { configDirectory, defaultAvatarCache, defaultManagedMemeTimeout, defaultPokeCooldown, defaultPokeProbability,
-  maxPokeCooldown, maxPokeProbability, readConfig } from "./catalog-policy.ts";
+import { configDirectory, defaultAvatarCache, defaultManagedMemeTimeout, readConfig } from "./catalog-policy.ts";
 import { isExcludedMemeName, memeNameExclusion } from "./catalog-exclusions.ts";
 
 type Setting = readonly [title: string, key: string,
-  type: "toggle" | "mode" | "users" | "templates" | "percentage" | "cooldown", fallback: unknown];
+  type: "toggle" | "mode" | "users" | "templates", fallback: unknown];
 type PanelSetting = Setting | readonly [title: string, key: string, type: "seconds", fallback: number];
 type MemeNameExclusion = ReturnType<typeof memeNameExclusion>;
 const sections = [
@@ -22,9 +21,6 @@ const sections = [
     ["消息图片", "imagesInMessage", "toggle", true],
     ["引用图片", "quotedImages", "toggle", true],
     ["错误回复", "errorReply", "toggle", true],
-    ["戳一戳表情", "pokeEnable", "toggle", false],
-    ["戳一戳触发概率", "pokeProbability", "percentage", defaultPokeProbability],
-    ["戳一戳冷却时间", "pokeLimit", "cooldown", defaultPokeCooldown],
   ] satisfies Setting[] },
   { title: "名单设置", file: "access.yaml", fields: [
     ["名单限制", "enable", "toggle", false],
@@ -142,10 +138,6 @@ function panelField(group: string, [label, key, type]: PanelSetting) {
     case "users":
     case "templates": return { label, field, component: "Select", componentProps: { mode: "tags" } };
     case "seconds": return { label, field, component: "InputNumber", componentProps: { min: 0, max: 120 } };
-    case "percentage":
-    case "cooldown": return { label, field, component: "InputNumber",
-      componentProps: { min: 0, max: type === "percentage" ? maxPokeProbability : maxPokeCooldown, precision: 0 },
-      bottomHelpMessage: type === "percentage" ? "单位为百分比，0 表示不触发。" : "单位为秒，0 表示不等待冷却。" };
   }
 }
 
@@ -164,12 +156,6 @@ function panelValue(type: PanelSetting[2], value: unknown, excluded = isExcluded
     case "seconds": {
       const number = typeof value === "string" && value.trim() !== "" ? Number(value) : value;
       if (typeof number === "number" && Number.isFinite(number) && number > 0 && number <= 120) return number;
-      break;
-    }
-    case "percentage":
-    case "cooldown": {
-      if (typeof value === "number" && Number.isSafeInteger(value) && value >= 0 &&
-          value <= (type === "percentage" ? maxPokeProbability : maxPokeCooldown)) return value;
       break;
     }
   }
@@ -275,8 +261,7 @@ export function supportGuoba() {
 function show(setting: PanelSetting, value: unknown): string {
   if (setting[2] === "toggle") return value === true ? "开启" : "关闭";
   if (setting[2] === "mode") return value === 1 ? "黑名单" : "白名单";
-  if (setting[2] === "percentage") return `${value}%`;
-  if (setting[2] === "cooldown" || setting[2] === "seconds") return `${value} 秒`;
+  if (setting[2] === "seconds") return `${value} 秒`;
   return Array.isArray(value) && value.length ? value.map(String).join("、") : "空";
 }
 
@@ -303,7 +288,6 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
     const normalized = argument.replace(/^统计设置/u, "表情统计设置").replace(/^服务设置/u, "合成设置");
     const selected = panelSections.find((section) => normalized.startsWith(section.title));
     const action = (selected ? normalized.slice(selected.title.length).trimStart() : normalized)
-      .replace(/^(戳一戳触发)(?!概率)/u, "戳一戳表情")
       .replace(/^缓存/u, "头像缓存")
       .replace(/^本机合成超时（秒）/u, "合成超时（秒）");
     const candidates = selected ? [selected] : panelSections;
@@ -326,11 +310,6 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
         document.set(key, next);
       } else if (type === "mode") {
         if (value !== "0" && value !== "1") return "名单模式使用 0（白名单）或 1（黑名单）。";
-        next = Number(value);
-        document.set(key, next);
-      } else if (type === "percentage" || type === "cooldown") {
-        const max = type === "percentage" ? maxPokeProbability : maxPokeCooldown;
-        if (!/^\d+$/u.test(value) || Number(value) > max) return `请填写 0 至 ${max} 的整数。`;
         next = Number(value);
         document.set(key, next);
       } else if (type === "seconds") {

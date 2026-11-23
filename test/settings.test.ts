@@ -95,7 +95,11 @@ list: []
       enable: true, master: true, userEnable: true, user: ["10003"], list: ["旧关键词"], 保留字段: "原样",
     });
 
-    expect(await settings("戳一戳触发开启", milkyOwner)).toBe("戳一戳表情：开启");
+    const beforeRemovedSetting = await readFile(meme, "utf8");
+    for (const argument of ["戳一戳触发开启", "戳一戳表情开启", "戳一戳触发概率100", "戳一戳冷却时间0"]) {
+      expect(await settings(argument, milkyOwner)).toBe("未找到该表情合成设置项。");
+    }
+    expect(await readFile(meme, "utf8")).toBe(beforeRemovedSetting);
     expect(await settings("统计设置表情统计关闭", milkyOwner)).toBe("表情统计：关闭");
     expect(await settings("其他设置自动更新资源关闭", milkyOwner)).toBe("未找到该表情合成设置项。");
     expect(await settings("服务设置 超时时间9", milkyOwner)).toBe("未找到该表情合成设置项。");
@@ -107,6 +111,7 @@ list: []
     const overview = await settings("", milkyOwner);
     expect(overview).toContain("用户白名单：已配置 1 项");
     expect(overview).not.toContain("10002");
+    expect(overview).not.toContain("戳一戳");
     expect(overview).not.toContain("https://example.test");
     expect(await settings("合成设置 合成超时（秒）", milkyOwner)).toBe("合成超时（秒）：9 秒");
 
@@ -139,7 +144,7 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     expect(configDirectory()).toBe(directory);
 
     const original = {
-      meme: "\uFEFF# 原表情设置\r\nenable: false\r\nreply: false # 原引用\r\ncache: true\r\ncustom: {flag:keep}\r\n",
+      meme: "\uFEFF# 原表情设置\r\nenable: false\r\nreply: false # 原引用\r\ncache: true\r\npokeEnable: true # 旧配置\r\npokeProbability: 100\r\npokeLimit: 0\r\ncustom: {flag:keep}\r\n",
       access: "# 保留紧凑流式样式\r\n{enable: true, mode: 0, userWhiteList: [10001], custom: keep,}\r\n",
       protect: "# 老配置保存一个 QQ\nuser: 10002\n",
       server: "url: 'http://127.0.0.1:1/saved' # 本地值\ntimeout: 5\nretry: 4\n",
@@ -150,18 +155,19 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     await Promise.all(Object.entries(original).map(([file, text]) => writeFile(path(file), text, { mode: 0o640 })));
     const { configInfo: form } = supportGuoba();
     const fields = form.schemas.flatMap(schema => "field" in schema ? [schema.field] : []);
-    expect(fields).toHaveLength(24);
+    expect(fields).toHaveLength(21);
     expect(fields).toContain("meme.cache");
     for (const field of ["server.backend", "server.url", "server.timeout", "server.retry", "other.autoUpdateRes", "other.autoUpdateResCron",
-      "other.autoUpdate", "other.hijackRes", "other.renderScale"]) {
+      "other.autoUpdate", "other.hijackRes", "other.renderScale", "meme.pokeEnable", "meme.pokeProbability", "meme.pokeLimit"]) {
       expect(fields).not.toContain(field);
     }
     expect(form.getConfigData()).toMatchObject({
-      meme: { enable: false, reply: false, cache: true, imagesInMessage: true, pokeEnable: false, pokeProbability: 50, pokeLimit: 20 },
+      meme: { enable: false, reply: false, cache: true, imagesInMessage: true },
       access: { mode: 0, userWhiteList: [10001] }, protect: { user: [10002] },
       server: { managedTimeout: 30 }, stat: { enable: true },
     });
     expect(form.getConfigData().server).toEqual({ managedTimeout: 30 });
+    expect(Object.keys(form.getConfigData().meme)).not.toContain("pokeEnable");
     expect(JSON.stringify(form.getConfigData())).not.toContain("127.0.0.1");
 
     expect(form.setConfigData({ "meme.reply": true, "access.mode": 1, "protect.user": [], "server.timeout": 999 }, {
@@ -178,7 +184,7 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
       { "meme.cache": "false" }, { "protect.user": ["bad-id"] }, { "access.mode": 7 },
       { "server.managedTimeout": 0 }, { "server.backend": "remote" }, { "server.url": "https://example.test" },
       { "server.timeout": 9 }, { "other.autoUpdateRes": true }, { "other.autoUpdateResCron": "0 0 2 * * *" },
-      { "meme.pokeProbability": 101 }, { "meme.pokeLimit": -1 }, { "meme.pokeLimit": 1.5 },
+      { "meme.pokeEnable": false }, { "meme.pokeProbability": 50 }, { "meme.pokeLimit": 20 },
     ]) {
       expect(form.setConfigData({ "meme.reply": false, ...invalid }, { Result })).toEqual({ ok: false, status: 422 });
     }
@@ -186,11 +192,12 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     expect(await read("server")).toBe(original.server);
     expect(await read("other")).toBe(original.other);
 
-    expect(form.setConfigData({ "meme.cache": false, "meme.pokeEnable": true, "meme.pokeProbability": 0, "meme.pokeLimit": 0 }, { Result }))
+    expect(form.setConfigData({ "meme.cache": false }, { Result }))
       .toEqual({ ok: true });
-    expect(form.getConfigData().meme).toMatchObject({ reply: true, cache: false, pokeEnable: true, pokeProbability: 0, pokeLimit: 0 });
+    expect(form.getConfigData().meme).toMatchObject({ reply: true, cache: false });
     expect(generationSettings().avatarCache).toBe(false);
-    const withPoke = await read("meme");
+    const updatedMeme = await read("meme");
+    expect(updatedMeme).toBe(original.meme.replace("reply: false", "reply: true").replace("cache: true", "cache: false"));
 
     expect(form.setConfigData({ "server.managedTimeout": 15.5, "stat.enable": false }, { Result })).toEqual({ ok: true });
     expect(form.getConfigData().server).toEqual({ managedTimeout: 15.5 });
@@ -200,7 +207,7 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     expect(await read("protect")).toBe(original.protect.replace("user: 10002", 'user: [10002,"10003"]'));
     await writeFile(path("stat"), "enable: [\n");
     expect(() => form.setConfigData({ "meme.reply": false, "stat.enable": true }, { Result })).toThrow();
-    expect(await read("meme")).toBe(withPoke);
+    expect(await read("meme")).toBe(updatedMeme);
   } finally {
     if (previousDirectory === undefined) delete Bun.env.LOTUS_MEME_CONFIG_DIR;
     else Bun.env.LOTUS_MEME_CONFIG_DIR = previousDirectory;
