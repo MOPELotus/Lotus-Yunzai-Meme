@@ -99,8 +99,12 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
   delete Bun.env.LOTUS_MEME_SERVER_URL;
   const { perspectiveMemeTemplates } = await import("../templates/perspective.ts");
   const { captionOverlayMemeTemplates } = await import("../templates/caption-overlays.ts");
+  const { legacyPhotoCaptionTemplates } = await import("../templates/legacy-photo-captions.ts");
   const launch = perspectiveMemeTemplates.find(template => template.info.key === "genshin_start")!;
   const fullHead = captionOverlayMemeTemplates.find(template => template.info.key === "fill_head")!;
+  const speechless = legacyPhotoCaptionTemplates.find(template => template.info.key === "speechless")!;
+  const png = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+  let coldCaption: readonly string[] | undefined;
   const backend = createManagedMemeBackend(signal, [{
     info: {
       key: "always",
@@ -115,12 +119,30 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
       },
     },
     async render() { return new Uint8Array([1]); },
-  }, launch, fullHead]);
+  }, launch, fullHead, {
+    ...speechless,
+    async render({ texts }) {
+      coldCaption = texts;
+      return png;
+    },
+  }]);
+  let disposeHost: (() => Promise<void>) | undefined;
   try {
     const { runAutomaticCatalogRefresh } = await import("../catalog-update.ts");
-    const { prepareMemeRequest, resolveMemeTrigger } = await import("../lotus.ts");
+    const { createModule, prepareMemeRequest, resolveMemeTrigger } = await import("../lotus.ts");
+    const host = createModule({ signal });
+    disposeHost = host.dispose;
     backend.ensure();
-    await runAutomaticCatalogRefresh(signal, true);
+    expect(await Bun.file(join(directory, "meme.db")).exists()).toBeFalse();
+    const text = "#典型的跨/段思维";
+    const reply = await host.fallback(text, {
+      message_type: "private", user_id: 1234, isMaster: true, isBotMaster: () => true,
+      message: [{ type: "text", text }, { type: "image", file: "base64://" + Buffer.from(png).toString("base64") }],
+    });
+    expect(reply).toEqual({ type: "image", file: png });
+    expect(coldCaption).toEqual(["典型的跨/段思维"]);
+    expect(resolveMemeTrigger("#典型的思维")).toBeUndefined();
+    expect(resolveMemeTrigger("#典型的跨段思维更多字")).toBeUndefined();
     expect(resolveMemeTrigger("#一直一直")).toEqual({ key: "always", keyword: "一直一直", text: "" });
     const request = await prepareMemeRequest("#一直一直", {
       user_id: 1234, isMaster: true, avatar: async () => new Blob(["avatar"], { type: "image/png" }),
@@ -175,6 +197,7 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
       await legacy.stop(true);
     }
   } finally {
+    await disposeHost?.();
     backend.dispose();
     for (const [index, name] of env.entries()) {
       const value = previous[index];

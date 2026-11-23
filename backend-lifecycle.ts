@@ -8,11 +8,28 @@ import { isExcludedMemeTemplate } from "./template-policy.ts";
 
 const maxOutputBytes = 8 * 1024 * 1024;
 
-const nativeTriggers = new WeakMap<NativeMemeServer["generate"], readonly string[]>();
+const nativeTriggers = new WeakMap<NativeMemeServer["generate"], {
+  readonly words: readonly string[];
+  readonly patterns: readonly RegExp[];
+}>();
+
+// Verified built-in captures. Catalog strings are never compiled as regular expressions.
+const nativeShortcutPatterns = [
+  { template: "genshin_start", source: "(?P<text>\\S+启动[!！]?)", pattern: /^(\S+启动[!！]?)(?=\s|$)/u },
+  { template: "fill_head", source: "满脑子都是(?P<name>\\S+)", pattern: /^满脑子都是(\S+)(?=\s|$)/u },
+  { template: "speechless", source: "(?P<text>典型的\\S+思维)", pattern: /^(典型的\S+思维)(?=\s|$)/u },
+];
+
+export function nativeShortcutPattern(template: string, source: string) {
+  return nativeShortcutPatterns.find(entry => entry.template === template && entry.source === source)?.pattern;
+}
 
 export function matchesManagedMemeTrigger(server: NativeMemeServer, message: string): boolean {
-  const input = message.replace(/^#/u, "").toLowerCase();
-  return nativeTriggers.get(server.generate)?.some(word => input.startsWith(word)) === true;
+  const input = message.replace(/^#/u, "");
+  const normalized = input.toLowerCase();
+  const triggers = nativeTriggers.get(server.generate);
+  return !!triggers && (triggers.words.some(word => normalized.startsWith(word)) ||
+    triggers.patterns.some(pattern => pattern.test(input)));
 }
 
 function buildRegistry(entries: readonly MemeTemplate[]) {
@@ -91,10 +108,17 @@ export function createManagedMemeBackend(signal: AbortSignal, entries?: readonly
         return run(preview, caller);
       },
     };
-    const triggers = [...registry.values()].flatMap(({ info }) => [
-      ...info.keywords, ...(info.shortcuts ?? []).map(({ key }) => key),
-    ]).filter(Boolean).map(word => word.toLowerCase());
-    nativeTriggers.set(managed.generate, [...new Set(triggers)]);
+    const words = new Set<string>();
+    const patterns = new Set<RegExp>();
+    for (const { info } of registry.values()) {
+      for (const keyword of info.keywords) if (keyword) words.add(keyword.toLowerCase());
+      for (const { key } of info.shortcuts ?? []) {
+        const pattern = nativeShortcutPattern(info.key, key);
+        if (pattern) patterns.add(pattern);
+        else if (key) words.add(key.toLowerCase());
+      }
+    }
+    nativeTriggers.set(managed.generate, { words: [...words], patterns: [...patterns] });
     withdraw = publishManagedMemeServer(managed);
 
     async function run(render: NonNullable<MemeTemplate["preview"]>, caller?: AbortSignal) {

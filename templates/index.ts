@@ -22,6 +22,7 @@ import { tudouShortAnimations } from "./tudou-short-animation.ts";
 import { tudouPortraitAnimations } from "./tudou-portrait-animations.ts";
 import { hug, kiss } from "./kiss-hug.ts";
 import { legacyBadgeTemplates } from "./legacy-badges.ts";
+import { legacyPhotoCaptionTemplates } from "./legacy-photo-captions.ts";
 import { legacyPortraitEffectTemplates } from "./legacy-portrait-effects.ts";
 import { legacySceneMemeTemplates } from "./legacy-scene.ts";
 import { mirrorFlashMemeTemplates } from "./mirror-flash.ts";
@@ -71,6 +72,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...anyliewTextDialogueTemplates,
   ...legacySceneMemeTemplates,
   ...legacyBadgeTemplates,
+  ...legacyPhotoCaptionTemplates,
   ...legacyPortraitEffectTemplates,
   ...textSignMemeTemplates,
   ...perspectiveMemeTemplates,
