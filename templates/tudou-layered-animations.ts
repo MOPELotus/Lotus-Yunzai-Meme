@@ -7,6 +7,7 @@ import { pasteMask } from "./masked-layout.ts";
 import { renderPythonGif } from "./python-gif.ts";
 import { jpg, previewImage } from "./template-layout.ts";
 import { tudouCompositions, type Pose, type TudouAvatarLayer, type TudouComposition } from "./tudou-layered-specs.ts";
+import { tudouOverlays } from "./tudou-overlay-specs.ts";
 
 type RenderMode = Parameters<typeof renderRgba>[3];
 type Frame = { readonly artwork: number; readonly avatars: readonly Image[] };
@@ -70,7 +71,7 @@ function template(spec: TudouComposition, mode: RenderMode): MemeTemplate {
     if (input.images.length !== avatarCount || input.texts.length) throw new Error(`该表情需要 ${avatarCount} 张图片。`);
     const { signal } = context;
     const artwork = new Map<number, Promise<Image>>();
-    const prepared = new WeakMap<Image, Promise<Image>>();
+    const prepared = new Map<TudouAvatarLayer, WeakMap<Image, Promise<Image>>>();
     function readArt(frame: number) {
       let result = artwork.get(frame);
       if (!result) {
@@ -79,15 +80,27 @@ function template(spec: TudouComposition, mode: RenderMode): MemeTemplate {
       }
       return result;
     }
-    function prepareCircle(avatar: Image) {
-      let image = prepared.get(avatar);
+    function prepareCircle(avatar: Image, layer: TudouAvatarLayer) {
+      let cached = prepared.get(layer);
+      if (!cached) {
+        cached = new WeakMap();
+        prepared.set(layer, cached);
+      }
+      let image = cached.get(avatar);
       if (!image) {
-        image = renderExactPng(110, 110, draw => {
-          clipCircle(draw, 0, 0, 110);
+        const [width, height] = layer.initialCircle === "input" ? [avatar.width, avatar.height] : layer.initialCircle ?? [110, 110];
+        const diameter = Math.min(width, height);
+        const left = Math.trunc((diameter - width) / 2), top = Math.trunc((diameter - height) / 2);
+        image = renderExactPng(diameter, diameter, draw => {
+          clipCircle(draw, 0, 0, diameter);
           draw.imageSmoothingQuality = "high";
-          draw.drawImage(avatar, 0, 0, 110, 110);
+          if (layer.squareFirst) {
+            const side = Math.min(avatar.width, avatar.height);
+            draw.drawImage(avatar, Math.trunc((avatar.width - side) / 2), Math.trunc((avatar.height - side) / 2), side, side,
+              left, top, width, height);
+          } else draw.drawImage(avatar, left, top, width, height);
         }, mode).then(({ png }) => loadImage(png));
-        prepared.set(avatar, image);
+        cached.set(avatar, image);
       }
       return image;
     }
@@ -105,7 +118,7 @@ function template(spec: TudouComposition, mode: RenderMode): MemeTemplate {
         signal.throwIfAborted();
         if (layer.visible && !layer.visible.some(([first, last]) => frame.artwork >= first && frame.artwork <= last)) continue;
         const avatar = frame.avatars[layer.source]!;
-        const image = layer.mode === "resize-circle" ? await prepareCircle(avatar) : avatar;
+        const image = layer.mode === "resize-circle" ? await prepareCircle(avatar, layer) : avatar;
         const pose = (typeof layer.poses[0] === "number" ? layer.poses : layer.poses[frame.artwork]) as Pose;
         const pixels = await raster(draw => drawLayer(draw, image, pose, layer));
         if (layer.below) {
@@ -181,3 +194,9 @@ export function createTudouLayeredTemplates(mode?: RenderMode) {
 }
 
 export const tudouLayeredTemplates = createTudouLayeredTemplates();
+
+export function createTudouOverlayTemplates(mode?: RenderMode) {
+  return tudouOverlays.map(spec => template(spec, mode));
+}
+
+export const tudouOverlayTemplates = createTudouOverlayTemplates();

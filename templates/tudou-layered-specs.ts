@@ -4,6 +4,8 @@ export interface TudouAvatarLayer {
   readonly source: number;
   readonly poses: Pose | readonly Pose[];
   readonly mode: "resize-circle" | "cover-circle" | "circle-cover";
+  readonly initialCircle?: readonly [width: number, height: number] | "input";
+  readonly squareFirst?: true;
   readonly angle?: number;
   readonly below?: true;
   readonly visible?: readonly (readonly [first: number, last: number])[];
