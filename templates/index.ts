@@ -1,5 +1,6 @@
 import type { MemeTemplate } from "../builtin-template.ts";
 import { hug, kiss } from "./kiss-hug.ts";
+import { overlayMemeTemplates } from "./overlays.ts";
 import { pat, rub } from "./pat-rub.ts";
 import { petpet } from "./petpet.ts";
 import { staticMemeTemplates } from "./static-layouts.ts";
@@ -9,4 +10,5 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   petpet, pat, rub, kiss, hug,
   ...staticMemeTemplates,
   ...transformMemeTemplates,
+  ...overlayMemeTemplates,
 ];
