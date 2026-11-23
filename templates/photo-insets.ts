@@ -31,7 +31,7 @@ const specs: readonly PhotoTemplate[] = [
   { key: "huanying", keywords: ["欢迎", "欢迎新人"], slots: [[77, 164, 150, 122]], assetPath: tudouWelcomePath },
 ];
 
-function coverImage(image: Image, [left, top, width, height]: Inset, replaceArt: boolean): Draw {
+export function coverImage(image: Image, [left, top, width, height]: Inset, replaceArt: boolean): Draw {
   const ratio = Math.max(width / image.width, height / image.height);
   const imageWidth = Math.max(width, Math.trunc(ratio * image.width));
   const imageHeight = Math.max(height, Math.trunc(ratio * image.height));

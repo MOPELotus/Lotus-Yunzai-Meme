@@ -6,6 +6,12 @@ const sources = [
 ];
 
 const captions = [
+  ["meme_generator/memes/teach/images/0.png", "65b6a5fd34a357e14875deda53e6952a87ea7e970536f4a87c1e10e69e236565"],
+  ["meme_generator/memes/thermometer_gun/images/0.png", "3f35043aa60692dd095aa93a79507dfacfa25e2c702dae786387b35ac92c71eb"],
+  ["meme_generator/memes/time_to_go/images/0.png", "2f1a231e53b24b370501b9f9a11e79ccff7fc6174cc1e592b2b52c25b0058a00"],
+  ["meme_generator/memes/safe_sense/images/0.png", "83f14a15818632417e14170e07ba15a4e15f39b3133b11bf96297ebbeb85e09c"],
+  ["meme_generator/memes/caused_by_this/images/0.png", "ccf0f91cfe33ddcb75a5b70d3408b4da022deac9cd149199f2f47e5b6c8d8dcd"],
+  ["meme_generator/memes/look_this_icon/images/nmsl.png", "496a3ab46d40757d40b38c50194c479be7755511c9194465a4669f15fbd2dee9"],
   ["meme_generator/memes/emperor_dragon/images/0.png", "a59113b07e8a459000ca98a1620cd71a7c0d580c6b1f9799b52762fb943379ca"],
   ["meme_generator/memes/imprison/images/0.jpg", "3dd3e6b71cab68f8a6c75893030ba5ae1062fedd632faaaf6ecd767c8fa196cb"],
   ["meme_generator/memes/murmur/images/0.jpg", "06fb5a38ef63b70d605ef768e43bd32d7d78dedbcca6026dafb4e07cced2552b"],
