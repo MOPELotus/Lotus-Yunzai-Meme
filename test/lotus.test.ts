@@ -4,7 +4,8 @@ import { mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import module, { prepareMemeRequest, resolveMemeTrigger } from "../lotus.ts";
-import { generationServer } from "../catalog-policy.ts";
+import { nativeCatalogTable } from "../catalog-file.ts";
+import { publishMemeProvider } from "../catalog-policy.ts";
 
 test("旧随机表情仅选择可用的单图或单文本模板，并沿普通生成发送说明和图片", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-random-"));
@@ -15,23 +16,28 @@ test("旧随机表情仅选择可用的单图或单文本模板，并沿普通�
     LOTUS_MEME_SERVER_URL: Bun.env.LOTUS_MEME_SERVER_URL,
   };
   const png = Uint8Array.fromBase64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1sAAAAASUVORK5CYII=");
-  const requests: { path: string; texts: FormDataEntryValue[]; image?: Uint8Array }[] = [];
+  const requests: { key: string; texts: FormDataEntryValue[]; image?: Uint8Array }[] = [];
   let fail = false;
-  const server = Bun.serve({
-    port: 0, hostname: "127.0.0.1",
-    async fetch(request) {
-      const form = await request.formData();
+  const identity = "lotus-skia:fixture-random";
+  const withdraw = publishMemeProvider({
+    catalogIdentity: identity,
+    async keys() { return ["selected"]; },
+    async info() { throw new Error("unchanged local catalog should not be rebuilt"); },
+    async generate(key, form) {
       const image = form.get("images");
-      requests.push({ path: new URL(request.url).pathname, texts: form.getAll("texts"),
-        image: image instanceof Blob ? await image.bytes() : undefined });
-      return fail ? new Response(null, { status: 503 }) : new Response(png);
+      requests.push({ key, texts: form.getAll("texts"), image: image instanceof Blob ? await image.bytes() : undefined });
+      return fail ? undefined : png;
     },
+    async preview() { return; },
   });
   try {
     const db = new Database(filename);
-    db.run(`CREATE TABLE meme (key TEXT PRIMARY KEY, keyWords TEXT, min_images INTEGER, max_images INTEGER,
-      min_texts INTEGER, max_texts INTEGER, params TEXT, defText TEXT)`);
-    const insert = db.query("INSERT INTO meme VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    db.run(`CREATE TABLE ${nativeCatalogTable} (key TEXT PRIMARY KEY, keyWords TEXT, min_images INTEGER, max_images INTEGER,
+      min_texts INTEGER, max_texts INTEGER, params TEXT, defText TEXT);
+      CREATE TABLE preset (name TEXT PRIMARY KEY, key TEXT, arg_name TEXT, arg_value TEXT);
+      CREATE TABLE lotus_catalog_provider (id INTEGER PRIMARY KEY, identity TEXT NOT NULL);`);
+    db.run("INSERT INTO lotus_catalog_provider VALUES (1, ?)", [identity]);
+    const insert = db.query(`INSERT INTO ${nativeCatalogTable} VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
     for (const [key, images, texts, defaults] of [
       ["selected", 1, 1, ["默认文字"]], ["blocked-key", 1, 1, ["禁用"]],
       ["blocked-alias", 1, 1, ["禁用"]], ["no-default", 1, 1, null],
@@ -45,7 +51,8 @@ test("旧随机表情仅选择可用的单图或单文本模板，并沿普通�
     const before = await readFile(filename);
     Bun.env.LOTUS_MEME_DB = filename;
     Bun.env.LOTUS_MEME_CONFIG_DIR = directory;
-    Bun.env.LOTUS_MEME_SERVER_URL = server.url.href;
+    Bun.env.LOTUS_MEME_SERVER_URL = "http://legacy.invalid/remote";
+    await writeFile(join(directory, "server.yaml"), "backend: obsolete\nurl: [invalid]\n");
     const access = join(directory, "access.yaml");
     const meme = join(directory, "meme.yaml");
     const hidden = "blackListEnable: true\nblackList: [blocked-key, 关键词-blocked-alias]\n";
@@ -61,7 +68,7 @@ test("旧随机表情仅选择可用的单图或单文本模板，并沿普通�
       type: "quoted",
       message: ["本次随机表情信息如下\n表情的名称：selected\n表情的别名：[关键词-selected]\n", { type: "image", file: png }],
     });
-    expect(requests).toEqual([{ path: "/memes/selected/", texts: ["默认文字"], image: png }]);
+    expect(requests).toEqual([{ key: "selected", texts: ["默认文字"], image: png }]);
 
     expect(await module.fallback("#随机meme", {
       ...input, lookupReply: async () => {
@@ -80,7 +87,7 @@ test("旧随机表情仅选择可用的单图或单文本模板，并沿普通�
     expect(requests).toHaveLength(2);
     expect(await readFile(filename)).toEqual(before);
   } finally {
-    await server.stop(true);
+    withdraw();
     for (const [key, value] of Object.entries(environment)) {
       if (value === undefined) delete Bun.env[key];
       else Bun.env[key] = value;
@@ -89,26 +96,29 @@ test("旧随机表情仅选择可用的单图或单文本模板，并沿普通�
   }
 });
 
-test("从旧 meme 表分页并查询详情，数据库保持不变", async () => {
+test("从本机表情目录分页并查询详情，数据库保持不变", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-catalog-"));
   const filename = join(directory, "data.db");
   const previousPath = Bun.env.LOTUS_MEME_DB;
   const previousConfiguration = Bun.env.LOTUS_MEME_CONFIG_DIR;
-  const previousServer = Bun.env.LOTUS_MEME_SERVER_URL;
-  let fixture: ReturnType<typeof Bun.serve> | undefined;
+  const identity = "lotus-skia:fixture-commands";
+  let withdraw: (() => void) | undefined;
   try {
     const db = new Database(filename);
-    db.run(`CREATE TABLE meme (
+    db.run(`CREATE TABLE ${nativeCatalogTable} (
       key TEXT PRIMARY KEY, keyWords TEXT, min_images INTEGER, max_images INTEGER,
-      min_texts INTEGER, max_texts INTEGER, params TEXT
-    )`);
-    const insert = db.query("INSERT INTO meme VALUES (?, ?, 1, 2, 0, 1, NULL)");
+      min_texts INTEGER, max_texts INTEGER, params TEXT, info TEXT
+    );
+    CREATE TABLE preset (name TEXT PRIMARY KEY, key TEXT, arg_name TEXT, arg_value TEXT);
+    CREATE TABLE lotus_catalog_provider (id INTEGER PRIMARY KEY, identity TEXT NOT NULL);`);
+    db.run("INSERT INTO lotus_catalog_provider VALUES (1, ?)", [identity]);
+    const insert = db.query(`INSERT INTO ${nativeCatalogTable} VALUES (?, ?, 1, 2, 0, 1, NULL, NULL)`);
     for (let index = 1; index <= 13; index++) {
       insert.run(`meme-${String(index).padStart(2, "0")}`, JSON.stringify(["表情", "样例", `别名${index}`,
         `${index}组合甲`, `${index}组合乙`, `${index}组合丙`]));
     }
-    db.run("UPDATE meme SET keyWords = ?, max_texts = 0 WHERE key = ?", [JSON.stringify(["只图", "a+b"]), "meme-12"]);
-    db.run("UPDATE meme SET params = ? WHERE key = ?", [JSON.stringify({
+    db.run(`UPDATE ${nativeCatalogTable} SET keyWords = ?, max_texts = 0 WHERE key = ?`, [JSON.stringify(["只图", "a+b"]), "meme-12"]);
+    db.run(`UPDATE ${nativeCatalogTable} SET params = ? WHERE key = ?`, [JSON.stringify({
       min_images: 1, max_images: 2, min_texts: 0, max_texts: 0, args_type: {
         args_model: { properties: {
           user_infos: { type: "array" },
@@ -123,7 +133,7 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
         ],
       },
     }), "meme-12"]);
-    db.run("UPDATE meme SET params = ? WHERE key = ?", [JSON.stringify({
+    db.run(`UPDATE ${nativeCatalogTable} SET params = ? WHERE key = ?`, [JSON.stringify({
       min_images: 1, max_images: 4, min_texts: 2, max_texts: 3, default_texts: ["默认"], args_type: null,
     }), "meme-13"]);
     db.close();
@@ -211,9 +221,7 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     if (!prepared || typeof prepared === "string") throw new Error("未生成请求体");
     expect(prepared.key).toBe("meme-13");
     expect(prepared.quote).toBe(true);
-    const transmitted = await new Request("http://localhost/memes/meme-13/", {
-      method: "POST", body: prepared.body,
-    }).formData();
+    const transmitted = prepared.body;
     expect(transmitted.getAll("texts")).toEqual(["昵称", "默认"]);
     expect(await Promise.all(transmitted.getAll("images").map((image) => (image as Blob).text()))).toEqual([
       "10002", "10001", "引用图片", "当前图片",
@@ -232,29 +240,20 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     const png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1sAAAAASUVORK5CYII=";
     let received: FormData | undefined;
     let count = 0;
-    let redirected = false;
-    let redirectDestination = false;
-    fixture = Bun.serve({
-      hostname: "127.0.0.1", port: 0,
-      async fetch(request) {
-        const url = new URL(request.url);
-        if (url.pathname === "/elsewhere") {
-          redirectDestination = true;
-          return new Response();
-        }
-        expect(request.method).toBe("POST");
-        expect(url.pathname).toBe("/fixture/memes/meme-13/");
-        received = await request.formData();
+    let renderFailed = false;
+    withdraw = publishMemeProvider({
+      catalogIdentity: identity,
+      async keys() { return ["meme-13"]; },
+      async info() { throw new Error("unchanged local catalog should not be rebuilt"); },
+      async generate(key, body, signal) {
+        expect(key).toBe("meme-13");
+        expect(signal).toBeInstanceOf(AbortSignal);
+        received = body;
         count++;
-        if (redirected) return new Response(null, { status: 307, headers: { Location: "/elsewhere" } });
-        return new Response(Uint8Array.fromBase64(png), { headers: { "content-type": "image/png" } });
+        if (!renderFailed) return Uint8Array.fromBase64(png);
       },
+      async preview() { return; },
     });
-    Bun.env.LOTUS_MEME_SERVER_URL = new URL("/fixture/", fixture.url).href;
-    const configuredFixture = Bun.env.LOTUS_MEME_SERVER_URL;
-    Bun.env.LOTUS_MEME_SERVER_URL = "http://meme:2233/internal/";
-    expect(generationServer()).toMatchObject({ protocol: "legacy", base: new URL("http://meme:2233/internal/") });
-    Bun.env.LOTUS_MEME_SERVER_URL = configuredFixture;
     const fallbackContext = {
       message_type: "group" as const,
       user_id: 10003, isMaster: false, isBotMaster: () => false,
@@ -262,11 +261,10 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     };
     expect(await module.fallback("别名13 前 / 后", fallbackContext)).toBeUndefined();
     expect(await module.fallback("#别名13 前 / 后", {
-      ...fallbackContext, message: [{ type: "image", url: new URL("/elsewhere", fixture.url).href }],
+      ...fallbackContext, message: [{ type: "image", url: "https://legacy.invalid/elsewhere" }],
     })).toContain("无法读取");
     expect(await module.fallback("#别名13 前 / 后", { ...fallbackContext, reply_id: 42 })).toContain("引用消息");
     expect(count).toBe(0);
-    expect(redirectDestination).toBe(false);
     const reply = await module.fallback("#别名13 前 / 后", fallbackContext);
     expect(reply).toEqual({ type: "quoted", message: { type: "image", file: Uint8Array.fromBase64(png) } });
     expect(received?.getAll("texts")).toEqual(["前", "后"]);
@@ -288,10 +286,9 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     expect(await module.fallback("#别名13 前 / 后", {
       ...withQuotedImage,
       lookupReply: async () => ({ user_id: 10004, message: [
-        { type: "image", url: new URL("/elsewhere", fixture?.url).href },
+        { type: "image", url: "https://legacy.invalid/elsewhere" },
       ] }),
     })).toContain("无法读取引用消息中的表情图片");
-    expect(redirectDestination).toBe(false);
     const sentImages = async () => {
       if (!received) throw new Error("没有收到表情生成请求");
       return Promise.all(received.getAll("images").map((image) => (image as Blob).bytes()));
@@ -302,10 +299,8 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     const fetchedImages: string[] = [];
     const signedImage = "https://multimedia.nt.qq.com.cn/download?appid=1406&fileid=ab%2Fcd&rkey=ef%2Bgh";
     const oldPrivateImage = "https://c2cpicdw.qpic.cn/offpic_new/10004/clip/0";
-    const realFetch = globalThis.fetch.bind(globalThis);
     const mockFetch = async (...[request, options]: Parameters<typeof fetch>) => {
       const url = new URL(request instanceof Request ? request.url : request.toString());
-      if (url.origin === fixture?.url.origin) return realFetch(request, options);
       if (url.href === signedImage || url.href === oldPrivateImage) {
         fetchedImages.push(url.href);
         expect(options?.redirect).toBe("error");
@@ -377,7 +372,7 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     const replacement = join(directory, "replacement.db");
     await writeFile(replacement, before);
     const replaced = new Database(replacement);
-    replaced.run("DELETE FROM meme");
+    replaced.run(`DELETE FROM ${nativeCatalogTable}`);
     replaced.close();
     expect(await module.fallback("#别名13 前 / 后", {
       ...withQuotedImage,
@@ -390,11 +385,11 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     expect(count).toBe(beforePolicyChange);
     await rename(original, filename);
 
-    redirected = true;
+    renderFailed = true;
     expect(await module.fallback("#别名13 前 / 后", fallbackContext)).toContain("表情生成失败");
-    expect(redirectDestination).toBe(false);
 
-    delete Bun.env.LOTUS_MEME_SERVER_URL;
+    withdraw();
+    withdraw = undefined;
     const accessConfig = join(directory, "access.yaml");
     const whitelist = `enable: true
 mode: 0
@@ -426,9 +421,7 @@ blackList: ["meme-01", "别名13"]
     expect(await module.commands["#表情详情"]("meme-02", { user_id: 10002 })).toContain("无法读取表情配置");
     expect(await readFile(filename)).toEqual(before);
   } finally {
-    await fixture?.stop(true);
-    if (previousServer === undefined) delete Bun.env.LOTUS_MEME_SERVER_URL;
-    else Bun.env.LOTUS_MEME_SERVER_URL = previousServer;
+    withdraw?.();
     if (previousPath === undefined) delete Bun.env.LOTUS_MEME_DB;
     else Bun.env.LOTUS_MEME_DB = previousPath;
     if (previousConfiguration === undefined) delete Bun.env.LOTUS_MEME_CONFIG_DIR;

@@ -54,7 +54,7 @@ test("安全的本机模板提示从聊天合成通道返回", async () => {
     message_type: "private", isMaster: true, isBotMaster: () => true, user_id: 1234,
     message: "#流萤举牌 -n 22",
   }, async () => ({ key: "firefly_holdsign", body: new FormData(), quote: false }), {
-    protocol: "native", catalogIdentity: "lotus-skia:fixture", timeout: 5_000,
+    catalogIdentity: "lotus-skia:fixture", timeout: 5_000,
     async keys() { return ["firefly_holdsign"]; },
     async info() { return firefly.info; },
     async generate() { throw new MemeTemplateFeedback("图片编号错误，请选择 1~21"); },

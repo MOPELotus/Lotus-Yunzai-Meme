@@ -1,52 +1,33 @@
 import { Database } from "bun:sqlite";
-import { expect, spyOn, test } from "bun:test";
+import { expect, test } from "bun:test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { publishManagedMemeServer } from "../catalog-policy.ts";
-import { runAutomaticCatalogRefresh } from "../catalog-update.ts";
+import { memeProvider, publishMemeProvider } from "../catalog-policy.ts";
+import { initializeLocalCatalog } from "../catalog-update.ts";
+import { scanMemeCatalogExclusions } from "../catalog-exclusions.ts";
 import { requestMemeImage, requestMemePreview } from "../generate-reply.ts";
-import module, { createModule, resolveMemeTrigger } from "../lotus.ts";
+import module, { resolveMemeTrigger } from "../lotus.ts";
 import { isExcludedMemeTemplate } from "../template-policy.ts";
 
 const png = Uint8Array.fromBase64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1sAAAAASUVORK5CYII=");
-const envKeys = ["LOTUS_MEME_DB", "LOTUS_MEME_CONFIG_DIR", "LOTUS_MEME_SERVER_URL"] as const;
 const owner = { message_type: "private" as const, user_id: 42, isMaster: true, isBotMaster: (user: number) => user === 42 };
-const server = { base: new URL("http://127.0.0.1:1/"), timeout: 1_000, protocol: "legacy" as const };
+const parameters = { min_images: 0, max_images: 0, min_texts: 0, max_texts: 0 };
 
-async function fixture(run: (file: string, signal: AbortSignal, calls: string[]) => Promise<void>,
-  remote?: Readonly<Record<string, unknown>>) {
+async function fixture(run: (file: string, signal: AbortSignal) => Promise<void>) {
   const dir = await mkdtemp(join(tmpdir(), "lotus-meme-template-exclusion-"));
   const file = join(dir, "catalog.sqlite");
+  const envKeys = ["LOTUS_MEME_DB", "LOTUS_MEME_CONFIG_DIR", "LOTUS_MEME_SERVER_URL"] as const;
   const previous = envKeys.map(key => [key, Bun.env[key]] as const);
   const controller = new AbortController();
-  const calls: string[] = [];
-  const fetchMock = async (input: RequestInfo | URL, init?: RequestInit) => {
-    const url = new URL(input instanceof Request ? input.url : String(input));
-    calls.push(`${init?.method ?? "GET"} ${url.pathname}`);
-    if (remote) {
-      if (url.pathname === "/memes/keys") return Response.json(Object.keys(remote));
-      const key = /^\/memes\/([^/]+)\/info$/u.exec(url.pathname)?.[1];
-      if (key && Object.hasOwn(remote, key)) return Response.json(remote[key]);
-    }
-    if (url.pathname === "/memes/keys") return Response.json(["jinhsi", "kurogames_rosetta", "custom", "ordinary"]);
-    if (url.pathname === "/memes/custom/info") return Response.json({ key: "custom", tags: ["Punishing: Gray Raven"] });
-    if (url.pathname === "/memes/ordinary/info") {
-      return Response.json({ key: "ordinary", keywords: ["安慰"], tags: ["普通"],
-        params_type: { min_texts: 0, max_texts: 0, min_images: 0, max_images: 0 } });
-    }
-    return new Response(png);
-  };
-  const intercept = spyOn(globalThis, "fetch").mockImplementation(Object.assign(fetchMock, { preconnect: () => {} }));
   try {
     Bun.env.LOTUS_MEME_DB = file;
     Bun.env.LOTUS_MEME_CONFIG_DIR = dir;
-    Bun.env.LOTUS_MEME_SERVER_URL = server.base.href;
-    await writeFile(join(dir, "meme.yaml"), "pokeEnable: true\npokeProbability: 100\nerrorReply: false\n");
-    await run(file, controller.signal, calls);
+    Bun.env.LOTUS_MEME_SERVER_URL = "http://127.0.0.1:1/ignored";
+    await writeFile(join(dir, "server.yaml"), "backend: remote\nurl: invalid-legacy-value\n");
+    await run(file, controller.signal);
   } finally {
     controller.abort();
-    intercept.mockRestore();
     for (const [key, value] of previous) {
       if (value === undefined) delete Bun.env[key];
       else Bun.env[key] = value;
@@ -93,85 +74,74 @@ test("排除固定模板及明确游戏标签，保留普通素材和共享词",
   expect(isExcludedMemeTemplate("kurogames_generic", ["库洛", "猫抓", "Wuthering Waves Music"])).toBe(false);
 });
 
-test("旧目录、查询、预设、随机和戳一戳都拦截相同的禁用模板，直接生成和预览不发请求", () =>
-  fixture(async (file, signal, calls) => {
+test("只打开本机目录，保留旧预设、统计及排除记录，拒绝已知或历史禁用键", () =>
+  fixture(async (file, signal) => {
     insertOldCatalog(file);
-    const list = module.commands["#表情列表"]("1", owner);
-    expect(list).toContain("共 2 项");
-    expect(list).toContain("kurogames_generic · 猫抓");
-    expect(await module.fallback("#表情搜索 汐汐", owner)).toContain("没有找到");
-    expect(await module.fallback("#表情搜索 罗塞塔", owner)).toContain("没有找到");
-    expect(await module.fallback("#表情搜索 猫抓", owner)).toEqual({
-      type: "quoted", message: [{ type: "text", text: "1. 猫抓" }],
-    });
-    for (const input of ["汐汐", "罗塞塔", "来自旧库", "仅来源标签", "旧专属预设"]) {
-      expect(resolveMemeTrigger(input, owner)).toBeUndefined();
-      expect(await module.fallback(input, owner)).toBeUndefined();
-    }
-    for (const key of ["jinhsi", "kurogames_rosetta", "custom", "stale"]) {
-      expect(await module.commands["#表情详情"](key, owner)).toContain("没有找到");
-      expect(await requestMemePreview(key, server)).toBeUndefined();
-      expect(await requestMemeImage({ key, body: new FormData() }, server)).toBeUndefined();
-    }
-    expect(calls).toEqual([]);
-    expect(resolveMemeTrigger("猫抓", owner)).toMatchObject({ key: "kurogames_generic" });
-    expect(await module.commands["#表情详情"]("猫抓", owner)).toMatchObject({ type: "quoted" });
-    expect(await module.fallback("#随机表情", owner)).toBeDefined();
-    const local = createModule({ signal });
-    const replies: unknown[] = [];
+    const legacy = new Database(file);
     try {
-      await local.handlePoke({ backend: "onebot", actorId: 42, botId: 99, targetId: 99, signal,
-        allowed: () => true, isBotMaster: () => false, reply(message) { replies.push(message); return true; } });
+      legacy.exec(`CREATE TABLE stat (key TEXT NOT NULL PRIMARY KEY, "all" INTEGER);
+        INSERT INTO stat VALUES ('ordinary', 11);
+        CREATE TABLE lotus_catalog_denied_keys (key TEXT NOT NULL PRIMARY KEY);
+        INSERT INTO lotus_catalog_denied_keys VALUES ('historic-denial');`);
+      legacy.query("INSERT INTO preset VALUES (?, 'ordinary', 'style', 'saved', NULL, NULL)")
+        .run(JSON.stringify("普通预设"));
     } finally {
-      await local.dispose();
+      legacy.close();
     }
-    expect(replies).toHaveLength(1);
-    expect(calls).toEqual(["GET /memes/kurogames_generic/preview", "POST /memes/kurogames_generic/", "GET /g", "POST /memes/avatar/"]);
-  }));
+    expect(resolveMemeTrigger("安慰", owner)).toContain("无法读取表情目录");
 
-test("启动清理旧缓存和排除预设，远端目录同步不索取已知排除模板的资料", () =>
-  fixture(async (file, signal, calls) => {
-    insertOldCatalog(file);
-    await runAutomaticCatalogRefresh(signal, true);
-    expect(await requestMemeImage({ key: "CUSTOM", body: new FormData() }, server)).toBeUndefined();
-    expect(await requestMemePreview("stale", server)).toBeUndefined();
-    expect(calls).toEqual([]);
-    const catalog = new Database(file);
-    try {
-      expect(catalog.query("SELECT key FROM meme ORDER BY key").values()).toEqual([["avatar"], ["kurogames_generic"]]);
-      expect(catalog.query("SELECT key FROM preset").values()).toEqual([]);
-      expect(await module.fallback("#表情更新资源", owner)).toContain("更新 1 项，移除 2 项");
-      expect(calls).toEqual(["GET /memes/keys", "GET /memes/custom/info", "GET /memes/ordinary/info"]);
-      expect(catalog.query("SELECT key FROM meme").values()).toEqual([["ordinary"]]);
-    } finally {
-      catalog.close();
-    }
-  }));
-
-test("从旧目录首次切换到本机目录会原子更新既有模板，后续同一版本沿用缓存", () =>
-  fixture(async (file, signal, calls) => {
-    insertOldCatalog(file);
-    delete Bun.env.LOTUS_MEME_SERVER_URL;
     const reads: string[] = [];
-    const withdraw = publishManagedMemeServer({
-      catalogIdentity: "fixture-managed-v1",
-      async keys() { reads.push("keys"); return ["kurogames_generic", "kurogames_chun_holdsign"]; },
+    const renders: string[] = [];
+    const withdraw = publishMemeProvider({
+      catalogIdentity: "test-local",
+      async keys() {
+        reads.push("keys");
+        return ["jinhsi", "ordinary", "custom", "historic-denial", "new-tagged"];
+      },
       async info(key) {
         reads.push(key);
-        return { key, keywords: ["新的普通表情"], tags: [],
-          params_type: { min_images: 0, max_images: 0, min_texts: 0, max_texts: 0 } };
+        const name = { ordinary: "本机普通表情", custom: "旧禁新名", "historic-denial": "历史禁用", "new-tagged": "新禁" };
+        return { key, keywords: [name[key as keyof typeof name]], tags: key === "new-tagged" ? ["战双"] : [], params_type: parameters };
       },
-      async generate() { return undefined; },
-      async preview() { return undefined; },
+      async generate(key) { renders.push(key); return png; },
+      async preview(key) { renders.push(key); return png; },
     });
     try {
-      expect(await runAutomaticCatalogRefresh(signal, true)).toContain("更新 1 项");
-      expect(reads).toEqual(["keys", "kurogames_generic"]);
-      expect(resolveMemeTrigger("安慰", owner)).toBeUndefined();
-      expect(resolveMemeTrigger("新的普通表情", owner)).toMatchObject({ key: "kurogames_generic" });
-      expect(await runAutomaticCatalogRefresh(signal, true)).toBeUndefined();
-      expect(reads).toEqual(["keys", "kurogames_generic"]);
-      expect(calls).toEqual([]);
+      expect(await initializeLocalCatalog(signal)).toContain("表情包数据更新完成");
+      expect(reads).toEqual(["keys", "ordinary", "custom", "historic-denial", "new-tagged"]);
+      expect(await initializeLocalCatalog(signal)).toBeUndefined();
+      expect(reads).toHaveLength(5);
+      expect(resolveMemeTrigger("本机普通表情", owner)).toMatchObject({ key: "ordinary" });
+      expect(resolveMemeTrigger("普通预设", owner)).toMatchObject({ key: "ordinary" });
+      for (const keyword of ["安慰", "旧专属预设", "罗塞塔", "旧禁新名", "历史禁用", "新禁"]) {
+        expect(resolveMemeTrigger(keyword, owner)).toBeUndefined();
+      }
+      const provider = memeProvider()!;
+      for (const key of ["JINHSI", "custom", "historic-denial", "stale", "new-tagged"]) {
+        expect(await requestMemeImage({ key, body: new FormData() }, provider)).toBeUndefined();
+        expect(await requestMemePreview(key, provider)).toBeUndefined();
+      }
+      expect(renders).toEqual([]);
+      expect(await requestMemeImage({ key: "ordinary", body: new FormData() }, provider)).toEqual(png);
+      expect(await requestMemePreview("ordinary", provider)).toEqual(png);
+      expect(renders).toEqual(["ordinary", "ordinary"]);
+      expect(await module.commands["#表情列表"]("1", owner)).toContain("共 1 项");
+
+      const archived = new Database(file, { readonly: true });
+      try {
+        expect(archived.query("SELECT key FROM main.meme ORDER BY key").values()).toEqual([
+          ["avatar"], ["cat_scratch"], ["custom"], ["jinhsi"], ["kurogames_generic"], ["kurogames_rosetta"], ["stale"],
+        ]);
+        expect(archived.query("SELECT key, arg_value FROM preset ORDER BY key").values()).toEqual([
+          ["jinhsi", "1"], ["ordinary", "saved"],
+        ]);
+        expect(archived.query('SELECT key, "all" FROM stat').values()).toEqual([["ordinary", 11]]);
+        expect(archived.query("SELECT key FROM lotus_catalog_denied_keys ORDER BY key").values()).toEqual([
+          ["custom"], ["historic-denial"], ["new-tagged"], ["stale"],
+        ]);
+      } finally {
+        archived.close();
+      }
     } finally {
       withdraw();
     }
@@ -186,8 +156,8 @@ const legacyMislabeled = [
   ["xueli_think", ["雪莉想", "雪梨想", "橘雪莉想"], [1, 1, 0, 1]],
 ] as const;
 
-test("六种旧归档误标保持可查，同键内容或来源发生变化仍按新标签过滤", () =>
-  fixture(async (file, signal, calls) => {
+test("旧归档误标只在已核实的指纹范围内豁免，同键内容变化仍记录为禁用", () =>
+  fixture(async (file) => {
     insertOldCatalog(file);
     const catalog = new Database(file);
     try {
@@ -199,14 +169,11 @@ test("六种旧归档误标保持可查，同键内容或来源发生变化仍�
         write.run(key, JSON.stringify({ key, keywords, params_type: params, tags }), JSON.stringify(keywords),
           JSON.stringify(params), min_images, max_images, min_texts, max_texts, JSON.stringify(tags));
       }
-      // An unfamiliar template only shares two of the proven legacy fields.
       write.run("laydown_do", "{}", '["躺撅"]', null, 1, 1, 0, 0, '["鸣潮"]');
       write.run("sitdown_do", "{}", '["坐撅"]', null, 1, 1, 0, 0, '["鸣潮"]');
-      await runAutomaticCatalogRefresh(signal, true);
-      for (const [key, [keyword]] of legacyMislabeled) expect(resolveMemeTrigger(keyword, owner)).toMatchObject({ key });
-      for (const keyword of ["躺撅", "坐撅"]) expect(resolveMemeTrigger(keyword, owner)).toBeUndefined();
-      for (const key of ["laydown_do", "sitdown_do"]) expect(isExcludedMemeTemplate(key)).toBe(false);
-      expect(calls).toEqual([]);
+      const initial = scanMemeCatalogExclusions(catalog);
+      expect([...initial.correctedArchiveKeys].sort()).toEqual(legacyMislabeled.map(([key]) => key).sort());
+      for (const key of ["laydown_do", "sitdown_do"]) expect(initial.keys.has(key)).toBe(true);
 
       catalog.query("UPDATE meme SET params = ? WHERE key = ?")
         .run('{"min_images":0,"max_images":0,"min_texts":1,"max_texts":2}', "acacia_anan_holdsign");
@@ -214,24 +181,32 @@ test("六种旧归档误标保持可查，同键内容或来源发生变化仍�
         .run('{"tags":["鸣潮","PGR"]}', "admission_letter");
       catalog.query("UPDATE meme SET keyWords = ? WHERE key = ?")
         .run('["新的游戏表情"]', "clownish");
-      expect(resolveMemeTrigger("安安举牌", owner)).toBeUndefined();
-      expect(resolveMemeTrigger("录取通知书", owner)).toBeUndefined();
-      expect(resolveMemeTrigger("新的游戏表情", owner)).toBeUndefined();
-      expect(resolveMemeTrigger("雪莉想", owner)).toMatchObject({ key: "xueli_think" });
-      expect(await requestMemePreview("acacia_anan_holdsign", server)).toBeUndefined();
-      expect(calls).toEqual([]);
+      const changed = scanMemeCatalogExclusions(catalog);
+      for (const key of ["acacia_anan_holdsign", "admission_letter", "clownish"]) expect(changed.keys.has(key)).toBe(true);
+      expect(changed.correctedArchiveKeys.has("xueli_think")).toBe(true);
     } finally {
       catalog.close();
     }
   }));
 
-test("远端同名注册不会继承旧 SQLite 误标豁免", () =>
-  fixture(async (_file, _signal, calls) => {
-    expect(await module.fallback("#表情强制更新资源", owner)).toContain("更新 0 项");
-    expect(resolveMemeTrigger("录取通知书", owner)).toBeUndefined();
-    expect(await requestMemeImage({ key: "admission_letter", body: new FormData() }, server)).toBeUndefined();
-    expect(calls).toEqual(["GET /memes/keys", "GET /memes/admission_letter/info"]);
-  }, {
-    admission_letter: { key: "admission_letter", keywords: ["录取通知书"], tags: ["鸣潮"],
-      params_type: { min_images: 0, max_images: 0, min_texts: 1, max_texts: 1 } },
+test("本机注册的新同名内容不会继承旧 SQLite 误标豁免", () =>
+  fixture(async (_file, signal) => {
+    const withdraw = publishMemeProvider({
+      catalogIdentity: "test-tagged-local",
+      async keys() { return ["admission_letter"]; },
+      async info(key) {
+        return { key, keywords: ["录取通知书"], tags: ["鸣潮"], params_type: {
+          ...parameters, min_texts: 1, max_texts: 1,
+        } };
+      },
+      async generate() { throw new Error("禁用模板不能生成"); },
+      async preview() { throw new Error("禁用模板不能预览"); },
+    });
+    try {
+      expect(await initializeLocalCatalog(signal)).toContain("更新 0 项");
+      expect(resolveMemeTrigger("录取通知书", owner)).toBeUndefined();
+      expect(await requestMemeImage({ key: "admission_letter", body: new FormData() }, memeProvider()!)).toBeUndefined();
+    } finally {
+      withdraw();
+    }
   }));

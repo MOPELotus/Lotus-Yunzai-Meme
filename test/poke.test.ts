@@ -5,10 +5,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createModule, type MemePokeContext } from "../lotus.ts";
 import { readMemeUsage } from "../usage.ts";
+import { initializeLocalCatalog } from "../catalog-update.ts";
+import { publishMemeProvider } from "../catalog-policy.ts";
 
 const png = Uint8Array.fromBase64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1sAAAAASUVORK5CYII=");
 const baseConfig = "pokeEnable: true\npokeProbability: 100\npokeLimit: 20\n";
 type Reply = Parameters<MemePokeContext["reply"]>[0];
+type Renderer = (key: string) => Uint8Array<ArrayBuffer> | undefined | Promise<Uint8Array<ArrayBuffer> | undefined>;
 
 async function fixture(run: (options: {
   handle: (input: MemePokeContext) => Promise<void>;
@@ -20,62 +23,58 @@ async function fixture(run: (options: {
   config: (meme: string) => Promise<void>;
   access: (value: string) => Promise<void>;
   count: () => number;
-  setRenderer: (renderer: (path: string) => Response | Promise<Response>) => void;
+  setRenderer: (renderer: Renderer) => void;
   setRandom: (value: number) => void;
 }) => Promise<void>) {
   const dir = await mkdtemp(join(tmpdir(), "lotus-meme-poke-"));
   const catalog = join(dir, "catalog.db");
-  const orig = Object.fromEntries(["LOTUS_MEME_DB", "LOTUS_MEME_CONFIG_DIR", "LOTUS_MEME_SERVER_URL"]
+  const orig = Object.fromEntries(["LOTUS_MEME_DB", "LOTUS_MEME_CONFIG_DIR"]
     .map(key => [key, Bun.env[key]]));
   Bun.env.LOTUS_MEME_DB = catalog;
   Bun.env.LOTUS_MEME_CONFIG_DIR = dir;
-  Bun.env.LOTUS_MEME_SERVER_URL = "http://127.0.0.1:1/meme";
   const config = (value: string) => writeFile(join(dir, "meme.yaml"), value);
   const access = (value: string) => writeFile(join(dir, "access.yaml"), value);
   const avatarPaths: string[] = [];
   const renderPaths: string[] = [];
   const replies: Reply[] = [];
   const warnings: string[] = [];
-  let render: (path: string) => Response | Promise<Response> = () => new Response(png);
+  let render: Renderer = () => png;
   let roll = 0;
   const random = spyOn(Math, "random").mockImplementation(() => roll);
   const logger = spyOn(console, "warn").mockImplementation((message: string) => { warnings.push(message); });
-  const fetchMock = async (resource: RequestInfo | URL, init?: RequestInit) => {
+  const fetchMock = async (resource: RequestInfo | URL) => {
     const url = new URL(resource instanceof Request ? resource.url : String(resource));
-    if (url.hostname === "q1.qlogo.cn") {
-      avatarPaths.push(url.searchParams.get("nk") ?? "");
-      return new Response(png);
-    }
-    expect(url.origin).toBe("http://127.0.0.1:1");
-    expect(init?.method).toBe("POST");
-    expect(init?.redirect).toBe("error");
-    expect(init?.signal).toBeInstanceOf(AbortSignal);
-    const form = init?.body as FormData;
-    expect(form.getAll("texts")).toEqual([]);
-    const images = form.getAll("images") as Blob[];
-    expect(images).toHaveLength(1);
-    expect(await images[0]!.bytes()).toEqual(png);
-    renderPaths.push(url.pathname);
-    return render(url.pathname);
+    expect(url.origin).toBe("https://q1.qlogo.cn");
+    expect(url.pathname).toBe("/g");
+    avatarPaths.push(url.searchParams.get("nk") ?? "");
+    return new Response(png);
   };
+  const entries = new Map(([
+    ["single-a", 1, 0], ["single-b", 1, 0], ["hidden", 1, 0], ["two", 2, 0], ["caption", 1, 1],
+  ] as const).map(([key, images, texts]) => [String(key), { key, keywords: [`触发词-${key}`],
+    params_type: { min_images: images, max_images: images, min_texts: texts, max_texts: texts } }]));
+  const withdraw = publishMemeProvider({
+    catalogIdentity: "lotus-skia:fixture-poke",
+    async keys() { return [...entries.keys()]; },
+    async info(key) { return entries.get(key); },
+    async generate(key, form, signal) {
+      expect(signal).toBeInstanceOf(AbortSignal);
+      expect(form.getAll("texts")).toEqual([]);
+      const images = form.getAll("images") as Blob[];
+      expect(images).toHaveLength(1);
+      expect(await images[0]!.bytes()).toEqual(png);
+      renderPaths.push(key);
+      return render(key);
+    },
+    async preview() { return; },
+  });
   const intercept = spyOn(globalThis, "fetch").mockImplementation(Object.assign(fetchMock, {
     preconnect: () => {},
   }));
   const controller = new AbortController();
   let module: ReturnType<typeof createModule> | undefined;
   try {
-    const db = new Database(catalog);
-    try {
-      db.run(`CREATE TABLE meme (key TEXT PRIMARY KEY, keyWords TEXT, min_images INTEGER, max_images INTEGER,
-        min_texts INTEGER, max_texts INTEGER, params TEXT)`);
-      const insert = db.query("INSERT INTO meme VALUES (?, ?, ?, ?, ?, ?, ?)");
-      for (const [key, images, texts] of [["single-a", 1, 0], ["single-b", 1, 0], ["hidden", 1, 0], ["two", 2, 0], ["caption", 1, 1]] as const) {
-        insert.run(key, JSON.stringify([`触发词-${key}`]), images, images, texts, texts,
-          JSON.stringify({ min_images: images, max_images: images, min_texts: texts, max_texts: texts }));
-      }
-    } finally {
-      db.close();
-    }
+    await initializeLocalCatalog(controller.signal);
     await access("blackListEnable: true\nblackList: [触发词-hidden]\n");
     module = createModule({ signal: controller.signal });
     const input: MemePokeContext = {
@@ -98,6 +97,7 @@ async function fixture(run: (options: {
   } finally {
     controller.abort();
     await module?.dispose();
+    withdraw();
     intercept.mockRestore();
     logger.mockRestore();
     random.mockRestore();
@@ -126,7 +126,7 @@ test("旧表情戳触发默认关闭、概率分界、只取操作者头像和�
     setRandom(0.49);
     await handle(input);
     expect(avatars).toEqual(["42"]);
-    expect(renders[0]).toMatch(/^\/meme\/memes\/single-[ab]\/$/u);
+    expect(renders[0]).toMatch(/^single-[ab]$/u);
     expect(replies[0]).toEqual([expect.stringContaining("触发词-single-"), { type: "image", file: png }]);
     await handle(input);
     expect(renders).toHaveLength(1);
@@ -150,7 +150,7 @@ test("戳一戳生成失败只重试另一模板，只有明确送达才记账�
   fixture(async ({ handle, input, replies, avatars, renders, warnings, config, count, setRenderer }) => {
     await config(baseConfig);
     let attempt = 0;
-    setRenderer(() => ++attempt === 1 ? new Response(null, { status: 503 }) : new Response(png));
+    setRenderer(() => ++attempt === 1 ? undefined : png);
     await handle({ ...input, reply: body => { replies.push(body); return false; } });
     expect(avatars).toEqual(["42"]);
     expect(renders).toHaveLength(2);
@@ -162,7 +162,7 @@ test("戳一戳生成失败只重试另一模板，只有明确送达才记账�
     expect(renders).toHaveLength(3);
     expect(count()).toBe(1);
     await config(baseConfig + "errorReply: false\n");
-    setRenderer(() => new Response("fixture service details", { status: 503 }));
+    setRenderer(() => undefined);
     await handle({ ...input, actorId: 43 });
     expect(renders).toHaveLength(5);
     expect(replies).toHaveLength(2);
@@ -176,7 +176,7 @@ test("戳一戳生成失败只重试另一模板，只有明确送达才记账�
 test("并发戳只启动一次，等待中的会话失效或模板禁用不回复", () =>
   fixture(async ({ handle, input, replies, renders, config, access, count, setRenderer }) => {
     await config(baseConfig);
-    const pending = Promise.withResolvers<Response>();
+    const pending = Promise.withResolvers<Uint8Array<ArrayBuffer>>();
     const entered = Promise.withResolvers<void>();
     setRenderer(() => { entered.resolve(); return pending.promise; });
     let allowed = true;
@@ -186,29 +186,29 @@ test("并发戳只启动一次，等待中的会话失效或模板禁用不回�
     await handle(event);
     expect(renders).toHaveLength(1);
     allowed = false;
-    pending.resolve(new Response(png));
+    pending.resolve(png);
     await first;
     expect(replies).toEqual([]);
     const enteredAgain = Promise.withResolvers<void>();
-    const pendingAgain = Promise.withResolvers<Response>();
+    const pendingAgain = Promise.withResolvers<Uint8Array<ArrayBuffer>>();
     setRenderer(() => { enteredAgain.resolve(); return pendingAgain.promise; });
     allowed = true;
     const next = handle(event);
     await enteredAgain.promise;
     await access("blackListEnable: true\nblackList: [single-a, single-b, hidden]\n");
-    pendingAgain.resolve(new Response(png));
+    pendingAgain.resolve(png);
     await next;
     expect(replies).toEqual([]);
 
     await access("blackListEnable: true\nblackList: [hidden]\n");
     const enteredAbort = Promise.withResolvers<void>();
-    const pendingAbort = Promise.withResolvers<Response>();
+    const pendingAbort = Promise.withResolvers<Uint8Array<ArrayBuffer>>();
     const live = new AbortController();
     setRenderer(() => { enteredAbort.resolve(); return pendingAbort.promise; });
     const aborted = handle({ ...event, signal: live.signal });
     await enteredAbort.promise;
     live.abort();
-    pendingAbort.resolve(new Response(png));
+    pendingAbort.resolve(png);
     await aborted;
     expect(replies).toEqual([]);
     expect(count()).toBe(0);

@@ -1,14 +1,13 @@
 import { MemeTemplateFeedback } from "./builtin-template.ts";
 import { catalogPath } from "./catalog-file.ts";
 import { isExcludedMemeCatalogKey } from "./catalog-exclusions.ts";
-import { type generationServer, generationSettings, safeCatalogKey } from "./catalog-policy.ts";
+import { type LocalMemeProvider, generationSettings, safeCatalogKey } from "./catalog-policy.ts";
 import type { GenerationInput } from "./generation.ts";
 import { recordMemeUsage } from "./usage.ts";
 
 type InboundSegment = Readonly<Record<string, unknown>> & { readonly type: string };
 type Image = { readonly type: "image"; readonly file: Uint8Array };
 type GenerationMessage = Image | readonly [string, Image];
-type Server = NonNullable<ReturnType<typeof generationServer>>;
 type PreparedRequest = {
   readonly key: string;
   readonly body: FormData;
@@ -136,35 +135,23 @@ export async function fetchAvatar(user: string, { size = 0, signal, cache = fals
 
 export async function requestMemeImage(
   { key, body }: Pick<PreparedRequest, "key" | "body">,
-  server: Server,
+  provider: LocalMemeProvider,
   signal?: AbortSignal,
 ) {
   if (!safeCatalogKey(key) || isExcludedMemeCatalogKey(key) || signal?.aborted) return;
-  const active = requestSignal(server.timeout, signal);
-  if (server.protocol === "native") return nativeImage(await server.generate(key, body, active), key, active);
-  const endpoint = new URL(server.base);
-  endpoint.pathname = `${endpoint.pathname.replace(/\/+$/u, "")}/memes/${encodeURIComponent(key)}/`;
-  return readResult(await fetch(endpoint, {
-    method: "POST", body, redirect: "error", signal: active,
-  }));
+  const active = requestSignal(provider.timeout, signal);
+  return nativeImage(await provider.generate(key, body, active), key, active);
 }
 
 export async function requestMemePreview(
-  key: string, server: Server, signal?: AbortSignal,
+  key: string, provider: LocalMemeProvider, signal?: AbortSignal,
 ) {
   if (!safeCatalogKey(key) || isExcludedMemeCatalogKey(key) || signal?.aborted) return;
   try {
-    const active = requestSignal(server.timeout, signal);
-    if (server.protocol === "native") return nativeImage(await server.preview(key, active), key, active);
-    const endpoint = new URL(server.base);
-    endpoint.pathname = `${endpoint.pathname.replace(/\/+$/u, "")}/memes/${encodeURIComponent(key)}/preview`;
-    const bytes = await readResult(await fetch(endpoint, {
-      redirect: "error", credentials: "omit", referrerPolicy: "no-referrer",
-      signal: active,
-    }));
-    if (!signal?.aborted) return bytes;
+    const active = requestSignal(provider.timeout, signal);
+    return nativeImage(await provider.preview(key, active), key, active);
   } catch {
-    // The local metadata is still available when the preview service cannot reply.
+    // A missing or unreadable preview does not prevent showing the metadata.
   }
 }
 
@@ -211,7 +198,7 @@ async function imagesIn(segments: readonly InboundSegment[], signal: AbortSignal
 export async function generateMemeReply(
   context: FallbackContext,
   prepare: (input: GenerationInput) => Promise<PreparedRequest | string | undefined>,
-  server: Server,
+  provider: LocalMemeProvider,
   signal?: AbortSignal,
 ): Promise<GenerationMessage | { type: "quoted"; message: GenerationMessage } | string | undefined> {
   const userId = context.user_id;
@@ -272,7 +259,7 @@ export async function generateMemeReply(
 
     if (isExcludedMemeCatalogKey(prepared.key)) return;
     const catalog = catalogPath();
-    const bytes = await requestMemeImage(prepared, server, signal);
+    const bytes = await requestMemeImage(prepared, provider, signal);
     if (bytes && !signal?.aborted) {
       recordGeneratedMeme(prepared.key, catalog);
       const image: Image = { type: "image", file: bytes };

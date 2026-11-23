@@ -1,6 +1,6 @@
-import { prepareNativeCatalog } from "./catalog-update.ts";
+import { prepareLocalCatalog } from "./catalog-update.ts";
 import { catalogPath, catalogVersion } from "./catalog-file.ts";
-import { catalogPolicy, generationServer, maxPokeCooldown, pokeSettings, sameGenerationServer } from "./catalog-policy.ts";
+import { catalogPolicy, memeProvider, maxPokeCooldown, pokeSettings, sameMemeProvider } from "./catalog-policy.ts";
 import { fetchAvatar, recordGeneratedMeme, requestMemeImage } from "./generate-reply.ts";
 import { buildGenerationBody } from "./generation.ts";
 
@@ -70,14 +70,12 @@ export function createMemePokeHandler(
 
     running.add(key);
     try {
-      const server = generationServer();
-      if (!server) return;
-      if (server.protocol === "native") {
-        const pending = prepareNativeCatalog(signal);
-        if (pending) {
-          await pending;
-          if (signal.aborted || !sameGenerationServer(server, generationServer())) return;
-        }
+      const provider = memeProvider();
+      if (!provider) return;
+      const pending = prepareLocalCatalog(signal);
+      if (pending) {
+        await pending;
+        if (signal.aborted || !sameMemeProvider(provider, memeProvider())) return;
       }
       const catalog = catalogPath();
       const version = catalogVersion();
@@ -97,7 +95,7 @@ export function createMemePokeHandler(
         });
         if (typeof prepared === "string" || prepared.body.getAll("images").length !== 1 || prepared.body.has("texts")) continue;
         if (!checkPolicy(template) || catalogVersion() !== version) return;
-        const bytes = await requestMemeImage(prepared, server, signal).catch(() => undefined);
+        const bytes = await requestMemeImage(prepared, provider, signal).catch(() => undefined);
         if (!bytes) continue;
         if (!checkPolicy(template) || catalogVersion() !== version) return;
         const alias = template.aliases.map(word => `[${word}]`).join(" ") || "[无]";

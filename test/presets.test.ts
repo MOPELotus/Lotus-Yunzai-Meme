@@ -3,6 +3,7 @@ import { expect, test } from "bun:test";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { nativeCatalogTable } from "../catalog-file.ts";
 import { prepareMemeRequest, resolveMemeTrigger } from "../lotus.ts";
 
 test("旧表情预设沿用触发、停用和固定参数规则", async () => {
@@ -12,7 +13,7 @@ test("旧表情预设沿用触发、停用和固定参数规则", async () => {
   const previousConfiguration = Bun.env.LOTUS_MEME_CONFIG_DIR;
   try {
     const db = new Database(filename);
-    db.run(`CREATE TABLE meme (
+    db.run(`CREATE TABLE ${nativeCatalogTable} (
       key TEXT PRIMARY KEY, keyWords TEXT, min_images INTEGER, max_images INTEGER,
       min_texts INTEGER, max_texts INTEGER, params TEXT
     )`);
@@ -26,8 +27,9 @@ test("旧表情预设沿用触发、停用和固定参数规则", async () => {
         parser_options: [{ names: ["-n", "--number"], args: [{ name: "number" }] }],
       },
     };
-    db.query("INSERT INTO meme VALUES (?, ?, 0, 0, 0, 0, ?)").run("template", '["普通"]', JSON.stringify(params));
-    db.query("INSERT INTO meme VALUES (?, ?, 0, 0, 0, 0, ?)").run("first", '["冲突"]', JSON.stringify(params));
+    const templates = db.query(`INSERT INTO ${nativeCatalogTable} VALUES (?, ?, 0, 0, 0, 0, ?)`);
+    templates.run("template", '["普通"]', JSON.stringify(params));
+    templates.run("first", '["冲突"]', JSON.stringify(params));
     const insert = db.query("INSERT INTO preset VALUES (?, ?, ?, ?)");
     insert.run(JSON.stringify("快捷"), "template", "character", "4");
     insert.run(JSON.stringify("冲突"), "template", "character", "2");

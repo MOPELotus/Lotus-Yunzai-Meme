@@ -1,8 +1,2 @@
-# 自定义表情包服务地址
-url: 'https://meme.pippi.top/pippi/'
-
-# 请求最大重试次数
-retry: 3
-
-# 请求超时时间
-timeout: 5
+# 合成超时（秒）
+managedTimeout: 30

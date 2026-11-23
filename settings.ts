@@ -2,19 +2,16 @@ import { chmodSync, chownSync, closeSync, constants, fstatSync, fsyncSync, mkdir
   openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { isDeepStrictEqual } from "node:util";
-import { Job } from "node-schedule";
 import { isMap, isSeq, parseDocument } from "yaml";
 import type { MemeReference } from "./reference-card.ts";
-import { configDirectory, defaultAvatarCache, defaultManagedMemeTimeout, defaultPokeCooldown, defaultPokeProbability, defaultRemoteMemeTimeout,
-  maxPokeCooldown, maxPokeProbability,
-  normalizeCatalogCron, parseGenerationServerUrl, readConfig } from "./catalog-policy.ts";
+import { configDirectory, defaultAvatarCache, defaultManagedMemeTimeout, defaultPokeCooldown, defaultPokeProbability,
+  maxPokeCooldown, maxPokeProbability, readConfig } from "./catalog-policy.ts";
 import { isExcludedMemeName, memeNameExclusion } from "./catalog-exclusions.ts";
 
 type Setting = readonly [title: string, key: string,
   type: "toggle" | "mode" | "users" | "templates" | "percentage" | "cooldown", fallback: unknown];
-type PanelSetting = Setting | readonly [title: string, key: string, type: "backend" | "url" | "seconds" | "cron", fallback: string | number];
+type PanelSetting = Setting | readonly [title: string, key: string, type: "seconds", fallback: number];
 type MemeNameExclusion = ReturnType<typeof memeNameExclusion>;
-const backendModes = { auto: "自动", managed: "本机托管", remote: "远端服务" } as const;
 const sections = [
   { title: "表情设置", file: "meme.yaml", fields: [
     ["默认表情", "enable", "toggle", true],
@@ -47,16 +44,11 @@ const sections = [
 ];
 
 const panelSections: readonly { title: string; file: string; fields: readonly PanelSetting[] }[] = [
-  { title: "服务设置", file: "server.yaml", fields: [
-    ["服务来源", "backend", "backend", "auto"],
-    ["服务地址", "url", "url", ""], ["请求超时（秒）", "timeout", "seconds", defaultRemoteMemeTimeout],
-    ["本机合成超时（秒）", "managedTimeout", "seconds", defaultManagedMemeTimeout],
+  { title: "合成设置", file: "server.yaml", fields: [
+    ["合成超时（秒）", "managedTimeout", "seconds", defaultManagedMemeTimeout],
   ] },
   ...sections,
   { title: "表情统计设置", file: "stat.yaml", fields: [["表情统计", "enable", "toggle", true]] },
-  { title: "目录更新设置", file: "other.yaml", fields: [
-    ["自动更新资源", "autoUpdateRes", "toggle", true], ["自动更新 Cron", "autoUpdateResCron", "cron", "0 0 2 * * ?"],
-  ] },
 ];
 
 const settingCommand = /^#表情(?:合成)?设置\s*/u;
@@ -143,25 +135,17 @@ function panelField(group: string, [label, key, type]: PanelSetting) {
   const field = `${group}.${key}`;
   switch (type) {
     case "toggle": return { label, field, component: "Switch",
-      ...(field === "meme.cache" && { bottomHelpMessage: "头像未变更时复用本进程中的缓存。" }),
-      ...(field === "other.autoUpdateRes" && { bottomHelpMessage: "重启后重新登记定时任务。" }) };
+      ...(field === "meme.cache" && { bottomHelpMessage: "头像未变更时复用本进程中的缓存。" }) };
     case "mode": return { label, field, component: "Select", componentProps: { options: [
       { label: "白名单", value: 0 }, { label: "黑名单", value: 1 },
     ] } };
     case "users":
     case "templates": return { label, field, component: "Select", componentProps: { mode: "tags" } };
-    case "backend": return { label, field, component: "Select",
-      componentProps: { options: Object.entries(backendModes).map(([value, label]) => ({ label, value })) },
-      bottomHelpMessage: "本机托管使用已内置模板。切换后首次查目录或使用本机表情时会准备目录。" };
-    case "url": return { label, field, component: "Input",
-      bottomHelpMessage: "自动模式沿用已填地址，留空使用本机托管。环境变量 LOTUS_MEME_SERVER_URL 优先。" };
-    case "seconds": return { label: field === "server.timeout" ? "远端请求超时（秒）" : label,
-      field, component: "InputNumber", componentProps: { min: 0, max: 120 } };
+    case "seconds": return { label, field, component: "InputNumber", componentProps: { min: 0, max: 120 } };
     case "percentage":
     case "cooldown": return { label, field, component: "InputNumber",
       componentProps: { min: 0, max: type === "percentage" ? maxPokeProbability : maxPokeCooldown, precision: 0 },
       bottomHelpMessage: type === "percentage" ? "单位为百分比，0 表示不触发。" : "单位为秒，0 表示不等待冷却。" };
-    case "cron": return { label, field, component: "EasyCron", bottomHelpMessage: "重启后按新时间更新目录。" };
   }
 }
 
@@ -169,7 +153,6 @@ function panelValue(type: PanelSetting[2], value: unknown, excluded = isExcluded
   switch (type) {
     case "toggle": if (typeof value === "boolean") return value; break;
     case "mode": if (value === 0 || value === 1) return value; break;
-    case "backend": if (typeof value === "string" && Object.hasOwn(backendModes, value)) return value; break;
     case "users":
     case "templates": {
       if (!Array.isArray(value) || !value.every(item => typeof item === "string" || Number.isSafeInteger(item))) break;
@@ -177,12 +160,6 @@ function panelValue(type: PanelSetting[2], value: unknown, excluded = isExcluded
       if (type === "templates" ? entries.every(item => item !== "" && !excluded(String(item))) :
         entries.every(item => /^[1-9]\d*$/u.test(String(item)) && Number.isSafeInteger(Number(item)))) return entries;
       break;
-    }
-    case "url": {
-      if (typeof value !== "string") break;
-      const url = value.trim();
-      if (url) parseGenerationServerUrl(url);
-      return url;
     }
     case "seconds": {
       const number = typeof value === "string" && value.trim() !== "" ? Number(value) : value;
@@ -193,16 +170,6 @@ function panelValue(type: PanelSetting[2], value: unknown, excluded = isExcluded
     case "cooldown": {
       if (typeof value === "number" && Number.isSafeInteger(value) && value >= 0 &&
           value <= (type === "percentage" ? maxPokeProbability : maxPokeCooldown)) return value;
-      break;
-    }
-    case "cron": {
-      const cron = normalizeCatalogCron(value);
-      const job: Job & { readonly isOneTimeJob?: boolean } = new Job(() => {});
-      try {
-        if (job.schedule(cron) && !job.isOneTimeJob) return (value as string).trim();
-      } finally {
-        job.cancel();
-      }
       break;
     }
   }
@@ -308,13 +275,8 @@ export function supportGuoba() {
 function show(setting: PanelSetting, value: unknown): string {
   if (setting[2] === "toggle") return value === true ? "开启" : "关闭";
   if (setting[2] === "mode") return value === 1 ? "黑名单" : "白名单";
-  if (setting[2] === "backend") {
-    return typeof value === "string" && Object.hasOwn(backendModes, value) ? backendModes[value as keyof typeof backendModes] : "无效设置";
-  }
   if (setting[2] === "percentage") return `${value}%`;
   if (setting[2] === "cooldown" || setting[2] === "seconds") return `${value} 秒`;
-  if (setting[2] === "url") return value ? "已配置" : "未配置";
-  if (setting[2] === "cron") return typeof value === "string" ? value : "未配置";
   return Array.isArray(value) && value.length ? value.map(String).join("、") : "空";
 }
 
@@ -338,14 +300,12 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
     const directory = configDirectory();
     let excludeName: MemeNameExclusion | undefined;
     const excluded = (name: string) => (excludeName ??= memeNameExclusion())(name);
-    const normalized = argument.replace(/^(统计设置|其他设置)/u,
-      (name) => name === "统计设置" ? "表情统计设置" : "目录更新设置");
+    const normalized = argument.replace(/^统计设置/u, "表情统计设置").replace(/^服务设置/u, "合成设置");
     const selected = panelSections.find((section) => normalized.startsWith(section.title));
     const action = (selected ? normalized.slice(selected.title.length).trimStart() : normalized)
       .replace(/^(戳一戳触发)(?!概率)/u, "戳一戳表情")
       .replace(/^缓存/u, "头像缓存")
-      .replace(/^自定义地址/u, "服务地址")
-      .replace(/^(超时时间|请求超时(?!（秒）))/u, "请求超时（秒）");
+      .replace(/^本机合成超时（秒）/u, "合成超时（秒）");
     const candidates = selected ? [selected] : panelSections;
     for (const section of candidates) {
       // Some field names are prefixes of longer fields (e.g. 表情保护 and 表情保护列表).
@@ -373,10 +333,8 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
         if (!/^\d+$/u.test(value) || Number(value) > max) return `请填写 0 至 ${max} 的整数。`;
         next = Number(value);
         document.set(key, next);
-      } else if (type === "backend" || type === "url" || type === "seconds" || type === "cron") {
-        const input = type === "backend" ? Object.entries(backendModes).find(([, label]) => label === value)?.[0] ?? value :
-          type === "url" && value === "清除" ? "" : value;
-        try { next = panelValue(type, input); }
+      } else if (type === "seconds") {
+        try { next = panelValue(type, value); }
         catch { return `${title}格式无效。`; }
         document.set(key, next);
       } else {
@@ -407,9 +365,7 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
         if (!isDeepStrictEqual(written, { ...values, [key]: next })) throw new Error();
         rewrite(directory, path, previous, yaml);
       }
-      const help = type === "backend" ? "（可运行 #表情更新资源 同步目录。）" :
-        section.file === "other.yaml" ? "（重启后重新登记定时任务。）" : "";
-      return `${title}：${show(setting, visibleSettingValue(setting, next, excluded))}${help}`;
+      return `${title}：${show(setting, visibleSettingValue(setting, next, excluded))}`;
     }
 
     if (action) return "未找到该表情合成设置项。";

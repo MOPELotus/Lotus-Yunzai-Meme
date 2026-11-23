@@ -3,7 +3,8 @@ import { expect, spyOn, test } from "bun:test";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { NativeMemeServer } from "../catalog-policy.ts";
+import { nativeCatalogTable } from "../catalog-file.ts";
+import type { LocalMemeProvider } from "../catalog-policy.ts";
 import { requestMemeImage, requestMemePreview } from "../generate-reply.ts";
 import { parseGenerationArgs } from "../generation-args.ts";
 
@@ -15,9 +16,9 @@ test("内置表情直接调用本地渲染器，拒绝被排除、取消及超�
   const fixture = join(directory, "catalog.db");
   Bun.env.LOTUS_MEME_DB = fixture;
   const db = new Database(fixture);
-  db.run("CREATE TABLE meme (key TEXT PRIMARY KEY, tags TEXT, info TEXT, keyWords TEXT)");
-  db.run("INSERT INTO meme VALUES ('example', '[]', '{}', '[]')");
-  db.run("INSERT INTO meme VALUES ('tagged', '[\"鸣潮\"]', '{}', '[]')");
+  db.run(`CREATE TABLE ${nativeCatalogTable} (key TEXT PRIMARY KEY, tags TEXT, info TEXT, keyWords TEXT)`);
+  db.run(`INSERT INTO ${nativeCatalogTable} VALUES ('example', '[]', '{}', '[]')`);
+  db.run(`INSERT INTO ${nativeCatalogTable} VALUES ('tagged', '[\"鸣潮\"]', '{}', '[]')`);
   const body = new FormData();
   body.append("images", new Blob([png], { type: "image/png" }), "avatar.png");
   body.append("texts", "测试文字");
@@ -25,8 +26,8 @@ test("内置表情直接调用本地渲染器，拒绝被排除、取消及超�
   const calls: string[] = [];
   let output = png;
   let afterGenerate: (() => void) | undefined;
-  const server: NativeMemeServer = {
-    protocol: "native", timeout: 5000, catalogIdentity: "fixture",
+  const server: LocalMemeProvider = {
+    timeout: 5000, catalogIdentity: "fixture",
     async keys() { return ["example"]; },
     async info() { return {}; },
     async generate(key, value, signal) {
@@ -56,7 +57,6 @@ test("内置表情直接调用本地渲染器，拒绝被排除、取消及超�
   try {
     expect(await requestMemeImage({ key: "jinhsi", body }, server)).toBeUndefined();
     expect(await requestMemePreview("tagged", server)).toBeUndefined();
-    expect(await requestMemePreview("tagged", { protocol: "legacy", timeout: 5000, base: new URL("http://fixture.invalid/") })).toBeUndefined();
     expect(calls).toEqual([]);
     expect(await requestMemeImage({ key: "example", body }, server)).toEqual(png);
     expect(await requestMemePreview("example", server)).toEqual(png);
@@ -73,7 +73,7 @@ test("内置表情直接调用本地渲染器，拒绝被排除、取消及超�
     expect(await requestMemeImage({ key: "example", body }, server)).toBeUndefined();
 
     output = png;
-    afterGenerate = () => db.run("UPDATE meme SET tags = '[\"鸣潮\"]' WHERE key = 'example'");
+    afterGenerate = () => db.run(`UPDATE ${nativeCatalogTable} SET tags = '[\"鸣潮\"]' WHERE key = 'example'`);
     expect(await requestMemeImage({ key: "example", body }, server)).toBeUndefined();
     expect(calls).toEqual(["generate:example", "preview:example", "generate:example", "preview:example", "generate:example", "generate:example"]);
     expect(fetched).not.toHaveBeenCalled();

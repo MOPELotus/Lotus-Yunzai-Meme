@@ -1,5 +1,5 @@
 import type { Database } from "bun:sqlite";
-import { activeCatalogTable, catalogVersion, openMemeCatalogReader, type CatalogTable } from "./catalog-file.ts";
+import { catalogVersion, nativeCatalogTable, openMemeCatalogReader, type CatalogTable } from "./catalog-file.ts";
 import { isCorrectedLegacyMemeTag, isExcludedMemeTemplate, isRetiredMemeAlias } from "./template-policy.ts";
 
 function json(source: string | null): unknown {
@@ -76,14 +76,12 @@ const denialTable = "lotus_catalog_denied_keys";
 const hasDenials = (db: Database) =>
   db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = ?").get(denialTable);
 
-export function keepMemeCatalogDenials(db: Database, denied: ReadonlySet<string>, accepted: readonly string[] = []) {
+export function keepMemeCatalogDenials(db: Database, denied: ReadonlySet<string>) {
   const tagged = [...denied].filter(key => !isExcludedMemeTemplate(key));
   if (tagged.length) db.exec(`CREATE TABLE IF NOT EXISTS ${denialTable} (key TEXT NOT NULL PRIMARY KEY)`);
-  else if (!hasDenials(db)) return;
+  else return;
   const add = db.query(`INSERT OR IGNORE INTO ${denialTable} VALUES (?)`);
   for (const key of tagged) add.run(key);
-  const remove = db.query(`DELETE FROM ${denialTable} WHERE key = ?`);
-  for (const key of accepted) remove.run(key);
 }
 
 let cached: (ReturnType<typeof scanMemeCatalogExclusions> & { version: string }) | undefined;
@@ -91,8 +89,8 @@ let cached: (ReturnType<typeof scanMemeCatalogExclusions> & { version: string })
 export function memeCatalogExclusions(db: Database) {
   const version = catalogVersion();
   if (cached?.version === version) return cached;
-  const result = scanMemeCatalogExclusions(db);
-  if (activeCatalogTable() === "meme" && hasDenials(db)) {
+  const result = scanMemeCatalogExclusions(db, nativeCatalogTable);
+  if (hasDenials(db)) {
     const recorded = db.query<{ key: string }, []>(`SELECT key FROM ${denialTable}`).all();
     for (const { key } of recorded) {
       if (result.correctedArchiveKeys.has(key)) continue;
@@ -111,7 +109,7 @@ function currentCatalogExclusions() {
     db = openMemeCatalogReader();
     return memeCatalogExclusions(db);
   } catch {
-    // A site may configure its template service before the first catalog is installed.
+    // The local template directory may still be initializing.
   } finally {
     db?.close();
   }

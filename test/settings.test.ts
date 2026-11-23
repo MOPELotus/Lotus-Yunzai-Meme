@@ -4,16 +4,10 @@ import { mkdtemp, readFile, rm, stat, symlink, writeFile } from "node:fs/promise
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { catalogPolicy, catalogRefreshSchedule, configDirectory, generationServer, generationSettings,
-  usesManagedMemeServer } from "../catalog-policy.ts";
+import { catalogPolicy, configDirectory, generationSettings, memeProvider, publishMemeProvider } from "../catalog-policy.ts";
 import module from "../lotus.ts";
 import { buildGenerationBody } from "../generation.ts";
 import { handleMemeSettings, supportGuoba } from "../settings.ts";
-
-function remoteServiceUrl() {
-  const server = generationServer();
-  return server?.protocol === "legacy" ? server.base.href : undefined;
-}
 
 test("表情设置命令可安全更新旧 YAML 并即时生效", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-settings-"));
@@ -103,17 +97,18 @@ list: []
 
     expect(await settings("戳一戳触发开启", milkyOwner)).toBe("戳一戳表情：开启");
     expect(await settings("统计设置表情统计关闭", milkyOwner)).toBe("表情统计：关闭");
-    expect(await settings("其他设置自动更新资源关闭", milkyOwner)).toContain("重启后");
-    expect(await settings("服务设置 超时时间9", milkyOwner)).toBe("请求超时（秒）：9 秒");
-    expect(await settings("服务设置 自定义地址https://example.test/meme/", milkyOwner)).toBe("服务地址：已配置");
+    expect(await settings("其他设置自动更新资源关闭", milkyOwner)).toBe("未找到该表情合成设置项。");
+    expect(await settings("服务设置 超时时间9", milkyOwner)).toBe("未找到该表情合成设置项。");
+    expect(await settings("服务设置 自定义地址https://example.test/meme/", milkyOwner)).toBe("未找到该表情合成设置项。");
+    expect(await settings("服务设置 本机合成超时（秒）9", milkyOwner)).toBe("合成超时（秒）：9 秒");
     expect(Bun.YAML.parse(await readFile(join(directory, "server.yaml"), "utf8"))).toEqual({
-      timeout: 9, url: "https://example.test/meme/",
+      managedTimeout: 9,
     });
     const overview = await settings("", milkyOwner);
     expect(overview).toContain("用户白名单：已配置 1 项");
     expect(overview).not.toContain("10002");
     expect(overview).not.toContain("https://example.test");
-    expect(await settings("服务设置 自定义地址清除", milkyOwner)).toBe("服务地址：未配置");
+    expect(await settings("合成设置 合成超时（秒）", milkyOwner)).toBe("合成超时（秒）：9 秒");
 
     await writeFile(meme, "forceSharp: [\n");
     expect(await settings("强制触发关闭", owner)).toContain("无法读取或保存");
@@ -155,17 +150,19 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     await Promise.all(Object.entries(original).map(([file, text]) => writeFile(path(file), text, { mode: 0o640 })));
     const { configInfo: form } = supportGuoba();
     const fields = form.schemas.flatMap(schema => "field" in schema ? [schema.field] : []);
-    expect(fields).toHaveLength(29);
+    expect(fields).toHaveLength(24);
     expect(fields).toContain("meme.cache");
-    for (const field of ["server.retry", "other.autoUpdate", "other.hijackRes", "other.renderScale"]) {
+    for (const field of ["server.backend", "server.url", "server.timeout", "server.retry", "other.autoUpdateRes", "other.autoUpdateResCron",
+      "other.autoUpdate", "other.hijackRes", "other.renderScale"]) {
       expect(fields).not.toContain(field);
     }
     expect(form.getConfigData()).toMatchObject({
       meme: { enable: false, reply: false, cache: true, imagesInMessage: true, pokeEnable: false, pokeProbability: 50, pokeLimit: 20 },
       access: { mode: 0, userWhiteList: [10001] }, protect: { user: [10002] },
-      server: { backend: "auto", url: "http://127.0.0.1:1/saved", timeout: 5, managedTimeout: 30 }, stat: { enable: true },
+      server: { managedTimeout: 30 }, stat: { enable: true },
     });
-    expect(remoteServiceUrl()).toBe("http://127.0.0.1:1/env");
+    expect(form.getConfigData().server).toEqual({ managedTimeout: 30 });
+    expect(JSON.stringify(form.getConfigData())).not.toContain("127.0.0.1");
 
     expect(form.setConfigData({ "meme.reply": true, "access.mode": 1, "protect.user": [], "server.timeout": 999 }, {
       Result, changedFields: ["meme.reply", "access.mode"],
@@ -179,8 +176,8 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
 
     for (const invalid of [
       { "meme.cache": "false" }, { "protect.user": ["bad-id"] }, { "access.mode": 7 },
-      { "server.timeout": 0 }, { "server.backend": "third-party" }, { "server.url": "http://user@127.0.0.1/" },
-      { "other.autoUpdateResCron": "0 0 99 * * *" }, { "other.autoUpdateResCron": "tomorrow" },
+      { "server.managedTimeout": 0 }, { "server.backend": "remote" }, { "server.url": "https://example.test" },
+      { "server.timeout": 9 }, { "other.autoUpdateRes": true }, { "other.autoUpdateResCron": "0 0 2 * * *" },
       { "meme.pokeProbability": 101 }, { "meme.pokeLimit": -1 }, { "meme.pokeLimit": 1.5 },
     ]) {
       expect(form.setConfigData({ "meme.reply": false, ...invalid }, { Result })).toEqual({ ok: false, status: 422 });
@@ -195,8 +192,9 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     expect(generationSettings().avatarCache).toBe(false);
     const withPoke = await read("meme");
 
-    expect(form.setConfigData({ "other.autoUpdateResCron": "*/15 * * * ?", "stat.enable": false }, { Result })).toEqual({ ok: true });
-    expect(catalogRefreshSchedule()).toBe("0 */15 * * * *");
+    expect(form.setConfigData({ "server.managedTimeout": 15.5, "stat.enable": false }, { Result })).toEqual({ ok: true });
+    expect(form.getConfigData().server).toEqual({ managedTimeout: 15.5 });
+    expect(await read("server")).toBe(original.server + "managedTimeout: 15.5\n");
     expect(form.getConfigData().stat).toEqual({ enable: false });
     expect(form.setConfigData({ "protect.user": [10002, "10003"] }, { Result })).toEqual({ ok: true });
     expect(await read("protect")).toBe(original.protect.replace("user: 10002", 'user: [10002,"10003"]'));
@@ -212,47 +210,36 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
   }
 });
 
-test("表情面板可修改服务来源并保留配置和环境优先级", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "lotus-meme-backend-mode-"));
+test("旧服务设置及环境变量从未改变本机渲染入口或合成超时", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "lotus-meme-native-timeout-"));
   const previousDirectory = Bun.env.LOTUS_MEME_CONFIG_DIR;
   const previousUrl = Bun.env.LOTUS_MEME_SERVER_URL;
   const path = join(directory, "server.yaml");
-  const old = "url: https://meme.pippi.top/pippi # 旧默认服务\ntimeout: 9\n其他字段: 保留\n";
+  const legacy = "backend: remote\nurl: https://fixture.invalid/private\ntimeout: 9\n";
   const Result = { ok: () => ({ ok: true }), error: (_message: string, status: number) => ({ ok: false, status }) };
+  const release = publishMemeProvider({
+    catalogIdentity: "local-fixture",
+    async keys() { return []; },
+    async info() { return undefined; },
+    async generate() { return undefined; },
+    async preview() { return undefined; },
+  });
   try {
     Bun.env.LOTUS_MEME_CONFIG_DIR = directory;
-    delete Bun.env.LOTUS_MEME_SERVER_URL;
-    const { configInfo: form } = supportGuoba();
-    expect(form.getConfigData().server).toMatchObject({ backend: "auto", url: "" });
-    expect(usesManagedMemeServer()).toBe(true);
-    await writeFile(path, old);
-    expect(form.getConfigData().server).toMatchObject({ backend: "auto", url: "https://meme.pippi.top/pippi" });
-    expect(usesManagedMemeServer()).toBe(false);
-    expect(remoteServiceUrl()).toBe("https://meme.pippi.top/pippi");
-    expect(form.setConfigData({ "server.backend": "remote", "server.url": "https://example.test/meme/" }, { Result }))
-      .toEqual({ ok: true });
-    expect(usesManagedMemeServer()).toBe(false);
-    expect(remoteServiceUrl()).toBe("https://example.test/meme/");
-    expect(generationServer()).toMatchObject({ protocol: "legacy", timeout: 9_000 });
-    expect(await readFile(path, "utf8")).toContain('# 旧默认服务\ntimeout: 9\n其他字段: 保留');
-    const owner = { isMaster: true };
-    expect(handleMemeSettings("#表情合成设置 服务来源", owner)).toBe("服务来源：远端服务");
-    expect(handleMemeSettings("#表情合成设置 服务来源 本机托管", owner)).toBe("服务来源：本机托管（可运行 #表情更新资源 同步目录。）");
-    expect(usesManagedMemeServer()).toBe(true);
-    expect(form.getConfigData().server).toMatchObject({ backend: "managed", url: "https://example.test/meme/" });
-    expect(form.setConfigData({ "server.managedTimeout": 18 }, { Result })).toEqual({ ok: true });
-    expect(form.getConfigData().server).toMatchObject({ timeout: 9, managedTimeout: 18 });
     Bun.env.LOTUS_MEME_SERVER_URL = "http://127.0.0.1:1/remote";
-    expect(usesManagedMemeServer()).toBe(false);
-    expect(remoteServiceUrl()).toBe("http://127.0.0.1:1/remote");
-    Bun.env.LOTUS_MEME_SERVER_URL = "";
-    expect(usesManagedMemeServer()).toBe(false);
-    expect(generationServer()).toBeUndefined();
-    delete Bun.env.LOTUS_MEME_SERVER_URL;
-    expect(form.setConfigData({ "server.backend": "remote", "server.url": "" }, { Result })).toEqual({ ok: true });
-    expect(usesManagedMemeServer()).toBe(false);
-    expect(generationServer()).toBeUndefined();
+    await writeFile(path, legacy);
+    const { configInfo: form } = supportGuoba();
+    expect(form.getConfigData().server).toEqual({ managedTimeout: 30 });
+    expect(memeProvider()?.timeout).toBe(30_000);
+    expect(form.setConfigData({ "server.backend": "remote", "server.url": "https://example.test" }, { Result }))
+      .toEqual({ ok: false, status: 422 });
+    expect(await readFile(path, "utf8")).toBe(legacy);
+    expect(form.setConfigData({ "server.managedTimeout": 18 }, { Result })).toEqual({ ok: true });
+    expect(form.getConfigData().server).toEqual({ managedTimeout: 18 });
+    expect(memeProvider()?.timeout).toBe(18_000);
+    expect(await readFile(path, "utf8")).toBe(legacy + "managedTimeout: 18\n");
   } finally {
+    release();
     if (previousDirectory === undefined) delete Bun.env.LOTUS_MEME_CONFIG_DIR;
     else Bun.env.LOTUS_MEME_CONFIG_DIR = previousDirectory;
     if (previousUrl === undefined) delete Bun.env.LOTUS_MEME_SERVER_URL;
@@ -271,9 +258,10 @@ test("面板与聊天设置隐藏下线模板，拒绝通过旧键和别名再�
     Bun.env.LOTUS_MEME_DB = join(directory, "catalog.sqlite");
     const database = new Database(Bun.env.LOTUS_MEME_DB);
     try {
-      database.exec("CREATE TABLE meme (key TEXT, keyWords TEXT, tags TEXT)");
-      const insert = database.query("INSERT INTO meme VALUES (?, ?, ?)");
-      insert.run("old_custom_key", JSON.stringify(["陈旧别名", "共享别名"]), JSON.stringify(["鸣潮"]));
+      database.exec(`CREATE TABLE lotus_meme_native (key TEXT, keyWords TEXT, tags TEXT);
+        CREATE TABLE lotus_catalog_denied_keys (key TEXT PRIMARY KEY);
+        INSERT INTO lotus_catalog_denied_keys VALUES ('old_custom_key');`);
+      const insert = database.query("INSERT INTO lotus_meme_native VALUES (?, ?, ?)");
       insert.run("ordinary_cat", JSON.stringify(["共享别名"]), JSON.stringify(["猫"]));
     } finally {
       database.close();

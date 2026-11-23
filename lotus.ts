@@ -1,8 +1,8 @@
 import type { Database } from "bun:sqlite";
 import type { CatalogCardRow } from "./catalog-card.ts";
 import type { LoadMemeInfoCard } from "./info-card-runtime.ts";
-import { activeCatalogTable, catalogVersion, nativeCatalogTable, openMemeCatalogReader } from "./catalog-file.ts";
-import { catalogPolicy, generationServer, sameGenerationServer } from "./catalog-policy.ts";
+import { catalogVersion, openMemeCatalogReader } from "./catalog-file.ts";
+import { catalogPolicy, memeProvider, sameMemeProvider } from "./catalog-policy.ts";
 import { argsTypeFromParams, parseGenerationArgs, type PresetArgument } from "./generation-args.ts";
 import { buildGenerationBody, type GenerationInput } from "./generation.ts";
 import { generateMemeReply, requestMemePreview, type FallbackContext } from "./generate-reply.ts";
@@ -10,13 +10,13 @@ import { generateMemeReply, requestMemePreview, type FallbackContext } from "./g
 import { handleMemeSettings, isMemeOwner } from "./settings.ts";
 import { helpReference, presentMemeReference } from "./reference-card.ts";
 import { presentMemeVersion } from "./version-card.ts";
-import { handleCatalogUpdate, prepareNativeCatalog } from "./catalog-update.ts";
+import { handleCatalogUpdate, prepareLocalCatalog } from "./catalog-update.ts";
 import { startCatalogRuntime, type MemeRuntime } from "./catalog-runtime.ts";
 import { readMemeUsage } from "./usage.ts";
 import { createMemePokeHandler } from "./poke.ts";
 import { memeCatalogExclusions } from "./catalog-exclusions.ts";
 import { excludedMemeTemplateMessage, isExcludedMemeTemplate } from "./template-policy.ts";
-import { createManagedMemeBackend, matchesManagedMemeTrigger, nativeShortcutPattern } from "./backend-lifecycle.ts";
+import { createLocalMemeBackend, matchesLocalMemeTrigger, nativeShortcutPattern } from "./backend-lifecycle.ts";
 import type { MemeTemplateShortcut } from "./builtin-template.ts";
 
 export { createProfileLikeImageRenderer } from "./profile-like-image.ts";
@@ -31,6 +31,7 @@ const helpCommand = /^#?(?:表情(?:合成)?|meme)(?:命令|帮助|菜单|help|�
 const versionCommand = /^#?(?:表情(?:合成)?|meme)(?:版本|版本信息|version|versioninfo|(?:插件)?更新日志)$/iu;
 const packageUpdateCommand = /^#?(?:表情(?:合成)?|meme)插件(强制)?更新$/iu;
 const usageCommand = /^#?(?:表情|meme)(?:调用)?统计$/iu;
+const catalogUnavailable = "无法读取表情目录，请检查本机表情目录配置。";
 
 // A legacy disable entry may be a stored key or one of its keywords.
 const retainedTemplates = `meme.key NOT IN (SELECT value FROM json_each(?1, '$.excluded'))`;
@@ -101,7 +102,7 @@ function withCatalog<T>(query: (db: Database) => T): T | string {
     db = openMemeCatalogReader();
     return query(db);
   } catch {
-    return "无法读取表情目录，请检查 LOTUS_MEME_DB 和本机导入的旧数据库。";
+    return catalogUnavailable;
   } finally {
     db?.close();
   }
@@ -251,7 +252,7 @@ function findPreset(db: Database, input: string, filters: string): TriggerMatch 
 }
 
 function nativeCatalogShortcuts(db: Database): boolean {
-  return activeCatalogTable() === nativeCatalogTable && !!db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'lotus_catalog_provider'").get() &&
+  return !!db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'lotus_catalog_provider'").get() &&
     !!db.query("SELECT 1 FROM lotus_catalog_provider WHERE id = 1 AND identity LIKE 'lotus-skia:%'").get();
 }
 
@@ -368,7 +369,7 @@ async function details(argument: string, context?: CatalogContext, signal?: Abor
   if (isExcludedMemeTemplate(key)) return excludedMemeTemplateMessage;
 
   let version: string;
-  try { version = catalogVersion(); } catch { return "无法读取表情目录，请检查本机导入的旧数据库。"; }
+  try { version = catalogVersion(); } catch { return catalogUnavailable; }
   const entry = queryCatalog(context?.user_id, (db, filters, hidden) => {
     let row = db.query<CatalogDetails, [string, string]>(
       `SELECT * ${visibleCatalog} AND key = ?`,
@@ -415,17 +416,17 @@ async function details(argument: string, context?: CatalogContext, signal?: Abor
     "预览图片：",
   ].join("\n");
   const failure = `${text}\n预览图片加载失败`;
-  let server: ReturnType<typeof generationServer>;
-  try { server = generationServer(); } catch { return failure; }
-  if (!server) return failure;
-  const preview = await requestMemePreview(row.key, server, signal);
+  let provider: ReturnType<typeof memeProvider>;
+  try { provider = memeProvider(); } catch { return failure; }
+  if (!provider) return failure;
+  const preview = await requestMemePreview(row.key, provider, signal);
   if (signal?.aborted) return;
   const policy = currentPolicy(context?.user_id);
   if (typeof policy === "string") return policy;
   if ([row.key, ...aliases].some(name => policy.hidden.includes(name))) return excludedMemeTemplateMessage;
   try {
     if (version !== catalogVersion()) return "表情目录已更新，请重新查看详情。";
-    if (!sameGenerationServer(server, generationServer())) return failure;
+    if (!sameMemeProvider(provider, memeProvider())) return failure;
   } catch { return failure; }
   return {
     type: "quoted" as const,
@@ -542,7 +543,7 @@ async function usageReport(context: CatalogContext, loadInfoCard?: LoadMemeInfoC
 
 function withReadyCatalog<T>(context: CatalogContext | undefined, signal: AbortSignal | undefined, read: () => T) {
   if (signal?.aborted) return;
-  const pending = typeof currentPolicy(context?.user_id) === "string" ? undefined : prepareNativeCatalog(signal);
+  const pending = typeof currentPolicy(context?.user_id) === "string" ? undefined : prepareLocalCatalog(signal);
   return pending ? pending.then(() => signal?.aborted ? undefined : read()) : read();
 }
 
@@ -582,27 +583,25 @@ async function memeFallback(message: string, context: FallbackContext, listCatal
   const update = handleCatalogUpdate(message, context, signal);
   if (update !== undefined) return update;
   if (context.user_id === undefined || context.message_type === "terminal") return;
-  let server: ReturnType<typeof generationServer>;
+  let provider: ReturnType<typeof memeProvider>;
   try {
-    server = generationServer();
+    provider = memeProvider();
   } catch {
     return;
   }
-  if (!server) return;
+  if (!provider) return;
   const random = randomMemeCommand.test(input);
-  if (random || (server.protocol === "native" && matchesManagedMemeTrigger(server, input))) {
+  if (random || matchesLocalMemeTrigger(provider, input)) {
     const policy = currentPolicy(context.user_id, true);
     if (typeof policy === "string") return random ? policy : undefined;
     if (policy.forceSharp && !input.startsWith("#")) return;
 
-    if (server.protocol === "native") {
-      const pending = prepareNativeCatalog(signal);
-      if (pending) {
-        await pending;
-        if (signal?.aborted || !sameGenerationServer(server, generationServer())) return;
-      }
+    const pending = prepareLocalCatalog(signal);
+    if (pending) {
+      await pending;
+      if (signal?.aborted || !sameMemeProvider(provider, memeProvider())) return;
     }
-    if (random) return generateMemeReply(context, (media) => prepareRandomMeme(input, media), server, signal);
+    if (random) return generateMemeReply(context, (media) => prepareRandomMeme(input, media), provider, signal);
   }
   const match = resolveTrigger(message, context, true);
   if (!match || typeof match === "string") return;
@@ -615,7 +614,7 @@ async function memeFallback(message: string, context: FallbackContext, listCatal
     const names = [match.row.key, match.keyword, ...keywords(match.row.keyWords)];
     if (names.some((name) => policy.hidden.includes(name))) return;
     return prepareResolvedRequest(match, input);
-  }, server, signal);
+  }, provider, signal);
 }
 
 export default createMemeCommands();
@@ -623,7 +622,7 @@ export default createMemeCommands();
 export function createModule({ signal, memeRuntime }: { readonly signal: AbortSignal; readonly memeRuntime?: MemeRuntime }) {
   const lifecycle = new AbortController();
   const active = AbortSignal.any([signal, lifecycle.signal]);
-  const backend = createManagedMemeBackend(active);
+  const backend = createLocalMemeBackend(active);
   const stop = memeRuntime && startCatalogRuntime(memeRuntime, active, backend);
   return {
     ...createMemeCommands(active, memeRuntime?.loadInfoCard),

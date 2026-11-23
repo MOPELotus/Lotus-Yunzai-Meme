@@ -2,13 +2,13 @@ import { join } from "node:path";
 import { createMemeResources } from "./backend-resources.ts";
 import type { MemeTemplate, MemeTemplateInput } from "./builtin-template.ts";
 import {
-  configDirectory, publishManagedMemeServer, safeCatalogKey, usesManagedMemeServer, type NativeMemeServer,
+  configDirectory, publishMemeProvider, safeCatalogKey, type LocalMemeProvider,
 } from "./catalog-policy.ts";
 import { isExcludedMemeTemplate } from "./template-policy.ts";
 
 const maxOutputBytes = 8 * 1024 * 1024;
 
-const nativeTriggers = new WeakMap<NativeMemeServer["generate"], {
+const nativeTriggers = new WeakMap<LocalMemeProvider["generate"], {
   readonly words: readonly string[];
   readonly patterns: readonly RegExp[];
 }>();
@@ -24,10 +24,10 @@ export function nativeShortcutPattern(template: string, source: string) {
   return nativeShortcutPatterns.find(entry => entry.template === template && entry.source === source)?.pattern;
 }
 
-export function matchesManagedMemeTrigger(server: NativeMemeServer, message: string): boolean {
+export function matchesLocalMemeTrigger(provider: LocalMemeProvider, message: string): boolean {
   const input = message.replace(/^#/u, "");
   const normalized = input.toLowerCase();
-  const triggers = nativeTriggers.get(server.generate);
+  const triggers = nativeTriggers.get(provider.generate);
   return !!triggers && (triggers.words.some(word => normalized.startsWith(word)) ||
     triggers.patterns.some(pattern => pattern.test(input)));
 }
@@ -58,7 +58,7 @@ function validCount(actual: number, min: number, max: number) {
   return actual >= min && actual <= max;
 }
 
-export function createManagedMemeBackend(signal: AbortSignal, entries?: readonly MemeTemplate[]) {
+export function createLocalMemeBackend(signal: AbortSignal, entries?: readonly MemeTemplate[]) {
   const lifetime = new AbortController();
   const active = AbortSignal.any([signal, lifetime.signal]);
   let withdraw: (() => void) | undefined;
@@ -68,9 +68,7 @@ export function createManagedMemeBackend(signal: AbortSignal, entries?: readonly
     if (active.aborted || withdraw) return;
     if (entries) return publish(entries);
     starting ??= import("./templates/index.ts").then(({ builtinMemeTemplates }) => publish(builtinMemeTemplates))
-      .catch((error) => {
-        if (usesManagedMemeServer()) throw error;
-      }).finally(() => { starting = undefined; });
+      .finally(() => { starting = undefined; });
     return starting;
   }
 
@@ -80,8 +78,8 @@ export function createManagedMemeBackend(signal: AbortSignal, entries?: readonly
     if (!registry.size) return;
     const resources = createMemeResources(join(configDirectory(), "..", "backend", "resources"), active);
     const keys = [...registry.keys()];
-    const catalogIdentity = `lotus-skia:${Bun.hash(JSON.stringify([...registry.values()].map(({ info }) => info))).toString(16)}`;
-    const managed = {
+    const catalogIdentity = `lotus-skia:local:${Bun.hash(JSON.stringify([...registry.values()].map(({ info }) => info))).toString(16)}`;
+    const provider = {
       catalogIdentity,
       async keys(caller?: AbortSignal) {
         active.throwIfAborted();
@@ -118,8 +116,8 @@ export function createManagedMemeBackend(signal: AbortSignal, entries?: readonly
         else if (key) words.add(key.toLowerCase());
       }
     }
-    nativeTriggers.set(managed.generate, { words: [...words], patterns: [...patterns] });
-    withdraw = publishManagedMemeServer(managed);
+    nativeTriggers.set(provider.generate, { words: [...words], patterns: [...patterns] });
+    withdraw = publishMemeProvider(provider);
 
     async function run(render: NonNullable<MemeTemplate["preview"]>, caller?: AbortSignal) {
       const requestSignal = caller ? AbortSignal.any([active, caller]) : active;

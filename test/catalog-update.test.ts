@@ -1,8 +1,9 @@
 import { Database } from "bun:sqlite";
 import { expect, test } from "bun:test";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { publishMemeProvider } from "../catalog-policy.ts";
 import module, { resolveMemeTrigger } from "../lotus.ts";
 
 test("旧资源更新命令按事务同步目录和预设", async () => {
@@ -15,28 +16,28 @@ test("旧资源更新命令按事务同步目录和预设", async () => {
   let word = "旧素材";
   let gate: { readonly started: ReturnType<typeof Promise.withResolvers<void>>;
     readonly release: ReturnType<typeof Promise.withResolvers<void>> } | undefined;
-  const fixture = Bun.serve({
-    hostname: "127.0.0.1", port: 0,
-    async fetch(request) {
-      const path = new URL(request.url).pathname;
-      requests.push(path);
-      if (path === "/fixture/memes/keys") return Response.json(keys);
-      const match = /^\/fixture\/memes\/([^/]+)\/info$/u.exec(path);
-      const key = match?.[1];
-      if (!key || !keys.includes(key) || fail && key === "new") return new Response(null, { status: 503 });
+  const fixture = {
+    catalogIdentity: "catalog-update-fixture",
+    async keys() { requests.push("keys"); return keys; },
+    async info(key: string) {
+      requests.push(key);
+      if (!keys.includes(key) || fail && key === "new") throw new Error("目录读取失败");
       if (gate && key === "new") {
         gate.started.resolve();
         await gate.release.promise;
       }
-      return Response.json({
+      return {
         key, keywords: [key === "ba_say" ? word : key], tags: [],
         params_type: {
           min_images: 0, max_images: 0, min_texts: 0, max_texts: 0,
           args_type: { args_model: { properties: { character: { type: "integer" } } } },
         },
-      });
+      };
     },
-  });
+    async generate() { return undefined; },
+    async preview() { return undefined; },
+  };
+  let withdraw: (() => void) | undefined;
   const owner = { message_type: "private" as const, user_id: 10001, isMaster: false,
     isBotMaster: (userId: number) => userId === 10001 };
   const update = (force = false, name = "表情合成") =>
@@ -44,9 +45,10 @@ test("旧资源更新命令按事务同步目录和预设", async () => {
   try {
     Bun.env.LOTUS_MEME_CONFIG_DIR = directory;
     Bun.env.LOTUS_MEME_DB = filename;
-    delete Bun.env.LOTUS_MEME_SERVER_URL;
-    expect(await update()).toBe("请先配置表情合成服务。");
-    Bun.env.LOTUS_MEME_SERVER_URL = new URL("/fixture/", fixture.url).href;
+    Bun.env.LOTUS_MEME_SERVER_URL = "http://127.0.0.1:1/ignored";
+    await writeFile(join(directory, "server.yaml"), "backend: remote\nurl: ignored-invalid-url\n");
+    expect(await update()).toBe("本机表情模板尚未就绪。");
+    withdraw = publishMemeProvider(fixture);
 
     for (const former of ["#清语表情更新资源", "#meme-plugin强制更新资源", "#清语meme更新数据"]) {
       expect(await module.fallback(former, owner)).toBeUndefined();
@@ -74,16 +76,18 @@ test("旧资源更新命令按事务同步目录和预设", async () => {
     gate = { started: Promise.withResolvers<void>(), release: Promise.withResolvers<void>() };
     const pending = update();
     await gate.started.promise;
-    Bun.env.LOTUS_MEME_SERVER_URL = new URL("/new-provider/", fixture.url).href;
+    expect(await update()).toBe("表情包数据更新中。");
+    const replaced = publishMemeProvider({ ...fixture, async generate() { return new Uint8Array([1]); } });
     gate.release.resolve();
     expect(await pending).toContain("更新失败");
     expect(await readFile(filename)).toEqual(beforeFailure);
-    Bun.env.LOTUS_MEME_SERVER_URL = new URL("/fixture/", fixture.url).href;
+    replaced();
+    withdraw = publishMemeProvider(fixture);
     gate = undefined;
     word = "新素材";
     requests.length = 0;
     expect(await update(false, "表情")).toContain("更新 1 项，移除 1 项");
-    expect(requests).toEqual(["/fixture/memes/keys", "/fixture/memes/new/info"]);
+    expect(requests).toEqual(["keys", "new"]);
     expect(resolveMemeTrigger("#旧素材")).toBeDefined();
     expect(resolveMemeTrigger("#removed")).toBeUndefined();
     expect(await update(true, "meme")).toContain("更新 2 项，移除 0 项");
@@ -101,7 +105,7 @@ test("旧资源更新命令按事务同步目录和预设", async () => {
     if (env.config === undefined) delete Bun.env.LOTUS_MEME_CONFIG_DIR; else Bun.env.LOTUS_MEME_CONFIG_DIR = env.config;
     if (env.file === undefined) delete Bun.env.LOTUS_MEME_DB; else Bun.env.LOTUS_MEME_DB = env.file;
     if (env.server === undefined) delete Bun.env.LOTUS_MEME_SERVER_URL; else Bun.env.LOTUS_MEME_SERVER_URL = env.server;
-    await fixture.stop(true);
+    withdraw?.();
     await rm(directory, { recursive: true, force: true });
   }
 });

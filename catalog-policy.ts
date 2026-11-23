@@ -60,7 +60,6 @@ export const defaultPokeCooldown = 20;
 export const maxPokeProbability = 100;
 export const maxPokeCooldown = 3_600;
 export const defaultAvatarCache = true;
-export const defaultRemoteMemeTimeout = 5;
 export const defaultManagedMemeTimeout = 30;
 
 export function pokeSettings() {
@@ -103,27 +102,12 @@ export function memeUsageEnabled() {
 }
 
 
-export function parseGenerationServerUrl(value: unknown): URL {
-  if (typeof value !== "string") throw new Error("无效的表情服务地址");
-  const base = new URL(value);
-  if ((base.protocol !== "https:" && base.protocol !== "http:") ||
-      base.username || base.password || base.search || base.hash) throw new Error("无效的表情服务地址");
-  return base;
-}
-
 export function safeCatalogKey(value: unknown): value is string {
   return typeof value === "string" && value !== "." && value !== ".." && /^[^/\\\s\x00-\x1f]{1,255}$/u.test(value);
 }
 
-export interface LegacyMemeServer {
-  readonly base: URL;
+export interface LocalMemeProvider {
   readonly timeout: number;
-  readonly protocol: "legacy";
-}
-
-export interface NativeMemeServer {
-  readonly timeout: number;
-  readonly protocol: "native";
   readonly catalogIdentity: string;
   keys(signal?: AbortSignal): Promise<readonly string[]>;
   info(key: string, signal?: AbortSignal): Promise<unknown>;
@@ -131,62 +115,27 @@ export interface NativeMemeServer {
   preview(key: string, signal?: AbortSignal): Promise<Uint8Array<ArrayBuffer> | undefined>;
 }
 
-let readyManagedServer: Omit<NativeMemeServer, "timeout" | "protocol"> | undefined;
+let localRenderer: Omit<LocalMemeProvider, "timeout"> | undefined;
 
-export function publishManagedMemeServer(server: NonNullable<typeof readyManagedServer>) {
-  readyManagedServer = server;
+export function publishMemeProvider(provider: NonNullable<typeof localRenderer>) {
+  localRenderer = provider;
   return () => {
-    if (readyManagedServer === server) readyManagedServer = undefined;
+    if (localRenderer === provider) localRenderer = undefined;
   };
 }
 
-function serverSettings() {
-  const settings = readConfig(configDirectory(), "server.yaml");
-  const explicitUrl = Bun.env.LOTUS_MEME_SERVER_URL;
-  const mode = settings.backend ?? "auto";
-  if (mode !== "auto" && mode !== "managed" && mode !== "remote") throw new Error("无效的表情服务运行方式");
-  const url = explicitUrl ?? settings.url;
-  const hasUrl = url !== undefined && url !== null && url !== "";
-  const base = hasUrl && (mode !== "managed" || explicitUrl !== undefined) ? parseGenerationServerUrl(url) : undefined;
-  const managed = explicitUrl === undefined && (mode === "managed" || (mode === "auto" && !base));
-  const timeout = managed ? settings.managedTimeout ?? defaultManagedMemeTimeout :
-    settings.timeout ?? defaultRemoteMemeTimeout;
+export function memeProvider(): LocalMemeProvider | undefined {
+  if (!localRenderer) return;
+  const timeout = readConfig(configDirectory(), "server.yaml").managedTimeout ?? defaultManagedMemeTimeout;
   if (typeof timeout !== "number" || !Number.isFinite(timeout) || timeout <= 0 || timeout > 120) {
-    throw new Error("无效的表情服务请求超时");
+    throw new Error("无效的表情合成超时");
   }
-  return { managed, base, timeout: Math.ceil(timeout * 1_000) };
+  return { ...localRenderer, timeout: Math.ceil(timeout * 1_000) };
 }
 
-export function usesManagedMemeServer() {
-  return serverSettings().managed;
-}
-
-export function generationServer(): LegacyMemeServer | NativeMemeServer | undefined {
-  const { managed, base, timeout } = serverSettings();
-  if (managed) return readyManagedServer && { ...readyManagedServer, timeout, protocol: "native" };
-  if (base) return { base, timeout, protocol: "legacy" };
-}
-
-export function sameGenerationServer(
-  first: LegacyMemeServer | NativeMemeServer | undefined,
-  second: LegacyMemeServer | NativeMemeServer | undefined,
+export function sameMemeProvider(
+  first: LocalMemeProvider | undefined,
+  second: LocalMemeProvider | undefined,
 ): boolean {
-  if (first?.protocol === "native") return second?.protocol === "native" && first.generate === second.generate;
-  if (first?.protocol === "legacy") return second?.protocol === "legacy" && first.base.href === second.base.href;
-  return second === undefined;
-}
-
-export function catalogRefreshSchedule(): string | undefined {
-  const settings = readConfig(configDirectory(), "other.yaml");
-  if (!flag(settings.autoUpdateRes, true)) return;
-  return normalizeCatalogCron(settings.autoUpdateResCron ?? "0 0 2 * * ?");
-}
-
-export function normalizeCatalogCron(cron: unknown): string {
-  if (typeof cron !== "string") throw new Error("无效的表情目录更新时间");
-  const fields = cron.trim().split(/\s+/u);
-  if (fields.length === 5) fields.unshift("0");
-  if (fields.length !== 6) throw new Error("无效的表情目录更新时间");
-  for (const index of [3, 5]) if (fields[index] === "?") fields[index] = "*";
-  return fields.join(" ");
+  return first?.generate === second?.generate;
 }

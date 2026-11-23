@@ -3,14 +3,13 @@ import { expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createManagedMemeBackend } from "../backend-lifecycle.ts";
-import { nativeCatalogTable, openMemeCatalogReader } from "../catalog-file.ts";
-import { generationServer, sameGenerationServer } from "../catalog-policy.ts";
-import { readMemeUsage, recordMemeUsage } from "../usage.ts";
+import { createLocalMemeBackend } from "../backend-lifecycle.ts";
+import { nativeCatalogTable } from "../catalog-file.ts";
+import { memeProvider, sameMemeProvider } from "../catalog-policy.ts";
 import type { MemeTemplate } from "../builtin-template.ts";
 import { excludedMemeTemplateMessage } from "../template-policy.ts";
 
-test("内置表情在就绪后直接生成，排除项不会注册或读取资源，显式远端和停止生效", async () => {
+test("内置表情在就绪后直接生成，排除项不会注册或读取资源，旧远端配置无效且停止会撤回本机服务", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-builtin-"));
   const config = join(directory, "config");
   await mkdir(config);
@@ -43,12 +42,12 @@ test("内置表情在就绪后直接生成，排除项不会注册或读取资�
   };
   Bun.env.LOTUS_MEME_CONFIG_DIR = config;
   delete Bun.env.LOTUS_MEME_SERVER_URL;
-  const backend = createManagedMemeBackend(lifetime.signal, [allowed, excluded]);
+  const backend = createLocalMemeBackend(lifetime.signal, [allowed, excluded]);
   try {
-    expect(generationServer()).toBeUndefined();
+    expect(memeProvider()).toBeUndefined();
     backend.ensure();
-    const builtin = generationServer();
-    if (builtin?.protocol !== "native") throw new Error("内置表情未就绪");
+    const builtin = memeProvider();
+    if (!builtin) throw new Error("内置表情未就绪");
     expect(await builtin.keys()).toEqual(["allowed"]);
     expect(await builtin.info("allowed")).toEqual(allowed.info);
     expect(await builtin.info("jinhsi")).toBeUndefined();
@@ -64,18 +63,14 @@ test("内置表情在就绪后直接生成，排除项不会注册或读取资�
     expect(called).toBe(1);
     expect(await Bun.file(join(directory, "backend", "resources", "resources.json")).exists()).toBe(false);
 
-    await writeFile(join(config, "server.yaml"), "backend: auto\nurl: https://meme.pippi.top/pippi/\n");
-    expect(generationServer()).toMatchObject({ protocol: "legacy", base: new URL("https://meme.pippi.top/pippi/") });
-    await writeFile(join(config, "server.yaml"), "backend: managed\nurl: https://meme.pippi.top/pippi/\n");
-    expect(sameGenerationServer(builtin, generationServer())).toBe(true);
-    Bun.env.LOTUS_MEME_SERVER_URL = "http://example.invalid/meme/";
-    expect(generationServer()).toMatchObject({ protocol: "legacy", base: new URL("http://example.invalid/meme/") });
-    expect(sameGenerationServer(builtin, generationServer())).toBe(false);
-    backend.ensure();
-    delete Bun.env.LOTUS_MEME_SERVER_URL;
-    expect(sameGenerationServer(builtin, generationServer())).toBe(true);
+    await writeFile(join(config, "server.yaml"), `backend: remote\nurl: "://ignored"\ntimeout: invalid\nmanagedTimeout: 9\n`);
+    Bun.env.LOTUS_MEME_SERVER_URL = "invalid and deliberately ignored";
+    expect(memeProvider()?.timeout).toBe(9000);
+    expect(sameMemeProvider(builtin, memeProvider())).toBe(true);
+    expect(await memeProvider()?.generate("allowed", body)).toEqual(unchanged);
+    expect(called).toBe(2);
     lifetime.abort();
-    expect(generationServer()).toBeUndefined();
+    expect(memeProvider()).toBeUndefined();
     await expect(builtin.generate("allowed", body)).rejects.toThrow();
   } finally {
     backend.dispose();
@@ -105,7 +100,7 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
   const speechless = legacyPhotoCaptionTemplates.find(template => template.info.key === "speechless")!;
   const png = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
   let coldCaption: readonly string[] | undefined;
-  const backend = createManagedMemeBackend(signal, [{
+  const backend = createLocalMemeBackend(signal, [{
     info: {
       key: "always",
       keywords: ["一直"],
@@ -128,8 +123,7 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
   }]);
   let disposeHost: (() => Promise<void>) | undefined;
   try {
-    const { runAutomaticCatalogRefresh } = await import("../catalog-update.ts");
-    const { createModule, prepareMemeRequest, resolveMemeTrigger } = await import("../lotus.ts");
+      const { createModule, prepareMemeRequest, resolveMemeTrigger } = await import("../lotus.ts");
     const host = createModule({ signal });
     disposeHost = host.dispose;
     backend.ensure();
@@ -177,21 +171,19 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
     expect(resolveMemeTrigger("#一直一直")).toBeUndefined();
     expect(resolveMemeTrigger("#一直")).toEqual({ key: "always", keyword: "一直", text: "" });
 
-    const requests: string[] = [];
-    const legacy = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch(request) {
-      const route = new URL(request.url).pathname;
-      requests.push(route);
-      if (route === "/memes/keys") return Response.json(["always"]);
-      if (route === "/memes/always/info") return Response.json({
-        key: "always", keywords: ["远端别名"], params_type: { min_images: 0, max_images: 0, min_texts: 0, max_texts: 0 },
-      });
-      return new Response(null, { status: 404 });
+    let requests = 0;
+    const legacy = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch() {
+      requests++;
+      return new Response("unexpected", { status: 591 });
     } });
     try {
       Bun.env.LOTUS_MEME_SERVER_URL = legacy.url.href;
-      await runAutomaticCatalogRefresh(signal);
-      expect(requests).toEqual(["/memes/keys", "/memes/always/info"]);
-      expect(resolveMemeTrigger("#远端别名")).toMatchObject({ key: "always" });
+      await writeFile(join(config, "server.yaml"), `backend: remote\nurl: ${legacy.url.href}\n`);
+      expect(await host.fallback("#表情强制更新资源", {
+        message_type: "private", user_id: 1234, isMaster: true, isBotMaster: () => true,
+      })).toContain("更新 4 项");
+      expect(requests).toBe(0);
+      expect(resolveMemeTrigger("#一直")).toMatchObject({ key: "always" });
       expect(resolveMemeTrigger("#一直一直")).toBeUndefined();
     } finally {
       await legacy.stop(true);
@@ -209,108 +201,7 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
 });
 
 
-test("本机合成与原目录各自同步，旧服务离线切回仍保留预设、统计及干净旧目录", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "lotus-meme-provider-switch-"));
-  const config = join(directory, "config");
-  const file = join(directory, "catalog.db");
-  const serverYaml = join(config, "server.yaml");
-  const env = ["LOTUS_MEME_CONFIG_DIR", "LOTUS_MEME_DB", "LOTUS_MEME_SERVER_URL"] as const;
-  const previous = env.map(name => Bun.env[name]);
-  const signal = new AbortController().signal;
-  const parameters = { min_images: 0, max_images: 0, min_texts: 0, max_texts: 0 };
-  const keys = ["legacy_only", "shared"];
-  let unavailable = false;
-  const remote = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch(request) {
-    if (unavailable) return new Response(null, { status: 521 });
-    const route = new URL(request.url).pathname;
-    if (route === "/memes/keys") return Response.json(keys);
-    const key = route.split("/")[2];
-    const alias = key === "legacy_only" ? "旧独有" : key === "shared" ? "旧共用" : "远端恢复新增";
-    return Response.json({ key, keywords: [alias], params_type: parameters });
-  } });
-  const backend = createManagedMemeBackend(signal, [{
-    info: { key: "shared", keywords: ["本机共用"], params_type: parameters },
-    async render() { return Uint8Array.of(1); },
-  }]);
-  try {
-    await mkdir(config);
-    Bun.env.LOTUS_MEME_CONFIG_DIR = config;
-    Bun.env.LOTUS_MEME_DB = file;
-    delete Bun.env.LOTUS_MEME_SERVER_URL;
-    const { runAutomaticCatalogRefresh } = await import("../catalog-update.ts");
-    const { resolveMemeTrigger } = await import("../lotus.ts");
-    const select = (mode: "remote" | "managed") =>
-      writeFile(serverYaml, `backend: ${mode}
-url: ${remote.url.href}
-`);
-
-    await select("remote");
-    backend.ensure();
-    await runAutomaticCatalogRefresh(signal, true);
-    const legacy = new Database(file);
-    try {
-      legacy.exec('CREATE TABLE stat (key TEXT PRIMARY KEY, "all" INTEGER NOT NULL)');
-      legacy.query("INSERT INTO stat VALUES ('shared', 6)").run();
-      legacy.query("INSERT INTO preset VALUES (?, 'legacy_only', 'mode', 'keep', '', '')").run(JSON.stringify("旧专用预设"));
-      legacy.query(`INSERT INTO meme SELECT 'unexpected_old_brand', '{}', '["退役素材"]', params, min_texts, max_texts,
-        min_images, max_images, defText, args_type, '["鸣潮"]', createdAt, updatedAt FROM meme WHERE key = 'legacy_only'`).run();
-    } finally {
-      legacy.close();
-    }
-    expect(resolveMemeTrigger("#旧独有")).toMatchObject({ key: "legacy_only" });
-    expect(resolveMemeTrigger("#旧专用预设")).toMatchObject({ key: "legacy_only" });
-    expect(resolveMemeTrigger("#退役素材")).toBeUndefined();
-
-    await select("managed");
-    await runAutomaticCatalogRefresh(signal, true);
-    expect(resolveMemeTrigger("#本机共用")).toMatchObject({ key: "shared" });
-    expect(resolveMemeTrigger("#旧独有")).toBeUndefined();
-    recordMemeUsage("shared", file);
-    const combined = openMemeCatalogReader();
-    try {
-      expect(readMemeUsage(combined).get("shared")).toBe(7);
-      expect(combined.query("SELECT key FROM main.meme ORDER BY key").all()).toEqual([{ key: "legacy_only" }, { key: "shared" }]);
-      expect(combined.query(`SELECT key FROM main.${nativeCatalogTable}`).all()).toEqual([{ key: "shared" }]);
-    } finally {
-      combined.close();
-    }
-
-    unavailable = true;
-    await select("remote");
-    expect(resolveMemeTrigger("#旧独有")).toMatchObject({ key: "legacy_only" });
-    expect(resolveMemeTrigger("#旧共用")).toMatchObject({ key: "shared" });
-    expect(resolveMemeTrigger("#本机共用")).toBeUndefined();
-    await expect(runAutomaticCatalogRefresh(signal)).rejects.toThrow();
-    await runAutomaticCatalogRefresh(signal, true);
-    expect(resolveMemeTrigger("#旧专用预设")).toMatchObject({ key: "legacy_only" });
-    expect(resolveMemeTrigger("#退役素材")).toBeUndefined();
-    const offline = openMemeCatalogReader();
-    try {
-      expect(readMemeUsage(offline).get("shared")).toBe(7);
-    } finally {
-      offline.close();
-    }
-
-    keys.push("recovered");
-    unavailable = false;
-    await runAutomaticCatalogRefresh(signal);
-    expect(resolveMemeTrigger("#远端恢复新增")).toMatchObject({ key: "recovered" });
-    await select("managed");
-    expect(resolveMemeTrigger("#本机共用")).toMatchObject({ key: "shared" });
-    expect(resolveMemeTrigger("#远端恢复新增")).toBeUndefined();
-  } finally {
-    backend.dispose();
-    await remote.stop(true);
-    for (const [index, name] of env.entries()) {
-      const value = previous[index];
-      if (value === undefined) delete Bun.env[name];
-      else Bun.env[name] = value;
-    }
-    await rm(directory, { recursive: true, force: true });
-  }
-});
-
-test("首次真正请求本机表情才建目录，远端等待与切换不会覆盖当前目录", async () => {
+test("首次实际使用时共用本机目录初始化，已取消的更新保留现有目录", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-hot-switch-"));
   const config = join(directory, "config");
   const file = join(directory, "catalog.db");
@@ -321,67 +212,33 @@ test("首次真正请求本机表情才建目录，远端等待与切换不会�
   const lifetime = new AbortController();
   const params = { min_images: 0, max_images: 0, min_texts: 0, max_texts: 0 };
   const png = Uint8Array.fromBase64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jR14AAAAASUVORK5CYII=");
-  const remoteStarted = Promise.withResolvers<void>();
-  const releaseRemote = Promise.withResolvers<void>();
-  let deferRemote = false;
-  const remote = Bun.serve({ hostname: "127.0.0.1", port: 0, async fetch(request) {
-    const path = new URL(request.url).pathname;
-    if (path === "/memes/keys") {
-      if (deferRemote) {
-        remoteStarted.resolve();
-        await releaseRemote.promise;
-        return Response.json(["awaited_remote"]);
-      }
-      return Response.json(["old"]);
-    }
-    if (path === "/memes/old/") return new Response(png, { headers: { "Content-Type": "image/png" } });
-    const key = path.split("/")[2];
-    return Response.json({ key, keywords: [key === "old" ? "远端早已就绪" : "陈旧回包"], params_type: params });
-  } });
-  const backend = createManagedMemeBackend(lifetime.signal, [{
+  const backend = createLocalMemeBackend(lifetime.signal, [{
     info: { key: "instant", keywords: ["本机立刻合成"], params_type: params },
     async render() { return png; },
   }]);
-  const { createModule, resolveMemeTrigger } = await import("../lotus.ts");
-  const { runAutomaticCatalogRefresh } = await import("../catalog-update.ts");
-  const { publishManagedMemeServer } = await import("../catalog-policy.ts");
+  const { createModule } = await import("../lotus.ts");
+  const { publishMemeProvider } = await import("../catalog-policy.ts");
   const module = createModule({ signal: lifetime.signal });
 
   try {
     Bun.env.LOTUS_MEME_CONFIG_DIR = config;
     Bun.env.LOTUS_MEME_DB = file;
     delete Bun.env.LOTUS_MEME_SERVER_URL;
-    const select = (mode: "managed" | "remote") =>
-      writeFile(join(config, "server.yaml"), `backend: ${mode}\nurl: ${remote.url.href}\n`);
     const call = (message: string) => module.fallback(message, {
       message_type: "private", user_id: 1234, isMaster: true, isBotMaster: () => true, message,
     });
 
-    await select("remote");
     backend.ensure();
-    await runAutomaticCatalogRefresh(lifetime.signal, true);
-    deferRemote = true;
-    const remoteRefresh = runAutomaticCatalogRefresh(lifetime.signal).then(() => false, () => true);
-    await remoteStarted.promise;
-
-    await select("managed");
     expect(await call("这句话没匹配")).toBeUndefined();
     expect(await call("本机立刻合成")).toBeUndefined();
-    const before = new Database(file, { readonly: true });
-    try {
-      expect(before.query("SELECT 1 FROM sqlite_schema WHERE name = ?").get(nativeCatalogTable)).toBeNull();
-    } finally {
-      before.close();
-    }
+    expect(await Bun.file(file).exists()).toBeFalse();
 
     const generated = await Promise.all([call("#本机立刻合成"), call("#本机立刻合成")]);
     expect(generated).toEqual([{ type: "image", file: png }, { type: "image", file: png }]);
-    releaseRemote.resolve();
-    expect(await remoteRefresh).toBe(true);
 
     const nativeStarted = Promise.withResolvers<void>();
     const releaseNative = Promise.withResolvers<void>();
-    const fresh = publishManagedMemeServer({
+    const fresh = publishMemeProvider({
       catalogIdentity: "lotus-skia:late-native",
       async keys() { nativeStarted.resolve(); await releaseNative.promise; return ["late_native"]; },
       async info() { return { key: "late_native", keywords: ["迟到的本机"], params_type: params }; },
@@ -391,15 +248,11 @@ test("首次真正请求本机表情才建目录，远端等待与切换不会�
     try {
       const pending = call("#表情列表");
       await nativeStarted.promise;
-      await select("remote");
-      expect(await call("#远端早已就绪")).toEqual({ type: "image", file: png });
-      expect(resolveMemeTrigger("#陈旧回包")).toBeUndefined();
       await module.dispose();
       releaseNative.resolve();
       await pending;
       const preserved = new Database(file, { readonly: true });
       try {
-        expect(preserved.query("SELECT key FROM meme").all()).toEqual([{ key: "old" }]);
         expect(preserved.query(`SELECT key FROM ${nativeCatalogTable}`).all()).toEqual([{ key: "instant" }]);
       } finally {
         preserved.close();
@@ -409,10 +262,8 @@ test("首次真正请求本机表情才建目录，远端等待与切换不会�
       releaseNative.resolve();
     }
   } finally {
-    releaseRemote.resolve();
     await module.dispose();
     backend.dispose();
-    await remote.stop(true);
     for (const [index, name] of env.entries()) {
       const value = previous[index];
       if (value === undefined) delete Bun.env[name];

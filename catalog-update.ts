@@ -1,18 +1,17 @@
 import { Database } from "bun:sqlite";
 import { existsSync, linkSync, mkdirSync, rmSync } from "node:fs";
 import { dirname } from "node:path";
-import { activeCatalogTable, catalogPath, catalogVersion, nativeCatalogTable, type CatalogTable } from "./catalog-file.ts";
-import { generationServer, safeCatalogKey, sameGenerationServer } from "./catalog-policy.ts";
+import { catalogPath, catalogVersion, nativeCatalogTable } from "./catalog-file.ts";
+import { memeProvider, safeCatalogKey, sameMemeProvider } from "./catalog-policy.ts";
 import { isMemeOwner, type SettingsContext } from "./settings.ts";
 import { keepMemeCatalogDenials, scanMemeCatalogExclusions } from "./catalog-exclusions.ts";
 import { isExcludedMemeTemplate } from "./template-policy.ts";
 
 const command = /^#?(?:表情(?:合成)?|meme)(强制)?更新(?:表情包|资源|数据)?$/iu;
-const maxResponseBytes = 4 * 1024 * 1024;
 const batchSize = 6;
 
-const createTables = (table: CatalogTable) => `
-  CREATE TABLE IF NOT EXISTS ${table} (
+const createTables = `
+  CREATE TABLE IF NOT EXISTS ${nativeCatalogTable} (
     key TEXT NOT NULL PRIMARY KEY, info JSON NOT NULL, keyWords JSON NOT NULL, params JSON NOT NULL,
     min_texts INTEGER NOT NULL, max_texts INTEGER NOT NULL, min_images INTEGER NOT NULL,
     max_images INTEGER NOT NULL, defText JSON, args_type JSON, tags JSON,
@@ -23,44 +22,11 @@ const createTables = (table: CatalogTable) => `
     createdAt DATETIME NOT NULL, updatedAt DATETIME NOT NULL
   );`;
 
-type Server = NonNullable<ReturnType<typeof generationServer>>;
 type Presets = typeof import("./models/Meme/preset.ts").preset;
 
 function record(value: unknown): Record<string, unknown> {
   if (typeof value !== "object" || value === null || Array.isArray(value)) throw new Error();
   return value as Record<string, unknown>;
-}
-
-async function fetchJSON(server: Extract<Server, { protocol: "legacy" }>, route: string, signal?: AbortSignal): Promise<unknown> {
-  const url = new URL(server.base);
-  url.pathname = `${url.pathname.replace(/\/+$/u, "")}/memes/${route}`;
-  const timeout = AbortSignal.timeout(server.timeout);
-  const response = await fetch(url, {
-    redirect: "error",
-    headers: { Accept: "application/json" },
-    signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
-  });
-  if (!response.ok || !response.body || Number(response.headers.get("content-length")) > maxResponseBytes) {
-    await response.body?.cancel();
-    throw new Error();
-  }
-  const reader = response.body.getReader();
-  try {
-    const decoder = new TextDecoder("utf-8", { fatal: true });
-    const chunks: string[] = [];
-    let size = 0;
-    for (;;) {
-      const result = await reader.read();
-      if (result.done) break;
-      size += result.value.byteLength;
-      if (size > maxResponseBytes) throw new Error();
-      chunks.push(decoder.decode(result.value, { stream: true }));
-    }
-    return JSON.parse(chunks.join("") + decoder.decode());
-  } finally {
-    await reader.cancel().catch(() => undefined);
-    reader.releaseLock();
-  }
 }
 
 function entryFor(key: string, value: unknown) {
@@ -89,29 +55,10 @@ function hasTable(db: Database, name: string) {
   return db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = ?").get(name) !== null;
 }
 
-function catalogKeys(db: Database, table: CatalogTable) {
-  return new Set(hasTable(db, table) ? db.query<{ key: string }, []>(`SELECT key FROM ${table}`).all().map(({ key }) => key) : []);
-}
-
-function dropTemplates(db: Database, table: CatalogTable, keys: Iterable<string>, excluded: ReadonlySet<string>) {
-  const drop = db.query(`DELETE FROM ${table} WHERE key = ?`);
-  const dropPreset = table === "meme" && hasTable(db, "preset") ? db.query("DELETE FROM preset WHERE key = ?") : undefined;
-  for (const key of keys) {
-    if (excluded.has(key)) dropPreset?.run(key);
-    drop.run(key);
-  }
-}
-
-function removeLegacyExclusions(db: Database) {
-  const excluded = scanMemeCatalogExclusions(db).keys;
-  if (excluded.size) {
-    keepMemeCatalogDenials(db, excluded);
-    dropTemplates(db, "meme", excluded, excluded);
-  }
-}
-
-function nativeCatalogIdentity(server: Server | undefined) {
-  return server?.protocol === "native" ? server.catalogIdentity : undefined;
+function localCatalogKeys(db: Database) {
+  return new Set(hasTable(db, nativeCatalogTable)
+    ? db.query<{ key: string }, []>(`SELECT key FROM ${nativeCatalogTable}`).all().map(({ key }) => key)
+    : []);
 }
 
 function storedCatalogIdentity(db: Database) {
@@ -132,58 +79,10 @@ function addPresets(db: Database, keys: ReadonlySet<string>, presets: Presets, n
   return count;
 }
 
-async function initializeCatalog(signal: AbortSignal): Promise<string | undefined> {
-  signal.throwIfAborted();
-  const file = catalogPath();
-  const server = generationServer();
-  const identity = nativeCatalogIdentity(server);
-  const table: CatalogTable = identity ? nativeCatalogTable : "meme";
-  let providerChanged = false;
-  if (existsSync(file)) {
-    const current = new Database(file, { readonly: true, strict: true });
-    let empty: boolean;
-    let hadTemplates: boolean;
-    try {
-      const keys = catalogKeys(current, table);
-      const excluded = scanMemeCatalogExclusions(current, table).keys;
-      providerChanged = !!identity && storedCatalogIdentity(current) !== identity;
-      hadTemplates = keys.size > 0;
-      empty = keys.size === excluded.size;
-      if (!providerChanged && !empty && !excluded.size && hasTable(current, "preset") &&
-          current.query("SELECT 1 FROM preset LIMIT 1").get()) return;
-    } finally {
-      current.close();
-    }
-    if (hadTemplates) {
-      const { preset } = await import("./models/Meme/preset.ts");
-      signal.throwIfAborted();
-      if (file !== catalogPath()) return;
-      const db = new Database(file, { strict: true, create: false });
-      try {
-        db.transaction(() => {
-          // Recheck the copied catalog inside the write transaction.
-          removeLegacyExclusions(db);
-          if (table === nativeCatalogTable) {
-            const excluded = scanMemeCatalogExclusions(db, table).keys;
-            if (excluded.size) dropTemplates(db, table, excluded, excluded);
-          }
-          if (hasTable(db, "preset") && db.query("SELECT 1 FROM preset LIMIT 1").get()) return;
-          db.exec(createTables(table));
-          addPresets(db, catalogKeys(db, table), preset, new Date().toISOString());
-        }).immediate();
-      } finally {
-        db.close();
-      }
-      if (!empty && !providerChanged) return;
-    }
-  }
-  if (server) return updateCatalog(true, signal);
-}
-
 async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<string> {
   signal?.throwIfAborted();
-  const server = generationServer();
-  if (!server) return "请先配置表情合成服务。";
+  const provider = memeProvider();
+  if (!provider) return "本机表情模板尚未就绪。";
 
   const file = catalogPath();
   let db: Database | undefined;
@@ -191,25 +90,23 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
   try {
     if (existsSync(file)) db = new Database(file, { strict: true, create: false });
     const initial = db && dataVersion(db);
-    const identity = nativeCatalogIdentity(server);
-    const table: CatalogTable = identity ? nativeCatalogTable : "meme";
-    const kept = db ? catalogKeys(db, table) : new Set<string>();
-    const excluded = db ? scanMemeCatalogExclusions(db, table).keys : new Set<string>();
+    const { catalogIdentity } = provider;
+    const kept = db ? localCatalogKeys(db) : new Set<string>();
+    const excluded = db ? scanMemeCatalogExclusions(db, nativeCatalogTable).keys : new Set<string>();
     const version = catalogVersion(file);
-    const sourceChanged = !!identity && (db && storedCatalogIdentity(db)) !== identity;
-    const result = await (server.protocol === "native" ? server.keys(signal) : fetchJSON(server, "keys", signal));
+    const sourceChanged = !db || storedCatalogIdentity(db) !== catalogIdentity || !hasTable(db, "preset");
+    const result = await provider.keys(signal);
     if (!Array.isArray(result) || !result.length || result.some((key) => !safeCatalogKey(key))) throw new Error();
-    const remote = new Set<string>();
+    const local = new Set<string>();
     for (const key of result) {
       if (isExcludedMemeTemplate(key)) excluded.add(key);
-      else remote.add(key);
+      else local.add(key);
     }
-    const required = [...remote].filter((key) => force || sourceChanged || !kept.has(key) || excluded.has(key));
+    const required = [...local].filter((key) => force || sourceChanged || !kept.has(key) || excluded.has(key));
     const entries: NonNullable<ReturnType<typeof entryFor>>[] = [];
     for (let start = 0; start < required.length; start += batchSize) {
       const pending = required.slice(start, start + batchSize).map(async (key) => ({
-        key, row: entryFor(key, await (server.protocol === "native" ? server.info(key, signal) :
-          fetchJSON(server, `${encodeURIComponent(key)}/info`, signal))),
+        key, row: entryFor(key, await provider.info(key, signal)),
       }));
       const batch = await Promise.allSettled(pending);
       if (batch.some((entry) => entry.status === "rejected")) throw new Error();
@@ -217,14 +114,14 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
         if (entry.value.row) entries.push(entry.value.row);
         else {
           excluded.add(entry.value.key);
-          remote.delete(entry.value.key);
+          local.delete(entry.value.key);
         }
       }
     }
-    const removed = [...kept].filter((key) => !remote.has(key));
+    const removed = [...kept].filter((key) => !local.has(key));
     const { preset } = await import("./models/Meme/preset.ts");
     signal?.throwIfAborted();
-    if (file !== catalogPath() || version !== catalogVersion(file) || !sameGenerationServer(server, generationServer())) throw new Error();
+    if (file !== catalogPath() || version !== catalogVersion(file) || !sameMemeProvider(provider, memeProvider())) throw new Error();
 
     mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
     if (!db) {
@@ -235,9 +132,9 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
     const now = new Date().toISOString();
     const added = target.transaction(() => {
       if (initial !== undefined && dataVersion(target) !== initial) throw new Error();
-      target.exec(createTables(table));
+      target.exec(createTables);
       const put = target.query(`
-        INSERT INTO ${table} (key,info,keyWords,params,min_texts,max_texts,min_images,max_images,
+        INSERT INTO ${nativeCatalogTable} (key,info,keyWords,params,min_texts,max_texts,min_images,max_images,
           defText,args_type,tags,createdAt,updatedAt)
         VALUES ($key,$info,$keywords,$params,$minTexts,$maxTexts,$minImages,$maxImages,$defaults,$args,$tags,$now,$now)
         ON CONFLICT(key) DO UPDATE SET info=excluded.info,keyWords=excluded.keyWords,params=excluded.params,
@@ -245,16 +142,15 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
           max_images=excluded.max_images,defText=excluded.defText,args_type=excluded.args_type,tags=excluded.tags,
           updatedAt=excluded.updatedAt`);
       for (const row of entries) put.run({ ...row, now });
-      dropTemplates(target, table, removed, excluded);
-      if (identity) {
-        removeLegacyExclusions(target);
-        target.exec("CREATE TABLE IF NOT EXISTS lotus_catalog_provider (id INTEGER PRIMARY KEY, identity TEXT NOT NULL)");
-        target.query("INSERT OR REPLACE INTO lotus_catalog_provider VALUES (1, ?)").run(identity);
-      } else {
-        keepMemeCatalogDenials(target, excluded, entries.map(({ key }) => key));
-      }
+      const drop = target.query(`DELETE FROM ${nativeCatalogTable} WHERE key = ?`);
+      for (const key of removed) drop.run(key);
+      // Preserve the old shared data and record denied legacy catalog entries before using the local view.
+      for (const key of scanMemeCatalogExclusions(target).keys) excluded.add(key);
+      keepMemeCatalogDenials(target, excluded);
+      target.exec("CREATE TABLE IF NOT EXISTS lotus_catalog_provider (id INTEGER PRIMARY KEY, identity TEXT NOT NULL)");
+      target.query("INSERT OR REPLACE INTO lotus_catalog_provider VALUES (1, ?)").run(catalogIdentity);
 
-      return addPresets(target, remote, preset, now);
+      return addPresets(target, local, preset, now);
     }).immediate();
     if (stagedFile) {
       target.close();
@@ -270,65 +166,48 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
 
 const refreshes = new Map<string, Promise<string | undefined>>();
 
-function refreshKey(protocol: "native" | "legacy") {
-  return JSON.stringify([catalogPath(), protocol]);
-}
-
 function runRefresh<T extends string | undefined>(key: string, run: () => Promise<T>): Promise<T> {
   const pending = run().finally(() => { refreshes.delete(key); });
   refreshes.set(key, pending);
   return pending;
 }
 
-export function prepareNativeCatalog(signal?: AbortSignal): Promise<void> | undefined {
+export function initializeLocalCatalog(signal?: AbortSignal) {
   if (signal?.aborted) return;
-  let server: Server | undefined;
-  try { server = generationServer(); } catch { return; }
-  if (server?.protocol !== "native") return;
+  const provider = memeProvider();
+  if (!provider) return;
   const file = catalogPath();
-  try {
-    if (existsSync(file)) {
-      const db = new Database(file, { readonly: true });
-      try {
-        if (hasTable(db, nativeCatalogTable) && storedCatalogIdentity(db) === server.catalogIdentity) return;
-      } finally {
-        db.close();
-      }
+  const pending = refreshes.get(file);
+  if (pending) return pending;
+  if (existsSync(file)) {
+    const db = new Database(file, { readonly: true });
+    try {
+      if (hasTable(db, nativeCatalogTable) && hasTable(db, "preset") && storedCatalogIdentity(db) === provider.catalogIdentity &&
+          db.query(`SELECT 1 FROM ${nativeCatalogTable} LIMIT 1`).get()) return;
+    } finally {
+      db.close();
     }
-  } catch {
-    return;
   }
-  const key = refreshKey("native");
-  const pending = refreshes.get(key);
-  if (pending) return pending.then(() => undefined, () => undefined);
-  return runRefresh(key, () => updateCatalog(true, signal)).then(() => undefined, error => {
-    if (!signal?.aborted && activeCatalogTable() === nativeCatalogTable) {
-      console.warn("[meme] 首次本机表情目录更新失败。", error);
-    }
-  });
+  return runRefresh(file, () => updateCatalog(true, signal));
 }
 
-export function runAutomaticCatalogRefresh(signal: AbortSignal, startup = false) {
-  const key = refreshKey(generationServer()?.protocol ?? "legacy");
-  const pending = refreshes.get(key);
-  if (pending) return pending.then(() => undefined, () => undefined);
-  return runRefresh(key, async () => {
-    if (startup) return initializeCatalog(signal);
-    if (generationServer()) return updateCatalog(false, signal);
-  });
+export function prepareLocalCatalog(signal?: AbortSignal): Promise<void> | undefined {
+  const warn = (error: unknown) => {
+    if (!signal?.aborted) console.warn("[meme] 首次本机表情目录更新失败。", error);
+  };
+  try {
+    return initializeLocalCatalog(signal)?.then(() => undefined, warn);
+  } catch (error) {
+    warn(error);
+  }
 }
 
 export function handleCatalogUpdate(message: string, context: SettingsContext, signal?: AbortSignal): Promise<string> | string | undefined {
   const match = command.exec(message.trim());
   if (!match) return;
   if (!isMemeOwner(context)) return "只有主人才能更新表情包数据";
-  let key: string;
-  try {
-    key = refreshKey(generationServer()?.protocol ?? "legacy");
-  } catch {
-    return "无法读取表情合成服务设置。";
-  }
-  if (refreshes.has(key)) return "表情包数据更新中。";
-  return runRefresh(key, () => updateCatalog(match[1] !== undefined, signal))
+  const file = catalogPath();
+  if (refreshes.has(file)) return "表情包数据更新中。";
+  return runRefresh(file, () => updateCatalog(match[1] !== undefined, signal))
     .catch(() => "表情包数据更新失败，旧目录仍可使用。");
 }
