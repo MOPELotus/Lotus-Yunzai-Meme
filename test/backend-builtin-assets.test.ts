@@ -1,11 +1,28 @@
 import { expect, test } from "bun:test";
 import { createHash } from "node:crypto";
-import { mkdir, mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { createBundledMemeResources } from "../backend-builtin-assets.ts";
+import { extraMemeAssets } from "../backend-extra-assets.ts";
 import { excludedMemeTemplateMessage } from "../template-policy.ts";
+import { builtinMemeTemplates } from "../templates/index.ts";
+
+test("随模块的素材清单覆盖已注册模板的固定素材，文件随 Git 提供", async () => {
+  const directory = new URL("../resources/builtin/", import.meta.url);
+  const { files }: { files: Record<string, string> } = await Bun.file(new URL("manifest.json", directory)).json();
+  const registered = new Set(builtinMemeTemplates.map(({ info }) => info.key));
+  const bundled = new Set(await readdir(directory, { recursive: true }));
+  const missingFiles = Object.entries(files).filter(([, digest]) =>
+    !bundled.has(`${digest.slice(0, 2)}/${digest.slice(2)}`)).map(([path]) => path);
+  const missingImages = [...extraMemeAssets].filter(([path, asset]) => {
+    const key = /^images\/(?:anyliew\/emoji\/|python\/meme_generator\/memes\/)?([^/]+)/u.exec(path)?.[1];
+    return key !== undefined && registered.has(key) && files[path] !== asset.digest;
+  }).map(([path]) => path);
+  expect(missingFiles).toEqual([]);
+  expect(missingImages).toEqual([]);
+});
 
 test("内置表情原图和字体直接按目录摘要读取，不依赖首用缓存", async () => {
   const root = await mkdtemp(join(tmpdir(), "lotus-meme-bundled-"));
