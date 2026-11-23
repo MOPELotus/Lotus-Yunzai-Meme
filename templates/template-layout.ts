@@ -49,10 +49,11 @@ export function paper(context: CanvasRenderingContext2D, width: number, height: 
 
 export function drawFittedText(context: CanvasRenderingContext2D, box: Box, text: string, font: string,
   minimum: number, maximum: number, alignment: "left" | "center" | "right" = "center", fill = "#000",
-  { wrap = true, stroke, vertical = "center" }: {
+  { wrap = true, stroke, vertical = "center", paragraphMetrics = false }: {
     readonly wrap?: boolean;
     readonly stroke?: readonly [color: string, ratio: number];
-    readonly vertical?: "top" | "center";
+    readonly vertical?: "top" | "center" | "bottom";
+    readonly paragraphMetrics?: boolean;
   } = {}) {
   const [left, top, right, bottom] = box;
   const width = right - left, height = bottom - top;
@@ -70,10 +71,15 @@ export function drawFittedText(context: CanvasRenderingContext2D, box: Box, text
       if (!lines.length) return;
       const last = lines[lines.length - 1]!;
       const first = lines[0]!;
-      const contentHeight = last.y + last.height - first.y;
-      if (contentHeight <= height && lines.every(line => line.width <= width)) {
+      const contentTop = paragraphMetrics ? first.ascent : first.y;
+      const contentBottom = paragraphMetrics ? last.descent : last.y + last.height;
+      const contentHeight = paragraphMetrics ? Math.round(contentBottom - contentTop) : contentBottom - contentTop;
+      const contentFits = paragraphMetrics ? metrics.width <= width : lines.every(line => line.width <= width);
+      if (contentHeight <= height && contentFits) {
         const x = alignment === "left" ? left : alignment === "right" ? right : (left + right) / 2;
-        const y = top + (vertical === "top" ? 0 : (height - contentHeight) / 2) - first.y;
+        const limit = height - contentHeight;
+        const offset = vertical === "top" ? 0 : vertical === "bottom" ? limit : limit / 2;
+        const y = top + offset - contentTop;
         if (stroke) {
           context.strokeStyle = stroke[0];
           context.lineJoin = "round";

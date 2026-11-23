@@ -1,22 +1,19 @@
 // Geometry and JPG/GIF selection follow MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { randomInt } from "node:crypto";
-import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
+import { loadImage, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import type { MemeImageSequence } from "./animated-input.ts";
+import { drawAvatar, type AvatarPlacement } from "./avatar-slot.ts";
 import { renderMaskedRaster } from "./masked-layout.ts";
 import { jpg, previewImage, type Draw } from "./template-layout.ts";
 import { readTransformSource, renderTransformSequence } from "./transforms.ts";
 
-interface OverlayLayout {
-  readonly slot: readonly [left: number, top: number, width: number, height: number];
-  readonly fit?: "contain" | "square";
-  readonly whitePadding?: boolean;
+interface OverlayLayout extends AvatarPlacement {
   readonly art?: string;
   readonly sticker?: readonly [asset: string, left: number, top: number];
   readonly avatarAboveArt?: boolean;
-  readonly replaceSlot?: boolean;
   readonly maskedStill?: boolean;
 }
 
@@ -78,38 +75,6 @@ const overlays: readonly Overlay[] = [
   { key: "distracted", keywords: ["注意力涣散"], tags: ["明日方舟"],
     layout: { art: "1.png", slot: [0, 0, 500, 500], fit: "square", sticker: ["0.png", 140, 320], maskedStill: true } },
 ];
-
-function drawAvatar(draw: CanvasRenderingContext2D, image: Image, layout: OverlayLayout, isStill: boolean) {
-  const { slot: [left, top, width, height], fit, whitePadding, replaceSlot } = layout;
-  draw.save();
-  draw.beginPath();
-  draw.rect(left, top, width, height);
-  draw.clip();
-  draw.imageSmoothingQuality = "high";
-  if (replaceSlot) {
-    if (isStill) {
-      draw.fillStyle = "white";
-      draw.fillRect(left, top, width, height);
-    } else draw.clearRect(left, top, width, height);
-  }
-  if (fit === "square") {
-    const square = Math.min(image.width, image.height);
-    draw.drawImage(image, Math.floor((image.width - square) / 2), Math.floor((image.height - square) / 2), square, square,
-      left, top, width, height);
-  } else {
-    const ratio = fit === "contain" ? Math.min(width / image.width, height / image.height) : Math.max(width / image.width, height / image.height);
-    const scaledWidth = Math.max(fit === "contain" ? 1 : width, Math.trunc(image.width * ratio));
-    const scaledHeight = Math.max(fit === "contain" ? 1 : height, Math.trunc(image.height * ratio));
-    const x = left + Math.trunc((width - scaledWidth) / 2), y = top + Math.trunc((height - scaledHeight) / 2);
-    if (whitePadding) {
-      draw.fillStyle = "white";
-      draw.fillRect(left, top, width, height);
-      if (fit === "contain" && !isStill) draw.clearRect(x, y, scaledWidth, scaledHeight);
-    }
-    draw.drawImage(image, x, y, scaledWidth, scaledHeight);
-  }
-  draw.restore();
-}
 
 async function grayImage(image: Image, signal: AbortSignal) {
   signal.throwIfAborted();

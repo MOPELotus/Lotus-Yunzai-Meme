@@ -4,6 +4,7 @@ import { anyliewDialogueTemplates } from "./anyliew-dialogue.ts";
 import { avatarCaptionMemeTemplates } from "./avatar-caption-cards.ts";
 import { avatarFrameMemeTemplates } from "./avatar-frames.ts";
 import { basicImageMemeTemplates } from "./basic-image-transforms.ts";
+import { captionOverlayMemeTemplates } from "./caption-overlays.ts";
 import { fixedAvatarAnimations } from "./fixed-avatar-animation.ts";
 import { shortAvatarAnimations } from "./short-avatar-animation.ts";
 import { hug, kiss } from "./kiss-hug.ts";
@@ -35,6 +36,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...mirrorFlashMemeTemplates,
   waveMemeTemplate,
   ...overlayMemeTemplates,
+  ...captionOverlayMemeTemplates,
   ...avatarFrameMemeTemplates,
   ...avatarCaptionMemeTemplates,
   ...rectangleOverlayTemplates,
