@@ -19,6 +19,7 @@ import { classicAvatarMemeTemplates } from "./classic-avatar-animations.ts";
 import { classicLayeredMemeTemplates } from "./classic-layered-animations.ts";
 import { dianzhongdian } from "./dianzhongdian.ts";
 import { fixedAvatarAnimations } from "./fixed-avatar-animation.ts";
+import { largeSourceAnimations } from "./large-source-animations.ts";
 import { flush } from "./flush.ts";
 import { jumpSoldMemeTemplates } from "./jump-sold.ts";
 import { shortAvatarAnimations } from "./short-avatar-animation.ts";
@@ -90,6 +91,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...textSignMemeTemplates,
   ...perspectiveMemeTemplates,
   ...fixedAvatarAnimations,
+  ...largeSourceAnimations,
   ...anyliewAvatarCycleTemplates,
   anyliewDeerHelpTemplate,
   ...anyliewFixedBatchTemplates,

@@ -17984,6 +17984,706 @@
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/chino_throw/20.png"
     },
+    "images/clauvio_twist/00.png": {
+      "digest": "c4c14d38f1b2319b17b675c6a87466e6d76b8eaad090d288bf36841ab97f2cff",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/00.png"
+    },
+    "images/clauvio_twist/01.png": {
+      "digest": "f1c155bd37f2ab98724f4784f660f967512226bd53a6282ea31efc72a4d8c253",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/01.png"
+    },
+    "images/clauvio_twist/02.png": {
+      "digest": "abe5282d5531fddefdbbb8dbc79f48a501173a5ee4566412bc3476108b6d179d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/02.png"
+    },
+    "images/clauvio_twist/03.png": {
+      "digest": "ae1f2b4c7e6b5f8d124b7e3dbf2992bd5e624fc7ed8521282813e867dfe57056",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/03.png"
+    },
+    "images/clauvio_twist/04.png": {
+      "digest": "cb433226bf34c5868db8e63eb107491c4e9da1ebe9c3b9b866345a33711f974d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/04.png"
+    },
+    "images/clauvio_twist/05.png": {
+      "digest": "b5ef7fcec614b69b7b8065f2d42d5f9bd3e94e1c98c7908837d7d07390a0a3af",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/05.png"
+    },
+    "images/clauvio_twist/06.png": {
+      "digest": "5ebc61ff19ad3739cdc687e43dedc68d3ab78ae91cfad4f8de9ce23422e7e7ce",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/06.png"
+    },
+    "images/clauvio_twist/07.png": {
+      "digest": "e7cf65241107f0060a6a220e7c60196bfde656b266b5054a52c6107c460d3e87",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/07.png"
+    },
+    "images/clauvio_twist/08.png": {
+      "digest": "e7d7fc2223cc6b79f3b6dc4e4490a3e2c8744b41c32a8794efd6f78f7a516ada",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/08.png"
+    },
+    "images/clauvio_twist/09.png": {
+      "digest": "2e30f34158ee75c7ba03d751b022ab87c771b791ee7ded47c7f26c800f072ec7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/09.png"
+    },
+    "images/clauvio_twist/10.png": {
+      "digest": "e8ad470e8893ec1e8a97c2790a53c7b86140b857d3371a846a6eb2d06ac5b0b0",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/10.png"
+    },
+    "images/clauvio_twist/11.png": {
+      "digest": "7d03c0f201d035a5bf7abc59ac627e844316d77454c0b589b8d0cf85901964f2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/11.png"
+    },
+    "images/clauvio_twist/12.png": {
+      "digest": "605c2bacfc5fd78d43ddecab0a9a9afed2569d215c3b55d92e0970356935139c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/12.png"
+    },
+    "images/clauvio_twist/13.png": {
+      "digest": "ae7d0b7e775c858c875424c61ab347abcfd3ed4c66625b5b1d806f64847b7ac9",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/13.png"
+    },
+    "images/clauvio_twist/14.png": {
+      "digest": "0c4a3a82300a5509d64d1599c1f195e14b10119d9317310648f45da58fe7ec95",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/14.png"
+    },
+    "images/clauvio_twist/15.png": {
+      "digest": "919a4b44340b22849548f9eb19502560303e86e339f56ff42e8a877fe6af0113",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/15.png"
+    },
+    "images/clauvio_twist/16.png": {
+      "digest": "e3aaadcadb38be9a08dd5f63b6bbb392089201e7f3420ab485f28c49c6822fba",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/16.png"
+    },
+    "images/clauvio_twist/17.png": {
+      "digest": "1b7154940c983fcfa07871fdeb47c574ebcc5db8e0435b827e1e4a4332877b58",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/17.png"
+    },
+    "images/clauvio_twist/18.png": {
+      "digest": "3030349db96f3a6307ac9b9045018340c9fb91b0b1b8e58493328526673e4bc4",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/18.png"
+    },
+    "images/clauvio_twist/19.png": {
+      "digest": "3fe16325aa40ae3cf73d09fb0c35746c793daed37fca3cef94177af0e2408868",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/19.png"
+    },
+    "images/clauvio_twist/20.png": {
+      "digest": "b215348c9c17571503715f95b85c03f45a610d5699dad7b5a56e12e91ae4e8d8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/20.png"
+    },
+    "images/clauvio_twist/21.png": {
+      "digest": "3dadf6fd2d0b542025e3b4bb744488be2a9a979fb2b733f8fe3a278b8554fa6a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/21.png"
+    },
+    "images/clauvio_twist/22.png": {
+      "digest": "fc36a31e2bfbbeb1e4df3c33357eff0b50fbc23e734c2d0afbad08bc6d9d6df8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/22.png"
+    },
+    "images/clauvio_twist/23.png": {
+      "digest": "babc036ef2a39dcf260aae8a0716da77d82bb066bf62c1772af2643d86949129",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/23.png"
+    },
+    "images/clauvio_twist/24.png": {
+      "digest": "395432d6316a3f3cd8e5f2bff12648b772a4d9d663624dee645a1381d1243dad",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/24.png"
+    },
+    "images/clauvio_twist/25.png": {
+      "digest": "c8756120359d9572e1bbfeb790d2df82024b5c5d32c0ab973c201d4891c30c82",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/25.png"
+    },
+    "images/clauvio_twist/26.png": {
+      "digest": "44d86ecb63e3483b0a938a390ba39c0c528cbd2c62b93967660a19178f358042",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/26.png"
+    },
+    "images/clauvio_twist/27.png": {
+      "digest": "9b615370076df77b1754b9e19a41f28b408cf6b515e8ded01c92d9b95dfe7d99",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/27.png"
+    },
+    "images/clauvio_twist/28.png": {
+      "digest": "82d1843146bc54c1372eb7babf4b27683628e8ff972d98ea86c6118295496734",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/28.png"
+    },
+    "images/clauvio_twist/29.png": {
+      "digest": "b558c2d1f9b9d147271bc50b88da00e8ceb3249dc3a244d1dab59b6e244b0516",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/29.png"
+    },
+    "images/clauvio_twist/30.png": {
+      "digest": "8d1dde4922ad38e84b023cb9758d5dad2c306389871eb636ed3db6e111f055c6",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/30.png"
+    },
+    "images/clauvio_twist/31.png": {
+      "digest": "c2869b8134002320c27c101318cbdbeb5ad5bdd79b962cb6030f47f8818f0629",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/31.png"
+    },
+    "images/clauvio_twist/32.png": {
+      "digest": "42f3cdd97dd81838d87b56269559e496bf2ee98ef3e0e5b14337cbe6820239b0",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/32.png"
+    },
+    "images/clauvio_twist/33.png": {
+      "digest": "1047246170ee293e6a9bd40ac714a6c2acfed650db300f5863ececac085f4b22",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/33.png"
+    },
+    "images/clauvio_twist/34.png": {
+      "digest": "034c9aad53bb6d5074ea6017b2815d340e276af068c0dcbfc0b1dcf450ce2b00",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/34.png"
+    },
+    "images/clauvio_twist/35.png": {
+      "digest": "1ff1fda55d4f07a541635b61b4a274aafa9dd122059fd5f33f017966214ae237",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/35.png"
+    },
+    "images/clauvio_twist/36.png": {
+      "digest": "e538f0388738573bd0eccda62e756da82920c211bb6b74e3d0f477b60fe8b76b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/36.png"
+    },
+    "images/clauvio_twist/37.png": {
+      "digest": "8e6d0cab577d93881420261c5f47bf663a953d0724ff45a2421cb118c208c2aa",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/37.png"
+    },
+    "images/clauvio_twist/38.png": {
+      "digest": "153d06e50237a75bacc66aed56265f5542f858b759caa1cab845003429dc11ca",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/38.png"
+    },
+    "images/clauvio_twist/39.png": {
+      "digest": "313bd74a090afa23d69481d03232ccae9ee39fe2004a7e50b864f0544cd7fa69",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clauvio_twist/39.png"
+    },
+    "images/confuse/00.png": {
+      "digest": "061a13b6ab65f87b3095bf5cc5a242fbc40dddcee0a938f7b85f859723e73825",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/00.png"
+    },
+    "images/confuse/01.png": {
+      "digest": "ada7b2e5f071a2486a90e3803cb30ea573d25d5d3e8bd999e7c6d3bf0c448bc6",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/01.png"
+    },
+    "images/confuse/02.png": {
+      "digest": "45b61f0beae1d61e959d892c2791785016e4f2577769d72a6ed93afd7cf3a648",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/02.png"
+    },
+    "images/confuse/03.png": {
+      "digest": "790ee6c878455213fe09b5ef755b8dc06f0a502d1a20da0207f4b9b403f26cfe",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/03.png"
+    },
+    "images/confuse/04.png": {
+      "digest": "ee7d08e8709cc006225ca0bada6b28728d3d2f26b9e801d999f0079da2286121",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/04.png"
+    },
+    "images/confuse/05.png": {
+      "digest": "e160ec5824e0ce2e609020da24942d6cfc33fed844444f2c97cb67b809be9a2a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/05.png"
+    },
+    "images/confuse/06.png": {
+      "digest": "59cc44e9408524bfbaf93538227d66b65c61c77e61fe810ec862bb9158f687ca",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/06.png"
+    },
+    "images/confuse/07.png": {
+      "digest": "e953cbe7ae67539a2686ac489fee8722d9a7151643063d540369ef0ee7ca11b3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/07.png"
+    },
+    "images/confuse/08.png": {
+      "digest": "8c9890d0b2f9c356fa8f86e2e41e5b20fbde2708f788c65ed83842146e2fb03e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/08.png"
+    },
+    "images/confuse/09.png": {
+      "digest": "8e21801c8e572868b46ea93f761650239f91df8d988ba794b91b88b8c27e2f28",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/09.png"
+    },
+    "images/confuse/10.png": {
+      "digest": "7a38159b1baee3d8f3ed368db8e6c678af9e20cfa3a0c29924bc9f93c5bdb28a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/10.png"
+    },
+    "images/confuse/11.png": {
+      "digest": "79239b4410ed128629211879b2f311b21a5af20dcda2b88ba45c1ec74542db81",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/11.png"
+    },
+    "images/confuse/12.png": {
+      "digest": "ea607b51904b5442c16ed77f6a05844469deb2836b66e9628c14aaa1293b74ee",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/12.png"
+    },
+    "images/confuse/13.png": {
+      "digest": "41a27cecad121373b550fdd1669e9f9bd1e2e49e7389f96573434d7ba51dfc2b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/13.png"
+    },
+    "images/confuse/14.png": {
+      "digest": "a453ea14f87b2fd687d4e231f6d9c17b4f88bc4cb7866f3978d4bd179184db22",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/14.png"
+    },
+    "images/confuse/15.png": {
+      "digest": "e3365c05274f7e847a12b59f7c7e0f059eca1e6c2deee13a301e6e415bacca44",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/15.png"
+    },
+    "images/confuse/16.png": {
+      "digest": "269f9048217faf7bb04b6d78b0fdeac8f976c8b42c79b0bae39e6623efadf22f",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/16.png"
+    },
+    "images/confuse/17.png": {
+      "digest": "5fb6f1b76a3d6ec97a477bf9748901310f0344e650a6513f51b819210b4a0437",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/17.png"
+    },
+    "images/confuse/18.png": {
+      "digest": "00293d4951b0a1612533cad35d77325e8ab8abec919389597345e03ac198a44e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/18.png"
+    },
+    "images/confuse/19.png": {
+      "digest": "a5a40f619095e67a55d604623910fd31445bf8b13ba44551defef2eff869abb1",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/19.png"
+    },
+    "images/confuse/20.png": {
+      "digest": "7603b1987582db101165574e5225e14a05f211caa05d745b9617bdf75ecdedb0",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/20.png"
+    },
+    "images/confuse/21.png": {
+      "digest": "f04b134f98108111e00379872106310d49661d4babf236313ac268a44682dd17",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/21.png"
+    },
+    "images/confuse/22.png": {
+      "digest": "7429c930c9fa5cbe11db57b8b7ae667d9532e17ec59eb23a28d689c06a3b1294",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/22.png"
+    },
+    "images/confuse/23.png": {
+      "digest": "edc2ddc47b0ae6a3e94b4f66f319cac98bb9c99273543777d6db0bf57b3aa0e4",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/23.png"
+    },
+    "images/confuse/24.png": {
+      "digest": "d36e7155d1c6f3ff2480839f6f8a1656af91d195fc6272e10dfdf71409d867b9",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/24.png"
+    },
+    "images/confuse/25.png": {
+      "digest": "c913a20e4a53911adefde26a9236a38e2a9e29949726c063519b26d4b9ddcdf6",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/25.png"
+    },
+    "images/confuse/26.png": {
+      "digest": "0b356284c65784c21579170c3a1cbc56512c3185180a8c4fd45bf1addf59c856",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/26.png"
+    },
+    "images/confuse/27.png": {
+      "digest": "1b49e98e1b1dea65a5027c63647fe3b7618aac5942f6e6bb97f9f836750af87f",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/27.png"
+    },
+    "images/confuse/28.png": {
+      "digest": "dd4532cced238eecf969a1e36bc2dca95db5a05c03ae1d7cf8d8a3febc720fa9",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/28.png"
+    },
+    "images/confuse/29.png": {
+      "digest": "bdb3dc71223d19b160096b9b249760306469e8fe4d3fa5bd374d150d060ff66e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/29.png"
+    },
+    "images/confuse/30.png": {
+      "digest": "0df5ec22d75aac6d60384751c0d799c39603ec4cf63a16f08149e354bab83838",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/30.png"
+    },
+    "images/confuse/31.png": {
+      "digest": "c8ded087ef374d126645471042fde4827da5b5345932663413a194a2008874cc",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/31.png"
+    },
+    "images/confuse/32.png": {
+      "digest": "e52e1fab7dbf0c6b6c054c22edfc72f5923775a81378edab733ecf6c1765fb6a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/32.png"
+    },
+    "images/confuse/33.png": {
+      "digest": "783f31af35384aa53b73e8d0c03fbaf3dbd140e01bd2388558093830a99b3ad0",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/33.png"
+    },
+    "images/confuse/34.png": {
+      "digest": "b85df3a07375f3fa7adc8fe4b8498a51aba4035fa01305ecca66e972a2af25a4",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/34.png"
+    },
+    "images/confuse/35.png": {
+      "digest": "e76ba95168c020d41d4dfbdcf87d2b13a7437d3ca7a69e0b44ab79b566b4095c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/35.png"
+    },
+    "images/confuse/36.png": {
+      "digest": "46550a0e12451ef7a0d22ac35350fdeb95ddb65eda04bfaac2d3a233201df8bb",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/36.png"
+    },
+    "images/confuse/37.png": {
+      "digest": "39a190726fbb0719a14fef145ac597cbfb15cab8804cc00616e1d8e1ef8011b8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/37.png"
+    },
+    "images/confuse/38.png": {
+      "digest": "8799ad8cbe2d5e7667e1b0aed94cb38ea7fc6ccd0c8c960382a859c6fa10c6fd",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/38.png"
+    },
+    "images/confuse/39.png": {
+      "digest": "13851d41e65502fb0d65965522cee92927941d975f5f32a47c1306f752fe66c9",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/39.png"
+    },
+    "images/confuse/40.png": {
+      "digest": "5b5b0d893e17fb414527c57a9b8d0780dcc134384b0946533dc5d2048474bddc",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/40.png"
+    },
+    "images/confuse/41.png": {
+      "digest": "4737d62c645b815b0df553e76a20b1c7b78685b5d5566482d5f27831fe598dcb",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/41.png"
+    },
+    "images/confuse/42.png": {
+      "digest": "df0ed971aee80dc0586edea9d0e6d783e20f6f2d930a49ced44f6fb6d842bde3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/42.png"
+    },
+    "images/confuse/43.png": {
+      "digest": "4e775c9c95ed3079528b0c20139826af82fca623c8f5498c16296880a901ada6",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/43.png"
+    },
+    "images/confuse/44.png": {
+      "digest": "b33dddfb9805487f0cd19c9935a4bd9d76e1ff1478dc4ef9e10b4594a437f91e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/44.png"
+    },
+    "images/confuse/45.png": {
+      "digest": "d4c4b0b6390355fc708c8b3a9f562ae424ef3b6d9720c2aaf5f6b969fa6d2e93",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/45.png"
+    },
+    "images/confuse/46.png": {
+      "digest": "54d04a1616a22d3501a146cf1089471196947594996e695401987b9ca1026cb0",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/46.png"
+    },
+    "images/confuse/47.png": {
+      "digest": "1bd3b2d2de243de28375e2aadce3d065fc5bbbf05fd228642fe089e5c1492cde",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/47.png"
+    },
+    "images/confuse/48.png": {
+      "digest": "919080f50280b4c1fa1bf6fd365f8e4914d4e15ff5703965601809c5ee27981b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/48.png"
+    },
+    "images/confuse/49.png": {
+      "digest": "690d2876178c1b27d9d17c291fd206a7ebad9df4e501a50ab80e234e7000beb7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/49.png"
+    },
+    "images/confuse/50.png": {
+      "digest": "e26fa008cf99f0b53a65ece5b4bc937ff16e45fef030c061b6ee87be10524118",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/50.png"
+    },
+    "images/confuse/51.png": {
+      "digest": "d8734f33ab75aede9b9fd454ca30a485cafe60a5264d092e1ad494f11f04a6ba",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/51.png"
+    },
+    "images/confuse/52.png": {
+      "digest": "e0a16761375a40df088f89ee260d0134eec4a89384c2524e7397eaa5c2e09eb8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/52.png"
+    },
+    "images/confuse/53.png": {
+      "digest": "94381f9a3a879fa8ffd7840621788bfdc9a4a4b73ef3e393820c09c90fbcb657",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/53.png"
+    },
+    "images/confuse/54.png": {
+      "digest": "52cc142895085c73a881bc4b63a892d53d61d81d70936b762942b1134deef2eb",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/54.png"
+    },
+    "images/confuse/55.png": {
+      "digest": "543426c30aebb1430151c30054524476464e1c865dcf5b0fde0047211d0e9895",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/55.png"
+    },
+    "images/confuse/56.png": {
+      "digest": "e1dbab5d2e4a058e4ced41f644d98aa8512cc4039a9f9ecaf17995d9a44fde9d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/56.png"
+    },
+    "images/confuse/57.png": {
+      "digest": "b31cfdcc32f716907ae4c71db3c6651507e97f5c4cf857ab799fa4a0a9ad6e7e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/57.png"
+    },
+    "images/confuse/58.png": {
+      "digest": "c81dd5560cc3270bd0e114a27f263a57a6cc547344df30a7bc7393760ab208d7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/58.png"
+    },
+    "images/confuse/59.png": {
+      "digest": "754a98325696b7427e14ceb61a670221793d2ed47164f486147546f9f43d9b25",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/59.png"
+    },
+    "images/confuse/60.png": {
+      "digest": "ab75fb42e2fc47a42d4b2df74d349e8ecc06e7dfe5bb46f6dfa8bede25b538a2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/60.png"
+    },
+    "images/confuse/61.png": {
+      "digest": "f1d9dc5ca87f307701e4d3c81280e7ed50c4f6008fb580ade9ff9b55ab13e09f",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/61.png"
+    },
+    "images/confuse/62.png": {
+      "digest": "e9a52f0b59c6bb1f7f6b033f15cd35ee6251cd3b43a64318e7810d50beb91a14",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/62.png"
+    },
+    "images/confuse/63.png": {
+      "digest": "57dd9d23109f6f508b0a526126089ae7cffc3a44b792ad387d8a6cc9b45a3f92",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/63.png"
+    },
+    "images/confuse/64.png": {
+      "digest": "57c83d3cfeb0a7781650e2d921c7aa72903baf94154a944fbadbb8b91a9a3073",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/64.png"
+    },
+    "images/confuse/65.png": {
+      "digest": "cbe88a03b745daa9cc309ae944f9e58f0efb96f78cc3567b624e2a3bd8ebfbdd",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/65.png"
+    },
+    "images/confuse/66.png": {
+      "digest": "400e095647f7288dcdc0c1c621cabfd5170d797a5eb460621ba749aa21613f7a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/66.png"
+    },
+    "images/confuse/67.png": {
+      "digest": "c005fc5c12d3aba8fc0ded68018f02300b344f20919778a6130571aedcf50008",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/67.png"
+    },
+    "images/confuse/68.png": {
+      "digest": "71b9e9903da2891d262bdc3afe6e2a7cc3bd5caad9790612b5c374e6f1a1e808",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/68.png"
+    },
+    "images/confuse/69.png": {
+      "digest": "f8d388c3d07f0c83bf313fe074465dbf8ff8a82c540ad4c2185f2294c0e37ad5",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/69.png"
+    },
+    "images/confuse/70.png": {
+      "digest": "61bc987cc9cb067ca78ce0bcc420bc36a56e1c23c1e2a778fdc7ceda47419c82",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/70.png"
+    },
+    "images/confuse/71.png": {
+      "digest": "0b212bd6a2a64ec83f086e65f57d1062efc512ed4472ddde55c29802290b75e8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/71.png"
+    },
+    "images/confuse/72.png": {
+      "digest": "1364f1bc7a7777fb51d46681c3330d67a0ebbb8b4bc062c16bcce28c49938f2c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/72.png"
+    },
+    "images/confuse/73.png": {
+      "digest": "8b605b24d69d7f74d82c2ebe339f78ce2c6b5fdfe45837ab2ac85d73ac836dac",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/73.png"
+    },
+    "images/confuse/74.png": {
+      "digest": "fb0286cd6175f4fadb282eb88fc199ca3275eb66ae5d91e548041a12afab5a9a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/74.png"
+    },
+    "images/confuse/75.png": {
+      "digest": "620857117daad5d56a91422722a55908b982342e6b2227bb7f53bd892bddeda3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/75.png"
+    },
+    "images/confuse/76.png": {
+      "digest": "877124f6ce8da976e104f4ef978dadd2ef8e47c480ce20af7307fa477bc517d4",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/76.png"
+    },
+    "images/confuse/77.png": {
+      "digest": "dbb392daeff655d917bfb6371fb3743fe3650fb15e6de4f66f11e739492ce297",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/77.png"
+    },
+    "images/confuse/78.png": {
+      "digest": "a1fca20b81755469c7aea0498b5211141e129f1c0a53a4bf35505168dc3f6d36",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/78.png"
+    },
+    "images/confuse/79.png": {
+      "digest": "ef4ffd59eda3996cf41a2fd1ef16518cd1103947b8a0cc1b197fd30676ae9d3f",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/79.png"
+    },
+    "images/confuse/80.png": {
+      "digest": "09c33bacc158e49297e0ce1c23c9e2a4ce2df527498a0e3f3e78f50e9f065947",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/80.png"
+    },
+    "images/confuse/81.png": {
+      "digest": "a52c983f83946cf535147dc40754604a13269c3894fdec317f359da3d8d55714",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/81.png"
+    },
+    "images/confuse/82.png": {
+      "digest": "d51b3f1833183568b9777aef4cac2c67a14c0b567c44858564e8ebeea1d53fc8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/82.png"
+    },
+    "images/confuse/83.png": {
+      "digest": "83f07c67b4e8b8d2f01a9a325915182978af05a699c6d4d46f7dff474ad230d2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/83.png"
+    },
+    "images/confuse/84.png": {
+      "digest": "123f5f564c33bec88ad736cc14e4a1bf7054146615e251b21655c898b3850962",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/84.png"
+    },
+    "images/confuse/85.png": {
+      "digest": "1d98c8d074cd7f9c225ed1e8993c97dbc26187a48c7be8889b0f626f9a660ba6",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/85.png"
+    },
+    "images/confuse/86.png": {
+      "digest": "4c7bf50d7bb96d70030eeecaa4a2d5e7cc8493e76b49e76a05c76876d782e3e2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/86.png"
+    },
+    "images/confuse/87.png": {
+      "digest": "99f05af8303f365c22e5ea49a2df204465681feebaaec688fc9b75f1314ff1fe",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/87.png"
+    },
+    "images/confuse/88.png": {
+      "digest": "e6725decfe4c4311addce58829def7cf4688e475295fb079d1af678a73d29be1",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/88.png"
+    },
+    "images/confuse/89.png": {
+      "digest": "c5da7e33506bf46f5af3be9d302929c7e0e779b86f0ffd0f0f5d74f8b17316bf",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/89.png"
+    },
+    "images/confuse/90.png": {
+      "digest": "b9044ac0ca5765c69dd31c3ae088a6891bba9a3d6a159040f1d05799553487c3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/90.png"
+    },
+    "images/confuse/91.png": {
+      "digest": "49d7a4183c2fc2d80ab06b924fcee5a678f0b33a2fabc5c1d419a17e8c19bcc6",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/91.png"
+    },
+    "images/confuse/92.png": {
+      "digest": "1120b4c0d4d1efe037864b282abdcfb9b41835d55f45944f12cf1b9c3ee32096",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/92.png"
+    },
+    "images/confuse/93.png": {
+      "digest": "5ccb1b0e416d51bd02c53c9f1091e2f55f0be458986d99f7779a13bbd405df8d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/93.png"
+    },
+    "images/confuse/94.png": {
+      "digest": "18907976604fdc66580182296ee66a21fb0a530e59f5c2e456bb4332495dc366",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/94.png"
+    },
+    "images/confuse/95.png": {
+      "digest": "96e25209d1ab7d4c683b7faceb04849acbfb0d1550749c41fe18f115ad8126ab",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/95.png"
+    },
+    "images/confuse/96.png": {
+      "digest": "14c327de76483c949f3898bf459587b6eb2c3ac32ebf3d9d1970a8ec18c512ba",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/96.png"
+    },
+    "images/confuse/97.png": {
+      "digest": "02254b6a1ad024788019d86bef55a1239f3ae01c55430d0a13a70caea8340140",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/97.png"
+    },
+    "images/confuse/98.png": {
+      "digest": "d3fe23ad94ef72d48376d1c8fa07449aa3b6710dd191d4d7f6cb0aa793ec725e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/98.png"
+    },
+    "images/confuse/99.png": {
+      "digest": "6967a81fa4c4c8d596a751029e2dd433dd49946738200f7124fabf5bdfac785d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/confuse/99.png"
+    },
     "images/cover_face/0.png": {
       "digest": "96738bce4fc2a0df30b790a6ef2195ff9ae9b1a113cfa67813d611e80c9d7d9a",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
@@ -18478,6 +19178,486 @@
       "digest": "0d55d8ce1cde63eb254ef6a3694ed6946246ab943ea8cc164393e998b009ba76",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/garbage/24.png"
+    },
+    "images/genshin_eat/hutao/00.png": {
+      "digest": "150cb7d7ce2526b91d976870fe0e529a58c0ee5b6293d8f3096fc777e56609c9",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/00.png"
+    },
+    "images/genshin_eat/hutao/01.png": {
+      "digest": "53863dbf3d3eb06dea33bd8aae7a8d57ed6644bfb89927be39d05eb538bc7b12",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/01.png"
+    },
+    "images/genshin_eat/hutao/02.png": {
+      "digest": "a2651bee32f5b82749e3ac5f7c1ec9f197ecd9e868741a725cf3a1fd709c8875",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/02.png"
+    },
+    "images/genshin_eat/hutao/03.png": {
+      "digest": "35b6a4ee6a57dcc75605fa1488dc2e7df8e6e3ca712127a1118146165c7bd80d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/03.png"
+    },
+    "images/genshin_eat/hutao/04.png": {
+      "digest": "e826064f30f67cfb4ba4ad1be3fd8a34f3653e05ab0c115fcaf73d34b80bee69",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/04.png"
+    },
+    "images/genshin_eat/hutao/05.png": {
+      "digest": "0097d5d4b79d82cc18889f214d0cc20998fb2ab3afb99dc51c8aedf000a936ed",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/05.png"
+    },
+    "images/genshin_eat/hutao/06.png": {
+      "digest": "0c99f6dc32f7652899986cd92f556cfcdd20eabdcea807a33bf3c41096d860d1",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/06.png"
+    },
+    "images/genshin_eat/hutao/07.png": {
+      "digest": "30e415ff82b49e349bf3e3e70aa7559adf1ec75ff41bea69665b47bd4236fcb5",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/07.png"
+    },
+    "images/genshin_eat/hutao/08.png": {
+      "digest": "ae84a64a0c29613cf4e544c66b35deaa09f56114cb4f7b1986d87f2b33017466",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/08.png"
+    },
+    "images/genshin_eat/hutao/09.png": {
+      "digest": "99591792771673bf591983d2d88aafc8ea4ab83dfc96c132666fb1edfbe7a836",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/09.png"
+    },
+    "images/genshin_eat/hutao/10.png": {
+      "digest": "19a1fa42899bcaa54a1844bb6c5a3a55b9586ebc4d82c5aae25d1129398eb51d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/10.png"
+    },
+    "images/genshin_eat/hutao/11.png": {
+      "digest": "933f174470ca95cd9a15bb35b5b2a6231c63d5d0632677548744f94441653a95",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/11.png"
+    },
+    "images/genshin_eat/hutao/12.png": {
+      "digest": "0c9da454ce1676f274f39c2928fba70f433c3b47b85bdf04c9779650c9a81552",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/12.png"
+    },
+    "images/genshin_eat/hutao/13.png": {
+      "digest": "1fea2506a53f3e0725672c580206a3437d2be26d1a697fbd64e53a9a81776f86",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/13.png"
+    },
+    "images/genshin_eat/hutao/14.png": {
+      "digest": "3f2f8ae327b087d9061b817048ca19e7568a8f8e94a166987be6b540346958ed",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/14.png"
+    },
+    "images/genshin_eat/hutao/15.png": {
+      "digest": "4c2e04d6e162a6d56f05c608b26ed778d96213dfa11b511cdf3cb44792975e4a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/hutao/15.png"
+    },
+    "images/genshin_eat/keqing/00.png": {
+      "digest": "9d1dfc7ddde679854cb7515a764e4eccbdf24d1cc758caa9c8b9d449663f6e15",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/00.png"
+    },
+    "images/genshin_eat/keqing/01.png": {
+      "digest": "f4bfc21fc6bec8f78cf30c6baea4c1b393b0a6b1c6e32f0c01f181020254d488",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/01.png"
+    },
+    "images/genshin_eat/keqing/02.png": {
+      "digest": "b4cfd917a2db311a7019cbc290a5d519bf018b82b7965f23590203710baf891c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/02.png"
+    },
+    "images/genshin_eat/keqing/03.png": {
+      "digest": "ab0c79d69356068e71ee3d434bdc4efb65f9bbbd2a38f4fc563a522177fd26b2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/03.png"
+    },
+    "images/genshin_eat/keqing/04.png": {
+      "digest": "633a11f6b37f9e56cee46356a340aaa2be5512dd2535a11ca34fb61c2ea34c41",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/04.png"
+    },
+    "images/genshin_eat/keqing/05.png": {
+      "digest": "36692ceaf7f9039fd1e90732badd6129f9ca79b116e0a546b6c6a8cd15a27ca0",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/05.png"
+    },
+    "images/genshin_eat/keqing/06.png": {
+      "digest": "04345f4a5c57c4f73288cbd6f82cb3a21215a72d75d2e425977d3db217de818f",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/06.png"
+    },
+    "images/genshin_eat/keqing/07.png": {
+      "digest": "7178cf221c82dad318b7c9c1913a8cec3023960648e44f5c935bb8f0037fc2dd",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/07.png"
+    },
+    "images/genshin_eat/keqing/08.png": {
+      "digest": "7d5bd1f8940be55c8ad196aa611d22565cb79f7742e8ba3d820f7ab913b25c22",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/08.png"
+    },
+    "images/genshin_eat/keqing/09.png": {
+      "digest": "9268f45746f9fca3368fb71a627f07d3a61e6a4be1357e297fee199a8ed729ed",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/09.png"
+    },
+    "images/genshin_eat/keqing/10.png": {
+      "digest": "d0e4237e2d47715197ef9a55ad33dbfce76d74be42075aef44cf11a9d2d45c4d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/10.png"
+    },
+    "images/genshin_eat/keqing/11.png": {
+      "digest": "a82ea6a00c4436dcf403749146c1b185e24948a8ffacadd1b34e723ff387029b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/11.png"
+    },
+    "images/genshin_eat/keqing/12.png": {
+      "digest": "7b7c17d6cc867e1012c56ed4ca35286a09ec7fd9d429e8180a25072fd2d04084",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/12.png"
+    },
+    "images/genshin_eat/keqing/13.png": {
+      "digest": "c16b9c84183026c579af7a4dbae8f891c8499579aa2469a36f93fa9dbf2695b8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/13.png"
+    },
+    "images/genshin_eat/keqing/14.png": {
+      "digest": "ab0c79d69356068e71ee3d434bdc4efb65f9bbbd2a38f4fc563a522177fd26b2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/14.png"
+    },
+    "images/genshin_eat/keqing/15.png": {
+      "digest": "523c9baa68647d2a8dea3d5732395bf5fea785a34de7cdf91e989be2a04bdfd7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/keqing/15.png"
+    },
+    "images/genshin_eat/klee/00.png": {
+      "digest": "3c63478f6d33ad1424a458ed1bc571b6e8fe6219cf394043d00782a0f838b826",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/00.png"
+    },
+    "images/genshin_eat/klee/01.png": {
+      "digest": "fc9f45c82a1f88d6984dda3be761bc3a2777d72ad76d39598a9ea80e86189ede",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/01.png"
+    },
+    "images/genshin_eat/klee/02.png": {
+      "digest": "7e3e88893e3e6797cd4f37076e77c0af6bf1f0341d744192a22ef685e5d02e5b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/02.png"
+    },
+    "images/genshin_eat/klee/03.png": {
+      "digest": "c8e222763e4e06f42f889657cf93e55eb7362950c95125acba17a82115e055de",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/03.png"
+    },
+    "images/genshin_eat/klee/04.png": {
+      "digest": "af45e893403cfb9b4b7e7c4ca87330703ebb16849a798bb4a4ae11176234fde0",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/04.png"
+    },
+    "images/genshin_eat/klee/05.png": {
+      "digest": "9df1c324a9a728df0a8329e3718a5c7c979663db3a24ba10e1157b37acc781e8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/05.png"
+    },
+    "images/genshin_eat/klee/06.png": {
+      "digest": "23ff111f3360497d71dbe2dadd1d0a9fce3e76ee0923fa0d58c21739196f891a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/06.png"
+    },
+    "images/genshin_eat/klee/07.png": {
+      "digest": "b8a77ce02cff99db18e5266ce986353796af329067d75d554ebed14debbb5e65",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/07.png"
+    },
+    "images/genshin_eat/klee/08.png": {
+      "digest": "bcaae503ad90297e0be130d4cb55939145b53ac0cffadc30a7874e77a1b47de7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/08.png"
+    },
+    "images/genshin_eat/klee/09.png": {
+      "digest": "49997187d4d036d16f1b638aaf9743d2afce39ceb55c9f4bae06de86f13a9bee",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/09.png"
+    },
+    "images/genshin_eat/klee/10.png": {
+      "digest": "db8b510338e37aecfe0c90aa05e05f991e42c1b6fa85bf9f65280e63e5026627",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/10.png"
+    },
+    "images/genshin_eat/klee/11.png": {
+      "digest": "50cad515f5e55480a3e8c6c290f3dce3fa6505fd878117fd7fd8f86b4685c9d8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/11.png"
+    },
+    "images/genshin_eat/klee/12.png": {
+      "digest": "e02269d98626d3f41e51cf1855fa4549598d36a035d1f062b6768c6282981d31",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/12.png"
+    },
+    "images/genshin_eat/klee/13.png": {
+      "digest": "d6cec70b5ff8621300f2d4fceb89935b9ff393fd4d7dc004674aabd3f995f9d9",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/13.png"
+    },
+    "images/genshin_eat/klee/14.png": {
+      "digest": "c8e222763e4e06f42f889657cf93e55eb7362950c95125acba17a82115e055de",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/14.png"
+    },
+    "images/genshin_eat/klee/15.png": {
+      "digest": "0a360a70ed7b28ca36bbbfde88e5d0a7ad1a095672846011d8c6e7dca3a4dbaf",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/klee/15.png"
+    },
+    "images/genshin_eat/nilou/00.png": {
+      "digest": "a4b37e26734ac3e0bbf459f9c2be2cf750190e036eb754dbca517144f829d91c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/00.png"
+    },
+    "images/genshin_eat/nilou/01.png": {
+      "digest": "a4b37e26734ac3e0bbf459f9c2be2cf750190e036eb754dbca517144f829d91c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/01.png"
+    },
+    "images/genshin_eat/nilou/02.png": {
+      "digest": "dc7eabd185f6f0291d39e6f32d34d9c35567c0148775de157c0d603009be926a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/02.png"
+    },
+    "images/genshin_eat/nilou/03.png": {
+      "digest": "528a4aa63517debea68f80e938f6596652dadeab2c7678ef9be893af3cf6497b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/03.png"
+    },
+    "images/genshin_eat/nilou/04.png": {
+      "digest": "f0193ae849687153d0b85e646c51d2cfe4ef51dd1a2500e46f36ece0994f5ef2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/04.png"
+    },
+    "images/genshin_eat/nilou/05.png": {
+      "digest": "b3c138cb99434729b6cbb2eaa35274372341bf4bce98e3b0c831e16b4c7f7a2e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/05.png"
+    },
+    "images/genshin_eat/nilou/06.png": {
+      "digest": "0f1df4deb5b0341a2fc8874e7bbcabb99868cc88ebf450d11b929b53b677c6ed",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/06.png"
+    },
+    "images/genshin_eat/nilou/07.png": {
+      "digest": "417b38083fc6b53d3505bc29229ea8f05b85b7ca6020ed8a8bddb4fc14d8a095",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/07.png"
+    },
+    "images/genshin_eat/nilou/08.png": {
+      "digest": "ca222f06eb05eba75c263bed9ba248a7f5334fdcae710aac2bf177c3dc4bafb5",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/08.png"
+    },
+    "images/genshin_eat/nilou/09.png": {
+      "digest": "3e8fe03156c52c13afd59752e9a971c609333ba345b4789ad8590c5479388838",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/09.png"
+    },
+    "images/genshin_eat/nilou/10.png": {
+      "digest": "ae0a5df11d34df8b87901392c1e12ca6d0c3319c77990659a1d922f21a8f677d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/10.png"
+    },
+    "images/genshin_eat/nilou/11.png": {
+      "digest": "a27ed0c8ab14991cd0949ec4d0e6213b2704de30dc2808a19a9593d83ac6d9ca",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/11.png"
+    },
+    "images/genshin_eat/nilou/12.png": {
+      "digest": "58ca400d89d3fd3e932a6cd8625a220fd76753b6572982964f6606ea5d9f2077",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/12.png"
+    },
+    "images/genshin_eat/nilou/13.png": {
+      "digest": "a0faf6baf46a02ad72577850da6b99747c863ded60931834c66551f8da414453",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/13.png"
+    },
+    "images/genshin_eat/nilou/14.png": {
+      "digest": "ae0a5df11d34df8b87901392c1e12ca6d0c3319c77990659a1d922f21a8f677d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/14.png"
+    },
+    "images/genshin_eat/nilou/15.png": {
+      "digest": "a27ed0c8ab14991cd0949ec4d0e6213b2704de30dc2808a19a9593d83ac6d9ca",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/nilou/15.png"
+    },
+    "images/genshin_eat/yae_miko/00.png": {
+      "digest": "ed5a7d083f6bdc364cee8f8cfd715c369697b58901c06036ef623c730b0e93b7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/00.png"
+    },
+    "images/genshin_eat/yae_miko/01.png": {
+      "digest": "ed5a7d083f6bdc364cee8f8cfd715c369697b58901c06036ef623c730b0e93b7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/01.png"
+    },
+    "images/genshin_eat/yae_miko/02.png": {
+      "digest": "c35500bf4a411e538d2df785ac71f41eaf046f8ca351c3688ad40358f13506a6",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/02.png"
+    },
+    "images/genshin_eat/yae_miko/03.png": {
+      "digest": "2551c4f9f4b53ebc718976243c8a294f6271e3a17d2695cf2c129ad1f656a928",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/03.png"
+    },
+    "images/genshin_eat/yae_miko/04.png": {
+      "digest": "723af543b329492c497cea4832e62861eeb6ac2a53c22efe2c1c140924c947a3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/04.png"
+    },
+    "images/genshin_eat/yae_miko/05.png": {
+      "digest": "01d5fff3ead4ca26917c548f92b4515e8202f0bb69cba1ef09aa2cc2fc7c54be",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/05.png"
+    },
+    "images/genshin_eat/yae_miko/06.png": {
+      "digest": "8d4537b67a6a8399082a8c15e86e1409bb14ecf5e00778e77eeb4424ee0dc70b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/06.png"
+    },
+    "images/genshin_eat/yae_miko/07.png": {
+      "digest": "3dff08c9fa32d7313297e660e7ea7eccbc931fdc71a07ba70051e24084cd23e6",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/07.png"
+    },
+    "images/genshin_eat/yae_miko/08.png": {
+      "digest": "0a813450de9a788ff94ce41d99b4fbdd3d45d5d514893a35bf2f09ac21bb3d7f",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/08.png"
+    },
+    "images/genshin_eat/yae_miko/09.png": {
+      "digest": "a8e9653de44d52b63173d5547385345c4b41be31bd71f960123a29027bd649e5",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/09.png"
+    },
+    "images/genshin_eat/yae_miko/10.png": {
+      "digest": "3dd7e808832cffe8940bada2c02a64c325c8ef5eefe8654dcbc0dde60b229876",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/10.png"
+    },
+    "images/genshin_eat/yae_miko/11.png": {
+      "digest": "7940ba6a97f9ec746b7733d4ea1940fcf6e2542383201254ccef31e6b0be5d83",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/11.png"
+    },
+    "images/genshin_eat/yae_miko/12.png": {
+      "digest": "bfc9c6665f91ee6fb85e0877d08b0d9c6b0d241f355dc00ec9092d4571d54d9b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/12.png"
+    },
+    "images/genshin_eat/yae_miko/13.png": {
+      "digest": "8ae66bdabbe9d2c181f9033344d40b86ed6c06f36f79abfd33476999ed6136c3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/13.png"
+    },
+    "images/genshin_eat/yae_miko/14.png": {
+      "digest": "fdc8fa2b063ff3ee8330a07c08734cd8b0bd9b5f1a6cafbe7d3c8de6151c118e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/14.png"
+    },
+    "images/genshin_eat/yae_miko/15.png": {
+      "digest": "b9c5ca0e27b4c48ac494d673a292de7df252bb5a1b390fa656b72e2aa48a2ccd",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/yae_miko/15.png"
+    },
+    "images/genshin_eat/zhongli/00.png": {
+      "digest": "7a9842434a397aec78b6ed0eac829a69575b4393e09388675c26613a7ac67c9b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/00.png"
+    },
+    "images/genshin_eat/zhongli/01.png": {
+      "digest": "50d56569f726519bd606ea032899104d45fa0a99c4b41119699b62a1ae3c14f7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/01.png"
+    },
+    "images/genshin_eat/zhongli/02.png": {
+      "digest": "e7e63da385a8ae4476016dc8427193a5bbf1bf1d96b53ab1332e5d0cc3db7887",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/02.png"
+    },
+    "images/genshin_eat/zhongli/03.png": {
+      "digest": "3a7023002e05082d983a11eb4ed34bcd63206833eb8655f2f45748f2faa61f73",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/03.png"
+    },
+    "images/genshin_eat/zhongli/04.png": {
+      "digest": "acf9b39a128abff6f4ae24422d22f32ee78ac40f70cb91551a709f13241a3a7d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/04.png"
+    },
+    "images/genshin_eat/zhongli/05.png": {
+      "digest": "3ffc1893d95616d6e0b8f309c5029ed6495481aab57ee3fbeaa1651f12c54c96",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/05.png"
+    },
+    "images/genshin_eat/zhongli/06.png": {
+      "digest": "5aff068a778df3f37b27127af7288de2ac141a86300ef8447b2d2bde5275275e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/06.png"
+    },
+    "images/genshin_eat/zhongli/07.png": {
+      "digest": "5714f9b5090b128b357e431505f9a512a5ab9881ef7b016d37e3601fa23f73a3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/07.png"
+    },
+    "images/genshin_eat/zhongli/08.png": {
+      "digest": "3a0ea33791bc49361ae2934ca96848129bf6eb29a02b99bbc3ddee308be67371",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/08.png"
+    },
+    "images/genshin_eat/zhongli/09.png": {
+      "digest": "54ef6df2f6b9d86f388ee39d084a64e4fc313d790cba5ba941f030631cc127c9",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/09.png"
+    },
+    "images/genshin_eat/zhongli/10.png": {
+      "digest": "6f8b5a7855d5913d819d6bfeb707038a6c24e3be93071931a4c42295582c3189",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/10.png"
+    },
+    "images/genshin_eat/zhongli/11.png": {
+      "digest": "209f95b05bd76f470f56715829642e93a63eccbd450c464ebb102a54d93bbb5c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/11.png"
+    },
+    "images/genshin_eat/zhongli/12.png": {
+      "digest": "bf76e66a51fcfcae11923ffc64de56e21442d31d29763fa70c5e0e720fdcd3b9",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/12.png"
+    },
+    "images/genshin_eat/zhongli/13.png": {
+      "digest": "f7c9b71d4f7f1c901cf2345eda27d4e2573717b2fdfa16ad1075cac7a6e901c1",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/13.png"
+    },
+    "images/genshin_eat/zhongli/14.png": {
+      "digest": "a7a7733c40c2c84d95168320359b78fd6c96b4bc5156442f4ec3f435dc65b5c9",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/14.png"
+    },
+    "images/genshin_eat/zhongli/15.png": {
+      "digest": "b6b2105c6058830e044def49652ea7e0eee742f59e53e0d8b461510c898860a4",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/genshin_eat/zhongli/15.png"
     },
     "images/genshin_start/0.png": {
       "digest": "094e7c6eddb3156159a15fddda15103df10ff7c7c6f652d33ec943f320047e3c",
@@ -20238,6 +21418,581 @@
       "digest": "71ef6f723f3691fe4540155f568d902708ee0ad8d166b28075b4572ee775c1f1",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/pound/7.png"
+    },
+    "images/printing/000.png": {
+      "digest": "8770fe4899947ab716a132495952df07d9d4de6985f6f5086655ebcac87be4fb",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/000.png"
+    },
+    "images/printing/001.png": {
+      "digest": "1075fec9c5c4150ec99752a722db4057cb4797be7423448b3c001f1493c498ee",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/001.png"
+    },
+    "images/printing/002.png": {
+      "digest": "592f386a6c52dad7973ce1a1b4ad009c4062a6c1bfb43c9f1d39ae104b85ec61",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/002.png"
+    },
+    "images/printing/003.png": {
+      "digest": "70575adc5893fd955ebb260e0be2296d1be54d95b61e2b1087ab471175b2b79e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/003.png"
+    },
+    "images/printing/004.png": {
+      "digest": "1b65808f8567aefa9f3396f9ef3469c4a7145e87ea15201148d66a40deac595d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/004.png"
+    },
+    "images/printing/005.png": {
+      "digest": "9484c42db92e067928113c354c45f33de77ad5dca646f0577b82ab4e9fe776e2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/005.png"
+    },
+    "images/printing/006.png": {
+      "digest": "886cab6403d11f33db5afd4de9b7554d35a9d8223bea224747daadfd590fc9d4",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/006.png"
+    },
+    "images/printing/007.png": {
+      "digest": "a3dfea95c69ac4669906765f5136d9933bc8926049778ad55395d3c5e8d82bdd",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/007.png"
+    },
+    "images/printing/008.png": {
+      "digest": "a825873b96571054d888599bcbb01192c22999c8e10b94c25662cdcde3e0958f",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/008.png"
+    },
+    "images/printing/009.png": {
+      "digest": "124f57a21cf3f7447ea4be729e385e63d92c6eb0a64c6291076e51a9af7dc107",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/009.png"
+    },
+    "images/printing/010.png": {
+      "digest": "9aab7f7f38b13869235445c622716a11cfcc398643c5b133e142970c920985e4",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/010.png"
+    },
+    "images/printing/011.png": {
+      "digest": "5d250c6dfe31989d6025fcbf1e3cd9235bd18055652234c58b1200fa20199261",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/011.png"
+    },
+    "images/printing/012.png": {
+      "digest": "0d3ce90600fb0a0448eb2d56faff384c1a007360273420ffdd4ba6a10e3cd7d1",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/012.png"
+    },
+    "images/printing/013.png": {
+      "digest": "dd0a421615c23cc53b8b9aa023d41694014523fa8e53ddc44f1da03667c3075b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/013.png"
+    },
+    "images/printing/014.png": {
+      "digest": "d564d865bc65884994f0def760c9f42661832461fdad7b130ac295470d65a2bd",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/014.png"
+    },
+    "images/printing/015.png": {
+      "digest": "332941eb4f335a84a265e1459bd72cde4b359c7d167d6947f7a45d9ff2fef755",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/015.png"
+    },
+    "images/printing/016.png": {
+      "digest": "52112f65ef664f963af7f6ded5d6c3b71b315a0f5f06ba2879dedde4e4f99742",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/016.png"
+    },
+    "images/printing/017.png": {
+      "digest": "18058e5f39521a4e9199caa009ea26a183bb8174d2720160f53b7815dd2da254",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/017.png"
+    },
+    "images/printing/018.png": {
+      "digest": "018999e969469daf225a6e42c198217f84e3904077ffd7708405d50202330e56",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/018.png"
+    },
+    "images/printing/019.png": {
+      "digest": "51430b14d6768d2c0acfdd776a921049ea0e815d4a87c317ec760ab12fc0a0ae",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/019.png"
+    },
+    "images/printing/020.png": {
+      "digest": "96e2920ed6862632400052740bfd3c22835016cd07d78eda00bcde7caa77cf08",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/020.png"
+    },
+    "images/printing/021.png": {
+      "digest": "5cbbd33a8a5cc54f27fdedbc1754906c943dfcf7b083289a2138df4c167115db",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/021.png"
+    },
+    "images/printing/022.png": {
+      "digest": "6c869828c6df117199c5425ecd7f9191615ebd7282f5ac8da3de4ea6c2ea5174",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/022.png"
+    },
+    "images/printing/023.png": {
+      "digest": "259fe7fc0ef2d088ac90a5525683d809f1f26dfe56acf78e0b19fc9d3ac77364",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/023.png"
+    },
+    "images/printing/024.png": {
+      "digest": "dc8ff23b78f2799d77dc05954982c6a12829c5f5795dd3258801042491c07e79",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/024.png"
+    },
+    "images/printing/025.png": {
+      "digest": "7faf5f364d70c6fb82dce3c1869c4c606f82edbf4ea0ca7006222631750eb7d1",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/025.png"
+    },
+    "images/printing/026.png": {
+      "digest": "d257703df928ac219283e535b983bb088e99ff5afc218add434f85cac8fd3b00",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/026.png"
+    },
+    "images/printing/027.png": {
+      "digest": "ba005774e80a93a03616d382ceaf807626a8e5cb44c466e65f53de23617a645b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/027.png"
+    },
+    "images/printing/028.png": {
+      "digest": "bfe768c947623427b99382c14a2dc689ad39795fd2f74e368467e37a448db78d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/028.png"
+    },
+    "images/printing/029.png": {
+      "digest": "c38530212f3f6cea636bcd2854848a4c755dc6319362cc6b3a3930140a118ba6",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/029.png"
+    },
+    "images/printing/030.png": {
+      "digest": "17ce3b6054f5e31119fa5b4f1f559f6d3e81b5b95ad5250b98e767e956479065",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/030.png"
+    },
+    "images/printing/031.png": {
+      "digest": "688d43d2e6a2f4e5ff0a261528f524e8201c36323a9034b975110c5e906c8c51",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/031.png"
+    },
+    "images/printing/032.png": {
+      "digest": "c5d505002711943dcaea8d799392f40900f427f77b7751ff180b51091e81b788",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/032.png"
+    },
+    "images/printing/033.png": {
+      "digest": "9a0165d7bb73609e44740f6e8dca3a7070f706266418b2a66cdf956548060d55",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/033.png"
+    },
+    "images/printing/034.png": {
+      "digest": "86d01ed1ccfc332c2f31b555632de78258613a0c5959f298859b1c9dac35b360",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/034.png"
+    },
+    "images/printing/035.png": {
+      "digest": "d03f2a5dacc6e6ce3a0c982880aea5c4a327b6a0254d26c7d4361d224bde06f1",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/035.png"
+    },
+    "images/printing/036.png": {
+      "digest": "a66820cf331b00792ddd9bb51aeeec181846fe6843c798ba50dd92f231a796ff",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/036.png"
+    },
+    "images/printing/037.png": {
+      "digest": "a16911feddd489b965dad8f55c88826bf29c43c0fdde37a30b4f230edc7517f0",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/037.png"
+    },
+    "images/printing/038.png": {
+      "digest": "282581bc0edaff73b5ab1a19e90d99b97cd6782bf1e410ecb30da5b6daadaa99",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/038.png"
+    },
+    "images/printing/039.png": {
+      "digest": "72fd4a240d503ef93ddd44046daec75f8f5d778369a3c629a9ad30826f64a58c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/039.png"
+    },
+    "images/printing/040.png": {
+      "digest": "5862e71c4c8e084920008e3dd9a48ee53a06626e4be6276e8a9d9a92e900cb5a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/040.png"
+    },
+    "images/printing/041.png": {
+      "digest": "bccb9784b06c1fa76a68dadbddc62942f316bb6168b426b5d100b741b0be5857",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/041.png"
+    },
+    "images/printing/042.png": {
+      "digest": "9cd32926b19b3a0e56261efa0d53a85c2eb179886fb6b1f6787ffa548d6a2971",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/042.png"
+    },
+    "images/printing/043.png": {
+      "digest": "5ab36a40869f8053008d99288fe01fa00c1099197dafd896e1fb40c94d9ad8f5",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/043.png"
+    },
+    "images/printing/044.png": {
+      "digest": "36235e64297ea6dc62ee0dd9a5e179f31eb7a6a0c7208adf0f00d4081c5f4d1a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/044.png"
+    },
+    "images/printing/045.png": {
+      "digest": "1bb9e15b9cb2f20de872b8904cfc2e78aaedb7864c54135ca10e55c86516bd82",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/045.png"
+    },
+    "images/printing/046.png": {
+      "digest": "8a71bf3448077222f4b29021fad19f325af23a7450659f29e8cb35051ce8ff4a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/046.png"
+    },
+    "images/printing/047.png": {
+      "digest": "bba090e923e26f942c1a3e57c9ec2875c4386ce1f54740ef49125a9dcffb1651",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/047.png"
+    },
+    "images/printing/048.png": {
+      "digest": "b94a2f0f0af67b88a4aee2fd9dcd65d287950060ed6e7679e5ce570343f96a8b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/048.png"
+    },
+    "images/printing/049.png": {
+      "digest": "013814d285dc19e39077ed3939699c7aee08470bcde4b7d1f13a36ea5a5a1f7e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/049.png"
+    },
+    "images/printing/050.png": {
+      "digest": "d8a78a9b555d7c1d4b6152a39204509d0e445fd43d18c8c6cc817716395cc06a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/050.png"
+    },
+    "images/printing/051.png": {
+      "digest": "b76da3dc85e1cf5293b0bfe62123d328e0dbba3e853791477e570106edb7547d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/051.png"
+    },
+    "images/printing/052.png": {
+      "digest": "633dfbcdcc9457a77aaa8ea5d6aadbcf1274a33bc7353aa6af7ce554d9d70970",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/052.png"
+    },
+    "images/printing/053.png": {
+      "digest": "aa6d5a78465d833ff3a318c5f10c861aa8fa9fcf74ad8709c4d6c97db2aa048e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/053.png"
+    },
+    "images/printing/054.png": {
+      "digest": "8ef31f5c08c1b383d9962d73f843ffdc101ac4f09b3a439226396e6175e90e64",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/054.png"
+    },
+    "images/printing/055.png": {
+      "digest": "34fabd98dd6746bf4754fe841cf270b25232db2d9910a38337281c101b98fb92",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/055.png"
+    },
+    "images/printing/056.png": {
+      "digest": "a5132a9ba46409d6ab7e68ca3904dd72590fc082c2f6dfed95559e7080286863",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/056.png"
+    },
+    "images/printing/057.png": {
+      "digest": "b12f5a5427d75acc3d5d442574f3b98e2e16515fd3d38653d66346ef72def617",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/057.png"
+    },
+    "images/printing/058.png": {
+      "digest": "2683f7c17d5f2b671e6c6536c18cb4bf44b2cbe74d4052d7a3d68e929fb061da",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/058.png"
+    },
+    "images/printing/059.png": {
+      "digest": "b6a7d759d8c1947213279af9448863885fdb315cdc0c362674ce37160d20e2d9",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/059.png"
+    },
+    "images/printing/060.png": {
+      "digest": "7986c42c8992d6748b200013068ded15af189ebbe7bec83c03a55ee3b1ca63ad",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/060.png"
+    },
+    "images/printing/061.png": {
+      "digest": "a8527f3147e15d1b97c246c49fa88f1943d1ca9e57b2aa1271daa21e4a3db859",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/061.png"
+    },
+    "images/printing/062.png": {
+      "digest": "94b9cb7cb63d58a8f7e8f8de2b18138ff083acb836262136dff3d2f7a2fb58a7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/062.png"
+    },
+    "images/printing/063.png": {
+      "digest": "584e67966bc04dce1be68e2b1628d8e33e461f0f6503d116b38dcfd99f07d593",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/063.png"
+    },
+    "images/printing/064.png": {
+      "digest": "e99fc94ba5484fb54aa3456b3bd4031037ce6ab5ef1a419fdadcb3dd08501313",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/064.png"
+    },
+    "images/printing/065.png": {
+      "digest": "234792a1279384b1f7a27548441e215de69b1f8e2c3bbf1111771ee70511bc12",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/065.png"
+    },
+    "images/printing/066.png": {
+      "digest": "26f3e7df7572a48a90b8d4cd7d399cb92f808a0919a576ef13fe2c03ed1d798a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/066.png"
+    },
+    "images/printing/067.png": {
+      "digest": "e7dea4df9daaf1d5e528ca3be9f4a370c0061734a8e9095862b91038e29d0440",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/067.png"
+    },
+    "images/printing/068.png": {
+      "digest": "639961a1a2845257be8036266c5e86d797b6a06d529193f92ab108dcbee006db",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/068.png"
+    },
+    "images/printing/069.png": {
+      "digest": "1cd2ac32b32c1aef62e9ef32f768fde978e1a0a3d112bb8b749de999985fe21a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/069.png"
+    },
+    "images/printing/070.png": {
+      "digest": "849f26a1dc988857129ed15d7af1197d0e5bf6873560ebfdb891e1a0ae94b8d8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/070.png"
+    },
+    "images/printing/071.png": {
+      "digest": "2fc541d38adfede9553ef7946124dacb9a35c573bf98c9acc7bb6a9f0820b772",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/071.png"
+    },
+    "images/printing/072.png": {
+      "digest": "5b7e1ae855f57ca39955b8d8cce469ce1e2e3f028e960ee22e67d7d04c1baa7d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/072.png"
+    },
+    "images/printing/073.png": {
+      "digest": "95561bdc6fe72d845317af18d1f362ebcab233ce5b8d851b4f9df2e00385ede2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/073.png"
+    },
+    "images/printing/074.png": {
+      "digest": "35726df666d1826dcaab73a63399af05801945425a7ec97ab02764bf4fe9265e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/074.png"
+    },
+    "images/printing/075.png": {
+      "digest": "bc6a0528ab8f77ce8d0418f03397d90069025fd51b1d8e9d9fdc42ef30e64ee7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/075.png"
+    },
+    "images/printing/076.png": {
+      "digest": "78280b2ab0450783cee08ed5494259d2efdbd5ad76a8812871b1714deb202b0b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/076.png"
+    },
+    "images/printing/077.png": {
+      "digest": "07cd05bb6d6f3b50ab164a72b63837e1dac6c5faa739dbfc445317088c2a4389",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/077.png"
+    },
+    "images/printing/078.png": {
+      "digest": "5d541d3e0fa1d9055fc45e2daee6348a461341c9c8eb24584780a0f18d3094e3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/078.png"
+    },
+    "images/printing/079.png": {
+      "digest": "d85699d8ebcc7bb784d2b13061c07c2b2d7986cefa70bb616f4847e5f222d3c6",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/079.png"
+    },
+    "images/printing/080.png": {
+      "digest": "f39f8ec8cf1518b5e49ea4e1e0e17ee6b58266c5ca580d6deefb450d4e44fa5f",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/080.png"
+    },
+    "images/printing/081.png": {
+      "digest": "f1afcc10978f9ebaf79ab4c3c45b326c601e351b42125e790cd66435566fd9ec",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/081.png"
+    },
+    "images/printing/082.png": {
+      "digest": "bbf02f11eca4a20f4f34178cedc86a2fcd50c1e1a12f7c6aecfdc14865249f94",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/082.png"
+    },
+    "images/printing/083.png": {
+      "digest": "51d64d72d79dc08aa966f111c8fa49185d1f27d656f12cb15dfc279f6d818fc5",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/083.png"
+    },
+    "images/printing/084.png": {
+      "digest": "be3a954d005e457dd4b325f260eb649b9e1ce06367083ec66d2485a5a93cb08f",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/084.png"
+    },
+    "images/printing/085.png": {
+      "digest": "3837d20947f5617a79eaa82bdc081c5b410db826efe729a954abec0c7b35dd50",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/085.png"
+    },
+    "images/printing/086.png": {
+      "digest": "299aecd140485501e4dc8a44a96ec19612cd7183c05025396a5c439eac38f21c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/086.png"
+    },
+    "images/printing/087.png": {
+      "digest": "c75e45185c49585313b08c309a1195964a2916cf041125343885c93c9cd72f8b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/087.png"
+    },
+    "images/printing/088.png": {
+      "digest": "5c394505883109ae1b7257a84a0467a89e4a4faab4bab61e8ea974be4765819e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/088.png"
+    },
+    "images/printing/089.png": {
+      "digest": "6881382ca6903012d5c4a3384b71107e9a3d709f047b1c16da5f865bde5cda60",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/089.png"
+    },
+    "images/printing/090.png": {
+      "digest": "74e773b569dce7a27eaf67024001e46127fe7000e1d7dbfa3614e142d0c05c85",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/090.png"
+    },
+    "images/printing/091.png": {
+      "digest": "0b76fb8291bb2f6a4e47ea49ce648cf649e0ae898643751e6134bf1c677c141b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/091.png"
+    },
+    "images/printing/092.png": {
+      "digest": "1f16f06d822b315e38bd96d05efdf90300a828fb585458a3ade96b23e05edaaf",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/092.png"
+    },
+    "images/printing/093.png": {
+      "digest": "5e0dc8fe809c6b8cb64b2f7756a7d0fa5006721a764675065c1de992ae1c6d30",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/093.png"
+    },
+    "images/printing/094.png": {
+      "digest": "9047fdb4b67666332ce34f006c1958edeacdf6aca92bca0442b2556bf1602a49",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/094.png"
+    },
+    "images/printing/095.png": {
+      "digest": "642113163155eaa3cfe1af8ace24a8b49ce47a2fcfde310a4666188783256a38",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/095.png"
+    },
+    "images/printing/096.png": {
+      "digest": "325a8f3f876ad98ed4ed94188178d936b469e1ab63c5dd5b326e84c1c0eb4fa2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/096.png"
+    },
+    "images/printing/097.png": {
+      "digest": "b1a35602b2281466b2a2c79c19518f800303b751d60d931ed6f76d7ff4662458",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/097.png"
+    },
+    "images/printing/098.png": {
+      "digest": "1c76bd2cbe148d10d8b2e86a0caf1b2a08947bbc5ce874a33010e4d48550be4e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/098.png"
+    },
+    "images/printing/099.png": {
+      "digest": "5ca5bab9a641a2641c649d82eec486cc75c16d36c9e8058c2c308f6a5a7ff673",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/099.png"
+    },
+    "images/printing/100.png": {
+      "digest": "1e1e31a5c2c55d3d08980dd43db114e9ec5d73ab1e191875786e0a3e963fb2f4",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/100.png"
+    },
+    "images/printing/101.png": {
+      "digest": "2a90770429b56b36ede66a4033f1c191a4379ebb10e5ccc46578b3e84730140b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/101.png"
+    },
+    "images/printing/102.png": {
+      "digest": "bde44bbfb8244dcfcea1aa81eb28cd2acbcaa7e0f9ecc861da5dea86dd9851d1",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/102.png"
+    },
+    "images/printing/103.png": {
+      "digest": "186141308c9108b09d4bc683c510c2dc6fdec9234df80ca00e522caba04028b7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/103.png"
+    },
+    "images/printing/104.png": {
+      "digest": "8da49d87805e822411f1d9732dbee0563bb60800c240bd52a6a6926a3e9d5973",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/104.png"
+    },
+    "images/printing/105.png": {
+      "digest": "44c68f63b036771992716d03966b1ebd57b506617f9ff01355a66f94ab5474ca",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/105.png"
+    },
+    "images/printing/106.png": {
+      "digest": "53942db55f4a196ba034f1239e4c1f9f57930721e87ff7eb8ed31b3e5ae5dd24",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/106.png"
+    },
+    "images/printing/107.png": {
+      "digest": "2df426a69c20193ce4ec5a13f54d1eeaca46e0dbf7da10874ffd54af80c73b7b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/107.png"
+    },
+    "images/printing/108.png": {
+      "digest": "9d07b7a7b5409730f5f57c520d88a8f595d39e81b43d3040486eee15d1219b80",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/108.png"
+    },
+    "images/printing/109.png": {
+      "digest": "6d2fb87a31cc7da4a761e49ea1817ffe2f60c5ea87d4548440aac7dab1136cd1",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/109.png"
+    },
+    "images/printing/110.png": {
+      "digest": "9c1381be6c91ecd279eb8d8920860430647f1540dba2aa41fa32c94887d1d9c7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/110.png"
+    },
+    "images/printing/111.png": {
+      "digest": "c066a411a284928e55469840cca7d4d6df7194f2e8aa058d96dcec244069a3e6",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/111.png"
+    },
+    "images/printing/112.png": {
+      "digest": "58706efea4fd1831ebff6561237a42fbfa82075ef9b51b1528b15b8750eaf0f5",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/112.png"
+    },
+    "images/printing/113.png": {
+      "digest": "65aaed39e4a329c458b915990af560ba54b9beb1e4e250814042da9c53d4574b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/113.png"
+    },
+    "images/printing/114.png": {
+      "digest": "96581003d43c61dfb723edb88a61062746a7143e10b1115fff2be59c205f9886",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/printing/114.png"
     },
     "images/prpr/0.png": {
       "digest": "37682024a2b558fe7a18fd9e4cdd4224cdfb1b5fb5c6edc7a929d08fbf550d0d",
@@ -23569,6 +25324,216 @@
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/run/0.png"
     },
+    "images/run_away/00.png": {
+      "digest": "eb60767c022c7e9a1a8b4e9905823529230aadcc776e79b4379e2fad48ac4ed3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/00.png"
+    },
+    "images/run_away/01.png": {
+      "digest": "09ef81cb0f994e2f5aa13b40c569b62979054f97febac10e713c949876e105d9",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/01.png"
+    },
+    "images/run_away/02.png": {
+      "digest": "c02116a4b7fc1742b38f7095d1a01d4585994f490e21bcdd73af6883729a1bc0",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/02.png"
+    },
+    "images/run_away/03.png": {
+      "digest": "d9d3a6d01936589bbfc56a34029ebeeea92e279ba797e9e92460650f53a52eaf",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/03.png"
+    },
+    "images/run_away/04.png": {
+      "digest": "634db2851fcc1cd0ed40bb2c655f566d800c9d70e496680c4347f3395dc339b8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/04.png"
+    },
+    "images/run_away/05.png": {
+      "digest": "553c57b827411b47097e9ad750a80724662a1ec406b2f0a046d1f2bc445d67d5",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/05.png"
+    },
+    "images/run_away/06.png": {
+      "digest": "46f46ad38c34c03641c29f08201a85e4158b3f41e01a6fb6de4212dec633384d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/06.png"
+    },
+    "images/run_away/07.png": {
+      "digest": "b8318e9a4525cdc4ef5a12e541e1fcb1cfa0679fb423552a7a4d155ceaeb27cc",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/07.png"
+    },
+    "images/run_away/08.png": {
+      "digest": "1a0bc8d7c6561396bc7d074735dd3aae475a394473d59e2b07c534b7fcb16371",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/08.png"
+    },
+    "images/run_away/09.png": {
+      "digest": "df9313fe063d15b691f0f8f5bbf7a7020470105f492c26d4e7a5ccd03e8b2179",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/09.png"
+    },
+    "images/run_away/10.png": {
+      "digest": "4df55b1253ea34e4d2e2764e0c482dd92f9bd0b3617bb46eedbd0f2d99d1da22",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/10.png"
+    },
+    "images/run_away/11.png": {
+      "digest": "22d76b1a285c5e7891551bde47b6c48c2e0a48082ab68a2282fa63d31b573df6",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/11.png"
+    },
+    "images/run_away/12.png": {
+      "digest": "23b6822b4c6ce5517b51c4e33174db80783fc40b16e386a8a513e23d947b3186",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/12.png"
+    },
+    "images/run_away/13.png": {
+      "digest": "0d0b25e6cb8c7a85e7c416297141cceb59b8112acac8627e11d1e93162869772",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/13.png"
+    },
+    "images/run_away/14.png": {
+      "digest": "b34183225c545faa0d30fb30689c1d170ce0072146a4361fffcffa42bdcfd970",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/14.png"
+    },
+    "images/run_away/15.png": {
+      "digest": "fd44305e26dadb5053c986f755b359782a786c4bebbf030a68c0184455cf9276",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/15.png"
+    },
+    "images/run_away/16.png": {
+      "digest": "4b9f55e5518fb50e6d9bdccf91af7ad661fe2d4745858869d9b68ce7a12cc9ae",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/16.png"
+    },
+    "images/run_away/17.png": {
+      "digest": "64d567c0818deedc84e8fb45be511d5ef1fa19685194864e964a223d4d9c3bf4",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/17.png"
+    },
+    "images/run_away/18.png": {
+      "digest": "45b9bcbab17ef202f24f607a188f0a45994f77ffc1fdac54ffafcf6a90ce71e8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/18.png"
+    },
+    "images/run_away/19.png": {
+      "digest": "1459fc2e0c83356ac7601a3a1917e193c63846d8785c39e0748daa51f26d04f8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/19.png"
+    },
+    "images/run_away/20.png": {
+      "digest": "da95fbf083005f53ec0e6ce8dd15969fc77cddad9f3a61ac7771bacf6ea356e9",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/20.png"
+    },
+    "images/run_away/21.png": {
+      "digest": "eda4db46405c0c6041a9db65c3a593b66e84a5de7439dee42cdccfdfbc4a4278",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/21.png"
+    },
+    "images/run_away/22.png": {
+      "digest": "7d0d5d87cb346f22275b448d74f7a72fdea8f7f2f6d989f8aabf25c8ab2938db",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/22.png"
+    },
+    "images/run_away/23.png": {
+      "digest": "62192d030ed820f6de5af1db6e4a61b61fc40de1e4a14e59fca910f0fef615fd",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/23.png"
+    },
+    "images/run_away/24.png": {
+      "digest": "87daeb2528e0b1424d00578b21515d10e67166168f7055e59de336a020d41bd3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/24.png"
+    },
+    "images/run_away/25.png": {
+      "digest": "b9b6914841714013ec91974b6655acc436ba37c8cecc9a25630679d7194e5cdf",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/25.png"
+    },
+    "images/run_away/26.png": {
+      "digest": "3b1f97c66c8bfa470602fc86aa3784d43f1f4aea807b3ad03dc7f55ab233793c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/26.png"
+    },
+    "images/run_away/27.png": {
+      "digest": "d8dba989a902c878c4275a0af7c8e95aab166e00c1a461a9c5af987427c13369",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/27.png"
+    },
+    "images/run_away/28.png": {
+      "digest": "2643d30a74549ed117bdb3497bc64917c2bfacc3459b19fd6a073a07bb2951f7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/28.png"
+    },
+    "images/run_away/29.png": {
+      "digest": "f5f246abbbdb2e4b4c25c38c31e0cc3d20ad2e962a077f136840a09b3d0eea55",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/29.png"
+    },
+    "images/run_away/30.png": {
+      "digest": "6f81e8701da5f4f88178a8df9721418a5af5ede90b8182bf038ff961a2081b1f",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/30.png"
+    },
+    "images/run_away/31.png": {
+      "digest": "7e5ee428d5aeb96ca581ed0950bc14887ad994683731709e3b01d70f992dd867",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/31.png"
+    },
+    "images/run_away/32.png": {
+      "digest": "2ab08070ac304297baacba6915424d281112949a6a3df03a18abc17e234ffd4b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/32.png"
+    },
+    "images/run_away/33.png": {
+      "digest": "bf278fa23e3de814a8fa07ba73aa284674d35bb47200f06a1987e2e09a0d32e8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/33.png"
+    },
+    "images/run_away/34.png": {
+      "digest": "318a6a0c36f4ba1fc662fa7511115904a7a0c9aca2fde5b09a13c70441163aaf",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/34.png"
+    },
+    "images/run_away/35.png": {
+      "digest": "bb5e4ad2ec0cf3c5dcc553496b5d00408321c3132ce92878f71c917c20eae853",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/35.png"
+    },
+    "images/run_away/36.png": {
+      "digest": "426ac41543f231eee257603dc533cbee36427f2644bc7ae23fbbb466bce5b52e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/36.png"
+    },
+    "images/run_away/37.png": {
+      "digest": "c2379b58a2f53a55c2e3778747e16b1412c1aa5627cfa0680818e9aebe28c92c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/37.png"
+    },
+    "images/run_away/38.png": {
+      "digest": "9b1721cffce621da665a0805ee23eeb52f158a821900d1475bb5abada3fee878",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/38.png"
+    },
+    "images/run_away/39.png": {
+      "digest": "cb5b18ac4a64a92e708397666e98ad46bb70185caf244a99f2fc39915e043a97",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/39.png"
+    },
+    "images/run_away/40.png": {
+      "digest": "a0703e35afa08f84bd93e2b6d2d114896a4b62a9da44dacd7c5d74200b7baf84",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/40.png"
+    },
+    "images/run_away/41.png": {
+      "digest": "91b5eecdf001ac0bb46a564b058583a4d6982279b9c7794595377850bbe2712b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/run_away/41.png"
+    },
     "images/scratch_head/0.png": {
       "digest": "5c31532bbe1875cde0a81ba9ed590a4c4080c0449dbc17fcb9b3b17ea9614d03",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
@@ -24748,6 +26713,351 @@
       "digest": "02e2f7794dba8cee07bc8bda7d2f0d791336fc6c1781f24c4443cc81c9b3af81",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/taunt/0.png"
+    },
+    "images/telescope/00.png": {
+      "digest": "54acf1431db203117a8003557e57158ad9f2bf52a4fe0ddef7acd6703fb349b1",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/00.png"
+    },
+    "images/telescope/01.png": {
+      "digest": "69e8f740bf9f331d5bef627e2a5b73af1a6bf8f03ebd87f98e4a51de23081773",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/01.png"
+    },
+    "images/telescope/02.png": {
+      "digest": "ff8bd318f837ea0ca09415fe9db28db525262e0a2ce159b1fb644581ead817f5",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/02.png"
+    },
+    "images/telescope/03.png": {
+      "digest": "c6ae42cf050af5d87c7c63d9aa5431cbd71bbaa82edbfb212c3d2e72607c3b80",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/03.png"
+    },
+    "images/telescope/04.png": {
+      "digest": "f378cbba77c41bc13ab7ad33ce016afdb850de227f351cbbc6fe8f04782c170f",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/04.png"
+    },
+    "images/telescope/05.png": {
+      "digest": "33023b3ffb15aac9826aaef72da4e3d992b785dfbb61cc76c03f19939b59de02",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/05.png"
+    },
+    "images/telescope/06.png": {
+      "digest": "1e1d43d2cc543384846d47375b317b68b347518c8374bb625d9d1feb9a0d891c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/06.png"
+    },
+    "images/telescope/07.png": {
+      "digest": "28a33b49b57435efd94a7412fd5f0f8c4c9d326d463f74f2293e30f6178555b3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/07.png"
+    },
+    "images/telescope/08.png": {
+      "digest": "d1acf9f2ac90d2919d9051828e390d64c09746f062e0daccbabb83eb13d1c400",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/08.png"
+    },
+    "images/telescope/09.png": {
+      "digest": "55c192b9058ab90c4272a09d3be111c1c5d3fd387f1b6a4e391cc2944965a691",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/09.png"
+    },
+    "images/telescope/10.png": {
+      "digest": "b53aa2c4d6b1669801fbd0b85f407bb95ed32f4fa99535b7b0e0f7617ef1ab20",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/10.png"
+    },
+    "images/telescope/11.png": {
+      "digest": "6d440bf1b965d267f8bd1370d7870a2f40338d99cc8476549dc4db967fb230d5",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/11.png"
+    },
+    "images/telescope/12.png": {
+      "digest": "2f458b1a3feb2311070e734715df1f6d1bb5e78c1a21c82ab83cdfc739f01b5a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/12.png"
+    },
+    "images/telescope/13.png": {
+      "digest": "f86706c85fb6a937ed0968033826690055430a3d102b8414c495a59dfdaace3b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/13.png"
+    },
+    "images/telescope/14.png": {
+      "digest": "c4cf5e9e8868f4a04e0600fbf54147d1b7ee2dec1e38b163014d1a38f108c45c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/14.png"
+    },
+    "images/telescope/15.png": {
+      "digest": "ed781c192823293aba64b122d0497d234280e23e832fdb2f9ba3dba4f5043be7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/15.png"
+    },
+    "images/telescope/16.png": {
+      "digest": "f12e3d767af83e57b46b8a79bd10b2f9536ba92881df0c5030e2f25ef5c34f61",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/16.png"
+    },
+    "images/telescope/17.png": {
+      "digest": "e02a3a90c729b47110276c4623c9db226d2ceec023c98be270a302f9866579d2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/17.png"
+    },
+    "images/telescope/18.png": {
+      "digest": "373b0a8e3c8cbe524c7a9008604097e0e49486c3faf61c6242c1aee8c5591456",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/18.png"
+    },
+    "images/telescope/19.png": {
+      "digest": "67132a335a13ae1322c2105e82b5b100d3a91748d2d21ec4b1512940aa3c98c7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/19.png"
+    },
+    "images/telescope/20.png": {
+      "digest": "f5f242ad660c86daed77a1b9cce58a8dbf65b1ef73ca700cc483eb72b7f537e3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/20.png"
+    },
+    "images/telescope/21.png": {
+      "digest": "f6d25e3f432d825d06263c3d920baef71a60823c48192f8fa95ba0964604842a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/21.png"
+    },
+    "images/telescope/22.png": {
+      "digest": "ce2aaca5e1709c151994e05c6e677a270a843e60b84a19a66570ae159fcb43b1",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/22.png"
+    },
+    "images/telescope/23.png": {
+      "digest": "fcbc0bb3f3e4a65527632174d8aaa9c5e8363fff2fde8b2a572580ac97dcc32a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/23.png"
+    },
+    "images/telescope/24.png": {
+      "digest": "57f0efd3849200f4eae7a9de940c3d9bf2e21c4947b25ae8232e68260d78baab",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/24.png"
+    },
+    "images/telescope/25.png": {
+      "digest": "421a7986dcda824712ff725cd1287169806bca5985d8eba34b800692714b173b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/25.png"
+    },
+    "images/telescope/26.png": {
+      "digest": "a093eae5de95ccae5a00ddb75a9bbc7477c7e4fad18eb79d74d7a1411f4bcde2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/26.png"
+    },
+    "images/telescope/27.png": {
+      "digest": "818ffa721cb3534962754afba5d0b602e161d7a564d1bad8c5ade0b80ab812ad",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/27.png"
+    },
+    "images/telescope/28.png": {
+      "digest": "2d9993cc35481b698937b28cbca117c70431b64aacfce4b38e6d08f63975960a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/28.png"
+    },
+    "images/telescope/29.png": {
+      "digest": "dfdb9017a0d446bd2540eb950fa4e074876035d33b104bdf413bdadd530f9185",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/29.png"
+    },
+    "images/telescope/30.png": {
+      "digest": "d72eb1f64e258c311672a61e333e96f338e734272d15564b26ccac077c27495d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/30.png"
+    },
+    "images/telescope/31.png": {
+      "digest": "1df1a6ee95dff71a9a8ff941793d308db7a56154ac8a1e1ee179f550cde51498",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/31.png"
+    },
+    "images/telescope/32.png": {
+      "digest": "7a2d3d902532f06ecb48863ee96dfebe0472c4d1a79bcccc8186f0f297ca887b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/32.png"
+    },
+    "images/telescope/33.png": {
+      "digest": "232db4b64c2aab3ec2ddc76f7773c4bc083d29558add537715b81779e003cc06",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/33.png"
+    },
+    "images/telescope/34.png": {
+      "digest": "1963d0759c043631a4d5faf3db0e54753794379e10241c824fc4f96ba337e039",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/34.png"
+    },
+    "images/telescope/35.png": {
+      "digest": "2066f23acb641d10ed862619aaa572ce037aa8e3a5e75b411da68c38cf676fa8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/35.png"
+    },
+    "images/telescope/36.png": {
+      "digest": "5be04aeaa50b781fe815e404e9eacc927697a5f7ead721a6f7c55bc7f0845362",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/36.png"
+    },
+    "images/telescope/37.png": {
+      "digest": "ee1850990cf8ef1de1a3fe225f9032d090bf014981c23da3b8ecd3f136b0db9f",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/37.png"
+    },
+    "images/telescope/38.png": {
+      "digest": "d22f4b570b2a64edda6bc2914cf8851bbe85c48becd061188af52ee0cd1bb5aa",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/38.png"
+    },
+    "images/telescope/39.png": {
+      "digest": "c63fcb6380b63f421868c8eda2df3c187912f9624468887c4f80f7cd6c063855",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/39.png"
+    },
+    "images/telescope/40.png": {
+      "digest": "862c27e6bc8b5b027b45d25aedccf5861164dab0b110dc8df6a7ba08e6839319",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/40.png"
+    },
+    "images/telescope/41.png": {
+      "digest": "a244d6f2e8b62bba3abab426a034a6603a8e0fbe31c4c07184e3e8a6af4bc598",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/41.png"
+    },
+    "images/telescope/42.png": {
+      "digest": "73e4023bece51bee1a6e4499003d54ceaa4eeeaf39622d57036e888e77a988c1",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/42.png"
+    },
+    "images/telescope/43.png": {
+      "digest": "6bb3c319ac7f415994625e0aec1bb60aa8ea798a735c40e050de4b7ebb94f7da",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/43.png"
+    },
+    "images/telescope/44.png": {
+      "digest": "3314ac794dce55b24d1a89f65b6e9d70b48f2cb44a16f2a07c95cdf4c6b4a398",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/44.png"
+    },
+    "images/telescope/45.png": {
+      "digest": "2fc2edb2aecc924fea88ab724fc2c992eae21a9296a7baaded72a42ba8158902",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/45.png"
+    },
+    "images/telescope/46.png": {
+      "digest": "69e6b477255eb5b99bc64456b9ae687613e9693be100eb9f286ca027b1db1285",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/46.png"
+    },
+    "images/telescope/47.png": {
+      "digest": "a0aa29d97c1c70d18103cf95ea7f87aba3dbd7019b5f127d0a707350879e97b7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/47.png"
+    },
+    "images/telescope/48.png": {
+      "digest": "4f77e546a37160a6b8d6836e85c7f4b80452365e8c8d1b458bac4b028409af9c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/48.png"
+    },
+    "images/telescope/49.png": {
+      "digest": "3d94bcaa7f28205ba87fe532d2d9f4b5bcd5771e22addd445e1b3224191128ed",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/49.png"
+    },
+    "images/telescope/50.png": {
+      "digest": "4cc13b97ebbe311d355947d28bd4b445ca231715a8f29adce7e7471fb1f9b478",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/50.png"
+    },
+    "images/telescope/51.png": {
+      "digest": "c363febae346a3c6e0df0f18aaf2603c1be41098bf54d171c85f77faf3af3129",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/51.png"
+    },
+    "images/telescope/52.png": {
+      "digest": "71ab9ec4e4e8bdbb5ea793926e16ce8961727261bae5c900def57960d82f25b7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/52.png"
+    },
+    "images/telescope/53.png": {
+      "digest": "b13ff2fbc1e0fd9b3b0d288ffd7de08dbb9acf8e0b8f3152e02c884f8c7668fb",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/53.png"
+    },
+    "images/telescope/54.png": {
+      "digest": "de5fde98c1a026979fcace57171bdf844e9da2ee9e0f6aaf2da19d565f64b932",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/54.png"
+    },
+    "images/telescope/55.png": {
+      "digest": "5fb64f568202cf80ef21b0e26547cc2c99d9c09b3f9d4f18dc3251f324c13294",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/55.png"
+    },
+    "images/telescope/56.png": {
+      "digest": "e6fe994be1172354271adf57c2ea5503bd145dafeca511261c5a3752d19cb02d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/56.png"
+    },
+    "images/telescope/57.png": {
+      "digest": "991a0d62115731219d8d2cac2a29d931f0efd20b2c457d858dc548e2a99a2cde",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/57.png"
+    },
+    "images/telescope/58.png": {
+      "digest": "e9f5abf4a966aeb9f71ff506ae3744e1b71d1360a14af75f497e8c5c7f5ee605",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/58.png"
+    },
+    "images/telescope/59.png": {
+      "digest": "b48cc5079a30695a97a2c86a2bc950177b020a1c8cdb6d531961397fbc5313ab",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/59.png"
+    },
+    "images/telescope/60.png": {
+      "digest": "83267aebd7fed5469e2ef391441b398b957aaf1f1a23530adaf76b342620f111",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/60.png"
+    },
+    "images/telescope/61.png": {
+      "digest": "efa25d0b7aa681a5dc5ac2ad08746597d3cdd4737c29367fbaa8f51b4cb081f3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/61.png"
+    },
+    "images/telescope/62.png": {
+      "digest": "27b1f605942cbffa76b19bf439b17e29ff9d83c61f5309b71d6390b66c71aabc",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/62.png"
+    },
+    "images/telescope/63.png": {
+      "digest": "1d28decc5b30caaa528c2d51f8a9c34c3f84a1b975ac8ed32c25098d444fb5c0",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/63.png"
+    },
+    "images/telescope/64.png": {
+      "digest": "c4338fff73b77d7cc01ed07c8372f1ef7472815b7a0c952a01f65b0b7c87bc5e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/64.png"
+    },
+    "images/telescope/65.png": {
+      "digest": "fd70df8b958eeca09964f473017411665cb4f657de5c65c6fe604b1ab40dab2d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/65.png"
+    },
+    "images/telescope/66.png": {
+      "digest": "74e5f1bf752eb00e20ddd8b9975069d50a324def857f1842f738b1c81e1dd0f3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/66.png"
+    },
+    "images/telescope/67.png": {
+      "digest": "b536cd00f5b22121e9bade91755d4c8128ee6ef0bce6057fb19bfd7e888bde8b",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/67.png"
+    },
+    "images/telescope/68.png": {
+      "digest": "1ff8cc62a89a5ef910077a870106c77188bf7c77f7d5c13323c7102cf7ac5af8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/telescope/68.png"
     },
     "images/think_what/0.png": {
       "digest": "bdcab00ed67fecb676375a6b3b0b33a28c14daadc7a63979454f5944c139ba8e",

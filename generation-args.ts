@@ -29,8 +29,9 @@ function optionsFor(schema: Fields, properties: Fields) {
     const parsed: ParserOption = args.length === 0
       ? { dest, value: action.value as Argument } : { dest };
     for (const name of option.names) {
-      if (typeof name === "string" && (/^--?[\p{L}\p{N}_]/u.test(name) ||
-          parsed.value !== undefined && /^\p{Script=Han}+$/u.test(name))) options.set(name, parsed);
+      if (typeof name === "string" && (/^--?[\p{L}\p{N}_]/u.test(name) || /^\p{Script=Han}+$/u.test(name))) {
+        options.set(name, parsed);
+      }
     }
   }
   return options;
