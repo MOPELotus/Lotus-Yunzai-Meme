@@ -1,3 +1,4 @@
+import { legacyWordmarkTemplates } from "./legacy-wordmarks.ts";
 import { legacyChatCardTemplates } from "./legacy-chat-cards.ts";
 import { pythonPhotoBehindTemplates } from "./python-photo-behind.ts";
 import { pythonGraphicSceneTemplates } from "./python-graphic-scenes.ts";
@@ -121,6 +122,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...legacyCaptionShortcutTemplates,
   ...legacyCaptionSceneTemplates,
   ...legacyBadgeTemplates,
+  ...legacyWordmarkTemplates,
   ...legacyChatCardTemplates,
   ...legacyPhotoCaptionTemplates,
   ...pythonGraphicSceneTemplates,
