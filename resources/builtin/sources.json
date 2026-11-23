@@ -24981,6 +24981,21 @@
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
       "originalPath": "meme/wanju/images/按摩 (10).png"
     },
+    "images/python/meme_generator/memes/atri_pillow/images/border.png": {
+      "digest": "5eb460faa1c45562f25ebca46f8cbb8131d084a8e636257f861da870ac05d65c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/atri_pillow/images/border.png"
+    },
+    "images/python/meme_generator/memes/atri_pillow/images/no.png": {
+      "digest": "0bf6b0546133fa5a10caf67d49ffb7c67dd243106c6eb9b620945309052b91f0",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/atri_pillow/images/no.png"
+    },
+    "images/python/meme_generator/memes/atri_pillow/images/yes.png": {
+      "digest": "ac084d8002d9ab5702307ba93601940c860b3180b6de3b96966c1773ded7ebc3",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/atri_pillow/images/yes.png"
+    },
     "images/python/meme_generator/memes/baipiaoguai/tudou/0.png": {
       "digest": "b1e212725aca0b841f4bf5892d5d6794563342b60b53e0b90bd48555e0232a72",
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
@@ -25375,6 +25390,11 @@
       "digest": "ccf0f91cfe33ddcb75a5b70d3408b4da022deac9cd149199f2f47e5b6c8d8dcd",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
       "originalPath": "meme_generator/memes/caused_by_this/images/0.png"
+    },
+    "images/python/meme_generator/memes/certificate/images/0.png": {
+      "digest": "ce64522d264c0d415afe32a633143054d5c0711a5b30cf1c75a2947c50b2a481",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/certificate/images/0.png"
     },
     "images/python/meme_generator/memes/cha/tudou/0.png": {
       "digest": "50b93a8a6c12c65f4f2d6a071bba3b1a5c3cafc46e57713bcde7feec24b3cf5a",
@@ -28076,6 +28096,66 @@
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
       "originalPath": "meme_generator/memes/karyl_point/images/0.png"
     },
+    "images/python/meme_generator/memes/kokona_seal/images/1.png": {
+      "digest": "678d5b2ee0a3a52663d251fb726788698edf2364985e9e6324e701b664778a71",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/kokona_seal/images/1.png"
+    },
+    "images/python/meme_generator/memes/kokona_seal/images/10.png": {
+      "digest": "3a339998630b64efba30d77abfa49398b18899e06777f04bbaada5242ef84516",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/kokona_seal/images/10.png"
+    },
+    "images/python/meme_generator/memes/kokona_seal/images/11.png": {
+      "digest": "6fe601195d7e7b5a36e1c5335a828e0450967c5a6f94688190b842952e834258",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/kokona_seal/images/11.png"
+    },
+    "images/python/meme_generator/memes/kokona_seal/images/12.png": {
+      "digest": "b8c2833cc5755b8c277495f5207cd2fa0828a3dac04b3fb0077c4b8666e8f5be",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/kokona_seal/images/12.png"
+    },
+    "images/python/meme_generator/memes/kokona_seal/images/2.png": {
+      "digest": "f5b9d6927237b96e868f1260917776c4358bd7056c2b2385c2e804e17828f150",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/kokona_seal/images/2.png"
+    },
+    "images/python/meme_generator/memes/kokona_seal/images/3.png": {
+      "digest": "aa52b0d1e7132b0e414b11078be0992ce8b63650293d682587890f5369ed4655",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/kokona_seal/images/3.png"
+    },
+    "images/python/meme_generator/memes/kokona_seal/images/4.png": {
+      "digest": "2f26dd88bb83abbb99d24b64f4936e9f1cc1ac43c04d6f792f28e2ea2095407c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/kokona_seal/images/4.png"
+    },
+    "images/python/meme_generator/memes/kokona_seal/images/5.png": {
+      "digest": "78bdd991cbe6be53ae493cf313a411badecf57bc7c6142c2cc7ef66f12c27499",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/kokona_seal/images/5.png"
+    },
+    "images/python/meme_generator/memes/kokona_seal/images/6.png": {
+      "digest": "6cddfc19fae0feca907cec7414fe7e6ca7a2a04fa595d3b447a8116d1d9f22f2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/kokona_seal/images/6.png"
+    },
+    "images/python/meme_generator/memes/kokona_seal/images/7.png": {
+      "digest": "f049ffdcb132869681fc3ac960ee6dceb33fcd9dd16d0f40b21de9faf8dd07af",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/kokona_seal/images/7.png"
+    },
+    "images/python/meme_generator/memes/kokona_seal/images/8.png": {
+      "digest": "3482005657c551eb58ad66f9922f8c0c6189ebe99b149338a5c6e035f58b6ea7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/kokona_seal/images/8.png"
+    },
+    "images/python/meme_generator/memes/kokona_seal/images/9.png": {
+      "digest": "4d5d7f2879548eff16739df5726c3c11fc6f6713424e67691969ef2009b81d85",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/kokona_seal/images/9.png"
+    },
     "images/python/meme_generator/memes/kou/tudou/0.png": {
       "digest": "7b10694184456c936d8d108596f19c38f056724e49547b8f2b11b9c9dc7a3c0f",
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
@@ -30215,6 +30295,11 @@
       "digest": "eeffd29fb05889f96b22d31dd3bae549eae42e6861cb5c78d30cf5bda3253257",
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
       "originalPath": "meme/拍你头/images/4.png"
+    },
+    "images/python/meme_generator/memes/panda_dragon_figure/images/0.png": {
+      "digest": "5740ef0a6f3238ea33c391b2f78f628c82506ebbf3c3979651caee741226f3b2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/panda_dragon_figure/images/0.png"
     },
     "images/python/meme_generator/memes/pao/tudou/0.png": {
       "digest": "a208f50ba4bc086086e81fa32139fba29890de88ef77997b21cfe3f756c3eaa6",

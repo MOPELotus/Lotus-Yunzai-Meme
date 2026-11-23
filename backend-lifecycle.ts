@@ -16,6 +16,11 @@ const nativeTriggers = new WeakMap<LocalMemeProvider["generate"], {
 // Verified built-in captures. Catalog strings are never compiled as regular expressions.
 const nativeShortcutPatterns: readonly NativeShortcutPattern[] = [
   ...legacyCaptionShortcutPatterns,
+  {
+    template: "panda_dragon_figure", source: "(?P<name>\\S{1,10})龙[\\s:：]+(?P<text>\\S+)",
+    pattern: /^(?<name>\S{1,10})龙[\s:：]+(?<text>\S+)(?=\s|$)/u,
+    captions: ["text"], option: { name: "name", capture: "name", suffix: "龙" },
+  },
   { template: "genshin_start", source: "(?P<text>\\S+启动[!！]?)", pattern: /^(\S+启动[!！]?)(?=\s|$)/u },
   { template: "fill_head", source: "满脑子都是(?P<name>\\S+)", pattern: /^满脑子都是(\S+)(?=\s|$)/u },
   { template: "speechless", source: "(?P<text>典型的\\S+思维)", pattern: /^(典型的\S+思维)(?=\s|$)/u },

@@ -17,6 +17,7 @@ import { createMemePokeHandler } from "./poke.ts";
 import { memeCatalogExclusions } from "./catalog-exclusions.ts";
 import { excludedMemeTemplateMessage, isExcludedMemeTemplate } from "./template-policy.ts";
 import { createLocalMemeBackend, matchesLocalMemeTrigger, nativeShortcutPattern } from "./backend-lifecycle.ts";
+import { matchFixedShortcut } from "./legacy-caption-shortcuts.ts";
 import type { MemeTemplateShortcut } from "./builtin-template.ts";
 
 export { createProfileLikeImageRenderer } from "./profile-like-image.ts";
@@ -272,10 +273,8 @@ function shortcutArgs(shortcut: MemeTemplateShortcut | undefined): string {
 function matchNativeShortcut(row: TriggerRow, shortcut: MemeTemplateShortcut, candidate: string): TriggerMatch | undefined {
   const definition = nativeShortcutPattern(row.key, shortcut.key);
   if (definition) {
-    const match = definition.pattern.exec(candidate);
-    if (!match) return;
-    const texts = definition.captions ? definition.captions.map(name => match.groups?.[name]) : [match[1]];
-    if (texts.every(text => text !== undefined)) return { row, keyword: match[0], shortcut, shortcutTexts: texts };
+    const match = matchFixedShortcut(definition, candidate);
+    if (match) return { row, shortcut, ...match };
     return;
   }
   if (sameKeyword(candidate.slice(0, shortcut.key.length), shortcut.key)) return { row, keyword: shortcut.key, shortcut };
@@ -351,8 +350,8 @@ function resolveTrigger(message: string, context?: CatalogContext, withParams = 
 type ResolvedTrigger = Exclude<ReturnType<typeof resolveTrigger>, string | undefined>;
 
 async function prepareResolvedRequest(match: ResolvedTrigger, input: GenerationInput) {
-  const args = shortcutArgs(match.shortcut);
-  const text = args && !match.shortcutTexts ? `${match.text} ${args}`.trim() : match.text;
+  const args = match.preset || match.shortcutTexts ? "" : shortcutArgs(match.shortcut);
+  const text = args ? `${match.text} ${args}`.trim() : match.text;
   const request = await buildGenerationBody(match.row.key, keywords(match.row.keyWords), text, match.params, input, match.preset);
   if (typeof request === "object" && match.shortcutTexts) {
     request.body.delete("texts");

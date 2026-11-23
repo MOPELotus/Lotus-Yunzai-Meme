@@ -75,6 +75,7 @@ import { spatialRotationTemplates } from "./spatial-rotation.ts";
 import { textAnnouncementMemeTemplates } from "./text-announcements.ts";
 import { textGraphicsMemeTemplates } from "./text-graphics.ts";
 import { specialTextCardTemplates } from "./special-text-cards.ts";
+import { specialPrintCardTemplates } from "./special-print-cards.ts";
 import { textPanelMemeTemplates } from "./text-panels.ts";
 import { textSignMemeTemplates } from "./text-signs.ts";
 import { textSpeechMemeTemplates } from "./text-speech.ts";
@@ -168,5 +169,6 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...textAnnouncementMemeTemplates,
   ...textGraphicsMemeTemplates,
   ...specialTextCardTemplates,
+  ...specialPrintCardTemplates,
   ...textPanelMemeTemplates,
 ];

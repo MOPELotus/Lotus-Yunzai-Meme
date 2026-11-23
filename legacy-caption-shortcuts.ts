@@ -5,7 +5,24 @@ export interface NativeShortcutPattern {
   readonly source: string;
   readonly pattern: RegExp;
   readonly captions?: readonly string[];
+  readonly option?: { readonly name: string; readonly capture: string; readonly suffix: string };
   readonly humanized?: string;
+}
+
+export function matchFixedShortcut(definition: NativeShortcutPattern, candidate: string) {
+  const match = definition.pattern.exec(candidate);
+  if (!match) return;
+  const option = definition.option;
+  const value = option && match.groups?.[option.capture];
+  if (option && value === undefined) return;
+  const captions = definition.captions ?? (option ? [] : undefined);
+  const shortcutTexts = captions ? captions.map(name => match.groups?.[name]) : [match[1]];
+  if (!shortcutTexts.every(text => text !== undefined)) return;
+  return {
+    keyword: match[0],
+    shortcutTexts: shortcutTexts.length ? shortcutTexts : undefined,
+    preset: option && value !== undefined ? { name: option.name, value: value + option.suffix } : undefined,
+  };
 }
 
 const patterns = [
