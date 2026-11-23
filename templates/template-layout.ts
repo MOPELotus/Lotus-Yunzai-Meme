@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Canvas, FontLibrary, loadImage, type CanvasRenderingContext2D } from "skia-canvas";
 import { nativeImageRasterScale, renderExactPng, renderPng, renderRgba } from "../../../packages/skia/index.ts";
-import type { MemeTemplateContext } from "../builtin-template.ts";
+import { MemeTemplateFeedback, type MemeTemplateContext } from "../builtin-template.ts";
 
 export type Draw = (context: CanvasRenderingContext2D) => void;
 type Box = readonly [left: number, top: number, right: number, bottom: number];
@@ -48,7 +48,12 @@ export function paper(context: CanvasRenderingContext2D, width: number, height: 
 }
 
 export function drawFittedText(context: CanvasRenderingContext2D, box: Box, text: string, font: string,
-  minimum: number, maximum: number, alignment: "left" | "center" | "right" = "center", fill = "#000") {
+  minimum: number, maximum: number, alignment: "left" | "center" | "right" = "center", fill = "#000",
+  { wrap = true, stroke, vertical = "center" }: {
+    readonly wrap?: boolean;
+    readonly stroke?: readonly [color: string, ratio: number];
+    readonly vertical?: "top" | "center";
+  } = {}) {
   const [left, top, right, bottom] = box;
   const width = right - left, height = bottom - top;
   context.save();
@@ -59,7 +64,8 @@ export function drawFittedText(context: CanvasRenderingContext2D, box: Box, text
     context.fillStyle = fill;
     for (let size = maximum; size >= minimum; size--) {
       context.font = `${size}px ${font}`;
-      const metrics = context.measureText(text, width);
+      const measuredWidth = wrap ? width : undefined;
+      const metrics = context.measureText(text, measuredWidth);
       const lines = metrics.lines;
       if (!lines.length) return;
       const last = lines[lines.length - 1]!;
@@ -67,11 +73,18 @@ export function drawFittedText(context: CanvasRenderingContext2D, box: Box, text
       const contentHeight = last.y + last.height - first.y;
       if (contentHeight <= height && lines.every(line => line.width <= width)) {
         const x = alignment === "left" ? left : alignment === "right" ? right : (left + right) / 2;
-        context.fillText(text, x, top + (height - contentHeight) / 2 - first.y, width);
+        const y = top + (vertical === "top" ? 0 : (height - contentHeight) / 2) - first.y;
+        if (stroke) {
+          context.strokeStyle = stroke[0];
+          context.lineJoin = "round";
+          context.lineWidth = Math.round(size * stroke[1]) * 2;
+          context.strokeText(text, x, y, measuredWidth);
+        }
+        context.fillText(text, x, y, measuredWidth);
         return;
       }
     }
-    throw new Error("文字过长，无法放进表情模板。");
+    throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
   } finally {
     context.restore();
   }

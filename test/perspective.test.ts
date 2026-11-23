@@ -1,10 +1,11 @@
 import { expect, test } from "bun:test";
 import { Canvas, loadImage, type Image } from "skia-canvas";
-import type { MemeTemplateContext } from "../builtin-template.ts";
+import { MemeTemplateFeedback, type MemeTemplateContext } from "../builtin-template.ts";
 import { readMemeImageSequence } from "../templates/animated-input.ts";
 import { encodeMemeGif } from "../templates/gif.ts";
 import { builtinMemeTemplates } from "../templates/index.ts";
 import { screenProjection } from "../templates/projective-transform.ts";
+import { drawFittedText } from "../templates/template-layout.ts";
 
 test("四点透视映射四角及其投影中心", () => {
   const input = [[0, 0], [100, 0], [100, 100], [0, 100]] as const;
@@ -79,3 +80,33 @@ for (const [key, width, height, x, y, format] of samples) {
     }
   });
 }
+
+test("透视文案保留默认文字、原神启动快捷式和原有字数限制", () => {
+  const expected = [
+    ["genshin_start", "原神，启动！"], ["play_game", "来玩休闲游戏啊"],
+    ["this_chicken", "这是十二生肖中的鸡"], ["incivilization", "你刚才说的话不是很礼貌！"],
+  ];
+  for (const [key, caption] of expected) {
+    const template = builtinMemeTemplates.find(t => t.info.key === key)!;
+    expect(template.info.params_type).toMatchObject({ min_images: 1, max_images: 1, min_texts: 0, max_texts: 1, default_texts: [caption] });
+  }
+  expect(builtinMemeTemplates.find(t => t.info.key === "genshin_start")?.info.shortcuts).toEqual([
+    { key: "(?P<text>\\S+启动[!！]?)", args: ["{text}"], humanized: "xx启动" },
+  ]);
+});
+
+test("单行标题保留实际描边，超长时返回模板提示", () => {
+  const paint = new Canvas(140, 100).getContext("2d");
+  drawFittedText(paint, [0, 0, 140, 100], "A", "sans-serif", 60, 60, "center", "white", { wrap: false, stroke: ["red", 0.1] });
+  const pixels = paint.getImageData(0, 0, 140, 100).data;
+  let white = 0, outlined = 0;
+  for (let i = 0; i < pixels.length; i += 4) {
+    if (pixels[i + 3]! <= 240 || pixels[i]! <= 240) continue;
+    if (pixels[i + 1]! > 240 && pixels[i + 2]! > 240) white++;
+    if (pixels[i + 1]! < 16 && pixels[i + 2]! < 16) outlined++;
+  }
+  expect(white).toBeGreaterThan(100);
+  expect(outlined).toBeGreaterThan(50);
+  expect(() => drawFittedText(paint, [0, 0, 50, 100], "AAA AAA AAA", "sans-serif", 40, 60,
+    "center", "white", { wrap: false, stroke: ["red", 0.1] })).toThrow(MemeTemplateFeedback);
+});

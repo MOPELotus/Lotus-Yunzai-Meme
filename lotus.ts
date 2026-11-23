@@ -219,6 +219,7 @@ interface TriggerMatch {
   readonly keyword: string;
   readonly preset?: PresetArgument;
   readonly shortcut?: MemeTemplateShortcut;
+  readonly shortcutText?: string;
 }
 
 function legacyPresetKeyword(value: string): string | undefined {
@@ -267,6 +268,16 @@ function shortcutArgs(shortcut: MemeTemplateShortcut | undefined): string {
   return (shortcut?.args ?? []).map((arg) => /[\s"']/u.test(arg) ? JSON.stringify(arg) : arg).join(" ");
 }
 
+function matchNativeShortcut(row: TriggerRow, shortcut: MemeTemplateShortcut, candidate: string): TriggerMatch | undefined {
+  // Match the verified built-in capture without executing patterns from the catalog.
+  if (row.key === "genshin_start" && shortcut.key === "(?P<text>\\S+启动[!！]?)") {
+    const keyword = /^\S+启动[!！]?(?=\s|$)/u.exec(candidate)?.[0];
+    if (keyword) return { row, keyword, shortcut, shortcutText: keyword };
+    return;
+  }
+  if (sameKeyword(candidate.slice(0, shortcut.key.length), shortcut.key)) return { row, keyword: shortcut.key, shortcut };
+}
+
 export function resolveMemeTrigger(
   message: string,
   context?: CatalogContext,
@@ -306,16 +317,15 @@ function resolveTrigger(message: string, context?: CatalogContext, withParams = 
       ).all(filters);
       for (const row of withShortcuts) {
         for (const shortcut of readShortcuts(row.info)) {
-          if (shortcut.key.length <= (match?.keyword.length ?? 0)) continue;
-          if (sameKeyword(candidate.slice(0, shortcut.key.length), shortcut.key)) {
-            match = { row, keyword: shortcut.key, shortcut };
-          }
+          const candidateMatch = matchNativeShortcut(row, shortcut, candidate);
+          if (candidateMatch && candidateMatch.keyword.length > (match?.keyword.length ?? 0)) match = candidateMatch;
         }
       }
     }
     match ??= findPreset(db, candidate, filters);
     if (!match) return;
     if ((match.preset || match.shortcut) && policy.hidden.includes(match.keyword)) return;
+    if (match.shortcut && policy.hidden.includes(match.shortcut.key)) return;
 
     const visible = db.query<{ key: string }, [string, string]>(
       `SELECT key ${visibleCatalog} AND key = ?`,
@@ -339,10 +349,12 @@ function resolveTrigger(message: string, context?: CatalogContext, withParams = 
 
 type ResolvedTrigger = Exclude<ReturnType<typeof resolveTrigger>, string | undefined>;
 
-function prepareResolvedRequest(match: ResolvedTrigger, input: GenerationInput) {
+async function prepareResolvedRequest(match: ResolvedTrigger, input: GenerationInput) {
   const args = shortcutArgs(match.shortcut);
-  const text = args ? `${match.text} ${args}`.trim() : match.text;
-  return buildGenerationBody(match.row.key, keywords(match.row.keyWords), text, match.params, input, match.preset);
+  const text = args && !match.shortcutText ? `${match.text} ${args}`.trim() : match.text;
+  const request = await buildGenerationBody(match.row.key, keywords(match.row.keyWords), text, match.params, input, match.preset);
+  if (typeof request === "object" && match.shortcutText !== undefined) request.body.set("texts", match.shortcutText);
+  return request;
 }
 
 export async function prepareMemeRequest(message: string, input: GenerationInput) {

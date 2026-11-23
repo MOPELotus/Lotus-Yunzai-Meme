@@ -94,6 +94,8 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
   Bun.env.LOTUS_MEME_CONFIG_DIR = config;
   Bun.env.LOTUS_MEME_DB = join(directory, "meme.db");
   delete Bun.env.LOTUS_MEME_SERVER_URL;
+  const { perspectiveMemeTemplates } = await import("../templates/perspective.ts");
+  const launch = perspectiveMemeTemplates.find(template => template.info.key === "genshin_start")!;
   const backend = createManagedMemeBackend(signal, [{
     info: {
       key: "always",
@@ -108,7 +110,7 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
       },
     },
     async render() { return new Uint8Array([1]); },
-  }]);
+  }, launch]);
   try {
     const { runAutomaticCatalogRefresh } = await import("../catalog-update.ts");
     const { prepareMemeRequest, resolveMemeTrigger } = await import("../lotus.ts");
@@ -119,6 +121,15 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
       user_id: 1234, isMaster: true, avatar: async () => new Blob(["avatar"], { type: "image/png" }),
     });
     expect(typeof request === "object" && request.body.get("args")).toContain('"mode":"loop"');
+    const launchTitle = "旅行/下午启动！";
+    const launchRequest = await prepareMemeRequest(`#${launchTitle} @456`, {
+      user_id: 1234, isMaster: true, avatar: async user => new Blob([user], { type: "image/png" }),
+    });
+    expect(typeof launchRequest === "object" && launchRequest.key).toBe("genshin_start");
+    expect(typeof launchRequest === "object" && launchRequest.body.getAll("texts")).toEqual([launchTitle]);
+    const targetAvatar = typeof launchRequest === "object" && launchRequest.body.get("images");
+    expect(targetAvatar instanceof File && await targetAvatar.text()).toBe("456");
+    expect(await prepareMemeRequest(`#${launchTitle}不匹配`, { user_id: 1234, isMaster: true })).toBeUndefined();
     await writeFile(join(config, "access.yaml"), "blackListEnable: true\nblackList: [一直一直]\n");
     expect(resolveMemeTrigger("#一直一直")).toBeUndefined();
     expect(resolveMemeTrigger("#一直")).toEqual({ key: "always", keyword: "一直", text: "" });
