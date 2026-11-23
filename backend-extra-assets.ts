@@ -1,4 +1,5 @@
 import { anyliewSignAssets } from "./backend-anyliew-sign-assets.ts";
+import { anyliewLargeAvatarAssets } from "./backend-anyliew-large-avatar-assets.ts";
 import { anyliewTextDialogueAssets } from "./backend-text-dialogue-assets.ts";
 import { anyliewAvatarSceneAssets } from "./backend-anyliew-avatar-scene-assets.ts";
 import { anyliewFixedAnimationV2Assets } from "./backend-anyliew-fixed-animation-v2-assets.ts";
@@ -76,6 +77,7 @@ interface ExtraMemeAsset {
 }
 
 const anyliewAssets = [
+  ...anyliewLargeAvatarAssets,
   ...Object.entries(anyliewFrames).map(([key, digest]) => [`emoji/${key}/images/0.png`, digest] as const),
   ...anyliewDialogueAssets,
   ...anyliewCircleDialogueAssets,

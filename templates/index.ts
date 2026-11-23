@@ -2,6 +2,7 @@ import type { MemeTemplate } from "../builtin-template.ts";
 import { anyliewFixedBatchTemplates } from "./anyliew-fixed-batch.ts";
 import { anyliewAvatarSceneTemplates } from "./anyliew-avatar-scenes.ts";
 import { anyliewFixedAnimationV2 } from "./anyliew-fixed-animation-v2.ts";
+import { anyliewLargeAvatarAnimations } from "./anyliew-large-avatar-animation.ts";
 import { anyliewCircleDialogueTemplates } from "./anyliew-circle-dialogue.ts";
 import { anyliewDialogueTemplates } from "./anyliew-dialogue.ts";
 import { anyliewSignTemplates } from "./anyliew-signs.ts";
@@ -83,6 +84,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...fixedAvatarAnimations,
   ...anyliewFixedBatchTemplates,
   ...anyliewFixedAnimationV2,
+  ...anyliewLargeAvatarAnimations,
   ...classicAvatarMemeTemplates,
   flush,
   ...jumpSoldMemeTemplates,

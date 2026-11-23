@@ -1,15 +1,27 @@
+import { mkdtemp, open, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
 interface RgbaFrame {
   readonly rgba: Uint8Array;
   readonly delayMs: number;
 }
 
 const maxFramePixels = 24_000_000;
+const maxStreamPixels = 64_000_000;
 const maxGifBytes = 16 * 1024 * 1024;
+const maxStreamGifBytes = 8 * 1024 * 1024;
 const maxColor = 255;
 
 export class MemeGifByteLimitError extends RangeError {
+  constructor(limit = maxGifBytes) {
+    super(`表情动图超过 ${limit / (1024 * 1024)} MiB。`);
+  }
+}
+
+export class MemeGifDimensionLimitError extends RangeError {
   constructor() {
-    super("表情动图超过 16 MiB。");
+    super("表情动图的尺寸或帧数超限。");
   }
 }
 
@@ -35,13 +47,12 @@ function colorBox(bins: number[], counts: Uint32Array) {
   return { bins, count, shift: channelShifts[ranges.indexOf(side)]!, priority: count * side };
 }
 
-function paletteFor(frames: readonly RgbaFrame[], signal: AbortSignal) {
+function paletteAccumulator() {
   const counts = new Uint32Array(1 << 15);
   const reds = new Float64Array(counts.length), greens = new Float64Array(counts.length), blues = new Float64Array(counts.length);
   const exact = new Map<number, number>();
   let transparent = false;
-  for (const { rgba } of frames) {
-    signal.throwIfAborted();
+  function add(rgba: Uint8Array) {
     for (let pixel = 0; pixel < rgba.length; pixel += 4) {
       if (rgba[pixel + 3]! < 128) {
         transparent = true;
@@ -56,6 +67,14 @@ function paletteFor(frames: readonly RgbaFrame[], signal: AbortSignal) {
       if (exact.size <= 256) exact.set((red << 16) | (green << 8) | blue, 0);
     }
   }
+  function finish() {
+    return makePalette(counts, reds, greens, blues, exact, transparent);
+  }
+  return { add, finish };
+}
+
+function makePalette(counts: Uint32Array, reds: Float64Array, greens: Float64Array, blues: Float64Array,
+  exact: Map<number, number>, transparent: boolean) {
   const colors: number[] = transparent ? [0, 0, 0] : [];
   const firstColor = transparent ? 1 : 0;
   if (exact.size <= 256 - firstColor) {
@@ -104,9 +123,11 @@ class GifBytes {
   private bytes = new Uint8Array(4096);
   private length = 0;
 
+  constructor(private readonly limit: number) {}
+
   byte(value: number) {
     if (this.length === this.bytes.length) {
-      if (this.length >= maxGifBytes) throw new MemeGifByteLimitError();
+      if (this.length >= this.limit) throw new MemeGifByteLimitError(this.limit);
       const expanded = new Uint8Array(this.bytes.length * 2);
       expanded.set(this.bytes);
       this.bytes = expanded;
@@ -191,24 +212,40 @@ function writeLzw(output: GifBytes, indexes: Uint8Array, codeSize: number) {
   output.byte(0);
 }
 
-export function assertMemeGifDimensions(width: number, height: number, frames: number) {
+function assertDimensions(width: number, height: number, frames: number, budget: number) {
   if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width < 1 || height < 1 ||
       width > 4096 || height > 4096 || !Number.isSafeInteger(frames) || frames < 1 || frames > 1_000 ||
-      width * height * frames > maxFramePixels) {
-    throw new RangeError("表情动图的尺寸或帧数超限。");
+      width * height * frames > budget) {
+    throw new MemeGifDimensionLimitError();
   }
 }
 
-/** Encode Skia RGBA frames as a looping GIF with explicitly bounded work. */
-export function encodeMemeGif(width: number, height: number, frames: readonly RgbaFrame[], signal: AbortSignal): Uint8Array {
-  assertMemeGifDimensions(width, height, frames.length);
-  if (frames.some(frame => frame.rgba.length !== width * height * 4 ||
-      !Number.isFinite(frame.delayMs) || frame.delayMs < 0 || frame.delayMs > 655_350)) {
+export function assertMemeGifDimensions(width: number, height: number, frames: number) {
+  assertDimensions(width, height, frames, maxFramePixels);
+}
+
+export function assertMemeGifStreamDimensions(width: number, height: number, frameLimit: number) {
+  assertDimensions(width, height, frameLimit, maxStreamPixels);
+}
+
+function validateFrame(frame: RgbaFrame, frameBytes: number) {
+  if (frame.rgba.length !== frameBytes || !Number.isFinite(frame.delayMs) || frame.delayMs < 0 || frame.delayMs > 655_350) {
     throw new RangeError("表情动图的帧像素或时长无效。");
   }
-  const palette = paletteFor(frames, signal);
+}
+
+type Palette = ReturnType<typeof makePalette>;
+
+function indexFrame(indexes: Uint8Array, rgba: Uint8Array, palette: Palette) {
+  for (let index = 0; index < indexes.length; index++) {
+    const pixel = index * 4;
+    indexes[index] = rgba[pixel + 3]! < 128 ? 0 : palette.index(rgba[pixel]!, rgba[pixel + 1]!, rgba[pixel + 2]!);
+  }
+}
+
+function gifWriter(width: number, height: number, palette: Palette, limit: number) {
   const exponent = Math.max(1, Math.ceil(Math.log2(palette.colors.length / 3)));
-  const output = new GifBytes();
+  const output = new GifBytes(limit);
   output.write([71, 73, 70, 56, 57, 97]);
   output.word(width);
   output.word(height);
@@ -217,21 +254,151 @@ export function encodeMemeGif(width: number, height: number, frames: readonly Rg
   for (let i = palette.colors.length; i < (1 << exponent) * 3; i++) output.byte(0);
   output.write([0x21, 0xff, 11, ...new TextEncoder().encode("NETSCAPE2.0"), 3, 1, 0, 0, 0]);
 
-  const indexes = new Uint8Array(width * height);
-  for (const { rgba, delayMs } of frames) {
-    signal.throwIfAborted();
-    for (let index = 0; index < indexes.length; index++) {
-      const pixel = index * 4;
-      indexes[index] = rgba[pixel + 3]! < 128 ? 0 : palette.index(rgba[pixel]!, rgba[pixel + 1]!, rgba[pixel + 2]!);
-    }
-    output.write([0x21, 0xf9, 4, palette.transparent ? 0x09 : 0x04]);
+  function add(indexes: Uint8Array, delayMs: number, { left = 0, top = 0, right = width, bottom = height } = {},
+    clear = palette.transparent) {
+    output.write([0x21, 0xf9, 4, (clear ? 0x08 : 0x04) | (palette.transparent ? 1 : 0)]);
     output.word(Math.max(1, Math.round(delayMs / 10)));
-    output.write([0, 0, 0x2c, 0, 0, 0, 0]);
-    output.word(width);
-    output.word(height);
+    output.write([0, 0, 0x2c]);
+    output.word(left);
+    output.word(top);
+    output.word(right - left);
+    output.word(bottom - top);
     output.byte(0);
     writeLzw(output, indexes, Math.max(2, exponent));
   }
-  output.byte(0x3b);
-  return output.result();
+  function finish() {
+    output.byte(0x3b);
+    return output.result();
+  }
+  return { add, finish };
+}
+
+/** Encode Skia RGBA frames as a looping GIF with explicitly bounded work. */
+export function encodeMemeGif(width: number, height: number, frames: readonly RgbaFrame[], signal: AbortSignal): Uint8Array {
+  assertMemeGifDimensions(width, height, frames.length);
+  for (const frame of frames) validateFrame(frame, width * height * 4);
+  const palette = paletteAccumulator();
+  for (const { rgba } of frames) {
+    signal.throwIfAborted();
+    palette.add(rgba);
+  }
+  const indexes = new Uint8Array(width * height);
+  const colors = palette.finish();
+  const writer = gifWriter(width, height, colors, maxGifBytes);
+  for (const { rgba, delayMs } of frames) {
+    signal.throwIfAborted();
+    indexFrame(indexes, rgba, colors);
+    writer.add(indexes, delayMs);
+  }
+  return writer.finish();
+}
+
+function changedRectangle(before: Uint8Array, after: Uint8Array, width: number, height: number) {
+  let left = width, top = height, right = 0, bottom = 0;
+  for (let y = 0; y < height; y++) {
+    const row = y * width;
+    for (let x = 0; x < width; x++) {
+      if (before[row + x] === after[row + x]) continue;
+      left = Math.min(left, x);
+      top = Math.min(top, y);
+      right = Math.max(right, x + 1);
+      bottom = y + 1;
+    }
+  }
+  return right === 0 ? { left: 0, top: 0, right: 1, bottom: 1 } : { left, top, right, bottom };
+}
+
+// A transparent GIF pixel leaves the previous screen untouched. Clear a full
+// frame before any transition that removes an opaque pixel.
+async function writeCompactFrames(width: number, height: number, delays: readonly number[], palette: Palette,
+  readIndexes: (frame: number, indexes: Uint8Array) => Promise<void>) {
+  const pixels = width * height;
+  let previous = new Uint8Array(pixels), current = new Uint8Array(pixels), next = new Uint8Array(pixels);
+  const cropped = new Uint8Array(pixels);
+  const writer = gifWriter(width, height, palette, maxStreamGifBytes);
+  let previousCleared = true;
+  await readIndexes(0, current);
+  for (const [frame, delay] of delays.entries()) {
+    const last = frame === delays.length - 1;
+    if (!last) await readIndexes(frame + 1, next);
+    const clear = palette.transparent && (last || next.some((color, i) => color === 0 && current[i] !== 0));
+    if (previousCleared || clear) {
+      writer.add(current, delay, undefined, clear);
+    } else {
+      const { left, top, right, bottom } = changedRectangle(previous, current, width, height);
+      const stride = right - left;
+      for (let row = top; row < bottom; row++) {
+        cropped.set(current.subarray(row * width + left, row * width + right), (row - top) * stride);
+      }
+      writer.add(cropped.subarray(0, stride * (bottom - top)), delay, { left, top, right, bottom }, clear);
+    }
+    previousCleared = clear;
+    [previous, current, next] = [current, next, previous];
+  }
+  return writer.finish();
+}
+
+/** Encode a large animation with one rendered frame in memory per pass. */
+export async function encodeMemeGifStream(
+  width: number, height: number, frameLimit: number, frames: AsyncIterable<RgbaFrame>, signal: AbortSignal,
+): Promise<Uint8Array> {
+  assertMemeGifStreamDimensions(width, height, frameLimit);
+  signal.throwIfAborted();
+  const directory = await mkdtemp(join(tmpdir(), "lotus-meme-gif-"));
+  try {
+    const file = await open(join(directory, "frames.rgba"), "wx+", 0o600);
+    try {
+      const frameBytes = width * height * 4;
+      const palette = paletteAccumulator();
+      const delays: number[] = [];
+      for await (const frame of frames) {
+        signal.throwIfAborted();
+        if (delays.length >= frameLimit) throw new MemeGifDimensionLimitError();
+        validateFrame(frame, frameBytes);
+        palette.add(frame.rgba);
+        const position = delays.length * frameBytes;
+        let written = 0;
+        while (written < frameBytes) {
+          signal.throwIfAborted();
+          const { bytesWritten } = await file.write(frame.rgba, written, frameBytes - written, position + written);
+          if (!bytesWritten) throw new Error("表情动图的缓存帧写入失败。");
+          written += bytesWritten;
+        }
+        delays.push(frame.delayMs);
+      }
+      signal.throwIfAborted();
+      if (!delays.length) throw new MemeGifDimensionLimitError();
+      const colors = palette.finish();
+      const rgba = Buffer.allocUnsafe(frameBytes);
+      async function readIndexes(index: number, indexes: Uint8Array) {
+        let read = 0;
+        while (read < frameBytes) {
+          signal.throwIfAborted();
+          const { bytesRead } = await file.read(rgba, read, frameBytes - read, index * frameBytes + read);
+          if (!bytesRead) throw new Error("表情动图的缓存帧读取不完整。");
+          read += bytesRead;
+        }
+        signal.throwIfAborted();
+        indexFrame(indexes, rgba, colors);
+      }
+      try {
+        const writer = gifWriter(width, height, colors, maxStreamGifBytes);
+        const indexes = new Uint8Array(width * height);
+        for (const [index, delayMs] of delays.entries()) {
+          await readIndexes(index, indexes);
+          writer.add(indexes, delayMs);
+        }
+        return writer.finish();
+      } catch (error) {
+        if (!(error instanceof MemeGifByteLimitError)) throw error;
+      }
+      const result = await writeCompactFrames(width, height, delays, colors, readIndexes);
+      signal.throwIfAborted();
+      return result;
+    } finally {
+      await file.close();
+    }
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 }

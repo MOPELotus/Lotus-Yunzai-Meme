@@ -2,7 +2,9 @@ import { loadImage, type Image, type CanvasRenderingContext2D } from "skia-canva
 import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeFirstImage } from "./animated-input.ts";
-import { assertMemeGifDimensions, encodeMemeGif, MemeGifByteLimitError } from "./gif.ts";
+import {
+  assertMemeGifDimensions, encodeMemeGif, encodeMemeGifStream, MemeGifByteLimitError, MemeGifDimensionLimitError,
+} from "./gif.ts";
 import { previewImage } from "./template-layout.ts";
 
 type Position = readonly [left: number, top: number];
@@ -28,6 +30,7 @@ interface FixedAvatarAnimation {
   readonly avatarOnTop?: true;
   readonly secondAvatar?: Pick<FixedAvatarAnimation, "positions" | "sizes">;
   readonly directUnderlay?: true;
+  readonly largeCanvas?: { readonly maxSide?: number };
   readonly mode?: Parameters<typeof renderRgba>[3];
 }
 
@@ -405,9 +408,11 @@ async function* orderedFrames(
 
 export function createFixedAvatarAnimation({
   key, keywords, tags, delayMs, positions, sizes, frames, sourceHolds, crop, circle, initialCircle, firstFrame = 1,
-  framePath = frame => `anyliew/emoji/${key}/images/${frame}.png`, avatarFrames, avatarOnTop, secondAvatar, directUnderlay, mode = "auto",
+  framePath = frame => `anyliew/emoji/${key}/images/${frame}.png`, avatarFrames, avatarOnTop, secondAvatar, directUnderlay,
+  largeCanvas, mode = "auto",
 }: FixedAvatarAnimation): MemeTemplate {
   const longAnimation = sourceHolds !== undefined;
+  const resizeForSend = longAnimation || largeCanvas !== undefined;
   const placements = [{ positions, sizes }, ...(secondAvatar ? [secondAvatar] : [])];
   const imageCount = placements.length;
   const fixedPlacement = avatarFrames === undefined && placements.every(({ positions, sizes }) =>
@@ -446,25 +451,38 @@ export function createFixedAvatarAnimation({
       readFrame(0, context),
     ]);
     const { width: sourceWidth, height: sourceHeight } = first;
-    let width = sourceWidth;
-    let height = sourceHeight;
+    const scale = Math.min(1, (largeCanvas?.maxSide ?? Infinity) / Math.max(sourceWidth, sourceHeight));
+    let width = Math.max(1, Math.floor(sourceWidth * scale));
+    let height = Math.max(1, Math.floor(sourceHeight * scale));
     for (;;) {
       signal.throwIfAborted();
-      const rendered = await drawFrames(width, height);
       try {
-        const gif = encodeMemeGif(width, height, rendered, signal);
-        if (!longAnimation || gif.byteLength <= maxSendBytes) return gif;
+        const gif = await encodeFrames(width, height);
+        if (!resizeForSend || gif.byteLength <= maxSendBytes) return gif;
       } catch (error) {
-        if (!longAnimation || !(error instanceof MemeGifByteLimitError) || width + height === 2) throw error;
+        const canResize = error instanceof MemeGifByteLimitError ? resizeForSend :
+          largeCanvas !== undefined && error instanceof MemeGifDimensionLimitError;
+        if (!canResize || width + height === 2) throw error;
       }
       width = Math.max(1, Math.floor(width * 0.9));
       height = Math.max(1, Math.floor(height * 0.9));
     }
 
-    async function drawFrames(width: number, height: number) {
-      assertMemeGifDimensions(width, height, frames);
+    async function encodeFrames(width: number, height: number) {
+      try {
+        assertMemeGifDimensions(width, height, frames);
+      } catch (error) {
+        if (!largeCanvas || !(error instanceof MemeGifDimensionLimitError)) throw error;
+        return encodeMemeGifStream(width, height, holds.length, drawFrames(width, height), signal);
+      }
+      const rendered = [];
+      for await (const frame of drawFrames(width, height)) rendered.push(frame);
+      return encodeMemeGif(width, height, rendered, signal);
+    }
+
+    async function* drawFrames(width: number, height: number) {
       const read = (index: number) => readFrame(index, context);
-      const rendered: { rgba: Buffer; delayMs: number }[] = [];
+      let previous: { rgba: Buffer; delayMs: number } | undefined;
       let avatarLayers: Buffer[] | undefined;
       const scaleX = width / sourceWidth, scaleY = height / sourceHeight;
       for await (const { index, foreground } of orderedFrames(holds.length, first, longAnimation ? 8 : 1, read, signal)) {
@@ -506,11 +524,13 @@ export function createFixedAvatarAnimation({
           ? avatarLayers.reduce((bottom, top, layer) => blendFixedArt(bottom, Buffer.from(top), directUnderlay, layer + 1 === imageCount), art)
           : blendFixedArt(avatarLayers[0]!, art, directUnderlay);
         const duration = delayMs * holds[index]!;
-        const previous = rendered.at(-1);
         if (previous?.rgba.equals(rgba)) previous.delayMs += duration;
-        else rendered.push({ rgba, delayMs: duration });
+        else {
+          if (previous) yield previous;
+          previous = { rgba, delayMs: duration };
+        }
       }
-      return rendered;
+      if (previous) yield previous;
     }
   }
 
