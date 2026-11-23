@@ -1,0 +1,128 @@
+import { expect, test } from "bun:test";
+import { renderPng, renderRgba } from "../../../packages/skia/index.ts";
+import { anyliewFixedAnimationAssets } from "../backend-fixed-animation-assets.ts";
+import type { MemeTemplateContext } from "../builtin-template.ts";
+import { readMemeImageSequence } from "../templates/animated-input.ts";
+import { fixedAvatarAnimations } from "../templates/fixed-avatar-animation.ts";
+import { encodeMemeGif } from "../templates/gif.ts";
+
+const signal = new AbortController().signal;
+
+async function foreground(color: string) {
+  const { rgba } = await renderRgba(300, 220, draw => {
+    draw.fillStyle = color;
+    draw.fillRect(0, 0, 12, 12);
+    draw.fillRect(29, 60, 6, 6);
+  });
+  return Buffer.from(encodeMemeGif(300, 220, [{ rgba, delayMs: 30 }], signal));
+}
+
+function inputGif() {
+  const width = 126;
+  const height = 42;
+  const frames = [false, true].map(second => {
+    const rgba = new Uint8Array(width * height * 4);
+    for (let pixel = 0; pixel < width * height; pixel++) {
+      const x = pixel % width;
+      const channel = second ? 2 : x <= 29 ? 0 : x <= 95 ? 1 : 2;
+      rgba[pixel * 4 + channel] = 255;
+      rgba[pixel * 4 + 3] = 255;
+    }
+    return { rgba, delayMs: 60 };
+  });
+  return new File([new Uint8Array(encodeMemeGif(width, height, frames, signal))], "avatar.gif");
+}
+
+function mockContext(frames: readonly Buffer[], paths: string[]): MemeTemplateContext {
+  return {
+    signal,
+    async imageAsset(path) {
+      paths.push(path);
+      const frame = Number(path.match(/\/(\d+)\.png$/u)?.[1]);
+      return frames[(frame - 1) % frames.length]!;
+    },
+    async fontAsset() { throw new Error("该表情不使用字体"); },
+  };
+}
+
+test("逐项保留固定动画的原关键词、参数和资产路径，并输出有效 GIF", async () => {
+  const foregrounds = await Promise.all([foreground("#ffffff"), foreground("#111111")]);
+  const cases = [
+    ["capoo_smash_egg", ["咖波砸蛋"], 3, 110],
+    ["ikun_trainee", ["练习生"], 12, 50],
+    ["mihoyo_kirara_delivery", ["绮良良派送", "派送"], 4, 40],
+    ["christmas_eve", ["平安夜", "平安夜快乐"], 3, 500],
+    ["doro_chasing", ["doro追", "Doro追", "桃乐丝追"], 4, 70],
+    ["doro_lick", ["桃乐丝舔", "doro舔", "Doro舔", "DORO舔"], 5, 90],
+    ["dog_ear_hat", ["狗耳帽", "狗帽"], 12, 90],
+    ["cheer", ["欢呼"], 10, 100],
+    ["happy_mid_autumn_festival", ["中秋快乐", "中秋节快乐"], 7, 150],
+    ["happy_national_day", ["国庆快乐", "国庆节快乐"], 4, 80],
+    ["happy_new_year", ["新年好"], 4, 70],
+    ["picking_flowers", ["摘花"], 4, 200],
+    ["small_hands", ["小手"], 3, 80],
+    ["wifi", ["wifi", "WIFI"], 4, 100],
+    ["slacking_off", ["摸鱼"], 4, 200],
+  ] as const;
+
+  const input = { images: [inputGif()], texts: [], args: {} };
+  expect(fixedAvatarAnimations.map(({ info }) => info.key)).toEqual(cases.map(([key]) => key));
+  for (const [key, keywords, frames, delay] of cases) {
+    const template = fixedAvatarAnimations.find(item => item.info.key === key)!;
+    expect(template.info.keywords).toEqual(keywords);
+    expect(template.info.params_type).toEqual({
+      min_images: 1, max_images: 1, min_texts: 0, max_texts: 0, args_type: null, default_texts: [],
+    });
+    const paths: string[] = [];
+    const output = await template.render(input, mockContext(foregrounds, paths));
+    const result = await readMemeImageSequence(new File([new Uint8Array(output)], "result.gif"), signal);
+    expect(result.frames).toHaveLength(frames);
+    expect(result.averageDelayMs).toBe(delay);
+    expect(paths).toEqual(Array.from({ length: frames }, (_, index) => `anyliew/emoji/${key}/images/${index + 1}.png`));
+    for (const path of paths) expect(anyliewFixedAnimationAssets.get(path.slice("anyliew/".length))).toMatch(/^[a-f0-9]{64}$/u);
+  }
+}, 20_000);
+
+test("固定动画只取输入首帧，保留遮罩顺序和居中覆盖裁切", async () => {
+  const overlay = await foreground("#ffffff");
+  const input = { images: [inputGif()], texts: [], args: {} };
+  const capoo = fixedAvatarAnimations[0]!;
+  const ikun = fixedAvatarAnimations[1]!;
+  const render = async (template: typeof capoo) => {
+    const result = await template.render(input, mockContext([overlay], []));
+    return readMemeImageSequence(new File([new Uint8Array(result)], "result.gif"), signal);
+  };
+
+  const [capooFrames, ikunFrames] = await Promise.all([render(capoo), render(ikun)]);
+  async function pixels(image: typeof capooFrames.frames[number], points: readonly (readonly [number, number])[]) {
+    const { rgba, engine } = await renderRgba(image.width, image.height, draw => draw.drawImage(image, 0, 0));
+    if (Bun.env.LOTUS_SKIA_MODE === "gpu") {
+      expect(engine.renderer).toBe("GPU");
+      expect(engine.device).toContain("RTX A4000");
+    }
+    return points.map(([x, y]) => [...rgba.subarray((y * image.width + x) * 4, (y * image.width + x) * 4 + 4)]);
+  }
+
+  expect(await pixels(capooFrames.frames[0]!, [[26, 58], [30, 61], [14, 14]])).toEqual([
+    [255, 0, 0, 255], [255, 255, 255, 255], [0, 0, 0, 0],
+  ]);
+  expect(await pixels(capooFrames.frames[1]!, [[25, 98]])).toEqual([[255, 0, 0, 255]]);
+  expect(await pixels(ikunFrames.frames[0]!, [[63, 69], [113, 69], [57, 69]])).toEqual([
+    [0, 255, 0, 255], [0, 255, 0, 255], [0, 0, 0, 0],
+  ]);
+
+  const { png } = await renderPng(8, 8, draw => {
+    draw.fillStyle = "#ff8000a8";
+    draw.fillRect(0, 0, 8, 8);
+  });
+  const transparent = new File([new Uint8Array(png)], "transparent.png");
+  const masked = await capoo.render({ ...input, images: [transparent] }, mockContext([overlay], []));
+  const maskedFrames = await readMemeImageSequence(new File([new Uint8Array(masked)], "masked.gif"), signal);
+  expect(await pixels(maskedFrames.frames[0]!, [[26, 58]])).toEqual([[168, 84, 0, 255]]);
+
+  const hands = fixedAvatarAnimations.find(item => item.info.key === "small_hands")!;
+  const collapsed = await hands.render(input, mockContext([overlay, overlay, await foreground("#111111")], []));
+  const sequence = await readMemeImageSequence(new File([new Uint8Array(collapsed)], "result.gif"), signal);
+  expect(sequence.frames).toHaveLength(2);
+  expect(sequence.averageDelayMs).toBe(120);
+});
