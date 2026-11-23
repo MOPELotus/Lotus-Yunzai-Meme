@@ -8,6 +8,7 @@ import { anyliewTailAssets } from "./backend-anyliew-tail-assets.ts";
 import { anyliewCircleDialogueAssets } from "./backend-circle-dialogue-assets.ts";
 import { anyliewDialogueAssets } from "./backend-dialogue-assets.ts";
 import { anyliewFixedAnimationAssets } from "./backend-fixed-animation-assets.ts";
+import { anyliewAvatarCycleAssets, anyliewDeerHelpAsset } from "./backend-anyliew-avatar-cycle-assets.ts";
 import { anyliewFixedBatchAssets } from "./backend-anyliew-fixed-batch-assets.ts";
 import { flushAssets } from "./backend-flush-assets.ts";
 import { pythonOverlayAssets } from "./backend-python-overlay-assets.ts";
@@ -83,6 +84,7 @@ const anyliewAssets = [
   ...anyliewDialogueAssets,
   ...anyliewCircleDialogueAssets,
   ...anyliewFixedAnimationAssets,
+  ...anyliewAvatarCycleAssets,
   ...anyliewFixedBatchAssets,
   ...anyliewFixedAnimationV2Assets,
   ...anyliewRectangleOverlayAssets,
@@ -98,6 +100,7 @@ const anyliewAssets = [
 
 export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map([
   ...anyliewAssets.map(([path, digest]) => [`images/anyliew/${path}`, { path, digest, sources: anyliewBase }] as const),
+  anyliewDeerHelpAsset,
   ...pythonOverlayAssets,
   ...legacyTextOverlayAssets,
   ...flushAssets,

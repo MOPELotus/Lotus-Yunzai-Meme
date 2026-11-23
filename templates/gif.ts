@@ -243,7 +243,7 @@ function indexFrame(indexes: Uint8Array, rgba: Uint8Array, palette: Palette) {
   }
 }
 
-function gifWriter(width: number, height: number, palette: Palette, limit: number) {
+function gifWriter(width: number, height: number, palette: Palette, limit: number, preserveZeroDelay = false) {
   const exponent = Math.max(1, Math.ceil(Math.log2(palette.colors.length / 3)));
   const output = new GifBytes(limit);
   output.write([71, 73, 70, 56, 57, 97]);
@@ -257,7 +257,7 @@ function gifWriter(width: number, height: number, palette: Palette, limit: numbe
   function add(indexes: Uint8Array, delayMs: number, { left = 0, top = 0, right = width, bottom = height } = {},
     clear = palette.transparent) {
     output.write([0x21, 0xf9, 4, (clear ? 0x08 : 0x04) | (palette.transparent ? 1 : 0)]);
-    output.word(Math.max(1, Math.round(delayMs / 10)));
+    output.word(preserveZeroDelay && delayMs === 0 ? 0 : Math.max(1, Math.round(delayMs / 10)));
     output.write([0, 0, 0x2c]);
     output.word(left);
     output.word(top);
@@ -274,7 +274,9 @@ function gifWriter(width: number, height: number, palette: Palette, limit: numbe
 }
 
 /** Encode Skia RGBA frames as a looping GIF with explicitly bounded work. */
-export function encodeMemeGif(width: number, height: number, frames: readonly RgbaFrame[], signal: AbortSignal): Uint8Array {
+export function encodeMemeGif(width: number, height: number, frames: readonly RgbaFrame[], signal: AbortSignal,
+  { preserveZeroDelay }: { readonly preserveZeroDelay?: true } = {},
+): Uint8Array {
   assertMemeGifDimensions(width, height, frames.length);
   for (const frame of frames) validateFrame(frame, width * height * 4);
   const palette = paletteAccumulator();
@@ -284,7 +286,7 @@ export function encodeMemeGif(width: number, height: number, frames: readonly Rg
   }
   const indexes = new Uint8Array(width * height);
   const colors = palette.finish();
-  const writer = gifWriter(width, height, colors, maxGifBytes);
+  const writer = gifWriter(width, height, colors, maxGifBytes, preserveZeroDelay);
   for (const { rgba, delayMs } of frames) {
     signal.throwIfAborted();
     indexFrame(indexes, rgba, colors);

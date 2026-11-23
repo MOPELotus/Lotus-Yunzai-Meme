@@ -1,7 +1,7 @@
 import { loadImage, type Image, type CanvasRenderingContext2D } from "skia-canvas";
 import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
-import { readMemeFirstImage } from "./animated-input.ts";
+import { readMemeFirstImage, readMemeImageSequence } from "./animated-input.ts";
 import {
   assertMemeGifDimensions, encodeMemeGif, encodeMemeGifStream, MemeGifByteLimitError, MemeGifDimensionLimitError,
 } from "./gif.ts";
@@ -26,7 +26,10 @@ interface FixedAvatarAnimation {
   readonly initialCircle?: { readonly size: Size; readonly cropFirst?: boolean };
   readonly firstFrame?: 0 | 1;
   readonly framePath?: (frame: number) => string;
+  readonly avatarStart?: number;
   readonly avatarFrames?: number;
+  readonly cycleSquareAvatar?: true;
+  readonly preserveZeroDelay?: true;
   readonly avatarOnTop?: true;
   readonly secondAvatar?: Pick<FixedAvatarAnimation, "positions" | "sizes">;
   readonly directUnderlay?: true;
@@ -324,21 +327,31 @@ function at<T extends Size>(values: T | readonly T[], index: number): T {
   return (typeof values[0] === "number" ? values : values[index]) as T;
 }
 
-function placeAvatar(context: CanvasRenderingContext2D, avatar: Image, [left, top]: Position, [width, height]: Size, crop: boolean) {
+function placeAvatar(context: CanvasRenderingContext2D, avatar: Image, [left, top]: Position, [width, height]: Size, crop: boolean,
+  square = false,
+) {
   context.imageSmoothingQuality = "high";
+  const side = Math.min(avatar.width, avatar.height);
+  const sourceWidth = square ? side : avatar.width;
+  const sourceHeight = square ? side : avatar.height;
+  const sx = Math.floor((avatar.width - sourceWidth) / 2), sy = Math.floor((avatar.height - sourceHeight) / 2);
+  const drawPhoto = (x: number, y: number, w: number, h: number) => {
+    if (square) context.drawImage(avatar, sx, sy, sourceWidth, sourceHeight, x, y, w, h);
+    else context.drawImage(avatar, x, y, w, h);
+  };
   if (!crop) {
-    context.drawImage(avatar, left, top, width, height);
+    drawPhoto(left, top, width, height);
     return;
   }
 
-  const ratio = Math.max(width / avatar.width, height / avatar.height);
-  const scaledWidth = Math.trunc(avatar.width * ratio);
-  const scaledHeight = Math.trunc(avatar.height * ratio);
+  const ratio = Math.max(width / sourceWidth, height / sourceHeight);
+  const scaledWidth = Math.trunc(sourceWidth * ratio);
+  const scaledHeight = Math.trunc(sourceHeight * ratio);
   context.save();
   context.beginPath();
   context.rect(left, top, width, height);
   context.clip();
-  context.drawImage(avatar, left + Math.trunc((width - scaledWidth) / 2), top + Math.trunc((height - scaledHeight) / 2),
+  drawPhoto(left + Math.trunc((width - scaledWidth) / 2), top + Math.trunc((height - scaledHeight) / 2),
     scaledWidth, scaledHeight);
   context.restore();
 }
@@ -408,14 +421,15 @@ async function* orderedFrames(
 
 export function createFixedAvatarAnimation({
   key, keywords, tags, delayMs, positions, sizes, frames, sourceHolds, crop, circle, initialCircle, firstFrame = 1,
-  framePath = frame => `anyliew/emoji/${key}/images/${frame}.png`, avatarFrames, avatarOnTop, secondAvatar, directUnderlay,
+  framePath = frame => `anyliew/emoji/${key}/images/${frame}.png`, avatarStart = 0, avatarFrames, cycleSquareAvatar, preserveZeroDelay,
+  avatarOnTop, secondAvatar, directUnderlay,
   largeCanvas, mode = "auto",
 }: FixedAvatarAnimation): MemeTemplate {
   const longAnimation = sourceHolds !== undefined;
   const resizeForSend = longAnimation || largeCanvas !== undefined;
   const placements = [{ positions, sizes }, ...(secondAvatar ? [secondAvatar] : [])];
   const imageCount = placements.length;
-  const fixedPlacement = avatarFrames === undefined && placements.every(({ positions, sizes }) =>
+  const fixedPlacement = !cycleSquareAvatar && avatarStart === 0 && avatarFrames === undefined && placements.every(({ positions, sizes }) =>
     typeof positions[0] === "number" && typeof sizes[0] === "number");
   const holds = sourceHolds ?? Array<number>(frames).fill(1);
   let sourceIndex = 0;
@@ -446,8 +460,11 @@ export function createFixedAvatarAnimation({
     const { signal } = context;
     signal.throwIfAborted();
     const [avatars, first] = await Promise.all([
-      Promise.all(input.images.map(file => readMemeFirstImage(file, signal)
-        .then(image => circle === "before-resize" ? circleSource(image, mode, initialCircle) : image))),
+      Promise.all(input.images.map(async file => {
+        if (cycleSquareAvatar) return (await readMemeImageSequence(file, signal)).frames;
+        const image = await readMemeFirstImage(file, signal);
+        return [circle === "before-resize" ? await circleSource(image, mode, initialCircle) : image];
+      })),
       readFrame(0, context),
     ]);
     const { width: sourceWidth, height: sourceHeight } = first;
@@ -477,7 +494,7 @@ export function createFixedAvatarAnimation({
       }
       const rendered = [];
       for await (const frame of drawFrames(width, height)) rendered.push(frame);
-      return encodeMemeGif(width, height, rendered, signal);
+      return encodeMemeGif(width, height, rendered, signal, { preserveZeroDelay });
     }
 
     async function* drawFrames(width: number, height: number) {
@@ -492,7 +509,7 @@ export function createFixedAvatarAnimation({
         if (!avatarLayers || !fixedPlacement) {
           const offset = offsets[index]!;
           avatarLayers = await Promise.all(placements.map(async ({ positions, sizes }, avatarIndex) => {
-            if (avatarFrames !== undefined && offset >= avatarFrames) return Buffer.alloc(width * height * 4);
+            if (offset < avatarStart || avatarFrames !== undefined && offset >= avatarFrames) return Buffer.alloc(width * height * 4);
             const position = at(positions, offset);
             const size = at(sizes, offset);
             const { rgba } = await renderRgba(width, height, canvas => {
@@ -501,7 +518,9 @@ export function createFixedAvatarAnimation({
                 avatarEllipse(canvas, position, size, circle === "hard-ellipse");
                 canvas.clip();
               }
-              placeAvatar(canvas, avatars[avatarIndex]!, position, size, crop ?? false);
+              const source = avatars[avatarIndex]!;
+              const image = source[(offset - avatarStart) % source.length]!;
+              placeAvatar(canvas, image, position, size, crop ?? false, cycleSquareAvatar);
             }, mode);
             if (circle === "hard-ellipse") {
               // The source replaces the original alpha with a hard ellipse.
