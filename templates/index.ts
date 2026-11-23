@@ -4,6 +4,7 @@ import { anyliewCircleDialogueTemplates } from "./anyliew-circle-dialogue.ts";
 import { anyliewDialogueTemplates } from "./anyliew-dialogue.ts";
 import { anyliewSignTemplates } from "./anyliew-signs.ts";
 import { anyliewStaticAvatarTemplates } from "./anyliew-static-avatar.ts";
+import { anyliewTailTemplates } from "./anyliew-tail.ts";
 import { anyliewTextDialogueTemplates } from "./anyliew-text-dialogue.ts";
 import { avatarCaptionMemeTemplates } from "./avatar-caption-cards.ts";
 import { avatarFrameMemeTemplates } from "./avatar-frames.ts";
@@ -58,6 +59,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...rectangleOverlayTemplates,
   ...anyliewAvatarSceneTemplates,
   ...anyliewStaticAvatarTemplates,
+  ...anyliewTailTemplates,
   ...anyliewDialogueTemplates,
   ...anyliewCircleDialogueTemplates,
   ...anyliewSignTemplates,
