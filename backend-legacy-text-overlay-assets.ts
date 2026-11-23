@@ -18,6 +18,10 @@ const captions = [
   ["meme_generator/memes/scratchcard/images/1.png", "58868a7eb9be598ae4730848e764990db4adf4375bfcdcc0cf4a3b1e5acda6f7"],
   ["meme_generator/memes/wakeup/images/0.jpg", "10c8d9052e3599c423a430c0b587819865f1c3cc66b75c75fa9f3c4286bf2dcf"],
   ["meme_generator/memes/wujing/images/0.jpg", "2b58fb75d5687c5c6c5ca20b9b4b618756c1b607ee476b96ff38acf0bed1a82e"],
+  ["meme_generator/memes/bluearchive/images/cross.png", "cf1937d922cdf72c49e65760bfef420335d59d953cf084ad195dd0f84066ab0f"],
+  ["meme_generator/memes/bluearchive/images/halo.png", "90f2e2ea6b0dbe30b7e51577e03e78542865f23d21d2bafcd8a96e8806bdee89"],
+  ["meme_generator/memes/nokia/images/0.jpg", "5dda5c9916f762ea6420ff71f8e3ca4f30e012a1df6d62860537793626024330"],
+  ["meme_generator/memes/p5letter/images/background.png", "28328b764181bfb3ae5e61795a35552d5f967cfb9f554358a76856f34b16624a"],
 ] as const;
 
 export const legacyTextOverlayAssets = captions.map(([path, digest]) =>

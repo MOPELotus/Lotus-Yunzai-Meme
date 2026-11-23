@@ -9,6 +9,7 @@ const manifestHash = "68a03183b74fffdb82abe1f49f5a9bf1b0e009ff09944646dfcd35f79b
 const rustSource = "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/";
 const fonts = new Set([
   "NotoColorEmoji.ttf", "NotoSansSC-Bold.ttf", "NotoSansSC-Regular.ttf",
+  "GlowSansSC-Normal-Heavy.otf", "NotoSerifSC-Regular.otf",
 ]);
 const bundled = fileURLToPath(new URL("../resources/builtin/", import.meta.url));
 

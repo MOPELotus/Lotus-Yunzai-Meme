@@ -14,6 +14,12 @@
       "license": "OFL-1.1",
       "distribution": "https://github.com/TakWolf/fusion-pixel-font/releases/download/v2026.11.10/fusion-pixel-font-12px-proportional-ttf-v2026.11.10.zip"
     },
+    "fonts/GlowSansSC-Normal-Heavy.otf": {
+      "digest": "6f7c4704c1ebf564cbd5fbefed3f497fc7d735521364debe2feb3b38153ec321",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/",
+      "originalPath": "resources/fonts/GlowSansSC-Normal-Heavy.otf",
+      "license": "OFL-1.1"
+    },
     "fonts/LXGWWenKaiLite-Regular.ttf": {
       "digest": "f799a538a3355877e597a0ae04050e897932c9ae7689eb9227c2953c5dd549ea",
       "source": "https://raw.githubusercontent.com/lxgw/LxgwWenKai-Lite/f87f49eb22d8c87d48982c2a19414e21a0b3ce0b/",
@@ -76,6 +82,12 @@
       "digest": "ae82f4e2a55e1316a55bcc1d05e9555ce08d8bda07e893b486896b626fd852ff",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "fonts/NotoSansSC-Regular.ttf",
+      "license": "OFL-1.1"
+    },
+    "fonts/NotoSerifSC-Regular.otf": {
+      "digest": "4f05a61b6543b1e595cfdf98b915b8e80ae804d5d0df5aa6ab0ca75bac296699",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/",
+      "originalPath": "resources/fonts/NotoSerifSC-Regular.otf",
       "license": "OFL-1.1"
     },
     "fonts/ZCOOLKuaiLe-Regular.ttf": {
@@ -23779,6 +23791,16 @@
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
       "originalPath": "meme_generator/memes/bite/images/9.png"
     },
+    "images/python/meme_generator/memes/bluearchive/images/cross.png": {
+      "digest": "cf1937d922cdf72c49e65760bfef420335d59d953cf084ad195dd0f84066ab0f",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/bluearchive/images/cross.png"
+    },
+    "images/python/meme_generator/memes/bluearchive/images/halo.png": {
+      "digest": "90f2e2ea6b0dbe30b7e51577e03e78542865f23d21d2bafcd8a96e8806bdee89",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/bluearchive/images/halo.png"
+    },
     "images/python/meme_generator/memes/captain/images/0.png": {
       "digest": "038f1c45931637f19be9f30b0b508142b3f3ba8051bdb8ba6574fb3fcc8d3248",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
@@ -25204,6 +25226,11 @@
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
       "originalPath": "meme/nizhejiah/images/0.png"
     },
+    "images/python/meme_generator/memes/nokia/images/0.jpg": {
+      "digest": "5dda5c9916f762ea6420ff71f8e3ca4f30e012a1df6d62860537793626024330",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/nokia/images/0.jpg"
+    },
     "images/python/meme_generator/memes/not_call_me/images/0.png": {
       "digest": "f2975df9337fcf13f64209d64a25bdbebe2ef98d6b6038abaefda3f710243bc1",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
@@ -25283,6 +25310,11 @@
       "digest": "f1e7e9a0683b4520814ee62732db30f2164811c06821e0f373917141c73627af",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
       "originalPath": "meme_generator/memes/osu/images/osu.png"
+    },
+    "images/python/meme_generator/memes/p5letter/images/background.png": {
+      "digest": "28328b764181bfb3ae5e61795a35552d5f967cfb9f554358a76856f34b16624a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/p5letter/images/background.png"
     },
     "images/python/meme_generator/memes/painitou/tudou/0.png": {
       "digest": "4ab7c4d77f333a5f869ca16dcc5136fe49ff32f03b71322c286d7bac848a654d",
