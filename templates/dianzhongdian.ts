@@ -1,8 +1,7 @@
 // Layout from MemeCrafters/meme-generator v0.1.14 (619fa105), dianzhongdian.
 import { loadImage } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
-import type { MemeTemplate } from "../builtin-template.ts";
-import { translateMemeToJapanese } from "../translation.ts";
+import { MemeTemplateFeedback, type MemeTemplate } from "../builtin-template.ts";
 import { readMemeFirstImage } from "./animated-input.ts";
 import { grayImage } from "./grayscale.ts";
 import { drawFittedText, jpg, previewImage, registerFont } from "./template-layout.ts";
@@ -26,11 +25,13 @@ export const dianzhongdian: MemeTemplate = {
   async render({ images, texts }, context) {
     if (images.length !== 1 || texts.length < 1 || texts.length > 2) throw new Error("典中典需要一张图片和一至两段文案。");
     const { signal } = context;
+    signal.throwIfAborted();
     const text = texts[0]!;
+    const japanese = texts[1];
+    if (!japanese?.trim()) throw new MemeTemplateFeedback("请用斜杠补上日语文案，例如 #典中典 救命啊/助けて。");
     const [image, font] = await Promise.all([readMemeFirstImage(images[0]!, signal), registerFont(context)]);
     const imageHeight = Math.max(1, Math.trunc(image.height * width / image.width));
     const first = await caption(text, font, 60, 25, 50);
-    const japanese = texts[1] ?? await translateMemeToJapanese(text, signal);
     const [gray, second] = await Promise.all([grayImage(image, signal), caption(japanese, font, 35, 10, 25)]);
     return jpg(width, imageHeight + 100, draw => {
       draw.fillStyle = "black";
