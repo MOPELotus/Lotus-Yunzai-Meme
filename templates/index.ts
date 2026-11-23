@@ -36,6 +36,8 @@ import { tudouLayeredTemplates, tudouOverlayTemplates, tudouExtendedOverlayTempl
 import { hug, kiss } from "./kiss-hug.ts";
 import { legacyBadgeTemplates } from "./legacy-badges.ts";
 import { legacyPhotoCaptionTemplates } from "./legacy-photo-captions.ts";
+import { legacyPhotoFormTemplates } from "./legacy-photo-forms.ts";
+import { leaveNoteTemplate } from "./leave-note.ts";
 import { legacyPortraitEffectTemplates } from "./legacy-portrait-effects.ts";
 import { legacySceneMemeTemplates } from "./legacy-scene.ts";
 import { legacyCaptionSceneTemplates } from "./legacy-caption-scenes.ts";
@@ -103,6 +105,8 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...legacyCaptionSceneTemplates,
   ...legacyBadgeTemplates,
   ...legacyPhotoCaptionTemplates,
+  ...legacyPhotoFormTemplates,
+  leaveNoteTemplate,
   ...legacyPortraitEffectTemplates,
   ...textSignMemeTemplates,
   ...perspectiveMemeTemplates,

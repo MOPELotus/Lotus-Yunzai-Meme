@@ -20141,6 +20141,11 @@
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/confuse/99.png"
     },
+    "images/coupon/0.png": {
+      "digest": "e4d02200b1d2a5d6b525ddd7e9f3c561094c410582c89ae4ceeff96eda03e6d5",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/coupon/0.png"
+    },
     "images/cover_face/0.png": {
       "digest": "96738bce4fc2a0df30b790a6ef2195ff9ae9b1a113cfa67813d611e80c9d7d9a",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
@@ -21696,6 +21701,16 @@
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/incivilization/0.png"
     },
+    "images/interview/huaji.png": {
+      "digest": "520cb8ef93ad8a615a0926ab165b8059290cf64d466908e3739efd3862709ffd",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/interview/huaji.png"
+    },
+    "images/interview/microphone.png": {
+      "digest": "752a421caf3ff120a1dc18e1bf7e8a2b4ce5a709dbcee392ad7893a9c193bb3d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/interview/microphone.png"
+    },
     "images/jiubingfufa/00.jpg": {
       "digest": "23c3148008562cfa31bdaf0f2ce3188bba2cfd3820599862340b5de37867b101",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
@@ -22616,6 +22631,11 @@
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/maimai_join/0.png"
     },
+    "images/make_friend/0.png": {
+      "digest": "6fa8737c23c384bab76a87fa957e73392069b7a5942ce2a8b2ad91ee415c533c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/make_friend/0.png"
+    },
     "images/meteor/0.png": {
       "digest": "8fae76bba77dd037923c655393a24ed00e8104876f4e56e1d36d31363888c711",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
@@ -22840,6 +22860,26 @@
       "digest": "89ab053978146c3af0ed1d2c37bfcbf86fa465c2bc2ec01839bc11564a9f9dd8",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/no_response/0.png"
+    },
+    "images/oshi_no_ko/background.png": {
+      "digest": "3c04fd7b8d1193f0f502db6984f68b25ff7af8a6ab496f312d99a6f262cdc463",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/oshi_no_ko/background.png"
+    },
+    "images/oshi_no_ko/foreground.png": {
+      "digest": "6052bae7869ef430ff4d926721a601a0bcea1c832c6507f95a3b8f973474d53e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/oshi_no_ko/foreground.png"
+    },
+    "images/oshi_no_ko/text1.png": {
+      "digest": "227870bc9ec61b47a55b9322575fd3efc77601f6b0099aedfb8438610cb26070",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/oshi_no_ko/text1.png"
+    },
+    "images/oshi_no_ko/text2.png": {
+      "digest": "1a45e80aedaefe4990454e6d01d369dabf4377a7424476eb5f6f802e1b6a710e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/oshi_no_ko/text2.png"
     },
     "images/overtime/0.png": {
       "digest": "b80011a380c07c7c26e4cfa02da13c776b4b784523132b24ecc00c8a2454cc47",
@@ -32461,6 +32501,11 @@
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/raise_sign/0.jpg"
     },
+    "images/read_book/0.png": {
+      "digest": "b0b1a01cd164dbb27430fecce6f4f7042bf5e8ffd83e8f9b3e66c6ad6a608cc0",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/read_book/0.png"
+    },
     "images/remote_control/00.png": {
       "digest": "207fabb78315b69e00086046daa12ac8d5e00a321900273d4009705bee00894d",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
@@ -33150,6 +33195,11 @@
       "digest": "1311dbf2549a67496947941dd8ad4d918947fd5f8f6280691a5dc012372fc87e",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/sekaiichi_kawaii/1.png"
+    },
+    "images/sit_still/0.png": {
+      "digest": "1bc59726997b74fd2f5ba8b032c097004b959a8252d1fc936982640736075f3a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/sit_still/0.png"
     },
     "images/slogan/0.jpg": {
       "digest": "b1e627afc021c76ff7a8eab3a880355f3232e4c95fecf073a6257d705ad67b04",
@@ -35405,6 +35455,11 @@
       "digest": "8278c707981973a5f8e79d274d6094e0dff12caef49a1bb2d20d8be20a38d780",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/why_at_me/0.png"
+    },
+    "images/why_have_hands/0.png": {
+      "digest": "d3790385b093c8a1269916a093cebdbd756691628a2b44376ecfdbae010ef6ff",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/why_have_hands/0.png"
     },
     "images/wish_fail/0.png": {
       "digest": "d8c74e95cd3edb900913163f3af359f51087cb488424bd6929f6611bffe3c638",

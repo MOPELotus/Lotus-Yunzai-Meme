@@ -10,6 +10,10 @@ export interface NativeShortcutPattern {
 
 const patterns = [
   {
+    template: "oshi_no_ko", source: "我推的(?P<name>\\S+)",
+    pattern: /^我推的(?<name>\S+)(?=\s|$)/u, captions: ["name"], humanized: "我推的xx",
+  },
+  {
     template: "caused_by_this", source: "你的(?P<text>.+?)(?:主要)?都?是由?这个引起的",
     pattern: /^你的(?<text>.+?)(?:主要)?都?是由?这个引起的(?=\s|$)/u,
     captions: ["text"], humanized: "你的xx主要都是由这个引起的",

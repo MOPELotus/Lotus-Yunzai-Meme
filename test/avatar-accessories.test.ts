@@ -3,9 +3,10 @@ import { loadImage } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import { createBundledMemeResources } from "../backend-builtin-assets.ts";
 import { parseGenerationArgs } from "../generation-args.ts";
-import { avatarAccessoryMemeTemplates, readAbstinenceDate } from "../templates/avatar-accessories.ts";
+import { avatarAccessoryMemeTemplates } from "../templates/avatar-accessories.ts";
 import { readMemeImageSequence } from "../templates/animated-input.ts";
 import { encodeMemeGif } from "../templates/gif.ts";
+import { readMemeDate } from "../templates/meme-date.ts";
 
 const signal = new AbortController().signal;
 const context = { signal, ...createBundledMemeResources(signal) };
@@ -75,7 +76,7 @@ test("小丑面具保留输入动画，拍头与鬼畜各按旧时间轴生成 G
 test("戒导时间参数按旧常见日期、多语言相对日期及回落处理", () => {
   const now = new Date(2026, 10, 23, 13, 30);
   const date = (value: string) => {
-    const result = readAbstinenceDate(value, now);
+    const result = readMemeDate(value, now);
     return [result.getFullYear(), result.getMonth() + 1, result.getDate()];
   };
   for (const value of ["2025-06-07", "2025年6月7日", "2025/06/07", "2025.6.7", "June 7, 2025", "2025-06-07T23:00:00-05:00"]) {
