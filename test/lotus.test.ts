@@ -47,6 +47,9 @@ test("旧随机表情仅选择可用的单图或单文本模板，并沿普通�
         JSON.stringify({ min_images: images, max_images: images, min_texts: texts, max_texts: texts, default_texts: defaults }),
         JSON.stringify(defaults));
     }
+    insert.run("dianzhongdian", JSON.stringify(["典中典"]), 1, 1, 1, 2,
+      JSON.stringify({ min_images: 1, max_images: 1, min_texts: 1, max_texts: 2, default_texts: ["救命啊"] }),
+      JSON.stringify(["救命啊"]));
     db.close();
     const before = await readFile(filename);
     Bun.env.LOTUS_MEME_DB = filename;
@@ -77,6 +80,7 @@ test("旧随机表情仅选择可用的单图或单文本模板，并沿普通�
       },
     })).toContain("无权");
     expect(requests).toHaveLength(1);
+    // 典中典 is the only single-image template with a default caption left.
     await writeFile(access, "blackListEnable: true\nblackList: [selected, blocked-key, 关键词-blocked-alias]\n");
     expect(await module.fallback("#随机表情", input)).toContain("未找到可用");
     expect(requests).toHaveLength(1);

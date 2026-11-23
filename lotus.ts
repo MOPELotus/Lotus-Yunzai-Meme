@@ -464,8 +464,10 @@ async function prepareRandomMeme(message: string, input: GenerationInput) {
     const defaults = hasLegacyDefaults
       ? "json_array_length(CASE WHEN json_valid(defText) THEN defText END)"
       : "json_array_length(CASE WHEN json_valid(params) THEN params END, '$.default_texts')";
+    // 典中典 has one default caption, but a user must supply the Japanese line.
     return db.query<CatalogRow & { params: string }, [string]>(`
       SELECT key, keyWords, params ${visibleCatalog}
+      AND key <> 'dianzhongdian'
       AND ((min_texts = 1 AND max_texts = 1) OR (min_images = 1 AND max_images = 1))
       AND json_valid(params)
       AND ${defaults} > 0
