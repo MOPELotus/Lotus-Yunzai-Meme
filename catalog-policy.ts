@@ -60,6 +60,8 @@ export const defaultPokeCooldown = 20;
 export const maxPokeProbability = 100;
 export const maxPokeCooldown = 3_600;
 export const defaultAvatarCache = true;
+export const defaultRemoteMemeTimeout = 5;
+export const defaultManagedMemeTimeout = 30;
 
 export function pokeSettings() {
   const meme = readConfig(configDirectory(), "meme.yaml");
@@ -147,7 +149,8 @@ function serverSettings() {
   const hasUrl = url !== undefined && url !== null && url !== "";
   const base = hasUrl && (mode !== "managed" || explicitUrl !== undefined) ? parseGenerationServerUrl(url) : undefined;
   const managed = explicitUrl === undefined && (mode === "managed" || (mode === "auto" && !base));
-  const timeout = settings.timeout ?? 5;
+  const timeout = managed ? settings.managedTimeout ?? defaultManagedMemeTimeout :
+    settings.timeout ?? defaultRemoteMemeTimeout;
   if (typeof timeout !== "number" || !Number.isFinite(timeout) || timeout <= 0 || timeout > 120) {
     throw new Error("无效的表情服务请求超时");
   }

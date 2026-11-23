@@ -5,7 +5,8 @@ import { isDeepStrictEqual } from "node:util";
 import { Job } from "node-schedule";
 import { isMap, isSeq, parseDocument } from "yaml";
 import type { MemeReference } from "./reference-card.ts";
-import { configDirectory, defaultAvatarCache, defaultPokeCooldown, defaultPokeProbability, maxPokeCooldown, maxPokeProbability,
+import { configDirectory, defaultAvatarCache, defaultManagedMemeTimeout, defaultPokeCooldown, defaultPokeProbability, defaultRemoteMemeTimeout,
+  maxPokeCooldown, maxPokeProbability,
   normalizeCatalogCron, parseGenerationServerUrl, readConfig } from "./catalog-policy.ts";
 import { isExcludedMemeName, memeNameExclusion } from "./catalog-exclusions.ts";
 
@@ -48,7 +49,8 @@ const sections = [
 const panelSections: readonly { title: string; file: string; fields: readonly PanelSetting[] }[] = [
   { title: "服务设置", file: "server.yaml", fields: [
     ["服务来源", "backend", "backend", "auto"],
-    ["服务地址", "url", "url", ""], ["请求超时（秒）", "timeout", "seconds", 5],
+    ["服务地址", "url", "url", ""], ["请求超时（秒）", "timeout", "seconds", defaultRemoteMemeTimeout],
+    ["本机合成超时（秒）", "managedTimeout", "seconds", defaultManagedMemeTimeout],
   ] },
   ...sections,
   { title: "表情统计设置", file: "stat.yaml", fields: [["表情统计", "enable", "toggle", true]] },
@@ -153,7 +155,8 @@ function panelField(group: string, [label, key, type]: PanelSetting) {
       bottomHelpMessage: "本机托管使用已内置模板。切换后可等待定时同步，也可运行 #表情更新资源。" };
     case "url": return { label, field, component: "Input",
       bottomHelpMessage: "自动模式沿用已填地址，留空使用本机托管。环境变量 LOTUS_MEME_SERVER_URL 优先。" };
-    case "seconds": return { label, field, component: "InputNumber", componentProps: { min: 0, max: 120 } };
+    case "seconds": return { label: field === "server.timeout" ? "远端请求超时（秒）" : label,
+      field, component: "InputNumber", componentProps: { min: 0, max: 120 } };
     case "percentage":
     case "cooldown": return { label, field, component: "InputNumber",
       componentProps: { min: 0, max: type === "percentage" ? maxPokeProbability : maxPokeCooldown, precision: 0 },

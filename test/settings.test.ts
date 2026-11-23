@@ -155,7 +155,7 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     await Promise.all(Object.entries(original).map(([file, text]) => writeFile(path(file), text, { mode: 0o640 })));
     const { configInfo: form } = supportGuoba();
     const fields = form.schemas.flatMap(schema => "field" in schema ? [schema.field] : []);
-    expect(fields).toHaveLength(28);
+    expect(fields).toHaveLength(29);
     expect(fields).toContain("meme.cache");
     for (const field of ["server.retry", "other.autoUpdate", "other.hijackRes", "other.renderScale"]) {
       expect(fields).not.toContain(field);
@@ -163,7 +163,7 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     expect(form.getConfigData()).toMatchObject({
       meme: { enable: false, reply: false, cache: true, imagesInMessage: true, pokeEnable: false, pokeProbability: 50, pokeLimit: 20 },
       access: { mode: 0, userWhiteList: [10001] }, protect: { user: [10002] },
-      server: { backend: "auto", url: "http://127.0.0.1:1/saved", timeout: 5 }, stat: { enable: true },
+      server: { backend: "auto", url: "http://127.0.0.1:1/saved", timeout: 5, managedTimeout: 30 }, stat: { enable: true },
     });
     expect(remoteServiceUrl()).toBe("http://127.0.0.1:1/env");
 
@@ -233,12 +233,15 @@ test("表情面板可修改服务来源并保留配置和环境优先级", async
       .toEqual({ ok: true });
     expect(usesManagedMemeServer()).toBe(false);
     expect(remoteServiceUrl()).toBe("https://example.test/meme/");
+    expect(generationServer()).toMatchObject({ protocol: "legacy", timeout: 9_000 });
     expect(await readFile(path, "utf8")).toContain('# 旧默认服务\ntimeout: 9\n其他字段: 保留');
     const owner = { isMaster: true };
     expect(handleMemeSettings("#表情合成设置 服务来源", owner)).toBe("服务来源：远端服务");
     expect(handleMemeSettings("#表情合成设置 服务来源 本机托管", owner)).toBe("服务来源：本机托管（可运行 #表情更新资源 同步目录。）");
     expect(usesManagedMemeServer()).toBe(true);
     expect(form.getConfigData().server).toMatchObject({ backend: "managed", url: "https://example.test/meme/" });
+    expect(form.setConfigData({ "server.managedTimeout": 18 }, { Result })).toEqual({ ok: true });
+    expect(form.getConfigData().server).toMatchObject({ timeout: 9, managedTimeout: 18 });
     Bun.env.LOTUS_MEME_SERVER_URL = "http://127.0.0.1:1/remote";
     expect(usesManagedMemeServer()).toBe(false);
     expect(remoteServiceUrl()).toBe("http://127.0.0.1:1/remote");
