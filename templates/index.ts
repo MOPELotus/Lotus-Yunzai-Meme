@@ -17,6 +17,7 @@ import { rectangleOverlayTemplates } from "./rectangle-overlays.ts";
 import { pythonOverlayMemeTemplates } from "./python-overlay-animation.ts";
 import { staticMemeTemplates } from "./static-layouts.ts";
 import { textAnnouncementMemeTemplates } from "./text-announcements.ts";
+import { textPanelMemeTemplates } from "./text-panels.ts";
 import { textSignMemeTemplates } from "./text-signs.ts";
 import { textSpeechMemeTemplates } from "./text-speech.ts";
 import { transformMemeTemplates } from "./transforms.ts";
@@ -43,4 +44,5 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...textSpeechMemeTemplates,
   ...pythonOverlayMemeTemplates,
   ...textAnnouncementMemeTemplates,
+  ...textPanelMemeTemplates,
 ];
