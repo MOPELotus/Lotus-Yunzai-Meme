@@ -1,6 +1,7 @@
 import type { MemeTemplate } from "../builtin-template.ts";
 import { anyliewCircleDialogueTemplates } from "./anyliew-circle-dialogue.ts";
 import { anyliewDialogueTemplates } from "./anyliew-dialogue.ts";
+import { anyliewSignTemplates } from "./anyliew-signs.ts";
 import { avatarCaptionMemeTemplates } from "./avatar-caption-cards.ts";
 import { avatarFrameMemeTemplates } from "./avatar-frames.ts";
 import { basicImageMemeTemplates } from "./basic-image-transforms.ts";
@@ -44,6 +45,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...rectangleOverlayTemplates,
   ...anyliewDialogueTemplates,
   ...anyliewCircleDialogueTemplates,
+  ...anyliewSignTemplates,
   ...legacySceneMemeTemplates,
   ...textSignMemeTemplates,
   ...perspectiveMemeTemplates,
