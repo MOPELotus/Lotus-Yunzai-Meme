@@ -10,6 +10,7 @@ import { basicImageMemeTemplates } from "./basic-image-transforms.ts";
 import { captionOverlayMemeTemplates } from "./caption-overlays.ts";
 import { dianzhongdian } from "./dianzhongdian.ts";
 import { fixedAvatarAnimations } from "./fixed-avatar-animation.ts";
+import { flush } from "./flush.ts";
 import { jumpSoldMemeTemplates } from "./jump-sold.ts";
 import { shortAvatarAnimations } from "./short-avatar-animation.ts";
 import { tudouShortAnimations } from "./tudou-short-animation.ts";
@@ -64,6 +65,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...textSignMemeTemplates,
   ...perspectiveMemeTemplates,
   ...fixedAvatarAnimations,
+  flush,
   ...jumpSoldMemeTemplates,
   ...shortAvatarAnimations,
   ...tudouShortAnimations,
