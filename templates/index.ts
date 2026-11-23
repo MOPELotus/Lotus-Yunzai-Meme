@@ -14,6 +14,7 @@ import { avatarFrameMemeTemplates } from "./avatar-frames.ts";
 import { basicImageMemeTemplates } from "./basic-image-transforms.ts";
 import { captionOverlayMemeTemplates } from "./caption-overlays.ts";
 import { classicAvatarMemeTemplates } from "./classic-avatar-animations.ts";
+import { classicLayeredMemeTemplates } from "./classic-layered-animations.ts";
 import { dianzhongdian } from "./dianzhongdian.ts";
 import { fixedAvatarAnimations } from "./fixed-avatar-animation.ts";
 import { flush } from "./flush.ts";
@@ -86,6 +87,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...anyliewFixedAnimationV2,
   ...anyliewLargeAvatarAnimations,
   ...classicAvatarMemeTemplates,
+  ...classicLayeredMemeTemplates,
   flush,
   ...jumpSoldMemeTemplates,
   ...shortAvatarAnimations,
