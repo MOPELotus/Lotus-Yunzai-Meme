@@ -1,11 +1,13 @@
 // Original layouts from MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
+import { randomInt } from "node:crypto";
 import { Canvas, loadImage, type CanvasRenderingContext2D } from "skia-canvas";
+import { renderPng } from "@lotus-yunzai/skia";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext } from "../builtin-template.ts";
 import { drawFittedText, jpg, registerFont } from "./template-layout.ts";
 
 type Caption = {
-  readonly text: string;
+  readonly text?: string;
   readonly box: readonly [number, number, number, number];
   readonly color?: string;
   decorate?(text: string): string;
@@ -15,6 +17,10 @@ interface Definition {
   readonly key: string;
   readonly keywords: readonly string[];
   readonly asset: string;
+  readonly png?: boolean;
+  readonly bold?: boolean;
+  readonly wrap?: boolean;
+  readonly tags?: readonly string[];
   readonly minFont: number;
   readonly maxFont: number;
   readonly captions: readonly Caption[];
@@ -49,8 +55,28 @@ const definitions: readonly Definition[] = [
     key: "meteor", keywords: ["流星"], asset: "meteor/0.png", minFont: 20, maxFont: 80,
     captions: [{ text: "我要对象", box: [220, 230, 920, 315], color: "#fff" }],
   },
+  {
+    key: "wish_fail", keywords: ["许愿失败"], asset: "wish_fail/0.png", minFont: 20, maxFont: 80,
+    captions: [{ text: "我要对象", box: [70, 305, 320, 380] }],
+  },
+  {
+    key: "top_notch", keywords: ["顶尖"], asset: "python/meme_generator/memes/top_notch/images/0.png", png: true,
+    minFont: 20, maxFont: 40,
+    captions: [{ text: "运营", box: [10, 240, 420, 300], decorate: text => `好，不愧是顶尖${text}` }],
+  },
+  {
+    key: "my_opinion", keywords: ["我的意见如下", "我的意见是"], asset: "my_opinion/0.png", png: true, bold: true, wrap: false,
+    tags: ["东方Project"], minFont: 20, maxFont: 500,
+    captions: [{ box: [37, 660, 487, 1070] }],
+  },
+  {
+    key: "not_call_me", keywords: ["不喊我"], asset: "python/meme_generator/memes/not_call_me/images/0.png", png: true,
+    minFont: 20, maxFont: 80,
+    captions: [{ text: "开银趴不喊我是吧", box: [228, 11, 340, 164] }],
+  },
 ];
 
+const legacyPreviewTexts = ["刘一", "陈二", "张三", "李四", "王五", "赵六", "孙七", "周八", "吴九", "郑十"] as const;
 const grudgeDefault = "群友不发涩图";
 
 function grudgeText(text: string, day = new Date()) {
@@ -95,25 +121,32 @@ const grudge: MemeTemplate = {
 };
 
 export const textPanelMemeTemplates: readonly MemeTemplate[] = definitions.map((item): MemeTemplate => {
-  const defaults = item.captions.map(({ text }) => text);
+  const defaults = item.captions.flatMap(({ text }) => text === undefined ? [] : [text]);
   async function render(texts: readonly string[], context: MemeTemplateContext) {
-    const [art, font] = await Promise.all([context.imageAsset(item.asset).then(loadImage), registerFont(context)]);
-    return jpg(art.width, art.height, draw => {
+    const [art, font] = await Promise.all([context.imageAsset(item.asset).then(loadImage), registerFont(context, item.bold)]);
+    const paint = (draw: CanvasRenderingContext2D) => {
       draw.drawImage(art, 0, 0);
       for (const [index, caption] of item.captions.entries()) {
         const text = texts[index] ?? caption.text;
-        drawFittedText(draw, caption.box, caption.decorate?.(text) ?? text, font, item.minFont, item.maxFont, "center", caption.color);
+        if (text === undefined) throw new MemeTemplateFeedback("该表情需要提供文字。");
+        drawFittedText(draw, caption.box, caption.decorate?.(text) ?? text, font, item.minFont, item.maxFont,
+          "center", caption.color, { wrap: item.wrap });
       }
-    }, context.signal);
+    };
+    if (!item.png) return jpg(art.width, art.height, paint, context.signal);
+    context.signal.throwIfAborted();
+    const result = await renderPng(art.width, art.height, paint);
+    context.signal.throwIfAborted();
+    return result.png;
   }
   return {
     info: {
-      key: item.key, keywords: item.keywords,
+      key: item.key, keywords: item.keywords, tags: item.tags,
       params_type: {
-        min_images: 0, max_images: 0, min_texts: defaults.length, max_texts: defaults.length, default_texts: defaults,
+        min_images: 0, max_images: 0, min_texts: item.captions.length, max_texts: item.captions.length, default_texts: defaults,
       },
     },
     render: (input, context) => render(input.texts, context),
-    preview: context => render(defaults, context),
+    preview: context => render(item.captions.map(({ text }) => text ?? legacyPreviewTexts[randomInt(legacyPreviewTexts.length)]!), context),
   };
 }).concat(grudge);

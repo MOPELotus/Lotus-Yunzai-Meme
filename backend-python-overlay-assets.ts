@@ -1,4 +1,4 @@
-// The source GIF art for play was never published in the Rust v0.2.3 manifest.
+// These legacy assets were never published in the Rust v0.2.3 manifest.
 const revision = "619fa10518fc2eca4fa1053af37f0a00a839f062";
 const sources = [
   `https://raw.githubusercontent.com/MemeCrafters/meme-generator/${revision}/`,
@@ -46,7 +46,15 @@ const playFrames = [
   "39b13610e89b3286d37aaf4bcab8ed7be6f4f78ef98fbc809fbefb69d13b42c8",
 ];
 
-export const pythonOverlayAssets = playFrames.map((digest, index) => {
-  const path = `meme_generator/memes/play/images/${index}.png`;
-  return [`images/python/${path}`, { path, digest, sources }] as const;
-});
+const textBackgrounds = {
+  top_notch: "b355f14594d6b5282d3bb623a8a47cf598aed41400e2dd99684651dfc021f577",
+  not_call_me: "f2975df9337fcf13f64209d64a25bdbebe2ef98d6b6038abaefda3f710243bc1",
+};
+const pythonArts = [
+  ...playFrames.map((digest, index) => [`meme_generator/memes/play/images/${index}.png`, digest] as const),
+  ...Object.entries(textBackgrounds).map(([key, digest]) => [`meme_generator/memes/${key}/images/0.png`, digest] as const),
+];
+
+export const pythonOverlayAssets = pythonArts.map(([path, digest]) =>
+  [`images/python/${path}`, { path, digest, sources }] as const,
+);
