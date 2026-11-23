@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import { downloadVerifiedFile, readVerifiedFile, writeBackendFile } from "./backend-asset-io.ts";
+import { extraMemeAssets } from "./backend-extra-assets.ts";
 import { excludedMemeTemplateMessage, isExcludedMemeTemplate } from "./template-policy.ts";
 
 const resourceVersion = "0.2.3";
@@ -23,15 +24,18 @@ export function createMemeResources(directory: string, lifetime: AbortSignal) {
   let manifest: Promise<Map<string, string>> | undefined;
   const pending = new Map<string, Promise<Buffer>>();
 
-  async function ensureFile(path: string, digest: string) {
+  async function ensureFile(
+    path: string, digest: string, remotePath = path, sources: readonly string[] = resourceSources,
+  ) {
     const fullPath = join(directory, path);
     const cached = await readVerifiedFile(fullPath, digest);
     if (cached) return cached;
     let cause: unknown;
-    for (const source of resourceSources) {
+    const encoded = remotePath.split("/").map(encodeURIComponent).join("/");
+    for (const source of sources) {
       lifetime.throwIfAborted();
       try {
-        const bytes = await downloadVerifiedFile(new URL(path.split("/").map(encodeURIComponent).join("/"), source).href, digest, lifetime);
+        const bytes = await downloadVerifiedFile(new URL(encoded, source).href, digest, lifetime);
         await writeBackendFile(fullPath, bytes, lifetime);
         return bytes;
       } catch (error) {
@@ -62,13 +66,18 @@ export function createMemeResources(directory: string, lifetime: AbortSignal) {
     if (type === "images" && isExcludedMemeTemplate(path.split("/")[0])) throw new Error(excludedMemeTemplateMessage);
     lifetime.throwIfAborted();
     const filename = `${type}/${path}`;
+    const extra = extraMemeAssets.get(filename);
+    if (type === "images" && path.startsWith("anyliew/") && !extra) {
+      throw new Error(`表情资源清单缺少 ${filename}`);
+    }
     let task = pending.get(filename);
     if (!task) {
-      task = loadManifest().then((files) => {
+      const load = extra ? ensureFile(filename, extra.digest, extra.path, extra.sources) : loadManifest().then((files) => {
         const digest = files.get(filename);
         if (!digest) throw new Error(`表情资源清单缺少 ${filename}`);
         return ensureFile(filename, digest);
-      }).finally(() => pending.delete(filename));
+      });
+      task = load.finally(() => pending.delete(filename));
       pending.set(filename, task);
     }
     return task;

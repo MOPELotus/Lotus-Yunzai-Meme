@@ -10,6 +10,6 @@ Lotus-Yunzai 的内置 `meme` 模块。支持`#表情列表`、`#表情详情`�
 
 本仓基于 ClarityJS 的 [清语表情](https://github.com/ClarityJS/meme-plugin) 及 [chinoyui 的续维护版本](https://github.com/chinoyui/meme-plugin/tree/39d3bd52daa4ad53d3b1586282cc1825bb66b996)，保留 Git 历史、原署名和 [GPL-3.0](LICENSE) 许可。
 
-内置模板参考 [MemeCrafters 原版](https://github.com/MemeCrafters/meme-generator) 与 [Rust 版 v0.2.3](https://github.com/MemeCrafters/meme-generator-rs/tree/v0.2.3)，保留 [MIT 许可和作者署名](LICENSE-MemeCrafters)。
+内置模板参考 [MemeCrafters 原版](https://github.com/MemeCrafters/meme-generator) 与 [Rust 版 v0.2.3](https://github.com/MemeCrafters/meme-generator-rs/tree/v0.2.3)，头像框沿用 [anyliew 的素材和原构图](https://github.com/anyliew/meme_emoji/tree/33bf418ac2ccd416be70faf9a13e97befb7703a8)，保留 [MIT 许可和作者署名](LICENSE-MemeCrafters)。
 
 Lotus-Yunzai 从 `lotus.ts` 加载模块。表情包数据可按原配置定时更新，模块代码由宿主的 `#更新 meme` 管理。

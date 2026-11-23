@@ -1,4 +1,5 @@
 import type { MemeTemplate } from "../builtin-template.ts";
+import { avatarFrameMemeTemplates } from "./avatar-frames.ts";
 import { basicImageMemeTemplates } from "./basic-image-transforms.ts";
 import { hug, kiss } from "./kiss-hug.ts";
 import { motionMemeTemplates } from "./motion.ts";
@@ -19,4 +20,5 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...offsetMotionMemeTemplates,
   waveMemeTemplate,
   ...overlayMemeTemplates,
+  ...avatarFrameMemeTemplates,
 ];
