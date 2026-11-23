@@ -13,6 +13,9 @@ test("固定单图字幕表情保留旧库存别名和真默认值", () => {
     ["frieren_take", ["芙莉莲拿"], ["所谓的男人啊，只要送他们这种东西就会很开心"]],
     ["learn", ["偷学"], ["偷学群友数理基础"]],
     ["what_he_wants", ["最想要的东西"], ["今年520"]],
+    ["fill_head", ["满脑子"], []],
+    ["stew", ["炖"], []],
+    ["together", ["一起"], ["一起玩{name}吧！"]],
   ]);
   for (const { info } of captionOverlayMemeTemplates) {
     expect(info.params_type).toMatchObject({ min_images: 1, max_images: 1, min_texts: 0, max_texts: 1, args_type: null });

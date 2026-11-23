@@ -98,7 +98,9 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
   Bun.env.LOTUS_MEME_DB = join(directory, "meme.db");
   delete Bun.env.LOTUS_MEME_SERVER_URL;
   const { perspectiveMemeTemplates } = await import("../templates/perspective.ts");
+  const { captionOverlayMemeTemplates } = await import("../templates/caption-overlays.ts");
   const launch = perspectiveMemeTemplates.find(template => template.info.key === "genshin_start")!;
+  const fullHead = captionOverlayMemeTemplates.find(template => template.info.key === "fill_head")!;
   const backend = createManagedMemeBackend(signal, [{
     info: {
       key: "always",
@@ -113,7 +115,7 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
       },
     },
     async render() { return new Uint8Array([1]); },
-  }, launch]);
+  }, launch, fullHead]);
   try {
     const { runAutomaticCatalogRefresh } = await import("../catalog-update.ts");
     const { prepareMemeRequest, resolveMemeTrigger } = await import("../lotus.ts");
@@ -133,6 +135,22 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
     const targetAvatar = typeof launchRequest === "object" && launchRequest.body.get("images");
     expect(targetAvatar instanceof File && await targetAvatar.text()).toBe("456");
     expect(await prepareMemeRequest(`#${launchTitle}不匹配`, { user_id: 1234, isMaster: true })).toBeUndefined();
+
+    const fillHeadInput = {
+      user_id: 1234, isMaster: true, avatar: async (user: string) => new Blob([user], { type: "image/png" }),
+      nickname: async (user: string) => user === "789" ? "指定群友" : "发指令的人",
+    };
+    const alias = await prepareMemeRequest("#满脑子 @789", fillHeadInput);
+    expect(typeof alias === "object" && alias.body.getAll("texts")).toEqual([]);
+    expect(typeof alias === "object" && alias.body.get("args")).toBeNull();
+    await writeFile(join(config, "meme.yaml"), "userName: true\n");
+    const named = await prepareMemeRequest("#满脑子 @789", fillHeadInput);
+    expect(typeof named === "object" && named.body.getAll("texts")).toEqual(["指定群友"]);
+    const captured = await prepareMemeRequest("#满脑子都是阿/尔 @789", fillHeadInput);
+    expect(typeof captured === "object" && captured.key).toBe("fill_head");
+    expect(typeof captured === "object" && captured.body.getAll("texts")).toEqual(["阿/尔"]);
+    const capturedAvatar = typeof captured === "object" && captured.body.get("images");
+    expect(capturedAvatar instanceof File && await capturedAvatar.text()).toBe("789");
     await writeFile(join(config, "access.yaml"), "blackListEnable: true\nblackList: [一直一直]\n");
     expect(resolveMemeTrigger("#一直一直")).toBeUndefined();
     expect(resolveMemeTrigger("#一直")).toEqual({ key: "always", keyword: "一直", text: "" });

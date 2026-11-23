@@ -268,11 +268,17 @@ function shortcutArgs(shortcut: MemeTemplateShortcut | undefined): string {
   return (shortcut?.args ?? []).map((arg) => /[\s"']/u.test(arg) ? JSON.stringify(arg) : arg).join(" ");
 }
 
+// Verified built-in captures. Catalog strings are never compiled as regular expressions.
+const nativeShortcutPatterns = [
+  { template: "genshin_start", source: "(?P<text>\\S+启动[!！]?)", pattern: /^(\S+启动[!！]?)(?=\s|$)/u },
+  { template: "fill_head", source: "满脑子都是(?P<name>\\S+)", pattern: /^满脑子都是(\S+)(?=\s|$)/u },
+];
+
 function matchNativeShortcut(row: TriggerRow, shortcut: MemeTemplateShortcut, candidate: string): TriggerMatch | undefined {
-  // Match the verified built-in capture without executing patterns from the catalog.
-  if (row.key === "genshin_start" && shortcut.key === "(?P<text>\\S+启动[!！]?)") {
-    const keyword = /^\S+启动[!！]?(?=\s|$)/u.exec(candidate)?.[0];
-    if (keyword) return { row, keyword, shortcut, shortcutText: keyword };
+  const known = nativeShortcutPatterns.find(entry => entry.template === row.key && entry.source === shortcut.key);
+  if (known) {
+    const match = known.pattern.exec(candidate);
+    if (match?.[1] !== undefined) return { row, keyword: match[0], shortcut, shortcutText: match[1] };
     return;
   }
   if (sameKeyword(candidate.slice(0, shortcut.key.length), shortcut.key)) return { row, keyword: shortcut.key, shortcut };
