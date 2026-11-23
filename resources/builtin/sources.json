@@ -84,6 +84,16 @@
       "originalPath": "ofl/zcoolkuaile/ZCOOLKuaiLe-Regular.ttf",
       "license": "OFL-1.1"
     },
+    "images/abstinence/base.png": {
+      "digest": "34c6720d7dfe0b3a3eb6834be66200fe7fca83c3c7138e97b81d438fc173c4a5",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/abstinence/base.png"
+    },
+    "images/abstinence/stamp.png": {
+      "digest": "62e297012be39747ebdf2208cb4554dbccac07d0efbe9158c227237d4a9a0038",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/abstinence/stamp.png"
+    },
     "images/ace_attorney_dialog/bubble.png": {
       "digest": "9c762c91e86cddc92b04712d1c6d0c7156c55a7b81921df819c5c447418e6764",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
@@ -17804,6 +17814,21 @@
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/bad_news/0.png"
     },
+    "images/beat_head/0.png": {
+      "digest": "6922a2c2311f993f573b181c6f3a87e9a6a7d7d62546ceaebd44235424dbb0f8",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/beat_head/0.png"
+    },
+    "images/beat_head/1.png": {
+      "digest": "0c6f61187d105f25729000dbc239696807f268ab12ea58e478583d01507eb77d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/beat_head/1.png"
+    },
+    "images/beat_head/2.png": {
+      "digest": "0fb1c85601d54ff5e31fddc1575d184ef59d181ea6d9820b9eeed47acd27ba3a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/beat_head/2.png"
+    },
     "images/blood_pressure/0.png": {
       "digest": "ebe8aad0aa5506a15efff51ecd9e0c04015b055b1a609de4b9a8bc565dfcaa1d",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
@@ -17928,6 +17953,11 @@
       "digest": "bd38cea6ef7b536dd634ed585dea37f9f2dfa50ba3f6add38f7c10d8471998b7",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/bronya_holdsign/0.jpg"
+    },
+    "images/bubble_tea/0.png": {
+      "digest": "3ad74a5294238f3ac644d060064b23497ad0e82b932bae6dfeac47f6ade05e1a",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/bubble_tea/0.png"
     },
     "images/capoo_point/0.png": {
       "digest": "2cd7ea0091c5546542adee9831cd9096ca2c34c4cc8822ee59960d05b0a736ed",
@@ -18958,6 +18988,21 @@
       "digest": "313bd74a090afa23d69481d03232ccae9ee39fe2004a7e50b864f0544cd7fa69",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/clauvio_twist/39.png"
+    },
+    "images/clown_mask/0.png": {
+      "digest": "8f64edeb054762148831da13db4be9170bc2dae5f367d5c396cfa33537ef417c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clown_mask/0.png"
+    },
+    "images/clown_mask/1.png": {
+      "digest": "144d610d06664fcf44ed9168d84c5ca5568141fc057b8b1da72ef7a71247b830",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clown_mask/1.png"
+    },
+    "images/clown_mask/2.png": {
+      "digest": "7c4f5b8de3df10a04e708eff0c7f992e7ef1b75ba465b03162c392da17682f02",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/clown_mask/2.png"
     },
     "images/confuse/00.png": {
       "digest": "061a13b6ab65f87b3095bf5cc5a242fbc40dddcee0a938f7b85f859723e73825",
@@ -20443,6 +20488,11 @@
       "digest": "543c97e0dbb6cb57d44a1f906279af0bb84c0404577c354f63e433007f0e7eb9",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/good_news/0.jpg"
+    },
+    "images/gun/0.png": {
+      "digest": "16946ccc80d61928bed28484d9e1f65ed1b80cf4f7e89f4f18ebcd268c099e12",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/gun/0.png"
     },
     "images/hammer/0.png": {
       "digest": "485ef1f93efc7129397a6924337923bbf83be6d3f41cbb61b10b6d64dbef4114",

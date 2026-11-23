@@ -1,4 +1,5 @@
 import type { MemeTemplate } from "../builtin-template.ts";
+import { avatarAccessoryMemeTemplates } from "./avatar-accessories.ts";
 import { legacyFixedPoseTemplates } from "./legacy-fixed-poses.ts";
 import { anyliewAvatarCycleTemplates } from "./anyliew-avatar-cycle.ts";
 import { anyliewDeerHelpTemplate } from "./anyliew-deer-help.ts";
@@ -61,6 +62,7 @@ import { timedOverlayMemeTemplates } from "./timed-overlays.ts";
 import { waveMemeTemplate } from "./wave.ts";
 
 export const builtinMemeTemplates: readonly MemeTemplate[] = [
+  ...avatarAccessoryMemeTemplates,
   petpet, pat, rub, kiss, hug,
   ...staticMemeTemplates,
   ...transformMemeTemplates,

@@ -38,7 +38,7 @@ export async function renderTransformSequence(sequence: MemeImageSequence, width
   });
 }
 
-function drawHalf(ctx: CanvasRenderingContext2D, image: Image, horizontal: boolean, half: number, position: number, mirrored: boolean) {
+export function drawHalf(ctx: CanvasRenderingContext2D, image: Image, horizontal: boolean, half: number, position: number, mirrored: boolean) {
   ctx.save();
   ctx.beginPath();
   if (horizontal) ctx.rect(position, 0, half, image.height);
