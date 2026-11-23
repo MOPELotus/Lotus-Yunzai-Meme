@@ -21,7 +21,10 @@ interface Scene {
   readonly above?: true;
   readonly jpegFrame?: true;
   readonly animatedInput?: true;
+  readonly tags?: readonly string[];
 }
+
+const genshin = ["米哈游", "原神"] as const;
 
 const scenes: readonly Scene[] = [
   { key: "shipborne_laser_weapons", keywords: ["舰载激光武器"], count: 1, animatedInput: true, layers: [
@@ -49,6 +52,42 @@ const scenes: readonly Scene[] = [
   { key: "torture_yourself", keywords: ["折磨自己"], count: 2, layers: [
     { image: 1, box: [722, 752, 175, 175] },
     { image: 0, box: [63, 278, 380, 410] },
+  ] },
+  { key: "ice_tea_head", keywords: ["冰红茶"], count: 1, animatedInput: true, above: true, layers: [
+    { image: 0, box: [320, 35, 500, 500], circle: true },
+  ] },
+  { key: "mahiro_fuck", keywords: ["真寻中指", "中指", "🖕🏻"], count: 1, animatedInput: true, above: true, layers: [
+    { image: 0, box: [430, 40, 180, 180], circle: true },
+  ] },
+  { key: "mi_monkey", keywords: ["米猴", "🐒", "🐵"], count: 1, animatedInput: true, above: true, layers: [
+    { image: 0, box: [500, 100, 180, 180], circle: true },
+  ] },
+  { key: "mihoyo_funina_death_penalty", keywords: ["死刑"], count: 1, animatedInput: true, above: true, tags: genshin, layers: [
+    { image: 0, box: [950, 380, 280, 280], circle: true },
+  ] },
+  { key: "mihoyo_funina_finger", keywords: ["芙芙指", "芙宁娜指", "芙芙酱指"], count: 1, animatedInput: true, above: true, tags: genshin, layers: [
+    { image: 0, box: [1400, 650, 500, 500], circle: true },
+  ] },
+  { key: "mihoyo_genshin_impact_op", keywords: ["OP", "op", "Op", "oP"], count: 1, animatedInput: true, above: true, tags: genshin, layers: [
+    { image: 0, box: [500, 100, 180, 180], circle: true },
+  ] },
+  { key: "mihoyo_genshin_impact_players", keywords: ["原批", "原神玩家"], count: 1, animatedInput: true, above: true, tags: genshin, layers: [
+    { image: 0, box: [385, 120, 220, 220], circle: true },
+  ] },
+  { key: "miss_in_my_sleep", keywords: ["睡梦中想念"], count: 1, animatedInput: true, above: true, layers: [
+    { image: 0, box: [125, 45, 250, 250], circle: true },
+  ] },
+  { key: "ikun_durian_head", keywords: ["榴莲坤头"], count: 1, animatedInput: true, layers: [
+    { image: 0, box: [62, 93, 180, 180] },
+  ] },
+  { key: "mihoyo_funina_square_head", keywords: ["芙芙方形头像", "芙宁娜方形头像"], count: 1, animatedInput: true, tags: genshin, layers: [
+    { image: 0, box: [60, 48, 1010, 1010] },
+  ] },
+  { key: "naruro_s_ninja", keywords: ["S忍", "s忍"], count: 1, animatedInput: true, layers: [
+    { image: 0, box: [1, 1, 1000, 1000] },
+  ] },
+  { key: "pig_surrounded", keywords: ["被猪包围"], count: 1, animatedInput: true, layers: [
+    { image: 0, box: [242, 458, 596, 596] },
   ] },
 ];
 
@@ -98,7 +137,7 @@ function template(scene: Scene): MemeTemplate {
       };
       const background = scale(draw => draw.drawImage(art, 0, 0));
       const placements = scene.layers.map(layer => scale(drawPlacement(layer, images[layer.image]!)));
-      if (scene.above) return renderMaskedRgba(w, h, background, placements, signal, { whiteBackground: true });
+      if (scene.above) return renderMaskedRgba(w, h, background, placements, signal, { whiteBackground: !scene.animatedInput });
       let foreground = background;
       let result!: Uint8Array;
       for (const [index, draw] of placements.entries()) {
@@ -123,7 +162,7 @@ function template(scene: Scene): MemeTemplate {
     });
   }
   return {
-    info: { key: scene.key, keywords: scene.keywords,
+    info: { key: scene.key, keywords: scene.keywords, tags: scene.tags,
       params_type: { min_images: scene.count, max_images: scene.count, min_texts: 0, max_texts: 0, args_type: null } },
     render,
     async preview(context) {

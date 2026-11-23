@@ -5879,6 +5879,11 @@
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
       "originalPath": "emoji/horse_riding/images/4.png"
     },
+    "images/anyliew/emoji/ice_tea_head/images/0.png": {
+      "digest": "63a067f6d1467f87ec1fbf93c75b9cd31a57b00906d1d1d8b5b06606b7e82144",
+      "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
+      "originalPath": "emoji/ice_tea_head/images/0.png"
+    },
     "images/anyliew/emoji/ignite/images/1.png": {
       "digest": "d391808f49b4ea19f1c362d5c0c94ab8235063ad7b52730ee37091ec9fb196d0",
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
@@ -7078,6 +7083,11 @@
       "digest": "eb67f5a11382dd7d50479c3880a0ed2524c22bca22ec89b5df5263c6bfa56244",
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
       "originalPath": "emoji/ikun_chicken_year/images/99.png"
+    },
+    "images/anyliew/emoji/ikun_durian_head/images/0.png": {
+      "digest": "9996cb09a9cd8fa340597095d0e15a6d02fb1fc6ab675d22ecaf077f15d0702d",
+      "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
+      "originalPath": "emoji/ikun_durian_head/images/0.png"
     },
     "images/anyliew/emoji/ikun_elastic/images/1.png": {
       "digest": "07bb26157ca77e0952ac240e3e9f3ea821d3f94e761a73e304ea12e778d1133e",
@@ -8769,6 +8779,11 @@
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
       "originalPath": "emoji/look_leg/images/6.png"
     },
+    "images/anyliew/emoji/mahiro_fuck/images/0.png": {
+      "digest": "727e472c6099ab0edfeb00caacec1b9b552aaa66deb019dd9ed67b9826a21783",
+      "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
+      "originalPath": "emoji/mahiro_fuck/images/0.png"
+    },
     "images/anyliew/emoji/maodie_whipped/images/1.png": {
       "digest": "5eef7e7f4c3f9d7883c27b67a06125a7217110c7f8aba987f65442e08e244865",
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
@@ -8953,6 +8968,11 @@
       "digest": "a8ecffe875b8a8072e49fdd13d8c96f68e5cad0e92b8180872d255940a062635",
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
       "originalPath": "emoji/mi_leijun_holdsign/images/0.jpg"
+    },
+    "images/anyliew/emoji/mi_monkey/images/0.png": {
+      "digest": "a47aeab34325d6acfa2f5c3f2a8690b0951a38e9fa4eaa9be1443c4faa4f351b",
+      "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
+      "originalPath": "emoji/mi_monkey/images/0.png"
     },
     "images/anyliew/emoji/mihoyo_amber_frame/images/0.png": {
       "digest": "c91d82f2247b416183f213495f7d8ebea7ab3b3e007145e7e5f36e6005c140de",
@@ -9164,6 +9184,16 @@
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
       "originalPath": "emoji/mihoyo_funina_card/images/0.png"
     },
+    "images/anyliew/emoji/mihoyo_funina_death_penalty/images/0.png": {
+      "digest": "69abd108fa5f9f5763995b6f68ccfebf9e67a83d6dc40fc01cf07b81354d3904",
+      "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
+      "originalPath": "emoji/mihoyo_funina_death_penalty/images/0.png"
+    },
+    "images/anyliew/emoji/mihoyo_funina_finger/images/0.png": {
+      "digest": "64394b815a9d2d9cb3758849b88eaf314615da9267ca44594e1c13777f6147a3",
+      "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
+      "originalPath": "emoji/mihoyo_funina_finger/images/0.png"
+    },
     "images/anyliew/emoji/mihoyo_funina_holdsign/images/0.png": {
       "digest": "f796ce4b5b114e63a3290b357c523cfd84d9efd295c506f0723e2c1a606a4d53",
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
@@ -9174,10 +9204,25 @@
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
       "originalPath": "emoji/mihoyo_funina_round_head/images/0.png"
     },
+    "images/anyliew/emoji/mihoyo_funina_square_head/images/0.png": {
+      "digest": "d91539d15987bfd64312b68920f1308f09ae6b75cd124f9d931d839f4e12b2a8",
+      "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
+      "originalPath": "emoji/mihoyo_funina_square_head/images/0.png"
+    },
     "images/anyliew/emoji/mihoyo_gemini_frame/images/0.png": {
       "digest": "ee60ed609bd16f256c9d5c6549a4d326aaf0e4abe14b3da0322ed2d6f2d0e52c",
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
       "originalPath": "emoji/mihoyo_gemini_frame/images/0.png"
+    },
+    "images/anyliew/emoji/mihoyo_genshin_impact_op/images/0.png": {
+      "digest": "14c7d5c0f9a170ed641e5b2dc1f6f2444def353a99a226591e95b4c2430ec354",
+      "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
+      "originalPath": "emoji/mihoyo_genshin_impact_op/images/0.png"
+    },
+    "images/anyliew/emoji/mihoyo_genshin_impact_players/images/0.png": {
+      "digest": "8740bdadf34212078e88e22b7027f470a36ae719de02d69a00974f5680f2244e",
+      "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
+      "originalPath": "emoji/mihoyo_genshin_impact_players/images/0.png"
     },
     "images/anyliew/emoji/mihoyo_guoba_frame/images/0.png": {
       "digest": "2d606011c44fdb582f0f3464b33da502315008767ba59e1d48d20479aa45bb5c",
@@ -9853,6 +9898,11 @@
       "digest": "e008b72662899ad1939ab3a5deef66c1c8369467d2ceb238bc59e13b6024c983",
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
       "originalPath": "emoji/miku_say/images/0.png"
+    },
+    "images/anyliew/emoji/miss_in_my_sleep/images/0.png": {
+      "digest": "02d67d6e387a0492acef5c518d89f70bce1e9693e01c975e2e8695e34a00a345",
+      "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
+      "originalPath": "emoji/miss_in_my_sleep/images/0.png"
     },
     "images/anyliew/emoji/mixue/images/0.png": {
       "digest": "d8665c9a5d092f573f238b09168197282a8ead8c478e204016ba9c0ca8c80da2",
@@ -11499,6 +11549,11 @@
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
       "originalPath": "emoji/naruro_resurrection/images/0.png"
     },
+    "images/anyliew/emoji/naruro_s_ninja/images/0.png": {
+      "digest": "d56391fadfaa16aa7bf1fedafda31597081a469f0186f3330ace3fb72f257b5e",
+      "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
+      "originalPath": "emoji/naruro_s_ninja/images/0.png"
+    },
     "images/anyliew/emoji/naruro_uzumaki_naruto_holdsign/images/0.jpg": {
       "digest": "0c70ea7f18ac67146cd2b2a0a5ba9941213ef815ea0282398f68356e83d4ea2b",
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
@@ -11963,6 +12018,11 @@
       "digest": "d94388f1682fdd64ce2f99c7ae7f9f294f79c43fd6a98fae40ba108d423b4e83",
       "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
       "originalPath": "emoji/pig_lot/images/9.png"
+    },
+    "images/anyliew/emoji/pig_surrounded/images/0.png": {
+      "digest": "ed6c35375e6e6ee0ef429172bea6fd0fa2bd89143b2252775e3e7663152c729b",
+      "source": "https://raw.githubusercontent.com/anyliew/meme_emoji/33bf418ac2ccd416be70faf9a13e97befb7703a8/",
+      "originalPath": "emoji/pig_surrounded/images/0.png"
     },
     "images/anyliew/emoji/pineapples/images/0.png": {
       "digest": "bc13dfee6f51bed3a352251b28096b6b90b901d938ee751a2de9508849837a82",

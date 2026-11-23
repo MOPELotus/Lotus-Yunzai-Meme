@@ -10,9 +10,25 @@ const expected = [
   ["throwing_poop", ["扔史"], 1, "png"],
   ["together_two", ["在一起"], 2, "jpg"],
   ["torture_yourself", ["折磨自己"], 2, "png"],
+  ["ice_tea_head", ["冰红茶"], 1, "png"],
+  ["mahiro_fuck", ["真寻中指", "中指", "🖕🏻"], 1, "png"],
+  ["mi_monkey", ["米猴", "🐒", "🐵"], 1, "png"],
+  ["mihoyo_funina_death_penalty", ["死刑"], 1, "png"],
+  ["mihoyo_funina_finger", ["芙芙指", "芙宁娜指", "芙芙酱指"], 1, "png"],
+  ["mihoyo_genshin_impact_op", ["OP", "op", "Op", "oP"], 1, "png"],
+  ["mihoyo_genshin_impact_players", ["原批", "原神玩家"], 1, "png"],
+  ["miss_in_my_sleep", ["睡梦中想念"], 1, "png"],
+  ["ikun_durian_head", ["榴莲坤头"], 1, "png"],
+  ["mihoyo_funina_square_head", ["芙芙方形头像", "芙宁娜方形头像"], 1, "png"],
+  ["naruro_s_ninja", ["S忍", "s忍"], 1, "png"],
+  ["pig_surrounded", ["被猪包围"], 1, "png"],
 ] as const;
 
-test("六款静态头像场景保留旧键、触发词、图片数量和原素材名", () => {
+test("头像场景保留旧键、触发词、图片数量和原素材名", () => {
+  expect(anyliewStaticAvatarTemplates.filter(({ info }) => info.tags?.includes("原神")).map(({ info }) => info.key)).toEqual([
+    "mihoyo_funina_death_penalty", "mihoyo_funina_finger", "mihoyo_genshin_impact_op",
+    "mihoyo_genshin_impact_players", "mihoyo_funina_square_head",
+  ]);
   expect(anyliewStaticAvatarAssets.map<string>(([path]) => path)).toEqual(
     expected.map(([key, , , ext]) => `emoji/${key}/images/0.${ext}`));
   expect(anyliewStaticAvatarTemplates.map(({ info }) => [
