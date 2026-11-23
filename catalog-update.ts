@@ -1,7 +1,7 @@
 import { Database } from "bun:sqlite";
 import { existsSync, linkSync, mkdirSync, rmSync } from "node:fs";
 import { dirname } from "node:path";
-import { catalogPath, catalogVersion } from "./catalog-file.ts";
+import { catalogPath, catalogVersion, nativeCatalogTable, type CatalogTable } from "./catalog-file.ts";
 import { generationServer, safeCatalogKey, sameGenerationServer } from "./catalog-policy.ts";
 import { isMemeOwner, type SettingsContext } from "./settings.ts";
 import { keepMemeCatalogDenials, scanMemeCatalogExclusions } from "./catalog-exclusions.ts";
@@ -11,8 +11,8 @@ const command = /^#?(?:表情(?:合成)?|meme)(强制)?更新(?:表情包|资源
 const maxResponseBytes = 4 * 1024 * 1024;
 const batchSize = 6;
 
-const createTables = `
-  CREATE TABLE IF NOT EXISTS meme (
+const createTables = (table: CatalogTable) => `
+  CREATE TABLE IF NOT EXISTS ${table} (
     key TEXT NOT NULL PRIMARY KEY, info JSON NOT NULL, keyWords JSON NOT NULL, params JSON NOT NULL,
     min_texts INTEGER NOT NULL, max_texts INTEGER NOT NULL, min_images INTEGER NOT NULL,
     max_images INTEGER NOT NULL, defText JSON, args_type JSON, tags JSON,
@@ -89,16 +89,24 @@ function hasTable(db: Database, name: string) {
   return db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = ?").get(name) !== null;
 }
 
-function catalogKeys(db: Database) {
-  return new Set(hasTable(db, "meme") ? db.query<{ key: string }, []>("SELECT key FROM meme").all().map(({ key }) => key) : []);
+function catalogKeys(db: Database, table: CatalogTable) {
+  return new Set(hasTable(db, table) ? db.query<{ key: string }, []>(`SELECT key FROM ${table}`).all().map(({ key }) => key) : []);
 }
 
-function dropTemplates(db: Database, keys: Iterable<string>, excluded: ReadonlySet<string>) {
-  const drop = db.query("DELETE FROM meme WHERE key = ?");
-  const dropPreset = hasTable(db, "preset") ? db.query("DELETE FROM preset WHERE key = ?") : undefined;
+function dropTemplates(db: Database, table: CatalogTable, keys: Iterable<string>, excluded: ReadonlySet<string>) {
+  const drop = db.query(`DELETE FROM ${table} WHERE key = ?`);
+  const dropPreset = table === "meme" && hasTable(db, "preset") ? db.query("DELETE FROM preset WHERE key = ?") : undefined;
   for (const key of keys) {
     if (excluded.has(key)) dropPreset?.run(key);
     drop.run(key);
+  }
+}
+
+function removeLegacyExclusions(db: Database) {
+  const excluded = scanMemeCatalogExclusions(db).keys;
+  if (excluded.size) {
+    keepMemeCatalogDenials(db, excluded);
+    dropTemplates(db, "meme", excluded, excluded);
   }
 }
 
@@ -129,15 +137,16 @@ async function initializeCatalog(signal: AbortSignal): Promise<string | undefine
   const file = catalogPath();
   const server = generationServer();
   const identity = nativeCatalogIdentity(server);
+  const table: CatalogTable = identity ? nativeCatalogTable : "meme";
   let providerChanged = false;
   if (existsSync(file)) {
     const current = new Database(file, { readonly: true, strict: true });
     let empty: boolean;
     let hadTemplates: boolean;
     try {
-      const keys = catalogKeys(current);
-      const excluded = scanMemeCatalogExclusions(current).keys;
-      providerChanged = !!server && storedCatalogIdentity(current) !== identity;
+      const keys = catalogKeys(current, table);
+      const excluded = scanMemeCatalogExclusions(current, table).keys;
+      providerChanged = !!identity && storedCatalogIdentity(current) !== identity;
       hadTemplates = keys.size > 0;
       empty = keys.size === excluded.size;
       if (!providerChanged && !empty && !excluded.size && hasTable(current, "preset") &&
@@ -153,14 +162,14 @@ async function initializeCatalog(signal: AbortSignal): Promise<string | undefine
       try {
         db.transaction(() => {
           // Recheck the copied catalog inside the write transaction.
-          const excluded = scanMemeCatalogExclusions(db).keys;
-          if (excluded.size) {
-            keepMemeCatalogDenials(db, excluded);
-            dropTemplates(db, excluded, excluded);
+          removeLegacyExclusions(db);
+          if (table === nativeCatalogTable) {
+            const excluded = scanMemeCatalogExclusions(db, table).keys;
+            if (excluded.size) dropTemplates(db, table, excluded, excluded);
           }
           if (hasTable(db, "preset") && db.query("SELECT 1 FROM preset LIMIT 1").get()) return;
-          db.exec(createTables);
-          addPresets(db, catalogKeys(db), preset, new Date().toISOString());
+          db.exec(createTables(table));
+          addPresets(db, catalogKeys(db, table), preset, new Date().toISOString());
         }).immediate();
       } finally {
         db.close();
@@ -182,11 +191,12 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
   try {
     if (existsSync(file)) db = new Database(file, { strict: true, create: false });
     const initial = db && dataVersion(db);
-    const kept = db ? catalogKeys(db) : new Set<string>();
-    const excluded = db ? scanMemeCatalogExclusions(db).keys : new Set<string>();
-    const version = catalogVersion(file);
     const identity = nativeCatalogIdentity(server);
-    const sourceChanged = (db && storedCatalogIdentity(db)) !== identity;
+    const table: CatalogTable = identity ? nativeCatalogTable : "meme";
+    const kept = db ? catalogKeys(db, table) : new Set<string>();
+    const excluded = db ? scanMemeCatalogExclusions(db, table).keys : new Set<string>();
+    const version = catalogVersion(file);
+    const sourceChanged = !!identity && (db && storedCatalogIdentity(db)) !== identity;
     const result = await (server.protocol === "native" ? server.keys(signal) : fetchJSON(server, "keys", signal));
     if (!Array.isArray(result) || !result.length || result.some((key) => !safeCatalogKey(key))) throw new Error();
     const remote = new Set<string>();
@@ -225,9 +235,9 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
     const now = new Date().toISOString();
     const added = target.transaction(() => {
       if (initial !== undefined && dataVersion(target) !== initial) throw new Error();
-      target.exec(createTables);
+      target.exec(createTables(table));
       const put = target.query(`
-        INSERT INTO meme (key,info,keyWords,params,min_texts,max_texts,min_images,max_images,
+        INSERT INTO ${table} (key,info,keyWords,params,min_texts,max_texts,min_images,max_images,
           defText,args_type,tags,createdAt,updatedAt)
         VALUES ($key,$info,$keywords,$params,$minTexts,$maxTexts,$minImages,$maxImages,$defaults,$args,$tags,$now,$now)
         ON CONFLICT(key) DO UPDATE SET info=excluded.info,keyWords=excluded.keyWords,params=excluded.params,
@@ -235,13 +245,13 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
           max_images=excluded.max_images,defText=excluded.defText,args_type=excluded.args_type,tags=excluded.tags,
           updatedAt=excluded.updatedAt`);
       for (const row of entries) put.run({ ...row, now });
-      dropTemplates(target, removed, excluded);
-      keepMemeCatalogDenials(target, excluded, entries.map(({ key }) => key));
+      dropTemplates(target, table, removed, excluded);
       if (identity) {
+        removeLegacyExclusions(target);
         target.exec("CREATE TABLE IF NOT EXISTS lotus_catalog_provider (id INTEGER PRIMARY KEY, identity TEXT NOT NULL)");
         target.query("INSERT OR REPLACE INTO lotus_catalog_provider VALUES (1, ?)").run(identity);
-      } else if (hasTable(target, "lotus_catalog_provider")) {
-        target.exec("DELETE FROM lotus_catalog_provider");
+      } else {
+        keepMemeCatalogDenials(target, excluded, entries.map(({ key }) => key));
       }
 
       return addPresets(target, remote, preset, now);

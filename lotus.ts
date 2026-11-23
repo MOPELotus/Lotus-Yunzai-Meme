@@ -1,7 +1,7 @@
-import { Database } from "bun:sqlite";
+import type { Database } from "bun:sqlite";
 import type { CatalogCardRow } from "./catalog-card.ts";
 import type { LoadMemeInfoCard } from "./info-card-runtime.ts";
-import { catalogPath, catalogVersion } from "./catalog-file.ts";
+import { activeCatalogTable, catalogVersion, nativeCatalogTable, openMemeCatalogReader } from "./catalog-file.ts";
 import { catalogPolicy, generationServer, sameGenerationServer } from "./catalog-policy.ts";
 import { argsTypeFromParams, parseGenerationArgs, type PresetArgument } from "./generation-args.ts";
 import { buildGenerationBody, type GenerationInput } from "./generation.ts";
@@ -98,7 +98,7 @@ function currentPolicy(userId: number | undefined, forGeneration = false) {
 function withCatalog<T>(query: (db: Database) => T): T | string {
   let db: Database | undefined;
   try {
-    db = new Database(catalogPath(), { readonly: true });
+    db = openMemeCatalogReader();
     return query(db);
   } catch {
     return "无法读取表情目录，请检查 LOTUS_MEME_DB 和本机导入的旧数据库。";
@@ -251,7 +251,7 @@ function findPreset(db: Database, input: string, filters: string): TriggerMatch 
 }
 
 function nativeCatalogShortcuts(db: Database): boolean {
-  return !!db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'lotus_catalog_provider'").get() &&
+  return activeCatalogTable() === nativeCatalogTable && !!db.query("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'lotus_catalog_provider'").get() &&
     !!db.query("SELECT 1 FROM lotus_catalog_provider WHERE id = 1 AND identity LIKE 'lotus-skia:%'").get();
 }
 

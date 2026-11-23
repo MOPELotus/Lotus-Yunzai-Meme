@@ -1,5 +1,5 @@
-import { Database } from "bun:sqlite";
-import { catalogPath, catalogVersion } from "./catalog-file.ts";
+import type { Database } from "bun:sqlite";
+import { activeCatalogTable, catalogVersion, openMemeCatalogReader, type CatalogTable } from "./catalog-file.ts";
 import { isCorrectedLegacyMemeTag, isExcludedMemeTemplate, isRetiredMemeAlias } from "./template-policy.ts";
 
 function json(source: string | null): unknown {
@@ -40,8 +40,8 @@ function matchesCorrectedArchive(row: CatalogMetadata, info: Record<string, unkn
   }
 }
 
-export function scanMemeCatalogExclusions(db: Database) {
-  const columns = db.query<{ name: string }, []>("PRAGMA table_info(meme)").all();
+export function scanMemeCatalogExclusions(db: Database, table: CatalogTable = "meme") {
+  const columns = db.query<{ name: string }, []>(`PRAGMA table_info(${table})`).all();
   const names = new Set(columns.map(column => column.name.toLowerCase()));
   const keys = new Set<string>();
   const normalizedKeys = new Set<string>();
@@ -50,7 +50,7 @@ export function scanMemeCatalogExclusions(db: Database) {
   if (names.has("key")) {
     const fields = (["tags", "info", "keyWords", "params", ...limitColumns] as const)
       .map(field => names.has(field.toLowerCase()) ? field : `NULL AS ${field}`);
-    const rows = db.query<CatalogMetadata, []>(`SELECT key, ${fields.join(", ")} FROM meme`).all();
+    const rows = db.query<CatalogMetadata, []>(`SELECT key, ${fields.join(", ")} FROM ${table}`).all();
     for (const row of rows) {
       if (typeof row.key !== "string") continue;
       const info = record(json(row.info));
@@ -92,7 +92,7 @@ export function memeCatalogExclusions(db: Database) {
   const version = catalogVersion();
   if (cached?.version === version) return cached;
   const result = scanMemeCatalogExclusions(db);
-  if (hasDenials(db)) {
+  if (activeCatalogTable() === "meme" && hasDenials(db)) {
     const recorded = db.query<{ key: string }, []>(`SELECT key FROM ${denialTable}`).all();
     for (const { key } of recorded) {
       if (result.correctedArchiveKeys.has(key)) continue;
@@ -108,7 +108,7 @@ function currentCatalogExclusions() {
   let db: Database | undefined;
   try {
     if (cached?.version === catalogVersion()) return cached;
-    db = new Database(catalogPath(), { readonly: true });
+    db = openMemeCatalogReader();
     return memeCatalogExclusions(db);
   } catch {
     // A site may configure its template service before the first catalog is installed.

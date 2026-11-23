@@ -1,9 +1,12 @@
+import { Database } from "bun:sqlite";
 import { expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createManagedMemeBackend } from "../backend-lifecycle.ts";
+import { nativeCatalogTable, openMemeCatalogReader } from "../catalog-file.ts";
 import { generationServer, sameGenerationServer } from "../catalog-policy.ts";
+import { readMemeUsage, recordMemeUsage } from "../usage.ts";
 import type { MemeTemplate } from "../builtin-template.ts";
 import { excludedMemeTemplateMessage } from "../template-policy.ts";
 
@@ -155,6 +158,108 @@ test("本机目录发布快捷指令，优先匹配较长别名并传入原模�
     }
   } finally {
     backend.dispose();
+    for (const [index, name] of env.entries()) {
+      const value = previous[index];
+      if (value === undefined) delete Bun.env[name];
+      else Bun.env[name] = value;
+    }
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+
+test("本机合成与原目录各自同步，旧服务离线切回仍保留预设、统计及干净旧目录", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "lotus-meme-provider-switch-"));
+  const config = join(directory, "config");
+  const file = join(directory, "catalog.db");
+  const serverYaml = join(config, "server.yaml");
+  const env = ["LOTUS_MEME_CONFIG_DIR", "LOTUS_MEME_DB", "LOTUS_MEME_SERVER_URL"] as const;
+  const previous = env.map(name => Bun.env[name]);
+  const signal = new AbortController().signal;
+  const parameters = { min_images: 0, max_images: 0, min_texts: 0, max_texts: 0 };
+  const keys = ["legacy_only", "shared"];
+  let unavailable = false;
+  const remote = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch(request) {
+    if (unavailable) return new Response(null, { status: 521 });
+    const route = new URL(request.url).pathname;
+    if (route === "/memes/keys") return Response.json(keys);
+    const key = route.split("/")[2];
+    const alias = key === "legacy_only" ? "旧独有" : key === "shared" ? "旧共用" : "远端恢复新增";
+    return Response.json({ key, keywords: [alias], params_type: parameters });
+  } });
+  const backend = createManagedMemeBackend(signal, [{
+    info: { key: "shared", keywords: ["本机共用"], params_type: parameters },
+    async render() { return Uint8Array.of(1); },
+  }]);
+  try {
+    await mkdir(config);
+    Bun.env.LOTUS_MEME_CONFIG_DIR = config;
+    Bun.env.LOTUS_MEME_DB = file;
+    delete Bun.env.LOTUS_MEME_SERVER_URL;
+    const { runAutomaticCatalogRefresh } = await import("../catalog-update.ts");
+    const { resolveMemeTrigger } = await import("../lotus.ts");
+    const select = (mode: "remote" | "managed") =>
+      writeFile(serverYaml, `backend: ${mode}
+url: ${remote.url.href}
+`);
+
+    await select("remote");
+    backend.ensure();
+    await runAutomaticCatalogRefresh(signal, true);
+    const legacy = new Database(file);
+    try {
+      legacy.exec('CREATE TABLE stat (key TEXT PRIMARY KEY, "all" INTEGER NOT NULL)');
+      legacy.query("INSERT INTO stat VALUES ('shared', 6)").run();
+      legacy.query("INSERT INTO preset VALUES (?, 'legacy_only', 'mode', 'keep', '', '')").run(JSON.stringify("旧专用预设"));
+      legacy.query(`INSERT INTO meme SELECT 'unexpected_old_brand', '{}', '["退役素材"]', params, min_texts, max_texts,
+        min_images, max_images, defText, args_type, '["鸣潮"]', createdAt, updatedAt FROM meme WHERE key = 'legacy_only'`).run();
+    } finally {
+      legacy.close();
+    }
+    expect(resolveMemeTrigger("#旧独有")).toMatchObject({ key: "legacy_only" });
+    expect(resolveMemeTrigger("#旧专用预设")).toMatchObject({ key: "legacy_only" });
+    expect(resolveMemeTrigger("#退役素材")).toBeUndefined();
+
+    await select("managed");
+    await runAutomaticCatalogRefresh(signal, true);
+    expect(resolveMemeTrigger("#本机共用")).toMatchObject({ key: "shared" });
+    expect(resolveMemeTrigger("#旧独有")).toBeUndefined();
+    recordMemeUsage("shared", file);
+    const combined = openMemeCatalogReader();
+    try {
+      expect(readMemeUsage(combined).get("shared")).toBe(7);
+      expect(combined.query("SELECT key FROM main.meme ORDER BY key").all()).toEqual([{ key: "legacy_only" }, { key: "shared" }]);
+      expect(combined.query(`SELECT key FROM main.${nativeCatalogTable}`).all()).toEqual([{ key: "shared" }]);
+    } finally {
+      combined.close();
+    }
+
+    unavailable = true;
+    await select("remote");
+    expect(resolveMemeTrigger("#旧独有")).toMatchObject({ key: "legacy_only" });
+    expect(resolveMemeTrigger("#旧共用")).toMatchObject({ key: "shared" });
+    expect(resolveMemeTrigger("#本机共用")).toBeUndefined();
+    await expect(runAutomaticCatalogRefresh(signal)).rejects.toThrow();
+    await runAutomaticCatalogRefresh(signal, true);
+    expect(resolveMemeTrigger("#旧专用预设")).toMatchObject({ key: "legacy_only" });
+    expect(resolveMemeTrigger("#退役素材")).toBeUndefined();
+    const offline = openMemeCatalogReader();
+    try {
+      expect(readMemeUsage(offline).get("shared")).toBe(7);
+    } finally {
+      offline.close();
+    }
+
+    keys.push("recovered");
+    unavailable = false;
+    await runAutomaticCatalogRefresh(signal);
+    expect(resolveMemeTrigger("#远端恢复新增")).toMatchObject({ key: "recovered" });
+    await select("managed");
+    expect(resolveMemeTrigger("#本机共用")).toMatchObject({ key: "shared" });
+    expect(resolveMemeTrigger("#远端恢复新增")).toBeUndefined();
+  } finally {
+    backend.dispose();
+    await remote.stop(true);
     for (const [index, name] of env.entries()) {
       const value = previous[index];
       if (value === undefined) delete Bun.env[name];
