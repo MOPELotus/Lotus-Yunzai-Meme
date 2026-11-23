@@ -1,5 +1,4 @@
 import { expect, test } from "bun:test";
-import { Canvas } from "skia-canvas";
 import type { MemeTemplateContext } from "../builtin-template.ts";
 import { legacyPortraitEffectTemplates } from "../templates/legacy-portrait-effects.ts";
 
@@ -22,13 +21,16 @@ test("两个旧模板保留可选文案与无参数入口", () => {
 });
 
 test("问问缺名字时回提示，旧用户资料可代替显式名字", async () => {
+  const controller = new AbortController();
+  const canceled = new Error("验收已停止。");
+  controller.abort(canceled);
   const context: MemeTemplateContext = {
-    signal: new AbortController().signal,
+    signal: controller.signal,
     async imageAsset() { throw new Error("问问不加载模板图片。"); },
-    async fontAsset() { throw new Error("已进入绘制。"); },
+    async fontAsset() { throw canceled; },
   };
-  const images = [new File([new Uint8Array(await new Canvas(2, 2).png)], "avatar.png")];
+  const images = [new File([], "avatar.png")];
   await expect(ask.render({ images, texts: [], args: {} }, context)).rejects.toThrow("文字或昵称数量不足");
   await expect(ask.render({ images, texts: [], args: { user_infos: [{ name: "旧昵称", gender: "male" }] } }, context))
-    .rejects.toThrow("已进入绘制。");
+    .rejects.toThrow(canceled);
 });
