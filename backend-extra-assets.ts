@@ -7,6 +7,7 @@ import { anyliewTailAssets } from "./backend-anyliew-tail-assets.ts";
 import { anyliewCircleDialogueAssets } from "./backend-circle-dialogue-assets.ts";
 import { anyliewDialogueAssets } from "./backend-dialogue-assets.ts";
 import { anyliewFixedAnimationAssets } from "./backend-fixed-animation-assets.ts";
+import { anyliewFixedBatchAssets } from "./backend-anyliew-fixed-batch-assets.ts";
 import { flushAssets } from "./backend-flush-assets.ts";
 import { pythonOverlayAssets } from "./backend-python-overlay-assets.ts";
 import { legacyTextOverlayAssets } from "./backend-legacy-text-overlay-assets.ts";
@@ -79,6 +80,7 @@ const anyliewAssets = [
   ...anyliewDialogueAssets,
   ...anyliewCircleDialogueAssets,
   ...anyliewFixedAnimationAssets,
+  ...anyliewFixedBatchAssets,
   ...anyliewFixedAnimationV2Assets,
   ...anyliewRectangleOverlayAssets,
   ...anyliewAvatarSceneAssets,
