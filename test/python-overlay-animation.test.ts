@@ -64,10 +64,14 @@ test("顶 / 玩保留 58 帧重复片段和无头像的 20 帧结尾", async () 
   avatarDraw.fillRect(0, 0, 10, 10);
   const source = new File([new Uint8Array(await avatar.png)], "avatar.png");
   const requested: string[] = [];
-  expect(pythonOverlayAssets).toHaveLength(38);
+  const playAssets = pythonOverlayAssets.filter(([path]) => path.startsWith("images/python/meme_generator/memes/play/images/"));
+  expect(playAssets).toHaveLength(38);
   async function imageAsset(path: string) {
     const index = requested.length;
-    expect<string | undefined>(pythonOverlayAssets[index]?.[0]).toBe(`images/${path}`);
+    const [key, metadata] = playAssets[index]!;
+    expect<string>(key).toBe(`images/${path}`);
+    expect<string>(metadata.path).toBe(path.slice("python/".length));
+    expect(metadata.digest).toMatch(/^[0-9a-f]{64}$/u);
     requested.push(path);
     const canvas = new Canvas(310, 245);
     const draw = canvas.getContext("2d");
