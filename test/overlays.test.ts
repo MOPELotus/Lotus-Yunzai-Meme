@@ -99,3 +99,108 @@ test("上香保留 --black 和黑白别名，只将头像转为黑白", async ()
     expectRgb(image, 673, 173, 0, 0, 255);
   }
 });
+
+const newCases = [
+  { key: "your_new_years_eve", width: 758, height: 1080, center: [293, 865], padding: [10, 660] },
+  { key: "keep_your_money", width: 1080, height: 1080, center: [250, 760], padding: [10, 450], asset: "arona.png", args: { number: 1 } },
+  { key: "fight_with_sunuo", width: 1280, height: 1868, center: [280, 1000], gray: true },
+  { key: "luotianyi_need", width: 573, height: 443, center: [140, 242], padding: [50, 155], avatarAboveArt: true },
+  { key: "maimai_join", width: 500, height: 500, center: [250, 250] },
+  { key: "need", width: 500, height: 440, center: [384, 289] },
+  { key: "taunt", width: 720, height: 720, center: [360, 360], avatarAboveArt: true },
+  { key: "sekaiichi_kawaii", width: 900, height: 506, center: [440, 252] },
+  { key: "distracted", width: 500, height: 500, center: [250, 250], asset: "1.png", sticker: true },
+] as const;
+
+async function variantContext(key: string, width: number, height: number, above: boolean, hasSticker: boolean) {
+  const art = new Canvas(width, height);
+  const draw = art.getContext("2d");
+  if (above) {
+    draw.fillStyle = "#00f";
+    draw.fillRect(0, 0, width, height);
+  }
+  const label = new Canvas(32, 32);
+  const drawLabel = label.getContext("2d");
+  drawLabel.fillStyle = "#0f0";
+  drawLabel.fillRect(0, 0, 32, 32);
+  const assets = await Promise.all([art.png, label.png]);
+  const requested: string[] = [];
+  const context: MemeTemplateContext = {
+    signal: new AbortController().signal,
+    async imageAsset(path) {
+      requested.push(path);
+      return assets[hasSticker && path === `${key}/0.png` ? 1 : 0];
+    },
+    async fontAsset() { throw new Error("该模板不使用字体"); },
+  };
+  return { context, requested };
+}
+
+async function avatarImage(width: number, height: number) {
+  const canvas = new Canvas(width, height);
+  const draw = canvas.getContext("2d");
+  draw.fillStyle = "#f00";
+  draw.fillRect(0, 0, width, height);
+  return new File([new Uint8Array(await canvas.png)], "red.png");
+}
+
+for (const entry of newCases) {
+  const { key, width, height, center: [x, y] } = entry;
+  test(`${key} 根据旧版变体构图选图`, async () => {
+    const above = "avatarAboveArt" in entry;
+    const hasSticker = "sticker" in entry;
+    const { context, requested } = await variantContext(key, width, height, above, hasSticker);
+    const template = builtinMemeTemplates.find(template => template.info.key === key)!;
+    const args = "args" in entry ? entry.args : {};
+    const jpeg = await template.render({ images: [await avatarImage(40, 10)], texts: [], args }, context);
+    const image = await loadImage(Buffer.from(jpeg));
+    expect([image.width, image.height]).toEqual([width, height]);
+    const mainAsset = `${key}/${"asset" in entry ? entry.asset : "0.png"}`;
+    expect(requested).toEqual(hasSticker ? [mainAsset, `${key}/0.png`] : [mainAsset]);
+    if ("gray" in entry) expectRgb(image, x, y, 76, 76, 76);
+    else expectRgb(image, x, y, 255, 0, 0);
+    if ("padding" in entry) {
+      const [left, top] = entry.padding;
+      if (above) expectRgb(image, left, top, 0, 0, 255);
+      else expectRgb(image, left, top, 255, 255, 255);
+    }
+    if (hasSticker) expectRgb(image, 156, 336, 0, 255, 0);
+  });
+}
+
+test("保留压岁钱编号、随机选图和世界第一可爱的竖版", async () => {
+  const money = builtinMemeTemplates.find(template => template.info.key === "keep_your_money")!;
+  const { context, requested } = await variantContext(money.info.key, 1080, 1080, false, false);
+  const input = { images: [await avatarImage(40, 10)], texts: [] };
+  const parsed = parseGenerationArgs(money.info.params_type.args_type, "--number 2");
+  expect(parsed).toMatchObject({ text: "", values: { number: 2 } });
+  await money.render({ ...input, args: parsed.values }, context);
+  expect(requested.pop()).toBe("keep_your_money/plana.png");
+  await money.render({ ...input, args: {} }, context);
+  expect(["keep_your_money/arona.png", "keep_your_money/plana.png"]).toContain(requested.pop()!);
+  await expect(money.render({ ...input, args: { number: 3 } }, context)).rejects.toThrow("图片编号错误");
+
+  const kawaii = builtinMemeTemplates.find(template => template.info.key === "sekaiichi_kawaii")!;
+  const vertical = await variantContext(kawaii.info.key, 675, 900, false, false);
+  const output = await kawaii.render({ images: [await avatarImage(10, 40)], texts: [], args: {} }, vertical.context);
+  const portrait = await loadImage(Buffer.from(output));
+  expect([portrait.width, portrait.height]).toEqual([675, 900]);
+  expect(vertical.requested).toEqual(["sekaiichi_kawaii/1.png"]);
+  expectRgb(portrait, 337, 450, 255, 0, 0);
+});
+
+test("注意力涣散保留旧静图半透明蒙版", async () => {
+  const template = builtinMemeTemplates.find(template => template.info.key === "distracted")!;
+  const frame = new Canvas(500, 500);
+  const paint = frame.getContext("2d");
+  paint.fillStyle = "rgba(0, 0, 255, 0.5)";
+  paint.fillRect(0, 0, 500, 500);
+  const [art, sticker] = await Promise.all([frame.png, new Canvas(1, 1).png]);
+  const context: MemeTemplateContext = {
+    signal: new AbortController().signal,
+    async imageAsset(path) { return path.endsWith("/1.png") ? art : sticker; },
+    async fontAsset() { throw new Error("该模板不使用字体"); },
+  };
+  const bytes = await template.render({ images: [await avatarImage(20, 20)], texts: [], args: {} }, context);
+  expectRgb(await loadImage(Buffer.from(bytes)), 230, 230, 159, 64, 160);
+});
