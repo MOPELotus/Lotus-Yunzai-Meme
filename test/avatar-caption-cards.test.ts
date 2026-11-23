@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { Canvas, loadImage } from "skia-canvas";
+import { createBundledMemeResources } from "../backend-builtin-assets.ts";
 import { readMemeImageSequence } from "../templates/animated-input.ts";
 import { avatarCaptionMemeTemplates } from "../templates/avatar-caption-cards.ts";
 import { encodeMemeGif } from "../templates/gif.ts";
@@ -12,7 +13,7 @@ const context = {
   async imageAsset() { throw new Error("这个模板不需要底图。"); },
   async fontAsset() { return readFile(new URL("../../starrail/rogue-theme/SR.ttf", import.meta.url)); },
 };
-const [keepAway, littleAngel] = avatarCaptionMemeTemplates;
+const [keepAway, littleAngel, follow] = avatarCaptionMemeTemplates;
 
 test("远离按原顺序分配八格，三张头像的剩余格归最后一张", async () => {
   expect(builtinMemeTemplates).toContain(keepAway);
@@ -44,4 +45,24 @@ test("小天使保留 GIF 的帧数、平均帧延时和原图宽高比", async 
   const sequence = await readMemeImageSequence(new File([new Uint8Array(bytes)], "小天使.gif"), signal);
   expect([sequence.frames[0].width, sequence.frames[0].height, sequence.frames.length, sequence.averageDelayMs])
     .toEqual([600, 530, 2, 90]);
+});
+
+test("关注按原版圆形裁切和灰色回执文字输出静态图", async () => {
+  const avatar = new Canvas(20, 10);
+  const paint = avatar.getContext("2d");
+  paint.fillStyle = "#2fa8cf";
+  paint.fillRect(0, 0, 20, 10);
+  const file = new File([new Uint8Array(await avatar.png)], "头像.png");
+  const assets = { signal, ...createBundledMemeResources(signal) };
+  const output = await follow.render({ images: [file], texts: [], args: {} }, assets);
+  expect(output.subarray(0, 2)).toEqual(Buffer.from([255, 216]));
+  const image = await loadImage(Buffer.from(output));
+  expect(image.height).toBe(300);
+  const draw = new Canvas(image.width, image.height).getContext("2d");
+  draw.drawImage(image, 0, 0);
+  expect(draw.getImageData(52, 52, 1, 1).data[0]).toBeGreaterThan(245);
+  expect(draw.getImageData(150, 150, 1, 1).data[2]).toBeGreaterThan(190);
+  const label = draw.getImageData(300, 145, image.width - 300, 85).data;
+  expect(label.some((channel, index) => index % 4 === 0 && channel > 110 && channel < 155)).toBe(true);
+  await expect(follow.render({ images: [file], texts: ["A".repeat(100)], args: {} }, assets)).rejects.toThrow("文字过长");
 });

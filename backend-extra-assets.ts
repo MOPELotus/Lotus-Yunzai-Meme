@@ -98,7 +98,7 @@ const anyliewAssets = [
   ...anyliewTextDialogueAssets,
 ];
 
-export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map([
+export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map<string, ExtraMemeAsset>([
   ...anyliewAssets.map(([path, digest]) => [`images/anyliew/${path}`, { path, digest, sources: anyliewBase }] as const),
   anyliewDeerHelpAsset,
   ...pythonOverlayAssets,

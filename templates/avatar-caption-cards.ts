@@ -1,9 +1,10 @@
-// Layouts from MemeCrafters/meme-generator (619fa105), keep_away and little_angel.
+// Layouts from MemeCrafters/meme-generator (619fa105).
 import { loadImage, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
-import type { MemeTemplate } from "../builtin-template.ts";
+import { MemeTemplateFeedback, type MemeTemplate } from "../builtin-template.ts";
 import { readMemeFirstImage } from "./animated-input.ts";
-import { drawFittedText, jpg, paper, previewImage, registerFont } from "./template-layout.ts";
+import { layoutMemeText } from "./bbcode-text.ts";
+import { drawFittedText, jpg, paper, previewImage, registerFont, registerMemeTypeface } from "./template-layout.ts";
 import { readTransformSource, renderTransformSequence, transformPreviewInput } from "./transforms.ts";
 
 const keepAwayCaption = "如何提高社交质量 : \n远离以下头像的人";
@@ -88,4 +89,50 @@ const littleAngel: MemeTemplate = {
   },
 };
 
-export const avatarCaptionMemeTemplates = [keepAway, littleAngel] as const;
+const follow: MemeTemplate = {
+  info: {
+    key: "follow",
+    keywords: ["关注"],
+    params_type: { min_images: 1, max_images: 1, min_texts: 0, max_texts: 1, default_texts: [], args_type: null },
+  },
+  async render({ images, texts, args }, context) {
+    const [avatar, regular, cjk] = await Promise.all([
+      readMemeFirstImage(images[0]!, context.signal),
+      registerMemeTypeface(context, "LiberationSans-Regular.ttf", "LotusMemeLiberationSans"),
+      registerFont(context),
+    ]);
+    const user: unknown = Array.isArray(args.user_infos) ? args.user_infos[0] : undefined;
+    const info = user && typeof user === "object" ? user as { name?: unknown; gender?: unknown } : undefined;
+    const fallbackName = info?.gender === "female" ? "女同" : "男同";
+    const name = texts[0] ?? (typeof info?.name === "string" && info.name ? info.name : fallbackName);
+    const families = { regular, cjk };
+    const caption = (text: string, color: string) => layoutMemeText(text.split(/\r\n|\r|\n/u).map(line => ({
+      alignment: "left",
+      spans: [{ text: line, size: 60, color }],
+    })), undefined, families);
+    const nameBlock = caption(name, "black");
+    const label = caption("关注了你", "#808080");
+    const textWidth = Math.max(nameBlock.width, label.width);
+    if (textWidth >= 1000) throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+    const width = 350 + textWidth;
+    const size = Math.min(avatar.width, avatar.height);
+    const x = Math.floor((avatar.width - size) / 2);
+    const y = Math.floor((avatar.height - size) / 2);
+    return jpg(width, 300, draw => {
+      paper(draw, width, 300);
+      draw.save();
+      draw.beginPath();
+      draw.arc(150, 150, 100, 0, 2 * Math.PI);
+      draw.clip();
+      draw.drawImage(avatar, x, y, size, size, 50, 50, 200, 200);
+      draw.restore();
+      nameBlock.draw(draw, 300, 135 - nameBlock.height);
+      label.draw(draw, 300, 145);
+    }, context.signal);
+  },
+  async preview(context) {
+    return follow.render({ images: [await previewImage(context.signal)], texts: [], args: {} }, context);
+  },
+};
+
+export const avatarCaptionMemeTemplates = [keepAway, littleAngel, follow] as const;

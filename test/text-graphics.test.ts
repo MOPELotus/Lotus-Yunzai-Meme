@@ -51,6 +51,8 @@ test("只解析旧文字标记，同名嵌套、换行和对齐保持独立", ()
   expect(literal.map(span => span.text).join("")).toBe("[url]a[/url]<img>B");
   expect(literal.at(-1)?.family).toBe("");
   expect(parseMemeBbcode("[color=rgb(255,0,0)]x[/color]", 45, "left")[0]?.spans[0]?.color).toBeUndefined();
+  expect(parseMemeBbcode("[color=darkgrey][stroke=slategrey]x[/stroke][/color]", 45, "left")[0]?.spans[0])
+    .toMatchObject({ color: "darkgray", stroke: "slategray" });
 });
 
 test("Google 使用旧六色，空格参与索引并按原换行变为空格", async () => {

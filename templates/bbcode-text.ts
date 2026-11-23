@@ -81,7 +81,8 @@ export function parseMemeBbcode(text: string, size: number, alignment: Alignment
         } else if ((tag === "color" || tag === "stroke") ? validColor(value) :
           tag === "align" ? /^(left|center|right)$/u.test(value) :
             tag === "size" ? /^\d+$/u.test(value) : true) {
-          stack.push(value);
+          // Skia recognizes the gray spelling of the colors also called grey in the old captions.
+          stack.push(tag === "color" || tag === "stroke" ? value.replace(/grey$/u, "gray") : value);
         }
       }
       stacks.set(tag, stack);
