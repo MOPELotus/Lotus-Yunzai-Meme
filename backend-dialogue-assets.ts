@@ -1,0 +1,21 @@
+// Only registered AnyLiew dialogue overlays from the fixed revision in backend-extra-assets.ts.
+export const anyliewDialogueAssets = [
+  ["emoji/ai_ace/images/0.png", "1658392c3c19a799622b7cc13cf7793fcfc415ca1550d8f71d8f01910c58ae88"],
+  ["emoji/allegiance/images/0.png", "8cde7e2902eb5519099b1707c08d80fcbb7704ba6343f27988886084819e4fb5"],
+  ["emoji/atri_like/images/0.png", "a8ee8834806e9bd811fadc619c0fbe62678b53d6a7cb3fc10f7c709ffc9c7a6d"],
+  ["emoji/beloveds/images/0.png", "b3686793e7b980776c5c831de3e1d4afa1d5f97a0e0a98ada6521612faae5bd7"],
+  ["emoji/doro_contact/images/0.png", "25e877ae8e549399bc520dce75f24fc94e7c3a1c05987bd49946e6c401ae15b4"],
+  ["emoji/doro_dear/images/0.png", "5e8e3e14c864627d5c14a9f5935faa4655f22af0796ddbc03ad1280e00fd4dba"],
+  ["emoji/doro_orange/images/0.png", "ce7e1d3a2832f4c02d4e5da10a784a17f037de4ccfd7a49e6af2f54640100e11"],
+  ["emoji/ikun_like/images/0.png", "0aed07507476803c5a0a6ac8a974d3ae3ebfea28028ff3ff6a9dbbf408daf24c"],
+  ["emoji/ikun_need_tv/images/0.png", "8df7fdd3a01a3eca2e026377fbf7510b5b56ae82e06387bd329f2a56c8dd9be1"],
+  ["emoji/mihoyo_keqing_pointo/images/0.png", "78dc64d546269f34fe7aa5efa5956648c20b48e2f07c265817b9adf4a87d464d"],
+  ["emoji/mihoyo_navia_caspar_persuade/images/0.png", "1b51ef59808593f1124c15327d5f60c8c3a8cb9c35d7d79325620c360a7a369d"],
+  ["emoji/pay_to_watch/images/0.png", "5f2171b794b2fc0c8559bb33829191c2feea2057bea6060b2a9a9472b788b863"],
+  ["emoji/rune/images/0.png", "3e00c107b36c654d58dab23775fb8141e90074f62014078cbd5b380eee98bc4b"],
+  ["emoji/something/images/0.png", "3919b8cb455ff6c70f0ae6887636e43f4e3a53a68a1bdd3aedad9dcaaf509fc0"],
+  ["emoji/yes/images/0.png", "9057c7df984a1659ab93b7ecf3d7798be6763a302aeb5fa9e723785b01300fbe"],
+  ["emoji/yuzu_soft_murasame_dislike/images/0.png", "58f07356a3f8f5b1c8991dfca90725b1ed8afbea79eec7f0e1c8feaf26f4453b"],
+  ["emoji/yuzu_soft_murasame_like/images/0.png", "6130d9a6ff5b16319e8f970eb0a2e4468e85d1c82588cf8399869e96eb8cff7d"],
+  ["emoji/yuzu_soft_ticket/images/0.png", "828509a1a98afa26e29e92cc5d4fc5399edc5c49b81a9b06b2e7a051df8a6c72"],
+] as const;

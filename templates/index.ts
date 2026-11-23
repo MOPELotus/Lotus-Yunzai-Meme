@@ -1,4 +1,5 @@
 import type { MemeTemplate } from "../builtin-template.ts";
+import { anyliewDialogueTemplates } from "./anyliew-dialogue.ts";
 import { avatarFrameMemeTemplates } from "./avatar-frames.ts";
 import { basicImageMemeTemplates } from "./basic-image-transforms.ts";
 import { fixedAvatarAnimations } from "./fixed-avatar-animation.ts";
@@ -31,6 +32,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...overlayMemeTemplates,
   ...avatarFrameMemeTemplates,
   ...rectangleOverlayTemplates,
+  ...anyliewDialogueTemplates,
   ...legacySceneMemeTemplates,
   ...textSignMemeTemplates,
   ...perspectiveMemeTemplates,

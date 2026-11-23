@@ -1,3 +1,4 @@
+import { anyliewDialogueAssets } from "./backend-dialogue-assets.ts";
 import { anyliewFixedAnimationAssets } from "./backend-fixed-animation-assets.ts";
 import { pythonOverlayAssets } from "./backend-python-overlay-assets.ts";
 import { anyliewRectangleOverlayAssets } from "./backend-rectangle-overlay-assets.ts";
@@ -61,6 +62,7 @@ interface ExtraMemeAsset {
 
 const anyliewAssets = [
   ...Object.entries(anyliewFrames).map(([key, digest]) => [`emoji/${key}/images/0.png`, digest] as const),
+  ...anyliewDialogueAssets,
   ...anyliewFixedAnimationAssets,
   ...anyliewRectangleOverlayAssets,
 ];
