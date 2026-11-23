@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import type { Image } from "skia-canvas";
 import { renderPng, renderRgba } from "../../../packages/skia/index.ts";
 import { extraMemeAssets } from "../backend-extra-assets.ts";
 import { anyliewFixedAnimationAssets } from "../backend-fixed-animation-assets.ts";
@@ -10,9 +11,9 @@ import { encodeMemeGif } from "../templates/gif.ts";
 
 const signal = new AbortController().signal;
 
-test("默认本机目录注册全部十五项且只接入固定上游帧的白名单", () => {
+test("默认本机目录注册全部二十五项且只接入固定上游帧的白名单", () => {
   const selected = new Set(fixedAvatarAnimations.map(({ info }) => info.key));
-  expect(selected.size).toBe(15);
+  expect(selected.size).toBe(25);
   expect(builtinMemeTemplates.filter(({ info }) => selected.has(info.key))).toEqual([...fixedAvatarAnimations]);
   for (const [path, digest] of anyliewFixedAnimationAssets) {
     expect(extraMemeAssets.get(`images/anyliew/${path}`)).toMatchObject({ path, digest });
@@ -57,6 +58,15 @@ function mockContext(frames: readonly Buffer[], paths: string[]): MemeTemplateCo
   };
 }
 
+async function pixels(image: Image, points: readonly (readonly [number, number])[]) {
+  const { rgba, engine } = await renderRgba(image.width, image.height, draw => draw.drawImage(image, 0, 0));
+  if (Bun.env.LOTUS_SKIA_MODE === "gpu") {
+    expect(engine.renderer).toBe("GPU");
+    expect(engine.device).toContain("RTX A4000");
+  }
+  return points.map(([x, y]) => [...rgba.subarray((y * image.width + x) * 4, (y * image.width + x) * 4 + 4)]);
+}
+
 test("逐项保留固定动画的原关键词、参数和资产路径，并输出有效 GIF", async () => {
   const foregrounds = await Promise.all([foreground("#ffffff"), foreground("#111111")]);
   const cases = [
@@ -75,6 +85,16 @@ test("逐项保留固定动画的原关键词、参数和资产路径，并输�
     ["small_hands", ["小手"], 3, 80],
     ["wifi", ["wifi", "WIFI"], 4, 100],
     ["slacking_off", ["摸鱼"], 4, 200],
+    ["bring_wealth", ["来财"], 24, 70],
+    ["capoo_fished_out", ["咖波掏"], 20, 100],
+    ["capoo_gothammered", ["咖波被锤"], 20, 50],
+    ["cat_lick", ["猫舔", "猫猫舔"], 30, 60],
+    ["doro_banging", ["doro敲", "Doro敲", "桃乐丝敲"], 11, 30],
+    ["doro_do", ["doro撅", "Doro撅", "桃乐丝撅"], 4, 50],
+    ["doro_kiss", ["桃乐丝亲", "Doro亲", "doro亲"], 9, 60],
+    ["doro_knight", ["骑士", "doro骑士", "Doro骑士", "DORO骑士"], 16, 100],
+    ["doro_stroke", ["抚摸", "doro抚摸", "Doro抚摸", "桃乐丝抚摸"], 16, 70],
+    ["doro_trampoline", ["跳床", "蹦床", "doro蹦床", "桃乐丝蹦床", "doro跳床", "桃乐丝跳床"], 15, 60],
   ] as const;
 
   const input = { images: [inputGif()], texts: [], args: {} };
@@ -106,14 +126,6 @@ test("固定动画只取输入首帧，保留遮罩顺序和居中覆盖裁切",
   };
 
   const [capooFrames, ikunFrames] = await Promise.all([render(capoo), render(ikun)]);
-  async function pixels(image: typeof capooFrames.frames[number], points: readonly (readonly [number, number])[]) {
-    const { rgba, engine } = await renderRgba(image.width, image.height, draw => draw.drawImage(image, 0, 0));
-    if (Bun.env.LOTUS_SKIA_MODE === "gpu") {
-      expect(engine.renderer).toBe("GPU");
-      expect(engine.device).toContain("RTX A4000");
-    }
-    return points.map(([x, y]) => [...rgba.subarray((y * image.width + x) * 4, (y * image.width + x) * 4 + 4)]);
-  }
 
   expect(await pixels(capooFrames.frames[0]!, [[26, 58], [30, 61], [14, 14]])).toEqual([
     [255, 0, 0, 255], [255, 255, 255, 255], [0, 0, 0, 0],
@@ -137,4 +149,25 @@ test("固定动画只取输入首帧，保留遮罩顺序和居中覆盖裁切",
   const sequence = await readMemeImageSequence(new File([new Uint8Array(collapsed)], "result.gif"), signal);
   expect(sequence.frames).toHaveLength(2);
   expect(sequence.averageDelayMs).toBe(120);
+});
+
+test("来财保留重复帧停顿，桃乐丝敲逐帧使用原坐标和尺寸", async () => {
+  const [light, dark] = await Promise.all([foreground("#ffffff"), foreground("#111111")]);
+  const input = { images: [inputGif()], texts: [], args: {} };
+  const wealth = fixedAvatarAnimations.find(item => item.info.key === "bring_wealth")!;
+  const originalHolds = [2, 3, 2, 3, 2, 2, 3, 2, 3, 2];
+  const repeatedFrames = originalHolds.flatMap((count, index) => Array<Buffer>(count).fill(index % 2 ? light : dark));
+  const held = await wealth.render(input, mockContext(repeatedFrames, []));
+  const heldSequence = await readMemeImageSequence(new File([new Uint8Array(held)], "held.gif"), signal);
+  expect(heldSequence.frames).toHaveLength(originalHolds.length);
+  expect(heldSequence.averageDelayMs).toBe(168);
+
+  const banging = fixedAvatarAnimations.find(item => item.info.key === "doro_banging")!;
+  const result = await banging.render(input, mockContext([light], []));
+  const { frames } = await readMemeImageSequence(new File([new Uint8Array(result)], "poses.gif"), signal);
+  expect(frames).toHaveLength(5);
+  const sample = [[142, 150], [243, 160], [157, 190]] as const;
+  expect(await pixels(frames[0]!, sample)).toEqual([[0, 0, 0, 0], [0, 0, 0, 0], [255, 0, 0, 255]]);
+  expect(await pixels(frames[1]!, sample)).toEqual([[255, 0, 0, 255], [0, 0, 0, 0], [0, 0, 0, 0]]);
+  expect(await pixels(frames[2]!, sample)).toEqual([[255, 0, 0, 255], [0, 0, 255, 255], [0, 0, 0, 0]]);
 });

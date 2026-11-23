@@ -99,6 +99,80 @@ const specs: readonly FixedAvatarAnimation[] = [
     positions: [10, 57],
     sizes: [145, 116],
   },
+  {
+    key: "bring_wealth", keywords: ["来财"], frames: 24, delayMs: 70,
+    positions: [0, 0],
+    sizes: [224, 224],
+  },
+  {
+    key: "capoo_fished_out", keywords: ["咖波掏"], frames: 20, delayMs: 100,
+    positions: [
+      [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1],
+      [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1],
+      [1, 1], [57, 84], [35, 117], [21, 102], [27, 112], [28, 112],
+    ],
+    sizes: [95, 95],
+    tags: ["猫猫虫", "咖波"],
+  },
+  {
+    key: "capoo_gothammered", keywords: ["咖波被锤"], frames: 20, delayMs: 50,
+    positions: [
+      [82, 147], [77, 116], [79, 128], [76, 135], [80, 146], [77, 127], [80, 127],
+      [78, 137], [81, 146], [78, 130], [81, 129], [81, 139], [81, 147], [80, 131],
+      [81, 130], [79, 137], [81, 146], [78, 131], [79, 130], [80, 138],
+    ],
+    sizes: [80, 80],
+    tags: ["猫猫虫", "咖波"],
+  },
+  {
+    key: "cat_lick", keywords: ["猫舔", "猫猫舔"], frames: 30, delayMs: 60,
+    positions: [38, 127],
+    sizes: [80, 65],
+  },
+  {
+    key: "doro_banging", keywords: ["doro敲", "Doro敲", "桃乐丝敲"], frames: 11, delayMs: 30,
+    positions: [
+      [149, 109], [149, 109], [149, 109], [139, 133], [134, 140], [143, 127], [149, 109],
+      [149, 109], [149, 109], [149, 109], [149, 109],
+    ],
+    sizes: [
+      [82, 82], [82, 82], [82, 82], [102, 52], [112, 45], [89, 60], [82, 82],
+      [82, 82], [82, 82], [82, 82], [82, 82],
+    ],
+  },
+  {
+    key: "doro_do", keywords: ["doro撅", "Doro撅", "桃乐丝撅"], frames: 4, delayMs: 50,
+    positions: [[0, 600], [0, 645], [0, 680], [0, 720]],
+    sizes: [640, 640],
+  },
+  {
+    key: "doro_kiss", keywords: ["桃乐丝亲", "Doro亲", "doro亲"], frames: 9, delayMs: 60,
+    positions: [65, 343],
+    sizes: [190, 160],
+  },
+  {
+    key: "doro_knight", keywords: ["骑士", "doro骑士", "Doro骑士", "DORO骑士"], frames: 16, delayMs: 100,
+    positions: [
+      [126, 203], [125, 197], [125, 204], [125, 209], [128, 197], [125, 200], [124, 207],
+      [125, 201], [125, 201], [125, 207], [125, 209], [126, 201], [125, 205], [125, 198],
+      [127, 197], [127, 206],
+    ],
+    sizes: [133, 133],
+  },
+  {
+    key: "doro_stroke", keywords: ["抚摸", "doro抚摸", "Doro抚摸", "桃乐丝抚摸"], frames: 16, delayMs: 70,
+    positions: [148, 306],
+    sizes: [81, 81],
+  },
+  {
+    key: "doro_trampoline", keywords: ["跳床", "蹦床", "doro蹦床", "桃乐丝蹦床", "doro跳床", "桃乐丝跳床"], frames: 15, delayMs: 60,
+    positions: [
+      [31, 94], [30, 96], [33, 68], [33, 66], [29, 65], [32, 62], [31, 76],
+      [31, 95], [30, 95], [30, 95], [32, 67], [32, 66], [33, 65], [36, 65],
+      [34, 74],
+    ],
+    sizes: [79, 66],
+  },
 ];
 
 function at<T extends Size>(values: T | readonly T[], index: number): T {
