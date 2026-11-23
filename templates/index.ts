@@ -31,6 +31,7 @@ import { classicLayeredMemeTemplates } from "./classic-layered-animations.ts";
 import { croppedPhotoTemplates } from "./cropped-photo-templates.ts";
 import { dianzhongdian } from "./dianzhongdian.ts";
 import { fixedAvatarAnimations } from "./fixed-avatar-animation.ts";
+import { operatorGenerator } from "./operator-generator.ts";
 import { shapeTimedAnimations } from "./shape-timed-animations.ts";
 import { largeSourceAnimations } from "./large-source-animations.ts";
 import { flush } from "./flush.ts";
@@ -146,6 +147,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...textSignMemeTemplates,
   ...perspectiveMemeTemplates,
   ...fixedAvatarAnimations,
+  operatorGenerator,
   ...shapeTimedAnimations,
   ...largeSourceAnimations,
   ...anyliewAvatarCycleTemplates,
