@@ -12,14 +12,24 @@ function pasteMask(rgba: Uint8Array, overlay: Uint8Array) {
   }
 }
 
+interface MaskedRasterOptions {
+  readonly whiteBackground?: boolean;
+  readonly clip?: Draw;
+}
+
 /** Reproduce the original Pillow paste with the artwork's own alpha as a mask. */
-export async function renderMaskedRaster(width: number, height: number, base: Draw, layers: readonly Draw[], signal: AbortSignal,
-  { whiteBackground = false } = {}) {
+export async function renderMaskedRgba(width: number, height: number, base: Draw, layers: readonly Draw[], signal: AbortSignal,
+  { whiteBackground = false, clip }: MaskedRasterOptions = {}) {
   signal.throwIfAborted();
   const { rgba } = await renderRgba(width, height, base);
   for (const draw of layers) {
     signal.throwIfAborted();
     pasteMask(rgba, (await renderRgba(width, height, draw)).rgba);
+  }
+  if (clip) {
+    signal.throwIfAborted();
+    const mask = (await renderRgba(width, height, clip)).rgba;
+    for (let i = 3; i < rgba.length; i += 4) rgba[i] = Math.round(rgba[i]! * mask[i]! / 255);
   }
   if (whiteBackground) {
     for (let i = 0; i < rgba.length; i += 4) {
@@ -31,6 +41,12 @@ export async function renderMaskedRaster(width: number, height: number, base: Dr
     }
   }
   signal.throwIfAborted();
+  return rgba;
+}
+
+export async function renderMaskedRaster(width: number, height: number, base: Draw, layers: readonly Draw[], signal: AbortSignal,
+  options?: MaskedRasterOptions) {
+  const rgba = await renderMaskedRgba(width, height, base, layers, signal, options);
   const pixels = new ImageData(new Uint8ClampedArray(rgba), width, height);
   const { png } = await renderExactPng(width, height, draw => draw.putImageData(pixels, 0, 0));
   signal.throwIfAborted();

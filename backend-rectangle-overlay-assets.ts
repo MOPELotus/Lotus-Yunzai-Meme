@@ -1,0 +1,18 @@
+// Fixed files used by the original rectangle overlays.
+export const anyliewRectangleOverlayAssets = [
+  ["emoji/deer_time/images/0.png", "daa63fe8be1fff1e577e440e9058f84bd8d73eacf48a81463d29c2aecf47ffe2"],
+  ["emoji/doro_group_photo/images/0.png", "77f0eab8ffae5184c1ed16c15d5eb1ad125120cdf08f529be09e6f05ebbcdee9"],
+  ["emoji/error3b/images/0.png", "c8c6b88e15d0f00438ab9688d4782082a130a2d876be8010f564527a8d29becf"],
+  ["emoji/mihoyo_columbina_hug/images/0.png", "71eaf9fe1990b4e8ccc2b50caea65422ec0f991d62eb98532ad8fa9fa1e9eef5"],
+  ["emoji/mihoyo_ineffa_droid/images/0.png", "570fdcc9a463b8dd1ea03e1af83b1f8143b4a345cf2283b1c7d0c8ea660b376a"],
+  ["emoji/mihoyo_senior_phone/images/0.png", "ea4189547fdeb236f72a273b10bcfacae3e9a4b6bdbe46799a1b95da2c316ed8"],
+  ["emoji/mixue/images/0.png", "d8665c9a5d092f573f238b09168197282a8ead8c478e204016ba9c0ca8c80da2"],
+  ["emoji/nakano_ltsuki/images/0.png", "50a0dbccce2896e320bcb732291dfcc12f740d52a2022f73f1e8880f8aed94a3"],
+  ["emoji/nakano_nino/images/0.png", "919b1712e2110ec1d84992a360fcd1566a6eefca6c8db971b971886002638944"],
+  ["emoji/naruro_resurrection/images/0.png", "011d86a8da8a580016f00a02fe2ddaf1d63982e35aaa586f7f91fc9019e75f1b"],
+  ["emoji/naruto_bagua_seal/images/0.png", "be295024f12e1d404c4d0e1c7b7874126069012653399cad9004dffea9a9c3c3"],
+  ["emoji/pregnancy_test/images/0.png", "13f16ccd8228ddc0f52ee3bcb46835f7354abeea81a71f3837d136de6b69e579"],
+  ["emoji/slam_table/images/0.png", "d594be5da794aabc97510473c21cd8df0c1823a1ba85d0e81e38f973a057780f"],
+  ["emoji/yuzu_soft_ciallo/images/0.png", "1e02bf58befa3a63f7061ff5fccdef40edcbb5cf2176eb8a1c5ca21ba608e812"],
+  ["emoji/yuzu_soft_ignore/images/0.png", "d623108bfcc5b0eb7461dbeacc8f9471afe3e5caed0753eaa4dc103672f529d4"],
+] as const;

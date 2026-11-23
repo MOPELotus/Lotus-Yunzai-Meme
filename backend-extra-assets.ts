@@ -1,5 +1,6 @@
 import { anyliewFixedAnimationAssets } from "./backend-fixed-animation-assets.ts";
 import { pythonOverlayAssets } from "./backend-python-overlay-assets.ts";
+import { anyliewRectangleOverlayAssets } from "./backend-rectangle-overlay-assets.ts";
 
 // Only assets used by registered templates are individually pinned.
 const anyliewRevision = "33bf418ac2ccd416be70faf9a13e97befb7703a8";
@@ -61,6 +62,7 @@ interface ExtraMemeAsset {
 const anyliewAssets = [
   ...Object.entries(anyliewFrames).map(([key, digest]) => [`emoji/${key}/images/0.png`, digest] as const),
   ...anyliewFixedAnimationAssets,
+  ...anyliewRectangleOverlayAssets,
 ];
 
 export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map([
