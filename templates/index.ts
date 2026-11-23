@@ -8,6 +8,7 @@ import { avatarCaptionMemeTemplates } from "./avatar-caption-cards.ts";
 import { avatarFrameMemeTemplates } from "./avatar-frames.ts";
 import { basicImageMemeTemplates } from "./basic-image-transforms.ts";
 import { captionOverlayMemeTemplates } from "./caption-overlays.ts";
+import { dianzhongdian } from "./dianzhongdian.ts";
 import { fixedAvatarAnimations } from "./fixed-avatar-animation.ts";
 import { shortAvatarAnimations } from "./short-avatar-animation.ts";
 import { tudouShortAnimations } from "./tudou-short-animation.ts";
@@ -44,6 +45,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   waveMemeTemplate,
   ...overlayMemeTemplates,
   ...captionOverlayMemeTemplates,
+  dianzhongdian,
   ...avatarFrameMemeTemplates,
   ...avatarCaptionMemeTemplates,
   ...photoCompositeMemeTemplates,

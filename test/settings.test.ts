@@ -155,8 +155,10 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     await Promise.all(Object.entries(original).map(([file, text]) => writeFile(path(file), text, { mode: 0o640 })));
     const { configInfo: form } = supportGuoba();
     const fields = form.schemas.flatMap(schema => "field" in schema ? [schema.field] : []);
-    expect(fields).toHaveLength(29);
+    expect(fields).toHaveLength(31);
     expect(fields).toContain("meme.cache");
+    expect(fields).toContain("translation.baidu_trans_appid");
+    expect(fields).toContain("translation.baidu_trans_apikey");
     for (const field of ["server.retry", "other.autoUpdate", "other.hijackRes", "other.renderScale"]) {
       expect(fields).not.toContain(field);
     }

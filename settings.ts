@@ -9,10 +9,12 @@ import { configDirectory, defaultAvatarCache, defaultManagedMemeTimeout, default
   maxPokeCooldown, maxPokeProbability,
   normalizeCatalogCron, parseGenerationServerUrl, readConfig } from "./catalog-policy.ts";
 import { isExcludedMemeName, memeNameExclusion } from "./catalog-exclusions.ts";
+import { baiduTranslationAppId, baiduTranslationSecret, memeTranslationFile, validTranslationSetting } from "./translation.ts";
 
 type Setting = readonly [title: string, key: string,
   type: "toggle" | "mode" | "users" | "templates" | "percentage" | "cooldown", fallback: unknown];
-type PanelSetting = Setting | readonly [title: string, key: string, type: "backend" | "url" | "seconds" | "cron", fallback: string | number];
+type PanelSetting = Setting | readonly [title: string, key: string,
+  type: "backend" | "url" | "seconds" | "cron" | "translation-appid" | "translation-secret", fallback: string | number];
 type MemeNameExclusion = ReturnType<typeof memeNameExclusion>;
 const backendModes = { auto: "自动", managed: "本机托管", remote: "远端服务" } as const;
 const sections = [
@@ -56,6 +58,10 @@ const panelSections: readonly { title: string; file: string; fields: readonly Pa
   { title: "表情统计设置", file: "stat.yaml", fields: [["表情统计", "enable", "toggle", true]] },
   { title: "目录更新设置", file: "other.yaml", fields: [
     ["自动更新资源", "autoUpdateRes", "toggle", true], ["自动更新 Cron", "autoUpdateResCron", "cron", "0 0 2 * * ?"],
+  ] },
+  { title: "百度翻译设置", file: memeTranslationFile, fields: [
+    ["百度翻译 APP ID", baiduTranslationAppId, "translation-appid", ""],
+    ["百度翻译密钥", baiduTranslationSecret, "translation-secret", ""],
   ] },
 ];
 
@@ -111,7 +117,7 @@ function rewrite(
         if (owner.uid !== previous.stat.uid || owner.gid !== previous.stat.gid) {
           chownSync(staged, Number(previous.stat.uid), Number(previous.stat.gid));
         }
-        chmodSync(staged, Number(previous.stat.mode & 0o777n));
+        chmodSync(staged, path === join(directory, memeTranslationFile) ? 0o600 : Number(previous.stat.mode & 0o777n));
       }
       fsyncSync(fd);
     } finally {
@@ -162,6 +168,9 @@ function panelField(group: string, [label, key, type]: PanelSetting) {
       componentProps: { min: 0, max: type === "percentage" ? maxPokeProbability : maxPokeCooldown, precision: 0 },
       bottomHelpMessage: type === "percentage" ? "单位为百分比，0 表示不触发。" : "单位为秒，0 表示不等待冷却。" };
     case "cron": return { label, field, component: "EasyCron", bottomHelpMessage: "重启后按新时间更新目录。" };
+    case "translation-appid": return { label, field, component: "Input",
+      bottomHelpMessage: "设齐 APP ID 和密钥后，典中典的单段文案会请求百度翻译。用斜杠提交两段文案时直接本机出图。" };
+    case "translation-secret": return { label, field, component: "InputPassword" };
   }
 }
 
@@ -203,6 +212,13 @@ function panelValue(type: PanelSetting[2], value: unknown, excluded = isExcluded
       } finally {
         job.cancel();
       }
+      break;
+    }
+    case "translation-appid":
+    case "translation-secret": {
+      if (type === "translation-secret" && value === null) return "";
+      const text = validTranslationSetting(value, type === "translation-secret");
+      if (text !== undefined) return text;
       break;
     }
   }

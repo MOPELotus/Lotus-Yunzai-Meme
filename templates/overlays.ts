@@ -2,9 +2,9 @@
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { randomInt } from "node:crypto";
 import { loadImage, type Image } from "skia-canvas";
-import { renderExactPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { drawAvatar, type AvatarPlacement } from "./avatar-slot.ts";
+import { grayImage } from "./grayscale.ts";
 import { renderMaskedRaster } from "./masked-layout.ts";
 import { jpg, previewImage, type Draw } from "./template-layout.ts";
 import { readTransformSource, renderTransformSequence } from "./transforms.ts";
@@ -74,24 +74,6 @@ const overlays: readonly Overlay[] = [
   { key: "distracted", keywords: ["注意力涣散"], tags: ["明日方舟"],
     layout: { art: "1.png", slot: [0, 0, 500, 500], fit: "square", sticker: ["0.png", 140, 320], maskedStill: true } },
 ];
-
-async function grayImage(image: Image, signal: AbortSignal) {
-  signal.throwIfAborted();
-  const { width, height } = image;
-  const { png } = await renderExactPng(width, height, (draw) => {
-    draw.drawImage(image, 0, 0);
-    const pixels = draw.getImageData(0, 0, width, height);
-    const rgba = pixels.data;
-    for (let i = 0; i < rgba.length; i += 4) {
-      const gray = Math.round(rgba[i]! * 0.299 + rgba[i + 1]! * 0.587 + rgba[i + 2]! * 0.114);
-      rgba[i] = rgba[i + 1] = rgba[i + 2] = gray;
-      rgba[i + 3] = 255;
-    }
-    draw.putImageData(pixels, 0, 0);
-  });
-  signal.throwIfAborted();
-  return loadImage(png);
-}
 
 async function renderMaskedStill(image: Image, frame: Image, extra: Image | undefined, layout: OverlayLayout, signal: AbortSignal) {
   const { width, height } = frame;
