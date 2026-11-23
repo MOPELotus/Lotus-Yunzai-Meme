@@ -125,3 +125,10 @@ export const tudouPortraitAnimationAssets = Object.entries(frames).flatMap(([key
     `images/${tudouShortFramePath(key, index)}`,
     { path: `meme/${key}/images/${index}.png`, digest, sources },
   ] as const));
+
+export const tudouWelcomePath = "python/meme_generator/memes/huanying/tudou/0.gif";
+export const tudouWelcomeAsset = [`images/${tudouWelcomePath}`, {
+  path: "meme/huanying/images/0.gif",
+  digest: "8ba4fa7aa6616939d458b396de0c3b07d360b29012c5d8fadfdc30d58fa441a2",
+  sources,
+}] as const;

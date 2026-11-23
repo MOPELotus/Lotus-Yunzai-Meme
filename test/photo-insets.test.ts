@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { Canvas, loadImage } from "skia-canvas";
+import { tudouWelcomePath } from "../backend-tudou-portrait-animation-assets.ts";
 import type { MemeTemplateContext } from "../builtin-template.ts";
 import { encodeMemeGif } from "../templates/gif.ts";
 import { photoInsetMemeTemplates } from "../templates/photo-insets.ts";
@@ -84,4 +85,37 @@ test("白天黑夜保留双图输入顺序和分隔，透明输入替换原图�
   expect(pixel(420, 570)[2]).toBeGreaterThan(220);
   expect(pixel(620, 175).slice(0, 3).every(value => value > 245)).toBeTrue();
   expect(pixel(220, 360)[1]).toBeGreaterThan(130);
+});
+
+test("欢迎取模板 GIF 的首帧，以旧图片槽输出白底 JPEG 并避免欢迎新人重名", async () => {
+  const template = photoInsetMemeTemplates.find(item => item.info.key === "huanying")!;
+  expect(template.info).toMatchObject({ keywords: ["欢迎"], params_type: { min_images: 1, max_images: 1 } });
+  const avatar = await raster(220, 65, draw => {
+    draw.fillStyle = "#ef2020";
+    draw.fillRect(0, 0, 220, 65);
+  });
+  const frames = [false, true].map(alternate => {
+    const rgba = new Uint8Array(300 * 315 * 4);
+    for (let y = 175; y < 195; y++) {
+      for (let x = 90; x < 110; x++) {
+        const i = (y * 300 + x) * 4;
+        rgba[i + (alternate ? 1 : 2)] = 235;
+        rgba[i + 3] = 255;
+      }
+    }
+    return { rgba, delayMs: 50 };
+  });
+  const context: MemeTemplateContext = {
+    signal,
+    async imageAsset(path) {
+      expect(path).toBe(tudouWelcomePath);
+      return Buffer.from(encodeMemeGif(300, 315, frames, signal));
+    },
+    async fontAsset() { throw new Error("旧模板没有字体资源"); },
+  };
+  const { image, pixel } = await sample(await template.render({ images: [new File([new Uint8Array(avatar)], "头像.png")], texts: [], args: {} }, context));
+  expect([image.width, image.height]).toEqual([300, 315]);
+  expect(pixel(100, 185)[2]).toBeGreaterThan(225);
+  expect(pixel(140, 205)[0]).toBeGreaterThan(230);
+  expect(pixel(20, 30).slice(0, 3).every(value => value > 245)).toBeTrue();
 });

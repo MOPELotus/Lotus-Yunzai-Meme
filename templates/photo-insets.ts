@@ -1,6 +1,7 @@
 // Original coordinates and static JPEG output from MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { loadImage, type Image } from "skia-canvas";
+import { tudouWelcomePath } from "../backend-tudou-portrait-animation-assets.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeFirstImage } from "./animated-input.ts";
 import { renderMaskedRaster } from "./masked-layout.ts";
@@ -15,6 +16,7 @@ interface PhotoTemplate {
   /** Omit to fill the original picture dimensions. */
   readonly slots?: readonly Inset[];
   readonly replaceArt?: boolean;
+  readonly assetPath?: string;
 }
 
 const specs: readonly PhotoTemplate[] = [
@@ -25,6 +27,8 @@ const specs: readonly PhotoTemplate[] = [
   { key: "no_response", keywords: ["无响应"], slots: [[0, 581, 1050, 783]] },
   { key: "you_dont_get", keywords: ["你不懂啦"], tags: ["猫猫虫", "咖波"], slots: [[217, 181, 142, 139]] },
   { key: "daynight", keywords: ["白天黑夜", "白天晚上"], slots: [[349, 0, 333, 360], [349, 361, 333, 360]], replaceArt: true },
+  // Tudou's 2022 welcome registration puts the first GIF image over the photo and saves a static JPEG.
+  { key: "huanying", keywords: ["欢迎"], slots: [[77, 164, 150, 122]], assetPath: tudouWelcomePath },
 ];
 
 function coverImage(image: Image, [left, top, width, height]: Inset, replaceArt: boolean): Draw {
@@ -45,13 +49,13 @@ function coverImage(image: Image, [left, top, width, height]: Inset, replaceArt:
   };
 }
 
-function photoTemplate({ key, keywords, tags, slots, replaceArt = false }: PhotoTemplate): MemeTemplate {
+function photoTemplate({ key, keywords, tags, slots, replaceArt = false, assetPath = `${key}/0.png` }: PhotoTemplate): MemeTemplate {
   const count = slots?.length ?? 1;
   async function render({ images, texts }: MemeTemplateInput, context: MemeTemplateContext) {
     if (images.length !== count || texts.length) throw new Error(`该表情需要 ${count} 张图片。`);
     const { signal } = context;
     const [art, ...photos] = await Promise.all([
-      context.imageAsset(`${key}/0.png`).then(loadImage),
+      context.imageAsset(assetPath).then(loadImage),
       ...images.map(image => readMemeFirstImage(image, signal)),
     ]);
     const { width, height } = art;

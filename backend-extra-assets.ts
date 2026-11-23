@@ -16,7 +16,7 @@ import { anyliewRectangleOverlayAssets } from "./backend-rectangle-overlay-asset
 import { anyliewShortAnimationAssets } from "./backend-short-animation-assets.ts";
 import { anyliewTwoLayerAnimationAssets } from "./backend-two-layer-animation-assets.ts";
 import { tudouShortAnimationAssets } from "./backend-tudou-short-animation-assets.ts";
-import { tudouPortraitAnimationAssets } from "./backend-tudou-portrait-animation-assets.ts";
+import { tudouPortraitAnimationAssets, tudouWelcomeAsset } from "./backend-tudou-portrait-animation-assets.ts";
 
 // Only assets used by registered templates are individually pinned.
 const anyliewRevision = "33bf418ac2ccd416be70faf9a13e97befb7703a8";
@@ -100,4 +100,5 @@ export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map([
   ...jumpSoldAssets,
   ...tudouShortAnimationAssets,
   ...tudouPortraitAnimationAssets,
+  tudouWelcomeAsset,
 ]);
