@@ -45,6 +45,17 @@ const definitions: readonly Definition[] = [
     ],
   },
   {
+    key: "slogan", keywords: ["口号"], asset: "slogan/0.jpg", minFont: 15, maxFont: 40,
+    captions: [
+      { text: "我们是谁？", box: [10, 0, 294, 50] },
+      { text: "浙大人！", box: [316, 0, 602, 50] },
+      { text: "到浙大来做什么？", box: [10, 230, 294, 280] },
+      { text: "混！", box: [316, 230, 602, 280] },
+      { text: "将来毕业后要做什么样的人？", box: [10, 455, 294, 505] },
+      { text: "混混！", box: [316, 455, 602, 505] },
+    ],
+  },
+  {
     key: "ascension", keywords: ["升天"], asset: "ascension/0.png", minFont: 20, maxFont: 50,
     captions: [{
       text: "学的是机械", box: [40, 30, 482, 135],

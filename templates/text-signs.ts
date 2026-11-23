@@ -143,8 +143,53 @@ async function fireflySign(text: string, number: unknown, context: MemeTemplateC
   return png;
 }
 
+const raiseSignText = "大佬带带我";
+async function raiseSign(text: string, context: MemeTemplateContext) {
+  const [frame, label] = await Promise.all([
+    context.imageAsset("raise_sign/0.jpg").then(loadImage),
+    perspectiveText(text, [360, 260], 10, [30, 80], "#51201b", context),
+  ]);
+  return jpg(frame.width, frame.height, draw => {
+    draw.drawImage(frame, 0, 0);
+    project(draw, label, [285, 24], [[33, 0], [375, 120], [333, 387], [0, 258]]);
+  }, context.signal);
+}
+
+const runText = "快跑";
+async function runSign(text: string, context: MemeTemplateContext) {
+  const [frame, font] = await Promise.all([context.imageAsset("run/0.png").then(loadImage), registerFont(context)]);
+  const width = 122, height = 53;
+  const { png } = await renderExactPng(width, height,
+    draw => drawFittedText(draw, [0, 0, width, height], text, font, 10, 50));
+  const label = await loadImage(png);
+  const angle = 7 * Math.PI / 180;
+  const halfWidth = (width * Math.cos(angle) + height * Math.sin(angle)) / 2;
+  const halfHeight = (width * Math.sin(angle) + height * Math.cos(angle)) / 2;
+  // Preserve the original Pillow rotate(expand=True) output origin after rotation.
+  const expandedWidth = Math.ceil(width / 2 + halfWidth) - Math.floor(width / 2 - halfWidth);
+  const expandedHeight = Math.ceil(height / 2 + halfHeight) - Math.floor(height / 2 - halfHeight);
+  return jpg(frame.width, frame.height, draw => {
+    draw.drawImage(frame, 0, 0);
+    draw.save();
+    draw.translate(200 + expandedWidth / 2, 195 + expandedHeight / 2);
+    draw.rotate(-angle);
+    draw.drawImage(label, -width / 2, -height / 2);
+    draw.restore();
+  }, context.signal);
+}
+
 export const textSignMemeTemplates: readonly MemeTemplate[] = [
   ...layouts.map(staticSign),
+  {
+    info: { key: "raise_sign", keywords: ["举牌"], params_type: fontAndTextOnly(raiseSignText) },
+    render: (input, context) => raiseSign(input.texts[0] ?? raiseSignText, context),
+    preview: context => raiseSign(raiseSignText, context),
+  },
+  {
+    info: { key: "run", keywords: ["快跑"], params_type: fontAndTextOnly(runText) },
+    render: (input, context) => runSign(input.texts[0] ?? runText, context),
+    preview: context => runSign(runText, context),
+  },
   {
     info: { key: "ayachi_holdsign", keywords: ["宁宁举牌"], tags: ["柚子社", "魔女的夜宴", "绫地宁宁"],
       params_type: fontAndTextOnly(ayachiText) },
