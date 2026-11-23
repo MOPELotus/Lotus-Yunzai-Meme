@@ -1,3 +1,5 @@
+export class MemeTemplateFeedback extends Error {}
+
 export interface MemeTemplateInput {
   readonly images: readonly File[];
   readonly texts: readonly string[];

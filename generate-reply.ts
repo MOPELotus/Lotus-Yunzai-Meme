@@ -1,3 +1,4 @@
+import { MemeTemplateFeedback } from "./builtin-template.ts";
 import { catalogPath } from "./catalog-file.ts";
 import { isExcludedMemeCatalogKey } from "./catalog-exclusions.ts";
 import { type generationServer, generationSettings, safeCatalogKey } from "./catalog-policy.ts";
@@ -278,8 +279,8 @@ export async function generateMemeReply(
       const message: GenerationMessage = prepared.summary ? [prepared.summary, image] : image;
       return prepared.quote ? { type: "quoted", message } : message;
     }
-  } catch {
-    // Backend and media errors can contain connection details. Keep the reply local.
+  } catch (error) {
+    if (error instanceof MemeTemplateFeedback && errorReply && !signal?.aborted) return error.message;
   }
   return errorReply && !signal?.aborted ? "表情生成失败，请稍后再试。" : undefined;
 }

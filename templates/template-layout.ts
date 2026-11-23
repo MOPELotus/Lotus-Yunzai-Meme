@@ -12,10 +12,14 @@ const normalFont = "LotusMemeNotoRegular";
 const boldFont = "LotusMemeNotoBold";
 const registeredFonts = new Map<string, Promise<void>>();
 
-export async function registerFont(context: MemeTemplateContext, bold = false) {
-  const family = bold ? boldFont : normalFont;
+export function registerFont(context: MemeTemplateContext, bold = false) {
+  return registerMemeTypeface(context, bold ? "NotoSansSC-Bold.ttf" : "NotoSansSC-Regular.ttf",
+    bold ? boldFont : normalFont);
+}
+
+export async function registerMemeTypeface(context: MemeTemplateContext, asset: string, family: string) {
   if (!registeredFonts.has(family)) {
-    const data = context.fontAsset(bold ? "NotoSansSC-Bold.ttf" : "NotoSansSC-Regular.ttf");
+    const data = context.fontAsset(asset);
     const request = (async () => {
       const bytes = await data;
       const directory = await mkdtemp(join(tmpdir(), "lotus-meme-font-"));
@@ -44,7 +48,7 @@ export function paper(context: CanvasRenderingContext2D, width: number, height: 
 }
 
 export function drawFittedText(context: CanvasRenderingContext2D, box: Box, text: string, font: string,
-  minimum: number, maximum: number, alignment: "left" | "center" | "right" = "center") {
+  minimum: number, maximum: number, alignment: "left" | "center" | "right" = "center", fill = "#000") {
   const [left, top, right, bottom] = box;
   const width = right - left, height = bottom - top;
   context.save();
@@ -52,7 +56,7 @@ export function drawFittedText(context: CanvasRenderingContext2D, box: Box, text
     context.textAlign = alignment;
     context.textBaseline = "alphabetic";
     context.textWrap = true;
-    context.fillStyle = "#000";
+    context.fillStyle = fill;
     for (let size = maximum; size >= minimum; size--) {
       context.font = `${size}px ${font}`;
       const metrics = context.measureText(text, width);

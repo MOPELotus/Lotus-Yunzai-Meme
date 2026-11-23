@@ -10,6 +10,7 @@ import { overlayMemeTemplates } from "./overlays.ts";
 import { pat, rub } from "./pat-rub.ts";
 import { petpet } from "./petpet.ts";
 import { staticMemeTemplates } from "./static-layouts.ts";
+import { textSignMemeTemplates } from "./text-signs.ts";
 import { transformMemeTemplates } from "./transforms.ts";
 import { waveMemeTemplate } from "./wave.ts";
 
@@ -25,4 +26,5 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...overlayMemeTemplates,
   ...avatarFrameMemeTemplates,
   ...legacySceneMemeTemplates,
+  ...textSignMemeTemplates,
 ];
