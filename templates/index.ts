@@ -76,6 +76,8 @@ import { textSignMemeTemplates } from "./text-signs.ts";
 import { textSpeechMemeTemplates } from "./text-speech.ts";
 import { transformMemeTemplates } from "./transforms.ts";
 import { timedOverlayMemeTemplates } from "./timed-overlays.ts";
+import { legacyPhotoScenes } from "./legacy-photo-scenes.ts";
+import { louvreMemeTemplate } from "./louvre.ts";
 import { waveMemeTemplate } from "./wave.ts";
 
 export const builtinMemeTemplates: readonly MemeTemplate[] = [
@@ -143,6 +145,8 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...shortAvatarAnimations,
   ...localCanvasAnimations,
   ...croppedPhotoTemplates,
+  ...legacyPhotoScenes,
+  louvreMemeTemplate,
   ...twoLayerAvatarAnimations,
   ...tudouShortAnimations,
   ...tudouPortraitAnimations,

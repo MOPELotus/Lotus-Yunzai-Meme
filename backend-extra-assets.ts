@@ -1,3 +1,4 @@
+import { legacyPhotoSceneAssets } from "./backend-legacy-photo-scene-assets.ts";
 import { pythonBehindAssets } from "./backend-python-behind-assets.ts";
 import { pythonGraphicAssets } from "./backend-python-graphic-assets.ts";
 import { croppedPhotoAssets } from "./backend-cropped-photo-assets.ts";
@@ -108,6 +109,7 @@ export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map<stri
   anyliewDeerHelpAsset,
   ...pythonOverlayAssets,
   ...croppedPhotoAssets,
+  ...legacyPhotoSceneAssets,
   ...legacyTextOverlayAssets,
   ...pythonGraphicAssets,
   ...pythonBehindAssets,
