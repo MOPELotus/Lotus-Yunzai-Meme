@@ -10,6 +10,7 @@ import { basicImageMemeTemplates } from "./basic-image-transforms.ts";
 import { captionOverlayMemeTemplates } from "./caption-overlays.ts";
 import { fixedAvatarAnimations } from "./fixed-avatar-animation.ts";
 import { shortAvatarAnimations } from "./short-avatar-animation.ts";
+import { tudouShortAnimations } from "./tudou-short-animation.ts";
 import { hug, kiss } from "./kiss-hug.ts";
 import { legacySceneMemeTemplates } from "./legacy-scene.ts";
 import { mirrorFlashMemeTemplates } from "./mirror-flash.ts";
@@ -59,6 +60,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...perspectiveMemeTemplates,
   ...fixedAvatarAnimations,
   ...shortAvatarAnimations,
+  ...tudouShortAnimations,
   ...textSpeechMemeTemplates,
   ...pythonOverlayMemeTemplates,
   ...textAnnouncementMemeTemplates,

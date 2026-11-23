@@ -21,8 +21,13 @@ interface FixedAvatarAnimation {
   readonly sourceHolds?: readonly number[];
   readonly crop?: true;
   readonly circle?: "before-resize" | "after-resize";
+  readonly initialCircle?: { readonly size: Size; readonly cropFirst?: boolean };
   readonly firstFrame?: 0 | 1;
+  readonly framePath?: (frame: number) => string;
+  readonly avatarFrames?: number;
   readonly avatarOnTop?: true;
+  readonly directUnderlay?: true;
+  readonly mode?: Parameters<typeof renderRgba>[3];
 }
 
 // Original pose tables and frame art from anyliew/meme_emoji at 33bf418ac2ccd416be70faf9a13e97befb7703a8.
@@ -334,14 +339,17 @@ function placeAvatar(context: CanvasRenderingContext2D, avatar: Image, [left, to
   context.restore();
 }
 
-async function circleSource(avatar: Image) {
-  const size = Math.min(avatar.width, avatar.height);
+async function circleSource(avatar: Image, mode: Parameters<typeof renderRgba>[3], initial?: FixedAvatarAnimation["initialCircle"]) {
+  const [width, height] = initial?.size ?? [avatar.width, avatar.height];
+  const size = Math.min(width, height);
   const { png } = await renderExactPng(size, size, draw => {
     draw.beginPath();
     draw.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
     draw.clip();
-    draw.drawImage(avatar, Math.trunc((size - avatar.width) / 2), Math.trunc((size - avatar.height) / 2));
-  });
+    const x = Math.trunc((size - width) / 2), y = Math.trunc((size - height) / 2);
+    if (initial) placeAvatar(draw, avatar, [x, y], [width, height], initial.cropFirst ?? false);
+    else draw.drawImage(avatar, x, y);
+  }, mode);
   return loadImage(png);
 }
 
@@ -351,17 +359,17 @@ function mixChannel(bottom: number, top: number, mask: number) {
 
 // The original Pillow paste used the source alpha to mix every straight RGBA
 // channel. Its GIF writer then reserved transparency for the zero-alpha entry.
-function blendFixedArt(avatar: Buffer, art: Buffer) {
+function blendFixedArt(avatar: Buffer, art: Buffer, directUnderlay = false) {
   for (let index = 0; index < art.length; index += 4) {
     const artMask = art[index + 3]!;
     if (artMask === 255) continue;
     const avatarMask = avatar[index + 3]!;
     if (artMask === 0 && avatarMask === 0) continue;
     for (let channel = index; channel < index + 3; channel++) {
-      const avatarColor = mixChannel(0, avatar[channel]!, avatarMask);
+      const avatarColor = directUnderlay ? avatar[channel]! : mixChannel(0, avatar[channel]!, avatarMask);
       art[channel] = mixChannel(avatarColor, art[channel]!, artMask);
     }
-    const avatarAlpha = mixChannel(0, avatarMask, avatarMask);
+    const avatarAlpha = directUnderlay ? avatarMask : mixChannel(0, avatarMask, avatarMask);
     art[index + 3] = mixChannel(avatarAlpha, artMask, artMask) > 0 ? 255 : 0;
   }
   return art;
@@ -389,10 +397,11 @@ async function* orderedFrames(
 }
 
 export function createFixedAvatarAnimation({
-  key, keywords, tags, delayMs, positions, sizes, frames, sourceHolds, crop, circle, firstFrame = 1, avatarOnTop,
+  key, keywords, tags, delayMs, positions, sizes, frames, sourceHolds, crop, circle, initialCircle, firstFrame = 1,
+  framePath = frame => `anyliew/emoji/${key}/images/${frame}.png`, avatarFrames, avatarOnTop, directUnderlay, mode = "auto",
 }: FixedAvatarAnimation): MemeTemplate {
   const longAnimation = sourceHolds !== undefined;
-  const fixedPlacement = typeof positions[0] === "number" && typeof sizes[0] === "number";
+  const fixedPlacement = avatarFrames === undefined && typeof positions[0] === "number" && typeof sizes[0] === "number";
   const holds = sourceHolds ?? Array<number>(frames).fill(1);
   let sourceIndex = 0;
   const offsets = holds.map(hold => {
@@ -402,7 +411,7 @@ export function createFixedAvatarAnimation({
   });
 
   async function readFrame(index: number, context: MemeTemplateContext) {
-    const path = `anyliew/emoji/${key}/images/${offsets[index]! + firstFrame}.png`;
+    const path = framePath(offsets[index]! + firstFrame);
     let bytes: Buffer;
     try {
       bytes = await context.imageAsset(path);
@@ -420,7 +429,7 @@ export function createFixedAvatarAnimation({
     const { signal } = context;
     signal.throwIfAborted();
     const [avatar, first] = await Promise.all([
-      readMemeFirstImage(input.images[0]!, signal).then(image => circle === "before-resize" ? circleSource(image) : image),
+      readMemeFirstImage(input.images[0]!, signal).then(image => circle === "before-resize" ? circleSource(image, mode, initialCircle) : image),
       readFrame(0, context),
     ]);
     const { width: sourceWidth, height: sourceHeight } = first;
@@ -452,6 +461,7 @@ export function createFixedAvatarAnimation({
         if (!avatarLayer || !fixedPlacement) {
           const offset = offsets[index]!;
           avatarLayer = (await renderRgba(width, height, canvas => {
+            if (avatarFrames !== undefined && offset >= avatarFrames) return;
             canvas.scale(scaleX, scaleY);
             const position = at(positions, offset);
             const size = at(sizes, offset);
@@ -461,14 +471,14 @@ export function createFixedAvatarAnimation({
               canvas.clip();
             }
             placeAvatar(canvas, avatar, position, size, crop ?? false);
-          })).rgba;
+          }, mode)).rgba;
         }
         const { rgba: art } = await renderRgba(width, height, canvas => {
           canvas.scale(scaleX, scaleY);
           canvas.imageSmoothingQuality = "high";
           canvas.drawImage(foreground, 0, 0);
-        });
-        const rgba = avatarOnTop ? blendFixedArt(art, Buffer.from(avatarLayer)) : blendFixedArt(avatarLayer, art);
+        }, mode);
+        const rgba = avatarOnTop ? blendFixedArt(art, Buffer.from(avatarLayer), directUnderlay) : blendFixedArt(avatarLayer, art, directUnderlay);
         const duration = delayMs * holds[index]!;
         const previous = rendered.at(-1);
         if (previous?.rgba.equals(rgba)) previous.delayMs += duration;
