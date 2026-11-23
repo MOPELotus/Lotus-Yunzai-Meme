@@ -49,6 +49,7 @@ import { perspectiveMemeTemplates } from "./perspective.ts";
 import { petpet } from "./petpet.ts";
 import { photoCompositeMemeTemplates } from "./photo-composites.ts";
 import { photoInsetMemeTemplates } from "./photo-insets.ts";
+import { portraitOverlayTemplates } from "./portrait-overlays.ts";
 import { rectangleOverlayTemplates } from "./rectangle-overlays.ts";
 import { rotatedInsetMemeTemplates } from "./rotated-insets.ts";
 import { pythonOverlayMemeTemplates } from "./python-overlay-animation.ts";
@@ -85,6 +86,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...photoCompositeMemeTemplates,
   ...photoInsetMemeTemplates,
   ...rotatedInsetMemeTemplates,
+  ...portraitOverlayTemplates,
   ...rectangleOverlayTemplates,
   ...anyliewAvatarSceneTemplates,
   ...anyliewStaticAvatarTemplates,
