@@ -41,6 +41,7 @@ import { rotatedInsetMemeTemplates } from "./rotated-insets.ts";
 import { pythonOverlayMemeTemplates } from "./python-overlay-animation.ts";
 import { staticMemeTemplates } from "./static-layouts.ts";
 import { textAnnouncementMemeTemplates } from "./text-announcements.ts";
+import { textGraphicsMemeTemplates } from "./text-graphics.ts";
 import { textPanelMemeTemplates } from "./text-panels.ts";
 import { textSignMemeTemplates } from "./text-signs.ts";
 import { textSpeechMemeTemplates } from "./text-speech.ts";
@@ -92,5 +93,6 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...textSpeechMemeTemplates,
   ...pythonOverlayMemeTemplates,
   ...textAnnouncementMemeTemplates,
+  ...textGraphicsMemeTemplates,
   ...textPanelMemeTemplates,
 ];
