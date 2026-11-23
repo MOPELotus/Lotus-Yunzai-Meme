@@ -1,12 +1,24 @@
 import { expect, test } from "bun:test";
 import { renderPng, renderRgba } from "../../../packages/skia/index.ts";
+import { extraMemeAssets } from "../backend-extra-assets.ts";
 import { anyliewFixedAnimationAssets } from "../backend-fixed-animation-assets.ts";
 import type { MemeTemplateContext } from "../builtin-template.ts";
 import { readMemeImageSequence } from "../templates/animated-input.ts";
 import { fixedAvatarAnimations } from "../templates/fixed-avatar-animation.ts";
+import { builtinMemeTemplates } from "../templates/index.ts";
 import { encodeMemeGif } from "../templates/gif.ts";
 
 const signal = new AbortController().signal;
+
+test("默认本机目录注册全部十五项且只接入固定上游帧的白名单", () => {
+  const selected = new Set(fixedAvatarAnimations.map(({ info }) => info.key));
+  expect(selected.size).toBe(15);
+  expect(builtinMemeTemplates.filter(({ info }) => selected.has(info.key))).toEqual([...fixedAvatarAnimations]);
+  for (const [path, digest] of anyliewFixedAnimationAssets) {
+    expect(extraMemeAssets.get(`images/anyliew/${path}`)).toMatchObject({ path, digest });
+  }
+  expect(extraMemeAssets.has("images/anyliew/emoji/kurogames_start/images/1.png")).toBeFalse();
+});
 
 async function foreground(color: string) {
   const { rgba } = await renderRgba(300, 220, draw => {

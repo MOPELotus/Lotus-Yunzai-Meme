@@ -1,3 +1,5 @@
+import { anyliewFixedAnimationAssets } from "./backend-fixed-animation-assets.ts";
+
 // Only assets used by registered templates are individually pinned.
 const anyliewRevision = "33bf418ac2ccd416be70faf9a13e97befb7703a8";
 const anyliewFrames = {
@@ -55,7 +57,11 @@ interface ExtraMemeAsset {
   readonly sources: readonly string[];
 }
 
-export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map(Object.entries(anyliewFrames).map(([key, digest]) => {
-  const path = `emoji/${key}/images/0.png`;
-  return [`images/anyliew/${path}`, { path, digest, sources: anyliewBase }] as const;
-}));
+const anyliewAssets = [
+  ...Object.entries(anyliewFrames).map(([key, digest]) => [`emoji/${key}/images/0.png`, digest] as const),
+  ...anyliewFixedAnimationAssets,
+];
+
+export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map(
+  anyliewAssets.map(([path, digest]) => [`images/anyliew/${path}`, { path, digest, sources: anyliewBase }]),
+);

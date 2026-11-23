@@ -1,6 +1,7 @@
 import type { MemeTemplate } from "../builtin-template.ts";
 import { avatarFrameMemeTemplates } from "./avatar-frames.ts";
 import { basicImageMemeTemplates } from "./basic-image-transforms.ts";
+import { fixedAvatarAnimations } from "./fixed-avatar-animation.ts";
 import { hug, kiss } from "./kiss-hug.ts";
 import { legacySceneMemeTemplates } from "./legacy-scene.ts";
 import { mirrorFlashMemeTemplates } from "./mirror-flash.ts";
@@ -29,4 +30,5 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...legacySceneMemeTemplates,
   ...textSignMemeTemplates,
   ...perspectiveMemeTemplates,
+  ...fixedAvatarAnimations,
 ];
