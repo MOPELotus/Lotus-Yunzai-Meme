@@ -60,6 +60,7 @@ import { pythonOverlayMemeTemplates } from "./python-overlay-animation.ts";
 import { staticMemeTemplates } from "./static-layouts.ts";
 import { scrollingDialogueMemeTemplates } from "./scrolling-dialogue.ts";
 import { subtitleMemeTemplates } from "./subtitle-animations.ts";
+import { spatialRotationTemplates } from "./spatial-rotation.ts";
 import { textAnnouncementMemeTemplates } from "./text-announcements.ts";
 import { textGraphicsMemeTemplates } from "./text-graphics.ts";
 import { specialTextCardTemplates } from "./special-text-cards.ts";
@@ -76,6 +77,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...staticMemeTemplates,
   ...scrollingDialogueMemeTemplates,
   ...subtitleMemeTemplates,
+  ...spatialRotationTemplates,
   ...transformMemeTemplates,
   ...basicImageMemeTemplates,
   ...motionMemeTemplates,
