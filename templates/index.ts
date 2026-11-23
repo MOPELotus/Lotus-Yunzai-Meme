@@ -1,6 +1,7 @@
 import type { MemeTemplate } from "../builtin-template.ts";
 import { anyliewCircleDialogueTemplates } from "./anyliew-circle-dialogue.ts";
 import { anyliewDialogueTemplates } from "./anyliew-dialogue.ts";
+import { avatarCaptionMemeTemplates } from "./avatar-caption-cards.ts";
 import { avatarFrameMemeTemplates } from "./avatar-frames.ts";
 import { basicImageMemeTemplates } from "./basic-image-transforms.ts";
 import { fixedAvatarAnimations } from "./fixed-avatar-animation.ts";
@@ -34,6 +35,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   waveMemeTemplate,
   ...overlayMemeTemplates,
   ...avatarFrameMemeTemplates,
+  ...avatarCaptionMemeTemplates,
   ...rectangleOverlayTemplates,
   ...anyliewDialogueTemplates,
   ...anyliewCircleDialogueTemplates,
