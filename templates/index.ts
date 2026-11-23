@@ -13,6 +13,7 @@ import { perspectiveMemeTemplates } from "./perspective.ts";
 import { petpet } from "./petpet.ts";
 import { staticMemeTemplates } from "./static-layouts.ts";
 import { textSignMemeTemplates } from "./text-signs.ts";
+import { textSpeechMemeTemplates } from "./text-speech.ts";
 import { transformMemeTemplates } from "./transforms.ts";
 import { waveMemeTemplate } from "./wave.ts";
 
@@ -31,4 +32,5 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...textSignMemeTemplates,
   ...perspectiveMemeTemplates,
   ...fixedAvatarAnimations,
+  ...textSpeechMemeTemplates,
 ];
