@@ -12,7 +12,8 @@ test("旧静态文字图沿用各自输入形态、关键词、默认内容，�
     ["emperor_dragon", ["皇帝龙图"]],
     ["osu", ["osu", "hso!"]],
   ]);
-  const sourcePaths = new Set<string>(legacyTextOverlayAssets.map(([path]) => path));
+  const sourcePaths = new Set<string>(legacyTextOverlayAssets.map(([path]) => path)
+    .filter(path => descriptors.has(path.split("/")[4] ?? "")));
   let loaded = 0;
   const context: MemeTemplateContext = {
     signal: new AbortController().signal,

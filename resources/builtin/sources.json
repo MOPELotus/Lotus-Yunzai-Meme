@@ -17524,6 +17524,11 @@
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
       "originalPath": "meme/汉堡耄耋/images/5.png"
     },
+    "images/python/meme_generator/memes/high_EQ/images/0.jpg": {
+      "digest": "064066fa7a2a18423bfb91af1ae2ca5f43a77d86873173b87cf2eadbd8f6d15d",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/high_EQ/images/0.jpg"
+    },
     "images/python/meme_generator/memes/huanying/tudou/0.gif": {
       "digest": "8ba4fa7aa6616939d458b396de0c3b07d360b29012c5d8fadfdc30d58fa441a2",
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
@@ -17603,6 +17608,11 @@
       "digest": "3dd3e6b71cab68f8a6c75893030ba5ae1062fedd632faaaf6ecd767c8fa196cb",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
       "originalPath": "meme_generator/memes/imprison/images/0.jpg"
+    },
+    "images/python/meme_generator/memes/intel_inside/images/0.jpg": {
+      "digest": "f40440bbfc8dfba336ad315a7f99ed7375113105fdf9588818cf7a59ddf8ddd7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/intel_inside/images/0.jpg"
     },
     "images/python/meme_generator/memes/jibao/tudou/0.png": {
       "digest": "3a4bd5369e366ace27662a608a763afd9d9c5877d4d71da672e00f06201f521d",
@@ -18149,6 +18159,16 @@
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
       "originalPath": "meme/qiu/images/0.png"
     },
+    "images/python/meme_generator/memes/scratchcard/images/0.png": {
+      "digest": "983d4e609d5d0755b9b5593d848adaa79860194ab3cc6cf38745d92e7738cb43",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/scratchcard/images/0.png"
+    },
+    "images/python/meme_generator/memes/scratchcard/images/1.png": {
+      "digest": "58868a7eb9be598ae4730848e764990db4adf4375bfcdcc0cf4a3b1e5acda6f7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/scratchcard/images/1.png"
+    },
     "images/python/meme_generator/memes/shuai/tudou/0.png": {
       "digest": "e50548eec677618758347b28f89344da66a6ed7b9a147c7bd70f906aafdaf8cc",
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
@@ -18669,6 +18689,11 @@
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
       "originalPath": "meme/托尼/images/9.png"
     },
+    "images/python/meme_generator/memes/wakeup/images/0.jpg": {
+      "digest": "10c8d9052e3599c423a430c0b587819865f1c3cc66b75c75fa9f3c4286bf2dcf",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/wakeup/images/0.jpg"
+    },
     "images/python/meme_generator/memes/wanweiba/tudou/0.png": {
       "digest": "00bcaafd1bccfef93a76262b99bf134c8a1d596252e26b2880590f5d0c6f4422",
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
@@ -18718,6 +18743,11 @@
       "digest": "bea2be456d0cb89fadbdbba3a9250b6e8d2fdb4745ebcded7fd47fa01eae9fb0",
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
       "originalPath": "meme/wudizhen/images/3.png"
+    },
+    "images/python/meme_generator/memes/wujing/images/0.jpg": {
+      "digest": "2b58fb75d5687c5c6c5ca20b9b4b618756c1b607ee476b96ff38acf0bed1a82e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/wujing/images/0.jpg"
     },
     "images/python/meme_generator/memes/xiaoxiongmaozi/tudou/0.png": {
       "digest": "2366080594c5b993d7b53cc36dcfe9077f5cfcbba1b7d0a65cb98a85a5105c97",

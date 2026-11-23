@@ -220,7 +220,7 @@ interface TriggerMatch {
   readonly keyword: string;
   readonly preset?: PresetArgument;
   readonly shortcut?: MemeTemplateShortcut;
-  readonly shortcutText?: string;
+  readonly shortcutTexts?: readonly string[];
 }
 
 function legacyPresetKeyword(value: string): string | undefined {
@@ -270,10 +270,12 @@ function shortcutArgs(shortcut: MemeTemplateShortcut | undefined): string {
 }
 
 function matchNativeShortcut(row: TriggerRow, shortcut: MemeTemplateShortcut, candidate: string): TriggerMatch | undefined {
-  const pattern = nativeShortcutPattern(row.key, shortcut.key);
-  if (pattern) {
-    const match = pattern.exec(candidate);
-    if (match?.[1] !== undefined) return { row, keyword: match[0], shortcut, shortcutText: match[1] };
+  const definition = nativeShortcutPattern(row.key, shortcut.key);
+  if (definition) {
+    const match = definition.pattern.exec(candidate);
+    if (!match) return;
+    const texts = definition.captions ? definition.captions.map(name => match.groups?.[name]) : [match[1]];
+    if (texts.every(text => text !== undefined)) return { row, keyword: match[0], shortcut, shortcutTexts: texts };
     return;
   }
   if (sameKeyword(candidate.slice(0, shortcut.key.length), shortcut.key)) return { row, keyword: shortcut.key, shortcut };
@@ -350,9 +352,12 @@ type ResolvedTrigger = Exclude<ReturnType<typeof resolveTrigger>, string | undef
 
 async function prepareResolvedRequest(match: ResolvedTrigger, input: GenerationInput) {
   const args = shortcutArgs(match.shortcut);
-  const text = args && !match.shortcutText ? `${match.text} ${args}`.trim() : match.text;
+  const text = args && !match.shortcutTexts ? `${match.text} ${args}`.trim() : match.text;
   const request = await buildGenerationBody(match.row.key, keywords(match.row.keyWords), text, match.params, input, match.preset);
-  if (typeof request === "object" && match.shortcutText !== undefined) request.body.set("texts", match.shortcutText);
+  if (typeof request === "object" && match.shortcutTexts) {
+    request.body.delete("texts");
+    for (const text of match.shortcutTexts) request.body.append("texts", text);
+  }
   return request;
 }
 

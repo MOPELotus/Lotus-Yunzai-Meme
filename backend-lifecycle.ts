@@ -1,5 +1,6 @@
 import { createBundledMemeResources } from "./backend-builtin-assets.ts";
 import type { MemeTemplate, MemeTemplateInput } from "./builtin-template.ts";
+import { legacyCaptionShortcutPatterns, type NativeShortcutPattern } from "./legacy-caption-shortcuts.ts";
 import {
   publishMemeProvider, safeCatalogKey, type LocalMemeProvider,
 } from "./catalog-policy.ts";
@@ -13,14 +14,15 @@ const nativeTriggers = new WeakMap<LocalMemeProvider["generate"], {
 }>();
 
 // Verified built-in captures. Catalog strings are never compiled as regular expressions.
-const nativeShortcutPatterns = [
+const nativeShortcutPatterns: readonly NativeShortcutPattern[] = [
+  ...legacyCaptionShortcutPatterns,
   { template: "genshin_start", source: "(?P<text>\\S+启动[!！]?)", pattern: /^(\S+启动[!！]?)(?=\s|$)/u },
   { template: "fill_head", source: "满脑子都是(?P<name>\\S+)", pattern: /^满脑子都是(\S+)(?=\s|$)/u },
   { template: "speechless", source: "(?P<text>典型的\\S+思维)", pattern: /^(典型的\S+思维)(?=\s|$)/u },
 ];
 
 export function nativeShortcutPattern(template: string, source: string) {
-  return nativeShortcutPatterns.find(entry => entry.template === template && entry.source === source)?.pattern;
+  return nativeShortcutPatterns.find(entry => entry.template === template && entry.source === source);
 }
 
 export function matchesLocalMemeTrigger(provider: LocalMemeProvider, message: string): boolean {
@@ -110,7 +112,7 @@ export function createLocalMemeBackend(signal: AbortSignal, entries?: readonly M
     for (const { info } of registry.values()) {
       for (const keyword of info.keywords) if (keyword) words.add(keyword.toLowerCase());
       for (const { key } of info.shortcuts ?? []) {
-        const pattern = nativeShortcutPattern(info.key, key);
+        const pattern = nativeShortcutPattern(info.key, key)?.pattern;
         if (pattern) patterns.add(pattern);
         else if (key) words.add(key.toLowerCase());
       }

@@ -29,6 +29,7 @@ import { legacyBadgeTemplates } from "./legacy-badges.ts";
 import { legacyPhotoCaptionTemplates } from "./legacy-photo-captions.ts";
 import { legacyPortraitEffectTemplates } from "./legacy-portrait-effects.ts";
 import { legacySceneMemeTemplates } from "./legacy-scene.ts";
+import { legacyCaptionShortcutTemplates } from "./legacy-caption-shortcuts.ts";
 import { legacyTextOverlayTemplates } from "./legacy-text-overlays.ts";
 import { mirrorFlashMemeTemplates } from "./mirror-flash.ts";
 import { motionMemeTemplates } from "./motion.ts";
@@ -78,6 +79,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...anyliewTextDialogueTemplates,
   ...legacySceneMemeTemplates,
   ...legacyTextOverlayTemplates,
+  ...legacyCaptionShortcutTemplates,
   ...legacyBadgeTemplates,
   ...legacyPhotoCaptionTemplates,
   ...legacyPortraitEffectTemplates,
