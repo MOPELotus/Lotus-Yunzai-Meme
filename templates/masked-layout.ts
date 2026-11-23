@@ -2,7 +2,7 @@ import { ImageData } from "skia-canvas";
 import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
 import type { Draw } from "./template-layout.ts";
 
-function pasteMask(rgba: Uint8Array, overlay: Uint8Array) {
+export function pasteMask(rgba: Uint8Array, overlay: Uint8Array) {
   for (let i = 0; i < rgba.length; i += 4) {
     const alpha = overlay[i + 3]!;
     if (!alpha) continue;

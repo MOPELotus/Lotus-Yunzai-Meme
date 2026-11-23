@@ -26,6 +26,7 @@ import { localCanvasAnimations } from "./local-canvas-animation.ts";
 import { twoLayerAvatarAnimations } from "./two-layer-avatar-animation.ts";
 import { tudouShortAnimations } from "./tudou-short-animation.ts";
 import { tudouPortraitAnimations } from "./tudou-portrait-animations.ts";
+import { tudouLayeredTemplates } from "./tudou-layered-animations.ts";
 import { hug, kiss } from "./kiss-hug.ts";
 import { legacyBadgeTemplates } from "./legacy-badges.ts";
 import { legacyPhotoCaptionTemplates } from "./legacy-photo-captions.ts";
@@ -102,6 +103,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...twoLayerAvatarAnimations,
   ...tudouShortAnimations,
   ...tudouPortraitAnimations,
+  ...tudouLayeredTemplates,
   ...textSpeechMemeTemplates,
   ...pythonOverlayMemeTemplates,
   ...textAnnouncementMemeTemplates,
