@@ -41,6 +41,8 @@ import { legacyPhotoCaptionTemplates } from "./legacy-photo-captions.ts";
 import { legacyPhotoFormTemplates } from "./legacy-photo-forms.ts";
 import { leaveNoteTemplate } from "./leave-note.ts";
 import { legacyPortraitEffectTemplates } from "./legacy-portrait-effects.ts";
+import { legacyLiveMemeTemplates } from "./legacy-live-effects.ts";
+import { legacyProjectedActionTemplates } from "./legacy-projected-actions.ts";
 import { legacySceneMemeTemplates } from "./legacy-scene.ts";
 import { legacyCaptionSceneTemplates } from "./legacy-caption-scenes.ts";
 import { legacyCaptionShortcutTemplates } from "./legacy-caption-shortcuts.ts";
@@ -112,6 +114,8 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...legacyPhotoFormTemplates,
   leaveNoteTemplate,
   ...legacyPortraitEffectTemplates,
+  ...legacyLiveMemeTemplates,
+  ...legacyProjectedActionTemplates,
   ...textSignMemeTemplates,
   ...perspectiveMemeTemplates,
   ...fixedAvatarAnimations,
