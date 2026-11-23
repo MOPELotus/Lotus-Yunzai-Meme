@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { alignMemeLoop, readMemeImageSequence } from "../templates/animated-input.ts";
-import { encodeMemeGif } from "../templates/gif.ts";
+import { assertMemeGifDimensions, encodeMemeGif } from "../templates/gif.ts";
 
 const signal = new AbortController().signal;
 const controlMarker = Buffer.from([0x21, 0xf9, 0x04]);
@@ -15,6 +15,14 @@ function animatedGif(delays: readonly number[]) {
 function readGif(bytes: Buffer, timing?: "pillow" | "skia") {
   return readMemeImageSequence(new File([Buffer.from(bytes)], "animation.gif", { type: "image/gif" }), signal, timing);
 }
+
+test("原版长动图可保留 435 帧，仍受总像素和帧数预算限制", async () => {
+  const frames = 435;
+  expect((await readGif(animatedGif(Array(frames).fill(30)))).frames).toHaveLength(frames);
+  expect(() => assertMemeGifDimensions(224, 224, frames)).not.toThrow();
+  expect(() => assertMemeGifDimensions(250, 250, frames)).toThrow(RangeError);
+  expect(() => assertMemeGifDimensions(1, 1, 1_001)).toThrow(RangeError);
+});
 
 test("旧 GIF 输入按实际记录保留 10ms，缺时长才使用旧默认", async () => {
   const fast = animatedGif([10, 10]);

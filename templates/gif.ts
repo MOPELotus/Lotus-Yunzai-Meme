@@ -193,7 +193,7 @@ function writeLzw(output: GifBytes, indexes: Uint8Array, codeSize: number) {
 
 export function assertMemeGifDimensions(width: number, height: number, frames: number) {
   if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width < 1 || height < 1 ||
-      width > 4096 || height > 4096 || !Number.isSafeInteger(frames) || frames < 1 || frames > 200 ||
+      width > 4096 || height > 4096 || !Number.isSafeInteger(frames) || frames < 1 || frames > 1_000 ||
       width * height * frames > maxFramePixels) {
     throw new RangeError("表情动图的尺寸或帧数超限。");
   }
