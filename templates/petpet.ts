@@ -6,6 +6,7 @@ import { encodeMemeGif } from "./gif.ts";
 
 const size = 112;
 const delayMs = 60;
+const animatedFrameLimit = 200;
 const poses = [
   [14, 20, 98, 98],
   [12, 33, 101, 85],
@@ -21,7 +22,7 @@ async function animate(source: MemeImageSequence, circle: boolean, context: Meme
     return image;
   }));
   const frames = [];
-  for (const { overlay, image } of alignMemeLoop(source, poses.length, delayMs)) {
+  for (const { overlay, image } of alignMemeLoop(source, poses.length, delayMs, animatedFrameLimit)) {
     context.signal.throwIfAborted();
     const [left, top, width, height] = poses[overlay]!;
     const square = Math.min(image.width, image.height);
@@ -60,7 +61,7 @@ export const petpet: MemeTemplate = {
   },
   async render({ images, args }, context) {
     if (images.length !== 1) throw new Error("摸头需要一张图片。");
-    return animate(await readMemeImageSequence(images[0]!, context.signal), args.circle === true, context);
+    return animate(await readMemeImageSequence(images[0]!, context.signal, "skia"), args.circle === true, context);
   },
   async preview(context) {
     context.signal.throwIfAborted();

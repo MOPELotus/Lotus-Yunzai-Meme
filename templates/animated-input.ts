@@ -6,7 +6,7 @@ interface Frame {
   readonly top: number;
   readonly width: number;
   readonly height: number;
-  readonly delayMs: number;
+  readonly delayMs?: number;
   readonly dispose: "keep" | "background" | "previous";
   readonly replace?: boolean;
 }
@@ -28,7 +28,8 @@ const MAX_SOURCE_PIXELS = 16_000_000;
 const MAX_TOTAL_PIXELS = 64_000_000;
 const MAX_SOURCE_BYTES = 24 * 1024 ** 2;
 const MAX_SOURCE_FRAMES = 1_000;
-const MAX_OUTPUT_FRAMES = 200;
+const DEFAULT_GIF_DURATION_MS = 20;
+const DEFAULT_ALIGNMENT_FRAMES = 100;
 
 function invalid(): never {
   throw new Error("无效或过大的表情输入图片。");
@@ -88,7 +89,7 @@ function gifAnimation(bytes: Buffer): Animation {
     frames.push({
       bytes: Buffer.concat([frameHeader, palette, control ?? Buffer.alloc(0), image, bytes.subarray(position + 10, end), GIF_TRAILER]),
       left, top, width: frameWidth, height: frameHeight,
-      delayMs: (control?.readUInt16LE(4) ?? 0) * 10,
+      delayMs: control ? control.readUInt16LE(4) * 10 : undefined,
       dispose: disposal === 2 ? "background" : disposal === 3 ? "previous" : "keep",
     });
     control = undefined;
@@ -174,10 +175,12 @@ export async function readMemeFirstImage(file: File, signal: AbortSignal): Promi
  * Skia decodes each frame's original compressed bitstream. It also performs
  * the compositing for sub-frames, transparency and GIF disposal.
  */
-export async function readMemeImageSequence(file: File, signal: AbortSignal): Promise<MemeImageSequence> {
+export async function readMemeImageSequence(file: File, signal: AbortSignal, timing: "pillow" | "skia" = "pillow"): Promise<MemeImageSequence> {
   const bytes = await readMemeImageBytes(file, signal);
   const format = bytes.subarray(0, 6).toString();
-  const animation = format === "GIF87a" || format === "GIF89a" ? gifAnimation(bytes) :
+  const isGif = format === "GIF87a" || format === "GIF89a";
+  const keepsShortDelay = isGif && timing === "pillow";
+  const animation = isGif ? gifAnimation(bytes) :
     bytes.subarray(0, 4).toString() === "RIFF" && bytes.subarray(8, 12).toString() === "WEBP" ? webpAnimation(bytes) : undefined;
   if (!animation || animation.frames.length <= 1) {
     return { frames: [await readFrame(bytes, signal)], averageDelayMs: 0 };
@@ -206,19 +209,23 @@ export async function readMemeImageSequence(file: File, signal: AbortSignal): Pr
     if (frame.replace) context.clearRect(frame.left, frame.top, frame.width, frame.height);
     context.drawImage(image, frame.left, frame.top);
     result.push(await loadImage(await canvas.png));
-    totalDelay += frame.delayMs;
+    totalDelay += frame.delayMs ?? (keepsShortDelay ? DEFAULT_GIF_DURATION_MS : 0);
     if (frame.dispose === "background") clear(frame.left, frame.top, frame.width, frame.height);
     if (previous) context.putImageData(previous, frame.left, frame.top);
   }
-  return { frames: result as [Image, ...Image[]], averageDelayMs: Math.max(20, totalDelay / frames.length) };
+  const average = totalDelay / frames.length;
+  // The legacy GIF duration fallback applies only to missing timing. Give
+  // entirely zero-delay animations a positive cycle so alignment can finish.
+  const averageDelayMs = keepsShortDelay && average > 0 ? average : Math.max(DEFAULT_GIF_DURATION_MS, average);
+  return { frames: result as [Image, ...Image[]], averageDelayMs };
 }
 
 /** Preserve the old ExtendLoop rule using the source's mean frame duration. */
-export function alignMemeLoop(source: MemeImageSequence, handFrames: number, frameDelayMs: number) {
+export function alignMemeLoop(source: MemeImageSequence, handFrames: number, frameDelayMs: number, maxFrames = DEFAULT_ALIGNMENT_FRAMES) {
   const sourceDuration = source.frames.length * source.averageDelayMs;
   let length = handFrames;
   if (sourceDuration - length * frameDelayMs >= frameDelayMs) {
-    while (length + handFrames <= MAX_OUTPUT_FRAMES) {
+    while (length + handFrames <= maxFrames) {
       length += handFrames;
       const duration = length * frameDelayMs;
       if (Math.abs(Math.round(duration / sourceDuration) * sourceDuration - duration) <= frameDelayMs) break;
