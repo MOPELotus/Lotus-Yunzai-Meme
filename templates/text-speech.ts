@@ -10,11 +10,11 @@ import { drawFittedText, jpg, registerFont, registerMemeTypeface, rgbaFrame, rgb
 const baCharacters = [
   ["心奈", "kokona", "春原心奈", "春原心菜"],
   ["爱丽丝", "arisu", "天童爱丽丝"],
-  ["泉奈", "izuna", "久田泉奈"],
+  ["泉奈", "izuna", "久田泉奈", "忍忍"],
   ["key", "key", "key"],
   ["玛丽", "mari", "伊落玛丽"],
   ["濑名", "sena", "冰室濑名"],
-  ["优香", "yuuka", "早濑优香"],
+  ["优香", "yuuka", "早濑优香", "邮箱"],
 ] as const;
 const baText = "那我问你";
 const baCharacterHelp = "角色编号：" + baCharacters.map(([name], index) => `${index + 1}、${name}`).join("，");

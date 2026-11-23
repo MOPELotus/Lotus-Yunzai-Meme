@@ -45,7 +45,7 @@ const signs: readonly Sign[] = [
     ],
   },
   {
-    key: "atri_holdsign", keywords: ["亚托莉举牌"], tags: ["ATRI", "亚托莉"],
+    key: "atri_holdsign", keywords: ["亚托莉举牌"], tags: ["ATRI", "亚托莉", "萝卜子"],
     text: "请不要忘记我哦……\n请一直,一直记住我哦\n明天,请把我带到伊甸\n我想看见大家的笑容\n我想看到大家开心的表情\n我想学习喜悦",
     frames: [{ asset: "0.jpg", box: [247, 935, 639, 1333], sizes: [20, 120], leftLines: true }],
   },

@@ -63,7 +63,7 @@ const scenes: readonly Scene[] = [
     tags: ["魔法少女的魔女审判", "二阶堂希罗"], frames: [{ file: "0.png", box: [0, 75, 500, 800] }] },
   { key: "xueli_think", keywords: ["雪莉想", "雪梨想", "橘雪莉想"], optionalText: true, fit: "cover",
     tags: ["魔法少女的魔女审判", "橘雪莉"], frames: [{ file: "0.png", box: [0, 0, 824, 824] }] },
-  { key: "yuzu_soft_ayachi_nene", keywords: ["宁宁困惑", "绫地宁宁困惑"], tags: ["柚子社", "绫地宁宁"], rotation: -45,
+  { key: "yuzu_soft_ayachi_nene", keywords: ["宁宁困惑", "绫地宁宁困惑"], tags: ["柚子社", "绫地宁宁", "魔女的夜宴"], rotation: -45,
     frames: [{ file: "0.png", box: [500, 410, 165, 165] }],
     caption: { box: [0, 0, 716, 128], sizes: [20, 150], message: name => `${name},这是你的照片吗？` } },
   { key: "yuzu_soft_murasame_hug", keywords: ["丛雨抱"], tags: yuzu, fit: "circle", frames: [

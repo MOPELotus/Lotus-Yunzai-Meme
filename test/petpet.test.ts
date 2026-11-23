@@ -64,7 +64,7 @@ test("摸头保留五帧、中心裁切、原位移、60ms 帧间隔与圆形选
   expect(pixel(rounded.frames[0], 16, 22)[3]).toBe(0);
   expect(pixel(rounded.frames[0], 60, 65)).toEqual([255, 0, 0, 255]);
   const args = petpet.info.params_type.args_type;
-  for (const option of ["-c", "--circle", "-圆"]) {
+  for (const option of ["-c", "--circle", "圆", "-圆"]) {
     expect(parseGenerationArgs(args, option)).toMatchObject({ values: { circle: true }, text: "" });
   }
 });

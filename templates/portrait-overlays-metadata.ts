@@ -325,6 +325,7 @@ export const portraitOverlayMetadata = [
     ],
     "tags": [
       "蔚蓝档案",
+      "碧蓝档案",
       "普拉娜"
     ],
     "params_type": {

@@ -5,6 +5,7 @@ type Pose = readonly [left: number, top: number, width: number, height: number];
 interface Scene {
   readonly key: string;
   readonly keywords: readonly string[];
+  readonly tags?: readonly string[];
   readonly frames: number;
   readonly poses: Pose | readonly Pose[];
   readonly ellipse?: true;
@@ -22,7 +23,7 @@ const scenes: readonly Scene[] = [
     poses: [[53, 40, 108, 95], [57, 41, 108, 95], [53, 40, 108, 95]],
   },
   {
-    key: "huochailu", keywords: ["火柴撸"], frames: 6,
+    key: "huochailu", keywords: ["火柴撸"], tags: ["火柴人"], frames: 6,
     poses: [
       [63, 28, 155, 155], [63, 28, 155, 155], [83, 38, 155, 155],
       [94, 40, 155, 155], [97, 45, 155, 155], [97, 45, 155, 155],
@@ -106,8 +107,8 @@ function placement(poses: Scene["poses"]) {
 }
 
 export function createTudouPortraitAnimations(mode?: Parameters<typeof createFixedAvatarAnimation>[0]["mode"]) {
-  return scenes.map(({ key, keywords, ellipse, frames, poses, second }) => createFixedAvatarAnimation({
-    key, keywords, frames, firstFrame: 0, framePath: index => tudouShortFramePath(key, index),
+  return scenes.map(({ key, keywords, tags, ellipse, frames, poses, second }) => createFixedAvatarAnimation({
+    key, keywords, tags, frames, firstFrame: 0, framePath: index => tudouShortFramePath(key, index),
     ...placement(poses), directUnderlay: true, mode,
     // The old 0.067 s GIF writer truncated to a 60 ms frame in the encoded file.
     ...(ellipse ? { delayMs: 60, crop: true, circle: "hard-ellipse", avatarOnTop: true } : {

@@ -11,7 +11,7 @@ const yuzu = ["柚子社"];
 
 const fixed: readonly AnyLiewDialogue[] = [
   {
-    ...jpegAvatar, key: "atri_finger", keywords: ["亚托莉指"], tags: ["ATRI", "亚托莉"], asset: "0.jpg",
+    ...jpegAvatar, key: "atri_finger", keywords: ["亚托莉指"], tags: ["ATRI", "亚托莉", "萝卜子"], asset: "0.jpg",
     avatar: [600, 140, 300, 300], box: [0, 588, 1171, 720], sizes: [15, 150], leftLines: true, font: "child", wrap: true,
     caption: name => `${name},你和夏先生一样笨得可爱`,
   },

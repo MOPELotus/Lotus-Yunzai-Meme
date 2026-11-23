@@ -55,7 +55,7 @@ export const petpet: MemeTemplate = {
       max_texts: 0,
       args_type: {
         args_model: { properties: { circle: { type: "boolean", default: false, description: "是否将图片变为圆形" } } },
-        parser_options: [{ names: ["-c", "--circle", "-圆"], dest: "circle", args: [], action: { type: 0, value: true } }],
+        parser_options: [{ names: ["-c", "--circle", "圆", "-圆"], dest: "circle", args: [], action: { type: 0, value: true } }],
       },
     },
   },

@@ -59,7 +59,7 @@ const dialogues: readonly Dialogue[] = [
     box: [1, 774, 1061, 942], sizes: [15, 120], leftLines: true, font: "slender",
   },
   {
-    ...outlinedCaption, key: "atri_like", keywords: ["亚托莉喜欢"], tags: ["ATRI", "亚托莉"],
+    ...outlinedCaption, key: "atri_like", keywords: ["亚托莉喜欢"], tags: ["ATRI", "亚托莉", "萝卜子"],
     avatar: [106, 72, 305, 235], caption: text => text, defaultText: "亚托莉喜欢这个",
   },
   {

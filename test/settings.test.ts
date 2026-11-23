@@ -167,7 +167,7 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
       server: { managedTimeout: 30 }, stat: { enable: true },
     });
     expect(form.getConfigData().server).toEqual({ managedTimeout: 30 });
-    expect(Object.keys(form.getConfigData().meme)).not.toContain("pokeEnable");
+    expect(form.getConfigData().meme?.pokeEnable).toBeUndefined();
     expect(JSON.stringify(form.getConfigData())).not.toContain("127.0.0.1");
 
     expect(form.setConfigData({ "meme.reply": true, "access.mode": 1, "protect.user": [], "server.timeout": 999 }, {

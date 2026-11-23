@@ -34,7 +34,7 @@ const cards: readonly WordCard[] = [
     childFont: true, leftLines: true, sizes: [5, 120], frames: [
       { asset: "0.jpg", box: [40, 35, 140, 210] }, { asset: "1.jpg", box: [360, 10, 490, 200] },
     ] },
-  { key: "atri_say", keywords: ["亚托莉说"], tags: ["ATRI", "亚托莉"], text: "好久不见，你长大了呢。",
+  { key: "atri_say", keywords: ["亚托莉说"], tags: ["ATRI", "亚托莉", "萝卜子"], text: "好久不见，你长大了呢。",
     childFont: true, leftLines: true, sizes: [20, 120], frames: [{ asset: "0.png", box: [25, 166, 114, 284] }] },
   { key: "deepseek_say", keywords: ["Deepseek说", "deepseek说", "鲸鱼娘说", "大肥鱼说"], text: "正在思考中……",
     childFont: true, sizes: [10, 180], args: "number", frames: [
