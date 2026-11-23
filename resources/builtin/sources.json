@@ -23461,6 +23461,31 @@
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/mourning/0.png"
     },
+    "images/my_friend/corner1.png": {
+      "digest": "662e553d3874e57c05be344691193ba7126bcabae17e20ff1b4c61958745c777",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/my_friend/corner1.png"
+    },
+    "images/my_friend/corner2.png": {
+      "digest": "466cfb07217ecd6cc58e016b01d9293c0c11c26b01a63c114b6508e7ed758ca2",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/my_friend/corner2.png"
+    },
+    "images/my_friend/corner3.png": {
+      "digest": "ac3a13281ad837c4b67aa0f2a0da223366d91798679720e34e42b0f35c5ccf34",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/my_friend/corner3.png"
+    },
+    "images/my_friend/corner4.png": {
+      "digest": "ab451c7a3fb77f862a42b03a78f7d7ac5a578f4173ca5a9e194c141b278fc3e7",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/my_friend/corner4.png"
+    },
+    "images/my_friend/label.png": {
+      "digest": "d6371b9d7b4fc2e219a07539f8f332aa5e75d8e0da4dfb78b19e397f2aa91abc",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/my_friend/label.png"
+    },
     "images/my_opinion/0.png": {
       "digest": "d77782ccd237a5ca2f34d27fb3766de70dc74938ab3f809076f0a9c29cfb0ce6",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
@@ -38450,6 +38475,11 @@
       "digest": "06b5730b3f9ec6335aa630fb5866eb809c940e2886e55503bcc14c188404d62c",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/speechless/sweat.png"
+    },
+    "images/steam_message/logo.png": {
+      "digest": "e61b670e56a384f6eb3ad952302eba4085f3f2db700f570dbb40bb2c85f43ec5",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/steam_message/logo.png"
     },
     "images/stew/0.png": {
       "digest": "3680aa48ca8ed223c073e5f2b67d4477d07c52c4d4e47accc1b3d678a0cba3bc",

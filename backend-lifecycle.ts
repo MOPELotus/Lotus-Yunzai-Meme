@@ -17,6 +17,11 @@ const nativeTriggers = new WeakMap<LocalMemeProvider["generate"], {
 const nativeShortcutPatterns: readonly NativeShortcutPattern[] = [
   ...legacyCaptionShortcutPatterns,
   {
+    template: "steam_message", source: "(?P<name>\\S+)正在玩(?P<game>\\S+)",
+    pattern: /^(?<name>\S+)正在玩(?<game>\S+)(?=\s|$)/u,
+    captions: ["game"], option: { name: "name", capture: "name", suffix: "" },
+  },
+  {
     template: "panda_dragon_figure", source: "(?P<name>\\S{1,10})龙[\\s:：]+(?P<text>\\S+)",
     pattern: /^(?<name>\S{1,10})龙[\s:：]+(?<text>\S+)(?=\s|$)/u,
     captions: ["text"], option: { name: "name", capture: "name", suffix: "龙" },
