@@ -8,6 +8,7 @@ import { renderPythonGif } from "./python-gif.ts";
 import { jpg, previewImage } from "./template-layout.ts";
 import { tudouCompositions, type Pose, type TudouAvatarLayer, type TudouComposition } from "./tudou-layered-specs.ts";
 import { tudouOverlays } from "./tudou-overlay-specs.ts";
+import { tudouExtendedOverlays } from "./tudou-extended-overlays.ts";
 
 type RenderMode = Parameters<typeof renderRgba>[3];
 type Frame = { readonly artwork: number; readonly avatars: readonly Image[] };
@@ -200,3 +201,9 @@ export function createTudouOverlayTemplates(mode?: RenderMode) {
 }
 
 export const tudouOverlayTemplates = createTudouOverlayTemplates();
+
+export function createTudouExtendedOverlayTemplates(mode?: RenderMode) {
+  return tudouExtendedOverlays.map(spec => template(spec, mode));
+}
+
+export const tudouExtendedOverlayTemplates = createTudouExtendedOverlayTemplates();
