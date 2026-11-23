@@ -67,7 +67,7 @@ test("顶 / 玩保留 58 帧重复片段和无头像的 20 帧结尾", async () 
   expect(pythonOverlayAssets).toHaveLength(38);
   async function imageAsset(path: string) {
     const index = requested.length;
-    expect(pythonOverlayAssets[index]?.[0]).toBe(`images/${path}`);
+    expect<string | undefined>(pythonOverlayAssets[index]?.[0]).toBe(`images/${path}`);
     requested.push(path);
     const canvas = new Canvas(310, 245);
     const draw = canvas.getContext("2d");
