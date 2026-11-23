@@ -1,4 +1,5 @@
 import { anyliewSignAssets } from "./backend-anyliew-sign-assets.ts";
+import { anyliewTextDialogueAssets } from "./backend-text-dialogue-assets.ts";
 import { anyliewAvatarSceneAssets } from "./backend-anyliew-avatar-scene-assets.ts";
 import { anyliewCircleDialogueAssets } from "./backend-circle-dialogue-assets.ts";
 import { anyliewDialogueAssets } from "./backend-dialogue-assets.ts";
@@ -73,6 +74,7 @@ const anyliewAssets = [
   ...anyliewAvatarSceneAssets,
   ...anyliewShortAnimationAssets,
   ...anyliewSignAssets,
+  ...anyliewTextDialogueAssets,
 ];
 
 export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map([

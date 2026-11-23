@@ -105,8 +105,8 @@ export async function firstImage(file: File, signal: AbortSignal) {
   return image;
 }
 
-export async function rasterCanvas(width: number, height: number, draw: Draw, signal: AbortSignal) {
-  if (width * height > maxStaticPixels || width > 8192 || height > 8192) throw new RangeError("表情尺寸超限。");
+export async function rasterCanvas(width: number, height: number, draw: Draw, signal: AbortSignal, maxPixels = maxStaticPixels) {
+  if (width * height > maxPixels || width > 8192 || height > 8192) throw new RangeError("表情尺寸超限。");
   signal.throwIfAborted();
   const rendered = await renderPng(width, height, draw);
   const image = await loadImage(rendered.png);
@@ -117,8 +117,8 @@ export async function rasterCanvas(width: number, height: number, draw: Draw, si
   return canvas;
 }
 
-export async function jpg(width: number, height: number, draw: Draw, signal: AbortSignal) {
-  const canvas = await rasterCanvas(width, height, draw, signal);
+export async function jpg(width: number, height: number, draw: Draw, signal: AbortSignal, maxPixels?: number) {
+  const canvas = await rasterCanvas(width, height, draw, signal, maxPixels);
   const content = await canvas.toBuffer("jpg", { quality: 0.75 });
   signal.throwIfAborted();
   return content;
