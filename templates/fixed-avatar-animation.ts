@@ -1,5 +1,5 @@
 import { loadImage, type Image, type CanvasRenderingContext2D } from "skia-canvas";
-import { renderRgba } from "../../../packages/skia/index.ts";
+import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeFirstImage } from "./animated-input.ts";
 import { assertMemeGifDimensions, encodeMemeGif, MemeGifByteLimitError } from "./gif.ts";
@@ -20,6 +20,9 @@ interface FixedAvatarAnimation {
   // Counts of byte-identical consecutive source PNGs, before GIF encoding.
   readonly sourceHolds?: readonly number[];
   readonly crop?: true;
+  readonly circle?: "before-resize" | "after-resize";
+  readonly firstFrame?: 0 | 1;
+  readonly avatarOnTop?: true;
 }
 
 // Original pose tables and frame art from anyliew/meme_emoji at 33bf418ac2ccd416be70faf9a13e97befb7703a8.
@@ -331,6 +334,17 @@ function placeAvatar(context: CanvasRenderingContext2D, avatar: Image, [left, to
   context.restore();
 }
 
+async function circleSource(avatar: Image) {
+  const size = Math.min(avatar.width, avatar.height);
+  const { png } = await renderExactPng(size, size, draw => {
+    draw.beginPath();
+    draw.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+    draw.clip();
+    draw.drawImage(avatar, Math.trunc((size - avatar.width) / 2), Math.trunc((size - avatar.height) / 2));
+  });
+  return loadImage(png);
+}
+
 function mixChannel(bottom: number, top: number, mask: number) {
   return Math.round((bottom * (255 - mask) + top * mask) / 255);
 }
@@ -374,7 +388,9 @@ async function* orderedFrames(
   }
 }
 
-function createTemplate({ key, keywords, tags, delayMs, positions, sizes, frames, sourceHolds, crop }: FixedAvatarAnimation): MemeTemplate {
+export function createFixedAvatarAnimation({
+  key, keywords, tags, delayMs, positions, sizes, frames, sourceHolds, crop, circle, firstFrame = 1, avatarOnTop,
+}: FixedAvatarAnimation): MemeTemplate {
   const longAnimation = sourceHolds !== undefined;
   const fixedPlacement = typeof positions[0] === "number" && typeof sizes[0] === "number";
   const holds = sourceHolds ?? Array<number>(frames).fill(1);
@@ -386,7 +402,7 @@ function createTemplate({ key, keywords, tags, delayMs, positions, sizes, frames
   });
 
   async function readFrame(index: number, context: MemeTemplateContext) {
-    const path = `anyliew/emoji/${key}/images/${offsets[index]! + 1}.png`;
+    const path = `anyliew/emoji/${key}/images/${offsets[index]! + firstFrame}.png`;
     let bytes: Buffer;
     try {
       bytes = await context.imageAsset(path);
@@ -403,7 +419,10 @@ function createTemplate({ key, keywords, tags, delayMs, positions, sizes, frames
 
     const { signal } = context;
     signal.throwIfAborted();
-    const [avatar, first] = await Promise.all([readMemeFirstImage(input.images[0]!, signal), readFrame(0, context)]);
+    const [avatar, first] = await Promise.all([
+      readMemeFirstImage(input.images[0]!, signal).then(image => circle === "before-resize" ? circleSource(image) : image),
+      readFrame(0, context),
+    ]);
     const { width: sourceWidth, height: sourceHeight } = first;
     let width = sourceWidth;
     let height = sourceHeight;
@@ -434,7 +453,14 @@ function createTemplate({ key, keywords, tags, delayMs, positions, sizes, frames
           const offset = offsets[index]!;
           avatarLayer = (await renderRgba(width, height, canvas => {
             canvas.scale(scaleX, scaleY);
-            placeAvatar(canvas, avatar, at(positions, offset), at(sizes, offset), crop ?? false);
+            const position = at(positions, offset);
+            const size = at(sizes, offset);
+            if (circle === "after-resize") {
+              canvas.beginPath();
+              canvas.arc(position[0] + size[0] / 2, position[1] + size[1] / 2, size[0] / 2, 0, Math.PI * 2);
+              canvas.clip();
+            }
+            placeAvatar(canvas, avatar, position, size, crop ?? false);
           })).rgba;
         }
         const { rgba: art } = await renderRgba(width, height, canvas => {
@@ -442,7 +468,7 @@ function createTemplate({ key, keywords, tags, delayMs, positions, sizes, frames
           canvas.imageSmoothingQuality = "high";
           canvas.drawImage(foreground, 0, 0);
         });
-        const rgba = blendFixedArt(avatarLayer, art);
+        const rgba = avatarOnTop ? blendFixedArt(art, Buffer.from(avatarLayer)) : blendFixedArt(avatarLayer, art);
         const duration = delayMs * holds[index]!;
         const previous = rendered.at(-1);
         if (previous?.rgba.equals(rgba)) previous.delayMs += duration;
@@ -461,4 +487,4 @@ function createTemplate({ key, keywords, tags, delayMs, positions, sizes, frames
   };
 }
 
-export const fixedAvatarAnimations: readonly MemeTemplate[] = specs.map(createTemplate);
+export const fixedAvatarAnimations: readonly MemeTemplate[] = specs.map(createFixedAvatarAnimation);
