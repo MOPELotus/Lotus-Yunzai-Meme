@@ -53,6 +53,7 @@ import { textPanelMemeTemplates } from "./text-panels.ts";
 import { textSignMemeTemplates } from "./text-signs.ts";
 import { textSpeechMemeTemplates } from "./text-speech.ts";
 import { transformMemeTemplates } from "./transforms.ts";
+import { timedOverlayMemeTemplates } from "./timed-overlays.ts";
 import { waveMemeTemplate } from "./wave.ts";
 
 export const builtinMemeTemplates: readonly MemeTemplate[] = [
@@ -96,6 +97,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...anyliewLargeAvatarAnimations,
   ...classicAvatarMemeTemplates,
   ...classicLayeredMemeTemplates,
+  ...timedOverlayMemeTemplates,
   flush,
   ...jumpSoldMemeTemplates,
   ...shortAvatarAnimations,
