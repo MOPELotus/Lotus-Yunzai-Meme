@@ -75,7 +75,24 @@ test("流式编码严格限制发送字节数", async () => {
   }
   await expect(encodeMemeGifStream(width, height, frames, rendered(), AbortSignal.timeout(10_000)))
     .rejects.toThrow(MemeGifByteLimitError);
-}, 12_000);
+
+  let yielded = 0;
+  async function* renderOnce() {
+    for await (const frame of rendered()) {
+      yielded++;
+      yield frame;
+    }
+  }
+  const signal = AbortSignal.timeout(12_000);
+  const optedIn = await encodeMemeGifStream(width, height, frames, renderOnce(), signal, { paletteLimits: [216, 8] });
+  expect(yielded).toBe(frames);
+  expect(optedIn.byteLength).toBeLessThanOrEqual(8 * 1024 * 1024);
+  expect(optedIn[10]! & 7).toBe(2); // The 216-color pass hit the same byte limit.
+  const sequence = await readMemeImageSequence(new File([new Uint8Array(optedIn)], "sample.gif"), signal);
+  expect(sequence.frames).toHaveLength(frames);
+  expect(sequence.averageDelayMs).toBe(30);
+  expect(sequence.frames[0]).toMatchObject({ width, height });
+}, 24_000);
 
 test("超限的全帧使用局部更新，且保持实际显示像素和透明区域", async () => {
   const width = 1024, height = 1024, count = 8;

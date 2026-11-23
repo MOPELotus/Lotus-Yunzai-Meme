@@ -67,17 +67,17 @@ function paletteAccumulator() {
       if (exact.size <= 256) exact.set((red << 16) | (green << 8) | blue, 0);
     }
   }
-  function finish() {
-    return makePalette(counts, reds, greens, blues, exact, transparent);
+  function finish(limit = 256, nearest = false) {
+    return makePalette(counts, reds, greens, blues, exact, transparent, limit, nearest);
   }
   return { add, finish };
 }
 
 function makePalette(counts: Uint32Array, reds: Float64Array, greens: Float64Array, blues: Float64Array,
-  exact: Map<number, number>, transparent: boolean) {
+  exact: Map<number, number>, transparent: boolean, limit: number, nearest: boolean) {
   const colors: number[] = transparent ? [0, 0, 0] : [];
   const firstColor = transparent ? 1 : 0;
-  if (exact.size <= 256 - firstColor) {
+  if (exact.size <= limit - firstColor) {
     for (const rgb of exact.keys()) {
       exact.set(rgb, colors.length / 3);
       colors.push(rgb >>> 16, (rgb >>> 8) & maxColor, rgb & maxColor);
@@ -94,7 +94,7 @@ function makePalette(counts: Uint32Array, reds: Float64Array, greens: Float64Arr
   const bins: number[] = [];
   for (let bin = 0; bin < counts.length; bin++) if (counts[bin]) bins.push(bin);
   const boxes = [colorBox(bins, counts)];
-  while (boxes.length < 256 - firstColor) {
+  while (boxes.length < limit - firstColor) {
     const highest = boxes.reduce((best, box, i) => box.priority > boxes[best]!.priority ? i : best, 0);
     const box = boxes[highest]!;
     if (box.bins.length < 2) break;
@@ -115,6 +115,20 @@ function makePalette(counts: Uint32Array, reds: Float64Array, greens: Float64Arr
       blue += blues[bin]!;
     }
     colors.push(Math.round(red / box.count), Math.round(green / box.count), Math.round(blue / box.count));
+  }
+  if (nearest) {
+    for (const bin of bins) {
+      const red = reds[bin]! / counts[bin]!, green = greens[bin]! / counts[bin]!, blue = blues[bin]! / counts[bin]!;
+      let closest = firstColor, best = Infinity;
+      for (let i = firstColor * 3; i < colors.length; i += 3) {
+        const r = red - colors[i]!, g = green - colors[i + 1]!, b = blue - colors[i + 2]!;
+        const distance = r * r + g * g + b * b;
+        if (distance >= best) continue;
+        closest = i / 3;
+        best = distance;
+      }
+      indexed[bin] = closest;
+    }
   }
   return { colors, transparent, index: (red: number, green: number, blue: number) => indexed[colorBin(red, green, blue)]! };
 }
@@ -343,7 +357,11 @@ async function writeCompactFrames(width: number, height: number, delays: readonl
 /** Encode a large animation with one rendered frame in memory per pass. */
 export async function encodeMemeGifStream(
   width: number, height: number, frameLimit: number, frames: AsyncIterable<RgbaFrame>, signal: AbortSignal,
+  { paletteLimits }: { readonly paletteLimits?: readonly [number, ...number[]] } = {},
 ): Promise<Uint8Array> {
+  if (paletteLimits?.some(limit => !Number.isSafeInteger(limit) || limit < 2 || limit > 256)) {
+    throw new RangeError("表情动图的调色板大小无效。");
+  }
   assertMemeGifStreamDimensions(width, height, frameLimit);
   signal.throwIfAborted();
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-gif-"));
@@ -370,33 +388,46 @@ export async function encodeMemeGifStream(
       }
       signal.throwIfAborted();
       if (!delays.length) throw new MemeGifDimensionLimitError();
-      const colors = palette.finish();
       const rgba = Buffer.allocUnsafe(frameBytes);
-      async function readIndexes(index: number, indexes: Uint8Array) {
-        let read = 0;
-        while (read < frameBytes) {
+      async function encode(colors: Palette) {
+        async function readIndexes(index: number, indexes: Uint8Array) {
+          let read = 0;
+          while (read < frameBytes) {
+            signal.throwIfAborted();
+            const { bytesRead } = await file.read(rgba, read, frameBytes - read, index * frameBytes + read);
+            if (!bytesRead) throw new Error("表情动图的缓存帧读取不完整。");
+            read += bytesRead;
+          }
           signal.throwIfAborted();
-          const { bytesRead } = await file.read(rgba, read, frameBytes - read, index * frameBytes + read);
-          if (!bytesRead) throw new Error("表情动图的缓存帧读取不完整。");
-          read += bytesRead;
+          indexFrame(indexes, rgba, colors);
         }
+        try {
+          const writer = gifWriter(width, height, colors, maxStreamGifBytes);
+          const indexes = new Uint8Array(width * height);
+          for (const [index, delayMs] of delays.entries()) {
+            await readIndexes(index, indexes);
+            writer.add(indexes, delayMs);
+          }
+          return writer.finish();
+        } catch (error) {
+          if (!(error instanceof MemeGifByteLimitError)) throw error;
+        }
+        const result = await writeCompactFrames(width, height, delays, colors, readIndexes);
         signal.throwIfAborted();
-        indexFrame(indexes, rgba, colors);
+        return result;
       }
-      try {
-        const writer = gifWriter(width, height, colors, maxStreamGifBytes);
-        const indexes = new Uint8Array(width * height);
-        for (const [index, delayMs] of delays.entries()) {
-          await readIndexes(index, indexes);
-          writer.add(indexes, delayMs);
+      if (!paletteLimits) return await encode(palette.finish());
+      let limitError = new MemeGifByteLimitError(maxStreamGifBytes);
+      for (const limit of paletteLimits) {
+        signal.throwIfAborted();
+        try {
+          return await encode(palette.finish(limit, true));
+        } catch (error) {
+          if (!(error instanceof MemeGifByteLimitError)) throw error;
+          limitError = error;
         }
-        return writer.finish();
-      } catch (error) {
-        if (!(error instanceof MemeGifByteLimitError)) throw error;
       }
-      const result = await writeCompactFrames(width, height, delays, colors, readIndexes);
-      signal.throwIfAborted();
-      return result;
+      throw limitError;
     } finally {
       await file.close();
     }

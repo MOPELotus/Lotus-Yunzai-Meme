@@ -3,7 +3,7 @@ import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeFirstImage } from "./animated-input.ts";
 import { createFixedAvatarAnimation } from "./fixed-avatar-animation.ts";
-import { encodeMemeGif } from "./gif.ts";
+import { encodeMemeGif, encodeMemeGifStream, MemeGifByteLimitError } from "./gif.ts";
 import { screenProjection } from "./projective-transform.ts";
 import { previewImage, type Draw } from "./template-layout.ts";
 import { fixedPoseSpecs, type FixedPoseSpec, type Pose } from "./legacy-fixed-pose-specs.ts";
@@ -104,19 +104,29 @@ function template(spec: FixedPoseSpec): MemeTemplate {
       return loadImage(await context.imageAsset(`${spec.directory}/${spec.frames[index]!.source}.png`));
     }
 
-    async function* renderFrames() {
+    async function* renderFrames(frameWidth = width, frameHeight = height) {
+      const resized = frameWidth !== width || frameHeight !== height;
+      function renderFrame(draw: Draw) {
+        return renderRgba(frameWidth, frameHeight, resized ? ctx => {
+          ctx.scale(frameWidth / width, frameHeight / height);
+          draw(ctx);
+        } : draw);
+      }
       let previous: { rgba: Uint8Array; delayMs: number } | undefined;
       for (const [i, frame] of spec.frames.entries()) {
         signal.throwIfAborted();
         const artwork = i === 0 ? first : await readArt(i);
         if (artwork.width !== width || artwork.height !== height) throw new Error("表情原帧尺寸不一致。");
-        const { rgba: art } = await renderRgba(width, height, draw => draw.drawImage(artwork, 0, 0));
+        const { rgba: art } = await renderFrame(draw => draw.drawImage(artwork, 0, 0));
         let rgba: Uint8Array = art;
         if (spec.layer === "paper") {
-          rgba = (await renderRgba(width, height, opaqueWhite)).rgba;
+          rgba = (await renderRgba(frameWidth, frameHeight, opaqueWhite)).rgba;
+        } else if (spec.layer === "masked-top") {
+          rgba = new Uint8Array(art.length);
+          paste(rgba, art);
         }
         for (const pose of frame.poses) {
-          const { rgba: avatar } = await renderRgba(width, height, avatarDraw(prepared[pose.image]!, pose, !!spec.cover));
+          const { rgba: avatar } = await renderFrame(avatarDraw(prepared[pose.image]!, pose, !!spec.cover));
           if (spec.layer === "under" || spec.layer === "under-mask") {
             const combined = spec.layer === "under" ? avatar : new Uint8Array(avatar.length);
             if (spec.layer === "under-mask") paste(combined, avatar);
@@ -136,6 +146,19 @@ function template(spec: FixedPoseSpec): MemeTemplate {
       if (previous) yield previous;
     }
 
+    if (spec.streamPaletteLimits) {
+      let frameWidth = width, frameHeight = height;
+      while (true) {
+        try {
+          return await encodeMemeGifStream(frameWidth, frameHeight, spec.frames.length,
+            renderFrames(frameWidth, frameHeight), signal, { paletteLimits: spec.streamPaletteLimits });
+        } catch (error) {
+          if (!(error instanceof MemeGifByteLimitError) || frameWidth + frameHeight === 2) throw error;
+        }
+        frameWidth = Math.max(1, Math.floor(frameWidth * 0.9));
+        frameHeight = Math.max(1, Math.floor(frameHeight * 0.9));
+      }
+    }
     const frames = [];
     for await (const frame of renderFrames()) frames.push(frame);
     return encodeMemeGif(width, height, frames, signal);
