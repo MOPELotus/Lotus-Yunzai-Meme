@@ -15,4 +15,11 @@ export const anyliewRectangleOverlayAssets = [
   ["emoji/slam_table/images/0.png", "d594be5da794aabc97510473c21cd8df0c1823a1ba85d0e81e38f973a057780f"],
   ["emoji/yuzu_soft_ciallo/images/0.png", "1e02bf58befa3a63f7061ff5fccdef40edcbb5cf2176eb8a1c5ca21ba608e812"],
   ["emoji/yuzu_soft_ignore/images/0.png", "d623108bfcc5b0eb7461dbeacc8f9471afe3e5caed0753eaa4dc103672f529d4"],
+  ["emoji/baby/images/0.png", "7243c5e4dda7d05dc543f47a3251621292c3f61c2f92af008a9c72d5d875c493"],
+  ["emoji/drumstick/images/0.png", "c8b77ff133607c00272282a4b2223f8b9a14c7f7e56b62339856638c7282c07e"],
+  ["emoji/izumi_sagiri_painting/images/0.png", "3ebe2af245a877b2c632927b247a9ef7167443aa601ecaa7a94f64dbdd37785c"],
+  ["emoji/mygo_sakiko_togawa/images/0.png", "861363b015c69115ce092c1894cb44c3e0908fd03a9e83d9bbe00ecceb2c1367"],
+  ["emoji/pineapples/images/0.png", "bc13dfee6f51bed3a352251b28096b6b90b901d938ee751a2de9508849837a82"],
+  ["emoji/scissor_seven_head/images/0.png", "173450f3f9d23109d82c04a273184f7919c5eb13ea98f562c52b9ba1627dcaf4"],
+  ["emoji/yuzu_soft_murasame_ipad/images/0.png", "e7152c436d133d7fda66a76bf64897e399f24005cfc4a9251de02b572e145e3f"],
 ] as const;

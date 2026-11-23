@@ -9,6 +9,7 @@ interface OverlayOptions {
   readonly tags?: readonly string[];
   readonly shortcuts?: readonly MemeTemplateShortcut[];
   readonly radius?: number;
+  readonly rotation?: number;
 }
 
 type Overlay = readonly [
@@ -42,10 +43,28 @@ const overlays: readonly Overlay[] = [
     ],
   }],
   ["yuzu_soft_ignore", ["视若无睹"], [95, 42, 340, 204], yuzu],
+  ["baby", ["宝宝", "BB", "bb", "baby", "Baby"], [140, 480, 235, 235], { rotation: -8 }],
+  ["drumstick", ["🍗", "鸡腿"], [150, 450, 339, 286], { ...genshin, rotation: -10 }],
+  ["izumi_sagiri_painting", ["和泉纱雾画画"], [350, 1423, 1270, 730], { rotation: -10 }],
+  ["mygo_sakiko_togawa", ["丰川祥子", "祥子", "豊川祥子"], [105, 70, 150, 150], { rotation: -5 }],
+  ["pineapples", ["🍍", "菠萝头"], [240, 576, 320, 280], { ...genshin, rotation: -15 }],
+  ["scissor_seven_head", ["伍六七", "阿七"], [100, 120, 200, 200], { rotation: -4 }],
+  ["yuzu_soft_murasame_ipad", ["丛雨平板"], [280, 475, 520, 350], { ...yuzu, rotation: -3 }],
 ];
 
+// Image.rotate(expand=True) encloses the rotated corners in whole pixels,
+// then uses the center of that expanded box to place the rotated input.
+function expandedCenter(length: number, extent: number) {
+  return (Math.ceil((length + extent) / 2) - Math.floor((length - extent) / 2)) / 2;
+}
+
 export const rectangleOverlayTemplates: readonly MemeTemplate[] = overlays.map(
-  ([key, keywords, [left, top, avatarWidth, avatarHeight], { tags = [], shortcuts, radius } = {}]) => {
+  ([key, keywords, [left, top, avatarWidth, avatarHeight], { tags = [], shortcuts, radius, rotation = 0 } = {}]) => {
+    const radians = -rotation * Math.PI / 180;
+    const cos = Math.abs(Math.cos(radians)), sin = Math.abs(Math.sin(radians));
+    const pivotX = left + expandedCenter(avatarWidth, avatarWidth * cos + avatarHeight * sin);
+    const pivotY = top + expandedCenter(avatarHeight, avatarWidth * sin + avatarHeight * cos);
+
     async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
       if (input.images.length !== 1 || input.texts.length) throw new Error("表情需要一张图片。");
       const { signal } = context;
@@ -64,7 +83,13 @@ export const rectangleOverlayTemplates: readonly MemeTemplate[] = overlays.map(
       function layers(avatar: (typeof source.frames)[number]): readonly Draw[] {
         return [canvas => {
           canvas.imageSmoothingQuality = "high";
-          canvas.drawImage(avatar, left * scale, top * scale, avatarWidth * scale, avatarHeight * scale);
+          if (rotation) {
+            canvas.translate(pivotX * scale, pivotY * scale);
+            canvas.rotate(radians);
+            canvas.drawImage(avatar, -avatarWidth * scale / 2, -avatarHeight * scale / 2, avatarWidth * scale, avatarHeight * scale);
+          } else {
+            canvas.drawImage(avatar, left * scale, top * scale, avatarWidth * scale, avatarHeight * scale);
+          }
         }, outline];
       }
       if (source.frames.length === 1) {

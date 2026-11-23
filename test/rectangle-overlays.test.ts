@@ -24,6 +24,16 @@ const expected = [
   ["yuzu_soft_ignore", ["视若无睹"], [95, 42, 340, 204], [1280, 852]],
 ] as const;
 
+const rotations = [
+  ["baby", ["宝宝", "BB", "bb", "baby", "Baby"], [140, 480, 235, 235], [850, 1048], -8, [267, 267]],
+  ["drumstick", ["🍗", "鸡腿"], [150, 450, 339, 286], [1032, 1001], -10, [385, 342]],
+  ["izumi_sagiri_painting", ["和泉纱雾画画"], [350, 1423, 1270, 730], [2531, 2531], -10, [1378, 940]],
+  ["mygo_sakiko_togawa", ["丰川祥子", "祥子", "豊川祥子"], [105, 70, 150, 150], [300, 300], -5, [164, 164]],
+  ["pineapples", ["🍍", "菠萝头"], [240, 576, 320, 280], [1146, 1145], -15, [382, 354]],
+  ["scissor_seven_head", ["伍六七", "阿七"], [100, 120, 200, 200], [420, 420], -4, [214, 214]],
+  ["yuzu_soft_murasame_ipad", ["丛雨平板"], [280, 475, 520, 350], [1080, 1532], -3, [538, 378]],
+] as const;
+
 const red = [255, 0, 0, 255];
 const blue = [0, 0, 255, 255];
 const colored = [255, 255, 0, 255];
@@ -71,8 +81,9 @@ function sourceImage() {
 
 test("十五款原图叠层沿用旧关键词、矩形拉伸、前后顺序、RGBA 蒙版和原尺寸", async () => {
   const file = new File([Buffer.from(await sourceImage().png)], "portrait.png");
-  expect(rectangleOverlayTemplates.map(template => template.info.key)).toEqual(expected.map(([key]) => key));
-  expect(anyliewRectangleOverlayAssets.map(([path]) => path)).toEqual(expected.map(([key]) => `emoji/${key}/images/0.png` as const));
+  const allKeys = [...expected, ...rotations].map(([key]) => key);
+  expect(rectangleOverlayTemplates.map(template => template.info.key)).toEqual(allKeys);
+  expect(anyliewRectangleOverlayAssets.map(([path]) => path)).toEqual(allKeys.map(key => `emoji/${key}/images/0.png` as const));
   for (const [index, [key, keywords, [left, top, width, height], size]] of expected.entries()) {
     const template = rectangleOverlayTemplates[index]!;
     const centerX = left + Math.floor(width / 2), centerY = top + Math.floor(height / 2);
@@ -121,3 +132,27 @@ test("叠层保留透明 GIF 的帧数和平均间隔，Ciallo 保留双星快�
   expect(pixels(result.frames[1]!)(115, 146)).toEqual([255, 0, 255, 255]);
   expect(pixels(result.frames[1]!)(0, 0)).toEqual(clear);
 });
+
+test("七款斜置头像沿用旧扩边中点和旋转方向", async () => {
+  const avatar = new File([Buffer.from(await sourceImage().png)], "portrait.png");
+  for (const [key, keywords, [left, top, width, height], size, angle, expanded] of rotations) {
+    const template = rectangleOverlayTemplates.find(({ info }) => info.key === key)!;
+    const centerX = left + expanded[0] / 2, centerY = top + expanded[1] / 2;
+    const source = contextFixture(key, size[0], size[1], Math.floor(centerX), Math.floor(centerY));
+    const bytes = await template.render({ images: [avatar], texts: [], args: {} }, source.context);
+    const image = await loadImage(Buffer.from(bytes));
+    expect(template.info.keywords).toEqual([...keywords]);
+    expect([image.width, image.height]).toEqual([...size]);
+    const pixel = pixels(image);
+    const radians = -angle * Math.PI / 180;
+    const point = (x: number, y: number) => pixel(
+      Math.floor(centerX + x * Math.cos(radians) - y * Math.sin(radians)),
+      Math.floor(centerY + x * Math.sin(radians) + y * Math.cos(radians)),
+    );
+    expect(point(-width / 2 + 4, -height / 2 + 4)).toEqual(red);
+    expect(point(width / 2 - 4, height / 2 - 4)).toEqual(blue);
+    expect(pixel(Math.floor(centerX), Math.floor(centerY))).toEqual(green);
+    expect(pixel(left + 1, top + 1)).toEqual(clear);
+    expect(source.count()).toBe(1);
+  }
+}, 45_000);
