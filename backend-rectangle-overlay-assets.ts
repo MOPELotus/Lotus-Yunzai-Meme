@@ -22,4 +22,9 @@ export const anyliewRectangleOverlayAssets = [
   ["emoji/pineapples/images/0.png", "bc13dfee6f51bed3a352251b28096b6b90b901d938ee751a2de9508849837a82"],
   ["emoji/scissor_seven_head/images/0.png", "173450f3f9d23109d82c04a273184f7919c5eb13ea98f562c52b9ba1627dcaf4"],
   ["emoji/yuzu_soft_murasame_ipad/images/0.png", "e7152c436d133d7fda66a76bf64897e399f24005cfc4a9251de02b572e145e3f"],
+  ["emoji/anyliew_struggling/images/0.png", "bc4056eb6ca0001ad340ecc22539fffb17fbf37c2afea5a58ced061b0a4d1761"],
+  ["emoji/durian/images/0.png", "e927f88855df7a3f77a503f983c6d257e2bd9a1a1b98e48a47571552d8b764f6"],
+  ["emoji/jd_takeout/images/0.png", "97c61af45eabfff41bab8a945952c55d96796f59a4fa8f7b5b9b8a151883be3e"],
+  ["emoji/mihoyo_columbina_jade_feet/images/0.png", "8e268a6dc675860704ce1ce64ca4bd52fd13a100018b4893b23b691001382141"],
+  ["emoji/ikun_basketball/images/0.png", "e3a7d3ffe537c5e0d2d422bbe6064de60dea546aeaef3c98471a23ae0ae793ba"],
 ] as const;

@@ -34,6 +34,14 @@ const rotations = [
   ["yuzu_soft_murasame_ipad", ["丛雨平板"], [280, 475, 520, 350], [1080, 1532], -3, [538, 378]],
 ] as const;
 
+const circularRotations = [
+  ["anyliew_struggling", ["挣扎"], [275, 28, 300, 300], [1144, 1514], 25, [400, 400], 0],
+  ["durian", ["榴莲"], [200, 425, 475, 475], [1080, 1156], -10, [551, 551], 1],
+  ["jd_takeout", ["京东外卖"], [625, 5, 230, 230], [1284, 996], 10, [268, 268], 0],
+  ["mihoyo_columbina_jade_feet", ["玉足"], [373, 255, 125, 125], [1228, 688], -35, [175, 175], 0],
+  ["ikun_basketball", ["篮球", "🏀"], [322, 129, 250, 250], [896, 1152], 10, [290, 290], 0],
+] as const;
+
 const red = [255, 0, 0, 255];
 const blue = [0, 0, 255, 255];
 const colored = [255, 255, 0, 255];
@@ -81,7 +89,7 @@ function sourceImage() {
 
 test("十五款原图叠层沿用旧关键词、矩形拉伸、前后顺序、RGBA 蒙版和原尺寸", async () => {
   const file = new File([Buffer.from(await sourceImage().png)], "portrait.png");
-  const allKeys = [...expected, ...rotations].map(([key]) => key);
+  const allKeys = [...expected, ...rotations, ...circularRotations].map(([key]) => key);
   expect(rectangleOverlayTemplates.map(template => template.info.key)).toEqual(allKeys);
   expect(anyliewRectangleOverlayAssets.map(([path]) => path)).toEqual(allKeys.map(key => `emoji/${key}/images/0.png` as const));
   for (const [index, [key, keywords, [left, top, width, height], size]] of expected.entries()) {
@@ -154,5 +162,40 @@ test("七款斜置头像沿用旧扩边中点和旋转方向", async () => {
     expect(pixel(Math.floor(centerX), Math.floor(centerY))).toEqual(green);
     expect(pixel(left + 1, top + 1)).toEqual(clear);
     expect(source.count()).toBe(1);
+  }
+}, 45_000);
+
+test("五款圆裁斜置叠图保留中心正圆、方向和旧文字参数", async () => {
+  const sourceImage = new Canvas(60, 20);
+  const draw = sourceImage.getContext("2d");
+  draw.fillStyle = "#0000ff";
+  draw.fillRect(0, 0, 60, 20);
+  draw.fillStyle = "#ff0000";
+  draw.fillRect(20, 0, 10, 20);
+  draw.fillStyle = "#ffff00";
+  draw.fillRect(30, 0, 10, 20);
+  const avatar = new File([Buffer.from(await sourceImage.png)], "portrait.png");
+  for (const [key, keywords, [left, top, width, height], size, angle, expanded, maxTexts] of circularRotations) {
+    const template = rectangleOverlayTemplates.find(({ info }) => info.key === key)!;
+    const centerX = left + expanded[0] / 2, centerY = top + expanded[1] / 2;
+    const { context } = contextFixture(key, size[0], size[1], Math.floor(centerX), Math.floor(centerY));
+    const input = { images: [avatar], texts: [], args: {} };
+    const bytes = await template.render(input, context);
+    const image = await loadImage(Buffer.from(bytes));
+    expect(template.info.keywords).toEqual([...keywords]);
+    expect(template.info.params_type.max_texts).toBe(maxTexts);
+    expect([image.width, image.height]).toEqual([...size]);
+    const pixel = pixels(image);
+    const radians = -angle * Math.PI / 180;
+    const point = (x: number, y: number) => pixel(
+      Math.floor(centerX + x * Math.cos(radians) - y * Math.sin(radians)),
+      Math.floor(centerY + x * Math.sin(radians) + y * Math.cos(radians)),
+    );
+    expect(point(-width * 0.32, 0)).toEqual(red);
+    expect(point(width * 0.32, 0)).toEqual(colored);
+    expect(point(width * 0.12, Math.sign(radians) * height * 0.34)).toEqual(colored);
+    expect(point(width * 0.4, height * 0.4)).toEqual(clear);
+    expect(pixel(Math.floor(centerX), Math.floor(centerY))).toEqual(green);
+    if (maxTexts) expect(await template.render({ ...input, texts: ["旧昵称"] }, context)).toEqual(bytes);
   }
 }, 45_000);

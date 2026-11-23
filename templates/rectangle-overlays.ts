@@ -10,6 +10,8 @@ interface OverlayOptions {
   readonly shortcuts?: readonly MemeTemplateShortcut[];
   readonly radius?: number;
   readonly rotation?: number;
+  readonly circle?: boolean;
+  readonly maxTexts?: 1;
 }
 
 type Overlay = readonly [
@@ -50,6 +52,11 @@ const overlays: readonly Overlay[] = [
   ["pineapples", ["🍍", "菠萝头"], [240, 576, 320, 280], { ...genshin, rotation: -15 }],
   ["scissor_seven_head", ["伍六七", "阿七"], [100, 120, 200, 200], { rotation: -4 }],
   ["yuzu_soft_murasame_ipad", ["丛雨平板"], [280, 475, 520, 350], { ...yuzu, rotation: -3 }],
+  ["anyliew_struggling", ["挣扎"], [275, 28, 300, 300], { rotation: 25, circle: true }],
+  ["durian", ["榴莲"], [200, 425, 475, 475], { rotation: -10, circle: true, maxTexts: 1 }],
+  ["jd_takeout", ["京东外卖"], [625, 5, 230, 230], { rotation: 10, circle: true }],
+  ["mihoyo_columbina_jade_feet", ["玉足"], [373, 255, 125, 125], { ...genshin, rotation: -35, circle: true }],
+  ["ikun_basketball", ["篮球", "🏀"], [322, 129, 250, 250], { rotation: 10, circle: true }],
 ];
 
 // Image.rotate(expand=True) encloses the rotated corners in whole pixels,
@@ -59,14 +66,17 @@ function expandedCenter(length: number, extent: number) {
 }
 
 export const rectangleOverlayTemplates: readonly MemeTemplate[] = overlays.map(
-  ([key, keywords, [left, top, avatarWidth, avatarHeight], { tags = [], shortcuts, radius, rotation = 0 } = {}]) => {
+  ([key, keywords, [left, top, avatarWidth, avatarHeight],
+    { tags = [], shortcuts, radius, rotation = 0, circle = false, maxTexts = 0 } = {}]) => {
     const radians = -rotation * Math.PI / 180;
     const cos = Math.abs(Math.cos(radians)), sin = Math.abs(Math.sin(radians));
     const pivotX = left + expandedCenter(avatarWidth, avatarWidth * cos + avatarHeight * sin);
     const pivotY = top + expandedCenter(avatarHeight, avatarWidth * sin + avatarHeight * cos);
+    const drawX = rotation ? -avatarWidth / 2 : left;
+    const drawY = rotation ? -avatarHeight / 2 : top;
 
     async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
-      if (input.images.length !== 1 || input.texts.length) throw new Error("表情需要一张图片。");
+      if (input.images.length !== 1 || input.texts.length > maxTexts) throw new Error("表情的图片或文字数量不符。");
       const { signal } = context;
       signal.throwIfAborted();
       const [source, frame] = await Promise.all([
@@ -83,12 +93,20 @@ export const rectangleOverlayTemplates: readonly MemeTemplate[] = overlays.map(
       function layers(avatar: (typeof source.frames)[number]): readonly Draw[] {
         return [canvas => {
           canvas.imageSmoothingQuality = "high";
+          canvas.scale(scale, scale);
           if (rotation) {
-            canvas.translate(pivotX * scale, pivotY * scale);
+            canvas.translate(pivotX, pivotY);
             canvas.rotate(radians);
-            canvas.drawImage(avatar, -avatarWidth * scale / 2, -avatarHeight * scale / 2, avatarWidth * scale, avatarHeight * scale);
+          }
+          if (circle) {
+            const side = Math.min(avatar.width, avatar.height);
+            const sourceX = Math.floor((avatar.width - side) / 2), sourceY = Math.floor((avatar.height - side) / 2);
+            canvas.beginPath();
+            canvas.ellipse(drawX + avatarWidth / 2, drawY + avatarHeight / 2, avatarWidth / 2, avatarHeight / 2, 0, 0, Math.PI * 2);
+            canvas.clip();
+            canvas.drawImage(avatar, sourceX, sourceY, side, side, drawX, drawY, avatarWidth, avatarHeight);
           } else {
-            canvas.drawImage(avatar, left * scale, top * scale, avatarWidth * scale, avatarHeight * scale);
+            canvas.drawImage(avatar, drawX, drawY, avatarWidth, avatarHeight);
           }
         }, outline];
       }
@@ -104,7 +122,7 @@ export const rectangleOverlayTemplates: readonly MemeTemplate[] = overlays.map(
       return encodeMemeGif(width, height, rendered, signal);
     }
     return {
-      info: { key, keywords, tags, ...(shortcuts && { shortcuts }), params_type: params },
+      info: { key, keywords, tags, ...(shortcuts && { shortcuts }), params_type: { ...params, max_texts: maxTexts } },
       render,
       async preview(context: MemeTemplateContext) {
         return render({ images: [await previewImage(context.signal)], texts: [], args: {} }, context);
