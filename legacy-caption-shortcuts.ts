@@ -1,3 +1,5 @@
+import { pjskCharacters } from "./pjsk-characters.ts";
+
 // Fixed from the original Python CommandShortcut registrations.
 // Group order is also the argument order, including the legacy low/high inversion for high_EQ.
 export interface NativeShortcutPattern {
@@ -5,6 +7,7 @@ export interface NativeShortcutPattern {
   readonly source: string;
   readonly pattern: RegExp;
   readonly captions?: readonly string[];
+  readonly args?: readonly string[];
   readonly option?: { readonly name: string; readonly capture: string; readonly suffix: string };
   readonly humanized?: string;
 }
@@ -25,7 +28,16 @@ export function matchFixedShortcut(definition: NativeShortcutPattern, candidate:
   };
 }
 
-const patterns = [
+const pjskPatterns = pjskCharacters.map(([name, english], index) => {
+  const source = `(:?pjsk|世界计划)[_-]?(:?${name}|${english})`;
+  return {
+    template: "pjsk", source, pattern: new RegExp(`^${source}`, "iu"),
+    captions: [], args: ["--character", String(index + 1)], humanized: `pjsk${name}`,
+  };
+});
+
+const patterns: readonly NativeShortcutPattern[] = [
+  ...pjskPatterns,
   {
     template: "oshi_no_ko", source: "我推的(?P<name>\\S+)",
     pattern: /^我推的(?<name>\S+)(?=\s|$)/u, captions: ["name"], humanized: "我推的xx",
@@ -60,12 +72,12 @@ const patterns = [
     template: "wakeup", source: "(?P<text>\\S{1,4})\\s+起来了",
     pattern: /^(?<text>\S{1,4})\s+起来了(?=\s|$)/u, captions: ["text"], humanized: "xx 起来了",
   },
-] as const satisfies readonly NativeShortcutPattern[];
+];
 
 export const legacyCaptionShortcutPatterns: readonly NativeShortcutPattern[] = patterns;
 
 export function legacyCaptionShortcuts(template: string) {
-  return patterns.filter(entry => entry.template === template).map(({ source, captions, humanized }) => ({
-    key: source, args: captions.map(name => "{" + name + "}"), humanized,
+  return patterns.filter(entry => entry.template === template).map(({ source, captions, args, humanized }) => ({
+    key: source, args: args ?? captions?.map(name => "{" + name + "}"), humanized,
   }));
 }

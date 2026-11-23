@@ -1,3 +1,4 @@
+import { pjskAssets } from "./backend-pjsk-assets.ts";
 import { legacyWordmarkAssets } from "./backend-legacy-wordmark-assets.ts";
 import { legacyChatCardAssets } from "./backend-legacy-chat-card-assets.ts";
 import { legacyPhotoSceneAssets } from "./backend-legacy-photo-scene-assets.ts";
@@ -107,6 +108,7 @@ const anyliewAssets = [
 ];
 
 export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map<string, ExtraMemeAsset>([
+  ...pjskAssets,
   ...legacyFixedPoseAssets,
   ...anyliewAssets.map(([path, digest]) => [`images/anyliew/${path}`, { path, digest, sources: anyliewBase }] as const),
   anyliewDeerHelpAsset,

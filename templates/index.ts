@@ -1,3 +1,4 @@
+import { pjskTemplate } from "./pjsk.ts";
 import { legacyWordmarkTemplates } from "./legacy-wordmarks.ts";
 import { legacyChatCardTemplates } from "./legacy-chat-cards.ts";
 import { pythonPhotoBehindTemplates } from "./python-photo-behind.ts";
@@ -121,6 +122,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...anyliewWordCardTemplates,
   ...legacySceneMemeTemplates,
   ...legacyTextOverlayTemplates,
+  pjskTemplate,
   ...legacyCaptionShortcutTemplates,
   ...legacyCaptionSceneTemplates,
   ...legacyBadgeTemplates,
