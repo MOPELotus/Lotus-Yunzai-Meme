@@ -11,6 +11,7 @@ import { pythonOverlayAssets } from "./backend-python-overlay-assets.ts";
 import { jumpSoldAssets } from "./backend-jump-sold-assets.ts";
 import { anyliewRectangleOverlayAssets } from "./backend-rectangle-overlay-assets.ts";
 import { anyliewShortAnimationAssets } from "./backend-short-animation-assets.ts";
+import { anyliewTwoLayerAnimationAssets } from "./backend-two-layer-animation-assets.ts";
 import { tudouShortAnimationAssets } from "./backend-tudou-short-animation-assets.ts";
 
 // Only assets used by registered templates are individually pinned.
@@ -80,6 +81,7 @@ const anyliewAssets = [
   ...anyliewStaticAvatarAssets,
   ...anyliewTailAssets,
   ...anyliewShortAnimationAssets,
+  ...anyliewTwoLayerAnimationAssets,
   ...anyliewSignAssets,
   ...anyliewTextDialogueAssets,
 ];

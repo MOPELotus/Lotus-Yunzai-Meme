@@ -15,6 +15,7 @@ import { fixedAvatarAnimations } from "./fixed-avatar-animation.ts";
 import { flush } from "./flush.ts";
 import { jumpSoldMemeTemplates } from "./jump-sold.ts";
 import { shortAvatarAnimations } from "./short-avatar-animation.ts";
+import { twoLayerAvatarAnimations } from "./two-layer-avatar-animation.ts";
 import { tudouShortAnimations } from "./tudou-short-animation.ts";
 import { hug, kiss } from "./kiss-hug.ts";
 import { legacyBadgeTemplates } from "./legacy-badges.ts";
@@ -74,6 +75,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   flush,
   ...jumpSoldMemeTemplates,
   ...shortAvatarAnimations,
+  ...twoLayerAvatarAnimations,
   ...tudouShortAnimations,
   ...textSpeechMemeTemplates,
   ...pythonOverlayMemeTemplates,
