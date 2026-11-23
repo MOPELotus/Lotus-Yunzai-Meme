@@ -5,11 +5,11 @@ import { anyliewAvatarSceneTemplates } from "../templates/anyliew-avatar-scenes.
 
 const expected = [
   ["all_the_days", ["一生一世"], 2, 0],
-  ["begged_me", ["求我"], 1, 0],
-  ["chillet_deer", ["疾风鹿"], 1, 0],
+  ["begged_me", ["求我"], 1, 1],
+  ["chillet_deer", ["疾风鹿"], 1, 1],
   ["cleverer", ["比聪明"], 1, 1],
-  ["commemorate", ["奠", "寄"], 1, 0],
-  ["dinosaur_head", ["恐龙头"], 1, 0],
+  ["commemorate", ["奠", "寄"], 1, 1],
+  ["dinosaur_head", ["恐龙头"], 1, 1],
   ["dog_girl", ["狗妹"], 1, 0],
   ["double_happiness", ["双喜"], 2, 0],
   ["ending", ["下场"], 2, 0],

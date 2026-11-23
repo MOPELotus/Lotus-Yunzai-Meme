@@ -20,6 +20,7 @@ interface Scene {
   readonly slots: readonly Slot[];
   readonly jpeg?: "above" | "below";
   readonly caption?: true;
+  readonly maxTexts?: 1;
 }
 
 const scenes: readonly Scene[] = [
@@ -27,11 +28,11 @@ const scenes: readonly Scene[] = [
     { image: 1, box: [255, 255, 95, 95], fit: "circle" },
     { image: 0, box: [425, 210, 95, 95], fit: "circle" },
   ] },
-  { key: "begged_me", keywords: ["求我"], slots: [{ image: 0, box: [125, 655, 1720, 1720], fit: "circle", rotation: -15 }] },
-  { key: "chillet_deer", keywords: ["疾风鹿"], slots: [{ image: 0, box: [202, 289, 549, 463] }] },
+  { key: "begged_me", keywords: ["求我"], maxTexts: 1, slots: [{ image: 0, box: [125, 655, 1720, 1720], fit: "circle", rotation: -15 }] },
+  { key: "chillet_deer", keywords: ["疾风鹿"], maxTexts: 1, slots: [{ image: 0, box: [202, 289, 549, 463] }] },
   { key: "cleverer", keywords: ["比聪明"], caption: true, slots: [{ image: 0, box: [-60, 99, 680, 680], fit: "cover" }] },
-  { key: "commemorate", keywords: ["奠", "寄"], slots: [{ image: 0, box: [129, 218, 815, 747], fit: "cover", gray: true }] },
-  { key: "dinosaur_head", keywords: ["恐龙头"], slots: [{ image: 0, box: [215, 245, 620, 620] }] },
+  { key: "commemorate", keywords: ["奠", "寄"], maxTexts: 1, slots: [{ image: 0, box: [129, 218, 815, 747], fit: "cover", gray: true }] },
+  { key: "dinosaur_head", keywords: ["恐龙头"], maxTexts: 1, slots: [{ image: 0, box: [215, 245, 620, 620] }] },
   { key: "dog_girl", keywords: ["狗妹"], jpeg: "below", slots: [{ image: 0, box: [312, 115, 180, 180], fit: "square" }] },
   { key: "double_happiness", keywords: ["双喜"], jpeg: "above", slots: [
     { image: 1, box: [1206, 138, 522, 522], fit: "circle" },
@@ -102,8 +103,9 @@ async function grayscaleSlot(slot: Slot, image: Image, signal: AbortSignal): Pro
 }
 
 function sceneTemplate(scene: Scene): MemeTemplate {
+  const maxTexts = scene.maxTexts ?? Number(!!scene.caption);
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
-    if (input.images.length !== scene.slots.length || input.texts.length > Number(!!scene.caption)) {
+    if (input.images.length !== scene.slots.length || input.texts.length > maxTexts) {
       throw new Error("表情的图片或文字数量不符。");
     }
     const { signal } = context;
@@ -171,7 +173,7 @@ function sceneTemplate(scene: Scene): MemeTemplate {
     info: {
       key: scene.key, keywords: scene.keywords,
       params_type: { min_images: scene.slots.length, max_images: scene.slots.length, min_texts: 0,
-        max_texts: Number(!!scene.caption), default_texts: [], args_type: null },
+        max_texts: maxTexts, default_texts: [], args_type: null },
     },
     render,
     async preview(context) {

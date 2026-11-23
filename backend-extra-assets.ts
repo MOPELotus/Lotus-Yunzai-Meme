@@ -114,6 +114,11 @@ export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map<stri
   ...pjskAssets,
   ...legacyFixedPoseAssets,
   ...anyliewAssets.map(([path, digest]) => [`images/anyliew/${path}`, { path, digest, sources: anyliewBase }] as const),
+  ["images/anyliew/emoji/new_goodnews/images/legacy-0.png", {
+    path: "emoji/new_goodnews/images/0.png",
+    digest: "5897e18617d7af9544094ccf7c25f9e491ec92a9065c9e2fc82de84a27ef3ef9",
+    sources: ["https://raw.githubusercontent.com/anyliew/meme_emoji/d2375879fb03731ba59c79f9708f51f3c14b44d2/"],
+  }],
   anyliewDeerHelpAsset,
   originalAdmissionLetterAsset,
   ...pixelEffectAssets,

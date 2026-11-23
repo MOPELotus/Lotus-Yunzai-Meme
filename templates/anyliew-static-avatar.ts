@@ -17,7 +17,7 @@ interface Placement {
 }
 
 interface SceneCaption extends AnyLiewCaptionStyle {
-  readonly text: (input: MemeTemplateInput) => string;
+  readonly text: (input: MemeTemplateInput) => string | undefined;
   readonly box: CaptionBox;
   readonly rotation?: { readonly x: number; readonly y: number; readonly degrees: number };
 }
@@ -34,6 +34,15 @@ export interface AnyLiewAvatarScene {
   readonly tags?: readonly string[];
   readonly captions?: readonly SceneCaption[];
   readonly defaultTexts?: readonly string[];
+  readonly minTexts?: number;
+  readonly maxTexts?: number;
+  readonly legacy?: {
+    readonly use: (input: MemeTemplateInput) => boolean;
+    readonly artwork: string;
+    readonly layers: readonly Placement[];
+    readonly captions: readonly SceneCaption[];
+    readonly jpegOutput?: true;
+  };
   readonly argsType?: unknown;
 }
 
@@ -80,40 +89,40 @@ const scenes: readonly AnyLiewAvatarScene[] = [
     { image: 1, box: [722, 752, 175, 175] },
     { image: 0, box: [63, 278, 380, 410] },
   ] },
-  { key: "ice_tea_head", keywords: ["冰红茶"], count: 1, animatedInput: true, above: true, layers: [
+  { key: "ice_tea_head", keywords: ["冰红茶"], maxTexts: 1, count: 1, animatedInput: true, above: true, layers: [
     { image: 0, box: [320, 35, 500, 500], circle: true },
   ] },
-  { key: "mahiro_fuck", keywords: ["真寻中指", "中指", "🖕🏻"], count: 1, animatedInput: true, above: true, layers: [
+  { key: "mahiro_fuck", keywords: ["真寻中指", "中指", "🖕🏻"], maxTexts: 1, count: 1, animatedInput: true, above: true, layers: [
     { image: 0, box: [430, 40, 180, 180], circle: true },
   ] },
-  { key: "mi_monkey", keywords: ["米猴", "🐒", "🐵"], count: 1, animatedInput: true, above: true, layers: [
+  { key: "mi_monkey", keywords: ["米猴", "🐒", "🐵"], maxTexts: 1, count: 1, animatedInput: true, above: true, layers: [
     { image: 0, box: [500, 100, 180, 180], circle: true },
   ] },
-  { key: "mihoyo_funina_death_penalty", keywords: ["死刑"], count: 1, animatedInput: true, above: true, tags: genshin, layers: [
+  { key: "mihoyo_funina_death_penalty", keywords: ["死刑"], maxTexts: 1, count: 1, animatedInput: true, above: true, tags: genshin, layers: [
     { image: 0, box: [950, 380, 280, 280], circle: true },
   ] },
-  { key: "mihoyo_funina_finger", keywords: ["芙芙指", "芙宁娜指", "芙芙酱指"], count: 1, animatedInput: true, above: true, tags: genshin, layers: [
+  { key: "mihoyo_funina_finger", keywords: ["芙芙指", "芙宁娜指", "芙芙酱指"], maxTexts: 1, count: 1, animatedInput: true, above: true, tags: genshin, layers: [
     { image: 0, box: [1400, 650, 500, 500], circle: true },
   ] },
-  { key: "mihoyo_genshin_impact_op", keywords: ["OP", "op", "Op", "oP"], count: 1, animatedInput: true, above: true, tags: genshin, layers: [
+  { key: "mihoyo_genshin_impact_op", keywords: ["OP", "op", "Op", "oP"], maxTexts: 1, count: 1, animatedInput: true, above: true, tags: genshin, layers: [
     { image: 0, box: [500, 100, 180, 180], circle: true },
   ] },
   { key: "mihoyo_genshin_impact_players", keywords: ["原批", "原神玩家"], count: 1, animatedInput: true, above: true, tags: genshin, layers: [
     { image: 0, box: [385, 120, 220, 220], circle: true },
   ] },
-  { key: "miss_in_my_sleep", keywords: ["睡梦中想念"], count: 1, animatedInput: true, above: true, layers: [
+  { key: "miss_in_my_sleep", keywords: ["睡梦中想念"], maxTexts: 1, count: 1, animatedInput: true, above: true, layers: [
     { image: 0, box: [125, 45, 250, 250], circle: true },
   ] },
-  { key: "ikun_durian_head", keywords: ["榴莲坤头"], count: 1, animatedInput: true, layers: [
+  { key: "ikun_durian_head", keywords: ["榴莲坤头"], maxTexts: 1, count: 1, animatedInput: true, layers: [
     { image: 0, box: [62, 93, 180, 180] },
   ] },
-  { key: "mihoyo_funina_square_head", keywords: ["芙芙方形头像", "芙宁娜方形头像"], count: 1, animatedInput: true, tags: genshin, layers: [
+  { key: "mihoyo_funina_square_head", keywords: ["芙芙方形头像", "芙宁娜方形头像"], maxTexts: 1, count: 1, animatedInput: true, tags: genshin, layers: [
     { image: 0, box: [60, 48, 1010, 1010] },
   ] },
-  { key: "naruro_s_ninja", keywords: ["S忍", "s忍"], count: 1, animatedInput: true, layers: [
+  { key: "naruro_s_ninja", keywords: ["S忍", "s忍"], maxTexts: 1, count: 1, animatedInput: true, layers: [
     { image: 0, box: [1, 1, 1000, 1000] },
   ] },
-  { key: "pig_surrounded", keywords: ["被猪包围"], count: 1, animatedInput: true, layers: [
+  { key: "pig_surrounded", keywords: ["被猪包围"], maxTexts: 1, count: 1, animatedInput: true, layers: [
     { image: 0, box: [242, 458, 596, 596] },
   ] },
 ];
@@ -148,18 +157,23 @@ function pixels(rgba: Uint8Array, width: number, height: number): Draw {
 }
 
 function template(scene: AnyLiewAvatarScene): MemeTemplate {
-  const minTexts = scene.defaultTexts?.length ?? 0;
-  const maxTexts = scene.captions ? 1 : 0;
+  const minTexts = scene.minTexts ?? scene.defaultTexts?.length ?? 0;
+  const maxTexts = scene.maxTexts ?? Number(!!scene.captions);
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
     if (input.images.length !== scene.count || input.texts.length < minTexts || input.texts.length > maxTexts) {
       throw new Error("表情的图片或文字数量不符。");
     }
     const { signal } = context;
+    const legacy = scene.legacy?.use(input) ? scene.legacy : undefined;
+    const layout = legacy ?? scene;
+    const filename = legacy?.artwork ?? (scene.jpegFrame ? "0.jpg" : "0.png");
     const [art, captions] = await Promise.all([
-      context.imageAsset(`anyliew/emoji/${scene.key}/images/0.${scene.jpegFrame ? "jpg" : "png"}`).then(loadImage),
-      Promise.all((scene.captions ?? []).map(async caption => {
-        const family = await anyLiewCaptionFonts(context, caption.font);
+      context.imageAsset(`anyliew/emoji/${scene.key}/images/${filename}`).then(loadImage),
+      Promise.all((layout.captions ?? []).flatMap(caption => {
         const text = caption.text(input);
+        return text === undefined ? [] : [{ caption, text }];
+      }).map(async ({ caption, text }) => {
+        const family = await anyLiewCaptionFonts(context, caption.font);
         const paint: Draw = draw => {
           const { rotation, box } = caption;
           if (rotation) {
@@ -185,7 +199,7 @@ function template(scene: AnyLiewAvatarScene): MemeTemplate {
       const background = rotatedCaptions.length
         ? pixels(await renderMaskedRgba(w, h, artwork, rotatedCaptions, signal), w, h)
         : artwork;
-      const placements = scene.layers.map(layer => scale(drawPlacement(layer, images[layer.image]!)));
+      const placements = layout.layers.map(layer => scale(drawPlacement(layer, images[layer.image]!)));
       if (scene.above) return renderMaskedRgba(w, h, background, placements, signal, { whiteBackground });
       let foreground = background;
       let result!: Uint8Array;
@@ -202,8 +216,8 @@ function template(scene: AnyLiewAvatarScene): MemeTemplate {
     }
     const sequence = await readMemeImageSequence(input.images[0]!, signal);
     if (sequence.frames.length === 1) {
-      const draw = pixels(await raster(sequence.frames, width, height, scene.jpegOutput), width, height);
-      return scene.jpegOutput ? jpg(art.width, art.height, draw, signal) : (await renderExactPng(width, height, draw)).png;
+      const draw = pixels(await raster(sequence.frames, width, height, layout.jpegOutput), width, height);
+      return layout.jpegOutput ? jpg(art.width, art.height, draw, signal) : (await renderExactPng(width, height, draw)).png;
     }
     return renderPythonGif({
       width, height, signal,

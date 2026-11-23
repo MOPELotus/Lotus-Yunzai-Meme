@@ -3,6 +3,11 @@ import type { AnyLiewAvatarScene } from "./anyliew-static-avatar.ts";
 
 const genshin = ["米哈游", "原神"] as const;
 const nameHelp = "昵称（第一段文字）";
+const defaultNewsBody = "喜报传佳讯\n福星高照\n满门庭";
+
+function namedNewsTitle(input: MemeTemplateInput) {
+  return typeof input.args.name === "string" && input.args.name ? input.args.name : undefined;
+}
 const pixelCaption = { font: "slender", lineHeight: 1 } as const;
 
 function userInfo(input: MemeTemplateInput) {
@@ -32,16 +37,16 @@ export const anyliewAvatarCaptionScenes: readonly AnyLiewAvatarScene[] = [
     ],
   },
   {
-    key: "ikun_why_are_you", keywords: ["你干嘛", "你干吗"], count: 1,
+    key: "ikun_why_are_you", keywords: ["你干嘛", "你干吗"], maxTexts: 1, count: 1,
     above: true, jpegFrame: true, jpegOutput: true, animatedInput: true,
     layers: [{ image: 0, box: [275, 75, 120, 120], circle: true, angle: -10 }],
   },
   {
-    key: "tencent_np", keywords: ["农P", "农批"], count: 1, above: true, jpegOutput: true, animatedInput: true,
+    key: "tencent_np", keywords: ["农P", "农批"], maxTexts: 1, count: 1, above: true, jpegOutput: true, animatedInput: true,
     layers: [{ image: 0, box: [1101, 211, 363, 363], circle: true }],
   },
   {
-    key: "mihoyo_player", keywords: ["二游玩家"], count: 1, tags: ["米哈游"],
+    key: "mihoyo_player", keywords: ["二游玩家"], maxTexts: 1, count: 1, tags: ["米哈游"],
     layers: [{ image: 0, box: [1073, 628, 312, 312], circle: true }],
   },
   {
@@ -107,18 +112,34 @@ export const anyliewAvatarCaptionScenes: readonly AnyLiewAvatarScene[] = [
   {
     key: "new_goodnews", keywords: ["新喜报"], count: 1, animatedInput: true,
     layers: [{ image: 0, box: [319, 408, 445, 445] }],
-    defaultTexts: ["喜报传佳讯\n福星高照\n满门庭"],
+    minTexts: 0, maxTexts: 2, defaultTexts: ["天命之人", defaultNewsBody],
+    legacy: {
+      use: input => namedNewsTitle(input) === undefined,
+      artwork: "legacy-0.png",
+      jpegOutput: true,
+      layers: [{ image: 0, box: [210, 270, 300, 300], circle: true }],
+      captions: [
+        {
+          text: input => input.texts[0] ?? "她",
+          box: [235, 615, 478, 659], sizes: [10, 100], color: "#ffdf00", ...pixelCaption,
+        },
+        {
+          text: input => input.texts[1],
+          box: [199, 708, 512, 923], sizes: [10, 60], color: "#ffd700", wrap: true, ...pixelCaption,
+        },
+      ],
+    },
     argsType: {
       args_model: { properties: { name: { type: "string", default: "", description: nameHelp } } },
       parser_options: [{ names: ["-n", "--name"], args: [{ name: "name", value: "str" }], help_text: nameHelp }],
     },
     captions: [
       {
-        text: input => (typeof input.args.name === "string" && input.args.name) || (userInfo(input)?.name ?? "天命之人"),
+        text: input => namedNewsTitle(input),
         box: [363, 910, 719, 985], sizes: [10, 100], color: "#1c1c1c", font: "child", lineHeight: 1.14,
       },
       {
-        text: input => input.texts[0]!,
+        text: input => input.texts[0] ?? defaultNewsBody,
         box: [297, 1055, 775, 1379], sizes: [10, 60], color: "#f9faa1", wrap: true, ...pixelCaption,
       },
     ],
