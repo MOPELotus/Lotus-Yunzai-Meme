@@ -20,6 +20,7 @@ import { fixedAvatarAnimations } from "./fixed-avatar-animation.ts";
 import { flush } from "./flush.ts";
 import { jumpSoldMemeTemplates } from "./jump-sold.ts";
 import { shortAvatarAnimations } from "./short-avatar-animation.ts";
+import { localCanvasAnimations } from "./local-canvas-animation.ts";
 import { twoLayerAvatarAnimations } from "./two-layer-avatar-animation.ts";
 import { tudouShortAnimations } from "./tudou-short-animation.ts";
 import { tudouPortraitAnimations } from "./tudou-portrait-animations.ts";
@@ -91,6 +92,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   flush,
   ...jumpSoldMemeTemplates,
   ...shortAvatarAnimations,
+  ...localCanvasAnimations,
   ...twoLayerAvatarAnimations,
   ...tudouShortAnimations,
   ...tudouPortraitAnimations,

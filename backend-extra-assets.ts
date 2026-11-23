@@ -15,6 +15,7 @@ import { legacyTextOverlayAssets } from "./backend-legacy-text-overlay-assets.ts
 import { jumpSoldAssets } from "./backend-jump-sold-assets.ts";
 import { anyliewRectangleOverlayAssets } from "./backend-rectangle-overlay-assets.ts";
 import { anyliewShortAnimationAssets } from "./backend-short-animation-assets.ts";
+import { anyliewLocalCanvasAssets, hanbaomaodieCanvasAssets } from "./backend-local-canvas-assets.ts";
 import { anyliewTwoLayerAnimationAssets } from "./backend-two-layer-animation-assets.ts";
 import { tudouShortAnimationAssets } from "./backend-tudou-short-animation-assets.ts";
 import { tudouPortraitAnimationAssets, tudouWelcomeAsset } from "./backend-tudou-portrait-animation-assets.ts";
@@ -89,6 +90,7 @@ const anyliewAssets = [
   ...anyliewStaticAvatarAssets,
   ...anyliewTailAssets,
   ...anyliewShortAnimationAssets,
+  ...anyliewLocalCanvasAssets,
   ...anyliewTwoLayerAnimationAssets,
   ...anyliewSignAssets,
   ...anyliewTextDialogueAssets,
@@ -101,6 +103,7 @@ export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map([
   ...flushAssets,
   ...jumpSoldAssets,
   ...tudouShortAnimationAssets,
+  ...hanbaomaodieCanvasAssets,
   ...tudouPortraitAnimationAssets,
   tudouWelcomeAsset,
 ]);
