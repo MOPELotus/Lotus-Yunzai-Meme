@@ -268,3 +268,115 @@ url: ${remote.url.href}
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test("首次真正请求本机表情才建目录，远端等待与切换不会覆盖当前目录", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "lotus-meme-hot-switch-"));
+  const config = join(directory, "config");
+  const file = join(directory, "catalog.db");
+  await mkdir(config);
+  await writeFile(join(config, "meme.yaml"), "forceSharp: true\n");
+  const env = ["LOTUS_MEME_CONFIG_DIR", "LOTUS_MEME_DB", "LOTUS_MEME_SERVER_URL"] as const;
+  const previous = env.map(name => Bun.env[name]);
+  const lifetime = new AbortController();
+  const params = { min_images: 0, max_images: 0, min_texts: 0, max_texts: 0 };
+  const png = Uint8Array.fromBase64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jR14AAAAASUVORK5CYII=");
+  const remoteStarted = Promise.withResolvers<void>();
+  const releaseRemote = Promise.withResolvers<void>();
+  let deferRemote = false;
+  const remote = Bun.serve({ hostname: "127.0.0.1", port: 0, async fetch(request) {
+    const path = new URL(request.url).pathname;
+    if (path === "/memes/keys") {
+      if (deferRemote) {
+        remoteStarted.resolve();
+        await releaseRemote.promise;
+        return Response.json(["awaited_remote"]);
+      }
+      return Response.json(["old"]);
+    }
+    if (path === "/memes/old/") return new Response(png, { headers: { "Content-Type": "image/png" } });
+    const key = path.split("/")[2];
+    return Response.json({ key, keywords: [key === "old" ? "远端早已就绪" : "陈旧回包"], params_type: params });
+  } });
+  const backend = createManagedMemeBackend(lifetime.signal, [{
+    info: { key: "instant", keywords: ["本机立刻合成"], params_type: params },
+    async render() { return png; },
+  }]);
+  const { createModule, resolveMemeTrigger } = await import("../lotus.ts");
+  const { runAutomaticCatalogRefresh } = await import("../catalog-update.ts");
+  const { publishManagedMemeServer } = await import("../catalog-policy.ts");
+  const module = createModule({ signal: lifetime.signal });
+
+  try {
+    Bun.env.LOTUS_MEME_CONFIG_DIR = config;
+    Bun.env.LOTUS_MEME_DB = file;
+    delete Bun.env.LOTUS_MEME_SERVER_URL;
+    const select = (mode: "managed" | "remote") =>
+      writeFile(join(config, "server.yaml"), `backend: ${mode}\nurl: ${remote.url.href}\n`);
+    const call = (message: string) => module.fallback(message, {
+      message_type: "private", user_id: 1234, isMaster: true, isBotMaster: () => true, message,
+    });
+
+    await select("remote");
+    backend.ensure();
+    await runAutomaticCatalogRefresh(lifetime.signal, true);
+    deferRemote = true;
+    const remoteRefresh = runAutomaticCatalogRefresh(lifetime.signal).then(() => false, () => true);
+    await remoteStarted.promise;
+
+    await select("managed");
+    expect(await call("这句话没匹配")).toBeUndefined();
+    expect(await call("本机立刻合成")).toBeUndefined();
+    const before = new Database(file, { readonly: true });
+    try {
+      expect(before.query("SELECT 1 FROM sqlite_schema WHERE name = ?").get(nativeCatalogTable)).toBeNull();
+    } finally {
+      before.close();
+    }
+
+    const generated = await Promise.all([call("#本机立刻合成"), call("#本机立刻合成")]);
+    expect(generated).toEqual([{ type: "image", file: png }, { type: "image", file: png }]);
+    releaseRemote.resolve();
+    expect(await remoteRefresh).toBe(true);
+
+    const nativeStarted = Promise.withResolvers<void>();
+    const releaseNative = Promise.withResolvers<void>();
+    const fresh = publishManagedMemeServer({
+      catalogIdentity: "lotus-skia:late-native",
+      async keys() { nativeStarted.resolve(); await releaseNative.promise; return ["late_native"]; },
+      async info() { return { key: "late_native", keywords: ["迟到的本机"], params_type: params }; },
+      async generate() { return png; },
+      async preview() { return png; },
+    });
+    try {
+      const pending = call("#表情列表");
+      await nativeStarted.promise;
+      await select("remote");
+      expect(await call("#远端早已就绪")).toEqual({ type: "image", file: png });
+      expect(resolveMemeTrigger("#陈旧回包")).toBeUndefined();
+      await module.dispose();
+      releaseNative.resolve();
+      await pending;
+      const preserved = new Database(file, { readonly: true });
+      try {
+        expect(preserved.query("SELECT key FROM meme").all()).toEqual([{ key: "old" }]);
+        expect(preserved.query(`SELECT key FROM ${nativeCatalogTable}`).all()).toEqual([{ key: "instant" }]);
+      } finally {
+        preserved.close();
+      }
+    } finally {
+      fresh();
+      releaseNative.resolve();
+    }
+  } finally {
+    releaseRemote.resolve();
+    await module.dispose();
+    backend.dispose();
+    await remote.stop(true);
+    for (const [index, name] of env.entries()) {
+      const value = previous[index];
+      if (value === undefined) delete Bun.env[name];
+      else Bun.env[name] = value;
+    }
+    await rm(directory, { recursive: true, force: true });
+  }
+});

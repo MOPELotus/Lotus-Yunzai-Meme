@@ -10,13 +10,13 @@ import { generateMemeReply, requestMemePreview, type FallbackContext } from "./g
 import { handleMemeSettings, isMemeOwner } from "./settings.ts";
 import { helpReference, presentMemeReference } from "./reference-card.ts";
 import { presentMemeVersion } from "./version-card.ts";
-import { handleCatalogUpdate } from "./catalog-update.ts";
+import { handleCatalogUpdate, prepareNativeCatalog } from "./catalog-update.ts";
 import { startCatalogRuntime, type MemeRuntime } from "./catalog-runtime.ts";
 import { readMemeUsage } from "./usage.ts";
 import { createMemePokeHandler } from "./poke.ts";
 import { memeCatalogExclusions } from "./catalog-exclusions.ts";
 import { excludedMemeTemplateMessage, isExcludedMemeTemplate } from "./template-policy.ts";
-import { createManagedMemeBackend } from "./backend-lifecycle.ts";
+import { createManagedMemeBackend, matchesManagedMemeTrigger } from "./backend-lifecycle.ts";
 import type { MemeTemplateShortcut } from "./builtin-template.ts";
 
 export { createProfileLikeImageRenderer } from "./profile-like-image.ts";
@@ -542,13 +542,21 @@ async function usageReport(context: CatalogContext, loadInfoCard?: LoadMemeInfoC
   }
 }
 
+function withReadyCatalog<T>(context: CatalogContext | undefined, signal: AbortSignal | undefined, read: () => T) {
+  if (signal?.aborted) return;
+  const pending = typeof currentPolicy(context?.user_id) === "string" ? undefined : prepareNativeCatalog(signal);
+  return pending ? pending.then(() => signal?.aborted ? undefined : read()) : read();
+}
+
 function createMemeCommands(signal?: AbortSignal, loadInfoCard?: LoadMemeInfoCard) {
   const listCatalog = illustratedCatalog(loadInfoCard, signal);
   return {
     fallback: (message: string, context: FallbackContext) => memeFallback(message, context, listCatalog, signal, loadInfoCard),
     commands: {
-      "#表情列表": listCatalog, "#表情详情": (argument: string, context?: CatalogContext) => details(argument, context, signal), "#表情搜索": search,
-      "#表情统计": (_argument: string, context: CatalogContext) => usageReport(context, loadInfoCard),
+      "#表情列表": (argument: string, context?: CatalogContext) => withReadyCatalog(context, signal, () => listCatalog(argument, context)),
+      "#表情详情": (argument: string, context?: CatalogContext) => withReadyCatalog(context, signal, () => details(argument, context, signal)),
+      "#表情搜索": (argument: string, context?: CatalogContext) => withReadyCatalog(context, signal, () => search(argument, context)),
+      "#表情统计": (_argument: string, context: CatalogContext) => withReadyCatalog(context, signal, () => usageReport(context, loadInfoCard)),
       "#表情帮助": (argument: string, context: FallbackContext) => argument.trim() ? "用法：#表情帮助。" :
         presentMemeReference(helpReference(isMemeOwner(context)), loadInfoCard, signal),
       "#表情版本": (argument: string, context?: Pick<FallbackContext, "inlineImageByteLimit">) =>
@@ -560,12 +568,12 @@ function createMemeCommands(signal?: AbortSignal, loadInfoCard?: LoadMemeInfoCar
 async function memeFallback(message: string, context: FallbackContext, listCatalog: ReturnType<typeof illustratedCatalog>,
   signal?: AbortSignal, loadInfoCard?: LoadMemeInfoCard) {
   const input = message.trim();
-  if (catalogList.test(input)) return listCatalog("", context);
+  if (catalogList.test(input)) return withReadyCatalog(context, signal, () => listCatalog("", context));
   const detailMatch = catalogDetail.exec(input);
-  if (detailMatch) return details(detailMatch[1] ?? "", context, signal);
+  if (detailMatch) return withReadyCatalog(context, signal, () => details(detailMatch[1] ?? "", context, signal));
   const searchMatch = catalogSearch.exec(input);
-  if (searchMatch) return search(searchMatch[1] ?? "", context);
-  if (usageCommand.test(input)) return usageReport(context, loadInfoCard);
+  if (searchMatch) return withReadyCatalog(context, signal, () => search(searchMatch[1] ?? "", context));
+  if (usageCommand.test(input)) return withReadyCatalog(context, signal, () => usageReport(context, loadInfoCard));
   if (helpCommand.test(input)) return presentMemeReference(helpReference(isMemeOwner(context)), loadInfoCard, signal);
   if (versionCommand.test(input)) return presentMemeVersion(loadInfoCard, signal, context.inlineImageByteLimit);
   const packageUpdate = packageUpdateCommand.exec(input);
@@ -583,11 +591,20 @@ async function memeFallback(message: string, context: FallbackContext, listCatal
     return;
   }
   if (!server) return;
-  if (randomMemeCommand.test(input)) {
+  const random = randomMemeCommand.test(input);
+  if (random || (server.protocol === "native" && matchesManagedMemeTrigger(server, input))) {
     const policy = currentPolicy(context.user_id, true);
-    if (typeof policy === "string") return policy;
+    if (typeof policy === "string") return random ? policy : undefined;
     if (policy.forceSharp && !input.startsWith("#")) return;
-    return generateMemeReply(context, (media) => prepareRandomMeme(input, media), server, signal);
+
+    if (server.protocol === "native") {
+      const pending = prepareNativeCatalog(signal);
+      if (pending) {
+        await pending;
+        if (signal?.aborted || !sameGenerationServer(server, generationServer())) return;
+      }
+    }
+    if (random) return generateMemeReply(context, (media) => prepareRandomMeme(input, media), server, signal);
   }
   const match = resolveTrigger(message, context, true);
   if (!match || typeof match === "string") return;

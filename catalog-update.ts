@@ -1,7 +1,7 @@
 import { Database } from "bun:sqlite";
 import { existsSync, linkSync, mkdirSync, rmSync } from "node:fs";
 import { dirname } from "node:path";
-import { catalogPath, catalogVersion, nativeCatalogTable, type CatalogTable } from "./catalog-file.ts";
+import { activeCatalogTable, catalogPath, catalogVersion, nativeCatalogTable, type CatalogTable } from "./catalog-file.ts";
 import { generationServer, safeCatalogKey, sameGenerationServer } from "./catalog-policy.ts";
 import { isMemeOwner, type SettingsContext } from "./settings.ts";
 import { keepMemeCatalogDenials, scanMemeCatalogExclusions } from "./catalog-exclusions.ts";
@@ -268,17 +268,51 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
   }
 }
 
-let refreshing: Promise<string | undefined> | undefined;
+const refreshes = new Map<string, Promise<string | undefined>>();
 
-function runRefresh<T extends string | undefined>(run: () => Promise<T>): Promise<T> {
-  const pending = run().finally(() => { refreshing = undefined; });
-  refreshing = pending;
+function refreshKey(protocol: "native" | "legacy") {
+  return JSON.stringify([catalogPath(), protocol]);
+}
+
+function runRefresh<T extends string | undefined>(key: string, run: () => Promise<T>): Promise<T> {
+  const pending = run().finally(() => { refreshes.delete(key); });
+  refreshes.set(key, pending);
   return pending;
 }
 
+export function prepareNativeCatalog(signal?: AbortSignal): Promise<void> | undefined {
+  if (signal?.aborted) return;
+  let server: Server | undefined;
+  try { server = generationServer(); } catch { return; }
+  if (server?.protocol !== "native") return;
+  const file = catalogPath();
+  try {
+    if (existsSync(file)) {
+      const db = new Database(file, { readonly: true });
+      try {
+        if (hasTable(db, nativeCatalogTable) && storedCatalogIdentity(db) === server.catalogIdentity) return;
+      } finally {
+        db.close();
+      }
+    }
+  } catch {
+    return;
+  }
+  const key = refreshKey("native");
+  const pending = refreshes.get(key);
+  if (pending) return pending.then(() => undefined, () => undefined);
+  return runRefresh(key, () => updateCatalog(true, signal)).then(() => undefined, error => {
+    if (!signal?.aborted && activeCatalogTable() === nativeCatalogTable) {
+      console.warn("[meme] 首次本机表情目录更新失败。", error);
+    }
+  });
+}
+
 export function runAutomaticCatalogRefresh(signal: AbortSignal, startup = false) {
-  if (refreshing) return refreshing.then(() => undefined, () => undefined);
-  return runRefresh(async () => {
+  const key = refreshKey(generationServer()?.protocol ?? "legacy");
+  const pending = refreshes.get(key);
+  if (pending) return pending.then(() => undefined, () => undefined);
+  return runRefresh(key, async () => {
     if (startup) return initializeCatalog(signal);
     if (generationServer()) return updateCatalog(false, signal);
   });
@@ -288,7 +322,13 @@ export function handleCatalogUpdate(message: string, context: SettingsContext, s
   const match = command.exec(message.trim());
   if (!match) return;
   if (!isMemeOwner(context)) return "只有主人才能更新表情包数据";
-  if (refreshing) return "表情包数据更新中。";
-  return runRefresh(() => updateCatalog(match[1] !== undefined, signal))
+  let key: string;
+  try {
+    key = refreshKey(generationServer()?.protocol ?? "legacy");
+  } catch {
+    return "无法读取表情合成服务设置。";
+  }
+  if (refreshes.has(key)) return "表情包数据更新中。";
+  return runRefresh(key, () => updateCatalog(match[1] !== undefined, signal))
     .catch(() => "表情包数据更新失败，旧目录仍可使用。");
 }

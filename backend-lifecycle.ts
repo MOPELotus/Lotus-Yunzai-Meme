@@ -2,11 +2,18 @@ import { join } from "node:path";
 import { createMemeResources } from "./backend-resources.ts";
 import type { MemeTemplate, MemeTemplateInput } from "./builtin-template.ts";
 import {
-  configDirectory, publishManagedMemeServer, safeCatalogKey, usesManagedMemeServer,
+  configDirectory, publishManagedMemeServer, safeCatalogKey, usesManagedMemeServer, type NativeMemeServer,
 } from "./catalog-policy.ts";
 import { isExcludedMemeTemplate } from "./template-policy.ts";
 
 const maxOutputBytes = 8 * 1024 * 1024;
+
+const nativeTriggers = new WeakMap<NativeMemeServer["generate"], readonly string[]>();
+
+export function matchesManagedMemeTrigger(server: NativeMemeServer, message: string): boolean {
+  const input = message.replace(/^#/u, "").toLowerCase();
+  return nativeTriggers.get(server.generate)?.some(word => input.startsWith(word)) === true;
+}
 
 function buildRegistry(entries: readonly MemeTemplate[]) {
   const templates = new Map<string, MemeTemplate>();
@@ -84,6 +91,10 @@ export function createManagedMemeBackend(signal: AbortSignal, entries?: readonly
         return run(preview, caller);
       },
     };
+    const triggers = [...registry.values()].flatMap(({ info }) => [
+      ...info.keywords, ...(info.shortcuts ?? []).map(({ key }) => key),
+    ]).filter(Boolean).map(word => word.toLowerCase());
+    nativeTriggers.set(managed.generate, [...new Set(triggers)]);
     withdraw = publishManagedMemeServer(managed);
 
     async function run(render: NonNullable<MemeTemplate["preview"]>, caller?: AbortSignal) {

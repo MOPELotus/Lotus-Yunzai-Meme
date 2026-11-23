@@ -1,5 +1,6 @@
+import { prepareNativeCatalog } from "./catalog-update.ts";
 import { catalogPath, catalogVersion } from "./catalog-file.ts";
-import { catalogPolicy, generationServer, maxPokeCooldown, pokeSettings } from "./catalog-policy.ts";
+import { catalogPolicy, generationServer, maxPokeCooldown, pokeSettings, sameGenerationServer } from "./catalog-policy.ts";
 import { fetchAvatar, recordGeneratedMeme, requestMemeImage } from "./generate-reply.ts";
 import { buildGenerationBody } from "./generation.ts";
 
@@ -71,6 +72,13 @@ export function createMemePokeHandler(
     try {
       const server = generationServer();
       if (!server) return;
+      if (server.protocol === "native") {
+        const pending = prepareNativeCatalog(signal);
+        if (pending) {
+          await pending;
+          if (signal.aborted || !sameGenerationServer(server, generationServer())) return;
+        }
+      }
       const catalog = catalogPath();
       const version = catalogVersion();
       const templates = selectTemplates(active.hidden);
