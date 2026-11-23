@@ -35,18 +35,23 @@ test("旧举牌模板保留别名、默认文本与只接收文字", () => {
 });
 
 test("流萤举牌按编号读取原素材，越界回原提示且不请求资源", async () => {
-  const requests: string[] = [];
+  const images: string[] = [];
+  const fonts: string[] = [];
   const context: MemeTemplateContext = {
     signal,
-    async imageAsset(path) { requests.push(path); throw new Error("fixture"); },
-    async fontAsset(path) { requests.push(path); throw new Error("fixture"); },
+    async imageAsset(path) { images.push(path); throw new Error("fixture"); },
+    async fontAsset(path) { fonts.push(path); throw new Error("fixture"); },
   };
   const input = { images: [], texts: ["你好"], args: { number: 21 } };
   await expect(firefly.render(input, context)).rejects.toThrow("fixture");
-  expect(requests).toEqual(["firefly_holdsign/21.png", "ZCOOLKuaiLe-Regular.ttf"]);
-  requests.length = 0;
+  expect(images).toEqual(["firefly_holdsign/21.png"]);
+  // The shared typeface may already have been registered by another template.
+  expect(fonts.every(path => path === "ZCOOLKuaiLe-Regular.ttf")).toBeTrue();
+  images.length = 0;
+  fonts.length = 0;
   await expect(firefly.render({ ...input, args: { number: -1 } }, context)).rejects.toBeInstanceOf(MemeTemplateFeedback);
-  expect(requests).toEqual([]);
+  expect(images).toEqual([]);
+  expect(fonts).toEqual([]);
 });
 
 test("安全的本机模板提示从聊天合成通道返回", async () => {
