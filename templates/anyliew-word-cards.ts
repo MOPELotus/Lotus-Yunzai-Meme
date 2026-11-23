@@ -24,11 +24,12 @@ interface WordCard {
 }
 
 const dates = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const namedLetterFrame: Frame = { asset: "0.png", box: [60, 225, 490, 320] };
 const noImages = { min_images: 0, max_images: 0, min_texts: 1, max_texts: 1 } as const;
 // Fixed AnyLiew templates. Original proprietary faces use the already bundled open mappings.
 const cards: readonly WordCard[] = [
-  { key: "admission_letter", keywords: ["录取通知书"], text: "KaedeharaLu", args: "name",
-    childFont: true, leftLines: true, sizes: [10, 24], frames: [{ asset: "0.png", box: [60, 225, 490, 320] }] },
+  { key: "admission_letter", keywords: ["录取通知书"], text: "Anyliew", args: "name",
+    childFont: true, leftLines: true, sizes: [10, 16], frames: [{ asset: "legacy-0.png", box: [102, 195, 500, 217] }] },
   { key: "aima_say", keywords: ["艾玛说", "樱羽艾玛说"], text: "何意味？",
     childFont: true, leftLines: true, sizes: [5, 120], frames: [
       { asset: "0.jpg", box: [40, 35, 140, 210] }, { asset: "1.jpg", box: [360, 10, 490, 200] },
@@ -72,7 +73,7 @@ function makeCard(card: WordCard): MemeTemplate {
   const option = card.args;
   const isLetter = option === "name";
   const count = card.frames.length;
-  const optionHelp = isLetter ? "昵称（第一段文字）" : "图片编号，0 随机，1～" + count + " 选定底图";
+  const optionHelp = isLetter ? "姓名，指定后使用日期与称呼版式" : "图片编号，0 随机，1～" + count + " 选定底图";
   const argsType = option ? {
     args_model: { properties: {
       [option]: { type: isLetter ? "string" : "integer", default: isLetter ? "" : 0, description: optionHelp },
@@ -87,7 +88,9 @@ function makeCard(card: WordCard): MemeTemplate {
       else if (typeof number === "number" && Number.isSafeInteger(number) && number >= 1 && number <= count) index = number - 1;
       else throw new MemeTemplateFeedback("图片编号错误，请选择 1～" + count + " 或 0（随机）");
     }
-    const frame = card.frames[index]!;
+    const name = isLetter && typeof args.name === "string" ? args.name : undefined;
+    const frame = name === undefined ? card.frames[index]! : namedLetterFrame;
+    const [min, max] = name === undefined ? card.sizes : [10, 24];
     const [image, primary, fallback, latin] = await Promise.all([
       context.imageAsset(assetPath(card.key, frame.asset)).then(loadImage),
       card.childFont ? childFont(context) : undefined,
@@ -96,15 +99,14 @@ function makeCard(card: WordCard): MemeTemplate {
     ]);
     const font = [latin, primary, fallback, "sans-serif"].filter(Boolean).join(", ");
     let text = caption;
-    if (isLetter) {
+    if (name !== undefined) {
       const now = new Date();
-      const name = typeof args.name === "string" && args.name ? args.name : caption;
-      text = dates[now.getMonth()] + " " + now.getDate() + " " + now.getFullYear() + "\n\nDear " + name;
+      text = dates[now.getMonth()] + " " + now.getDate() + " " + now.getFullYear() + "\n\nDear " + (name || caption);
     }
     return jpg(image.width, image.height, draw => {
       paper(draw, image.width, image.height);
       draw.drawImage(image, 0, 0);
-      const paint = (box: Box) => drawFittedText(draw, box, text, font, ...card.sizes, card.leftLines ? "left" : "center", frame.color, {
+      const paint = (box: Box) => drawFittedText(draw, box, text, font, min, max, card.leftLines ? "left" : "center", frame.color, {
         paragraphMetrics: true, blockAlignment: isLetter ? "left" : "center", vertical: isLetter ? "top" : "center",
       });
       if (card.key === "deepseek_say") withLegacyChineseMetrics(draw, frame.box, paint, 1.06);

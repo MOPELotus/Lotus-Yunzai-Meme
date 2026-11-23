@@ -37,6 +37,9 @@ test("AnyLiew 通知书、说话、手写、外框及头像卡从隔离私聊离
     });
     const segment = { type: "image", file: "base64://" + png.toString("base64") };
     for (const [text, key, marker, dimensions, numImages] of [
+      ["#录取通知书", "admission_letter", "ffd8ff", [778, 991], 0],
+      ["#录取通知书 自定义正文", "admission_letter", "ffd8ff", [778, 991], 0],
+      ["#录取通知书 -n 李华", "admission_letter", "ffd8ff", [1111, 1416], 0],
       ["#录取通知书 --name 测试对象 原来姓名", "admission_letter", "ffd8ff", [1111, 1416], 0],
       ["#樱羽艾玛说", "aima_say", "ffd8ff", undefined, 0],
       ["#亚托莉说", "atri_say", "ffd8ff", [549, 489], 0],
@@ -57,8 +60,10 @@ test("AnyLiew 通知书、说话、手写、外框及头像卡从隔离私聊离
         if (!prepared || typeof prepared === "string") throw new Error("未识别命令 " + text);
         expect(prepared.key).toBe(key);
         if (key === "admission_letter") {
-          expect(JSON.parse(String(prepared.body.get("args"))).name).toBe("测试对象");
-          expect(prepared.body.getAll("texts")).toEqual(["原来姓名"]);
+          const name = text.includes("--name") ? "测试对象" : text.includes("-n") ? "李华" : undefined;
+          const caption = text.includes("原来姓名") ? "原来姓名" : text.includes("自定义正文") ? "自定义正文" : "Anyliew";
+          expect(JSON.parse(String(prepared.body.get("args"))).name).toBe(name);
+          expect(prepared.body.getAll("texts")).toEqual([caption]);
         }
         if (key === "deepseek_say") expect(JSON.parse(String(prepared.body.get("args"))).number).toBe(text.includes("4") ? 4 : 1);
       }

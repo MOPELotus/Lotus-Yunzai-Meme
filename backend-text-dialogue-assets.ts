@@ -26,3 +26,16 @@ export const anyliewTextDialogueAssets = [
   ["emoji/naruto_uchiha_itachi_say/images/0.png", "0dbec9ed4123b4987feb169a41e8ba9af9fd5e88701e423256e71757daf2f2df"],
   ["emoji/naruto_yakushi_kabuto_say/images/0.png", "d418dc4c3ca91003bb58c206eedce032c2be71ea26b2eb85f7a8e99af2195209"],
 ] as const;
+
+const originalLetterRevision = "1d69c0376e5538c60c40974f509e4c2f895752ca";
+export const originalAdmissionLetterAsset = [
+  "images/anyliew/emoji/admission_letter/images/legacy-0.png",
+  {
+    path: "emoji/admission_letter/images/0.png",
+    digest: "092768a26961456c09af3bc449c9eb481ac34f40dd940f7b409471303e8ecf50",
+    sources: [
+      `https://raw.githubusercontent.com/anyliew/meme_emoji/${originalLetterRevision}/`,
+      `https://cdn.jsdelivr.net/gh/anyliew/meme_emoji@${originalLetterRevision}/`,
+    ],
+  },
+] as const;
