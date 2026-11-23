@@ -20,12 +20,13 @@ interface FixedAvatarAnimation {
   // Counts of byte-identical consecutive source PNGs, before GIF encoding.
   readonly sourceHolds?: readonly number[];
   readonly crop?: true;
-  readonly circle?: "before-resize" | "after-resize";
+  readonly circle?: "before-resize" | "after-resize" | "hard-ellipse";
   readonly initialCircle?: { readonly size: Size; readonly cropFirst?: boolean };
   readonly firstFrame?: 0 | 1;
   readonly framePath?: (frame: number) => string;
   readonly avatarFrames?: number;
   readonly avatarOnTop?: true;
+  readonly secondAvatar?: Pick<FixedAvatarAnimation, "positions" | "sizes">;
   readonly directUnderlay?: true;
   readonly mode?: Parameters<typeof renderRgba>[3];
 }
@@ -339,6 +340,11 @@ function placeAvatar(context: CanvasRenderingContext2D, avatar: Image, [left, to
   context.restore();
 }
 
+function avatarEllipse(draw: CanvasRenderingContext2D, [x, y]: Position, [width, height]: Size, hard: boolean) {
+  draw.beginPath();
+  draw.ellipse(x + width / 2, y + height / 2, width / 2, (hard ? height : width) / 2, 0, 0, Math.PI * 2);
+}
+
 async function circleSource(avatar: Image, mode: Parameters<typeof renderRgba>[3], initial?: FixedAvatarAnimation["initialCircle"]) {
   const [width, height] = initial?.size ?? [avatar.width, avatar.height];
   const size = Math.min(width, height);
@@ -359,7 +365,7 @@ function mixChannel(bottom: number, top: number, mask: number) {
 
 // The original Pillow paste used the source alpha to mix every straight RGBA
 // channel. Its GIF writer then reserved transparency for the zero-alpha entry.
-function blendFixedArt(avatar: Buffer, art: Buffer, directUnderlay = false) {
+function blendFixedArt(avatar: Buffer, art: Buffer, directUnderlay = false, flattenAlpha = true) {
   for (let index = 0; index < art.length; index += 4) {
     const artMask = art[index + 3]!;
     if (artMask === 255) continue;
@@ -370,7 +376,8 @@ function blendFixedArt(avatar: Buffer, art: Buffer, directUnderlay = false) {
       art[channel] = mixChannel(avatarColor, art[channel]!, artMask);
     }
     const avatarAlpha = directUnderlay ? avatarMask : mixChannel(0, avatarMask, avatarMask);
-    art[index + 3] = mixChannel(avatarAlpha, artMask, artMask) > 0 ? 255 : 0;
+    const alpha = mixChannel(avatarAlpha, artMask, artMask);
+    art[index + 3] = flattenAlpha && alpha > 0 ? 255 : alpha;
   }
   return art;
 }
@@ -398,10 +405,13 @@ async function* orderedFrames(
 
 export function createFixedAvatarAnimation({
   key, keywords, tags, delayMs, positions, sizes, frames, sourceHolds, crop, circle, initialCircle, firstFrame = 1,
-  framePath = frame => `anyliew/emoji/${key}/images/${frame}.png`, avatarFrames, avatarOnTop, directUnderlay, mode = "auto",
+  framePath = frame => `anyliew/emoji/${key}/images/${frame}.png`, avatarFrames, avatarOnTop, secondAvatar, directUnderlay, mode = "auto",
 }: FixedAvatarAnimation): MemeTemplate {
   const longAnimation = sourceHolds !== undefined;
-  const fixedPlacement = avatarFrames === undefined && typeof positions[0] === "number" && typeof sizes[0] === "number";
+  const placements = [{ positions, sizes }, ...(secondAvatar ? [secondAvatar] : [])];
+  const imageCount = placements.length;
+  const fixedPlacement = avatarFrames === undefined && placements.every(({ positions, sizes }) =>
+    typeof positions[0] === "number" && typeof sizes[0] === "number");
   const holds = sourceHolds ?? Array<number>(frames).fill(1);
   let sourceIndex = 0;
   const offsets = holds.map(hold => {
@@ -424,12 +434,15 @@ export function createFixedAvatarAnimation({
   }
 
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
-    if (input.images.length !== 1 || input.texts.length) throw new Error("这个表情需要一张图片。");
+    if (input.images.length !== imageCount || input.texts.length) {
+      throw new Error(imageCount === 1 ? "这个表情需要一张图片。" : "这个表情需要两张图片。");
+    }
 
     const { signal } = context;
     signal.throwIfAborted();
-    const [avatar, first] = await Promise.all([
-      readMemeFirstImage(input.images[0]!, signal).then(image => circle === "before-resize" ? circleSource(image, mode, initialCircle) : image),
+    const [avatars, first] = await Promise.all([
+      Promise.all(input.images.map(file => readMemeFirstImage(file, signal)
+        .then(image => circle === "before-resize" ? circleSource(image, mode, initialCircle) : image))),
       readFrame(0, context),
     ]);
     const { width: sourceWidth, height: sourceHeight } = first;
@@ -452,33 +465,46 @@ export function createFixedAvatarAnimation({
       assertMemeGifDimensions(width, height, frames);
       const read = (index: number) => readFrame(index, context);
       const rendered: { rgba: Buffer; delayMs: number }[] = [];
-      let avatarLayer: Buffer | undefined;
+      let avatarLayers: Buffer[] | undefined;
       const scaleX = width / sourceWidth, scaleY = height / sourceHeight;
       for await (const { index, foreground } of orderedFrames(holds.length, first, longAnimation ? 8 : 1, read, signal)) {
         if (foreground.width !== sourceWidth || foreground.height !== sourceHeight) {
           throw new Error(`表情模板 ${key} 的帧尺寸不一致。`);
         }
-        if (!avatarLayer || !fixedPlacement) {
+        if (!avatarLayers || !fixedPlacement) {
           const offset = offsets[index]!;
-          avatarLayer = (await renderRgba(width, height, canvas => {
-            if (avatarFrames !== undefined && offset >= avatarFrames) return;
-            canvas.scale(scaleX, scaleY);
+          avatarLayers = await Promise.all(placements.map(async ({ positions, sizes }, avatarIndex) => {
+            if (avatarFrames !== undefined && offset >= avatarFrames) return Buffer.alloc(width * height * 4);
             const position = at(positions, offset);
             const size = at(sizes, offset);
-            if (circle === "after-resize") {
-              canvas.beginPath();
-              canvas.arc(position[0] + size[0] / 2, position[1] + size[1] / 2, size[0] / 2, 0, Math.PI * 2);
-              canvas.clip();
+            const { rgba } = await renderRgba(width, height, canvas => {
+              canvas.scale(scaleX, scaleY);
+              if (circle === "after-resize" || circle === "hard-ellipse") {
+                avatarEllipse(canvas, position, size, circle === "hard-ellipse");
+                canvas.clip();
+              }
+              placeAvatar(canvas, avatars[avatarIndex]!, position, size, crop ?? false);
+            }, mode);
+            if (circle === "hard-ellipse") {
+              // The source replaces the original alpha with a hard ellipse.
+              const { rgba: mask } = await renderRgba(width, height, canvas => {
+                canvas.scale(scaleX, scaleY);
+                avatarEllipse(canvas, position, size, true);
+                canvas.fill();
+              }, mode);
+              for (let alpha = 3; alpha < rgba.length; alpha += 4) rgba[alpha] = mask[alpha]! >= 128 ? 255 : 0;
             }
-            placeAvatar(canvas, avatar, position, size, crop ?? false);
-          }, mode)).rgba;
+            return rgba;
+          }));
         }
         const { rgba: art } = await renderRgba(width, height, canvas => {
           canvas.scale(scaleX, scaleY);
           canvas.imageSmoothingQuality = "high";
           canvas.drawImage(foreground, 0, 0);
         }, mode);
-        const rgba = avatarOnTop ? blendFixedArt(art, Buffer.from(avatarLayer), directUnderlay) : blendFixedArt(avatarLayer, art, directUnderlay);
+        const rgba = avatarOnTop
+          ? avatarLayers.reduce((bottom, top, layer) => blendFixedArt(bottom, Buffer.from(top), directUnderlay, layer + 1 === imageCount), art)
+          : blendFixedArt(avatarLayers[0]!, art, directUnderlay);
         const duration = delayMs * holds[index]!;
         const previous = rendered.at(-1);
         if (previous?.rgba.equals(rgba)) previous.delayMs += duration;
@@ -489,10 +515,11 @@ export function createFixedAvatarAnimation({
   }
 
   return {
-    info: { key, keywords, tags, params_type: params },
+    info: { key, keywords, tags, params_type: { ...params, min_images: imageCount, max_images: imageCount } },
     render,
     async preview(context) {
-      return render({ images: [await previewImage(context.signal)], texts: [], args: {} }, context);
+      const image = await previewImage(context.signal);
+      return render({ images: Array<File>(imageCount).fill(image), texts: [], args: {} }, context);
     },
   };
 }

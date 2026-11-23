@@ -19,6 +19,7 @@ import { jumpSoldMemeTemplates } from "./jump-sold.ts";
 import { shortAvatarAnimations } from "./short-avatar-animation.ts";
 import { twoLayerAvatarAnimations } from "./two-layer-avatar-animation.ts";
 import { tudouShortAnimations } from "./tudou-short-animation.ts";
+import { tudouPortraitAnimations } from "./tudou-portrait-animations.ts";
 import { hug, kiss } from "./kiss-hug.ts";
 import { legacyBadgeTemplates } from "./legacy-badges.ts";
 import { legacyPortraitEffectTemplates } from "./legacy-portrait-effects.ts";
@@ -81,6 +82,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...shortAvatarAnimations,
   ...twoLayerAvatarAnimations,
   ...tudouShortAnimations,
+  ...tudouPortraitAnimations,
   ...textSpeechMemeTemplates,
   ...pythonOverlayMemeTemplates,
   ...textAnnouncementMemeTemplates,
