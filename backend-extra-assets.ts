@@ -1,3 +1,4 @@
+import { legacyChatCardAssets } from "./backend-legacy-chat-card-assets.ts";
 import { legacyPhotoSceneAssets } from "./backend-legacy-photo-scene-assets.ts";
 import { pythonBehindAssets } from "./backend-python-behind-assets.ts";
 import { pythonGraphicAssets } from "./backend-python-graphic-assets.ts";
@@ -111,6 +112,7 @@ export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map<stri
   ...croppedPhotoAssets,
   ...legacyPhotoSceneAssets,
   ...legacyTextOverlayAssets,
+  ...legacyChatCardAssets,
   ...pythonGraphicAssets,
   ...pythonBehindAssets,
   ...flushAssets,

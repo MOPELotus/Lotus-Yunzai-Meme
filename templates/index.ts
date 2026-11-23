@@ -1,3 +1,4 @@
+import { legacyChatCardTemplates } from "./legacy-chat-cards.ts";
 import { pythonPhotoBehindTemplates } from "./python-photo-behind.ts";
 import { pythonGraphicSceneTemplates } from "./python-graphic-scenes.ts";
 import { pythonMotionSceneTemplates } from "./python-motion-scenes.ts";
@@ -120,6 +121,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...legacyCaptionShortcutTemplates,
   ...legacyCaptionSceneTemplates,
   ...legacyBadgeTemplates,
+  ...legacyChatCardTemplates,
   ...legacyPhotoCaptionTemplates,
   ...pythonGraphicSceneTemplates,
   ...pythonMotionSceneTemplates,
