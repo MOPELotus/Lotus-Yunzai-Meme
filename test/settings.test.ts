@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { Database } from "bun:sqlite";
 import { mkdtemp, readFile, rm, stat, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -6,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { catalogPolicy, catalogRefreshSchedule, configDirectory, generationServer, generationSettings } from "../catalog-policy.ts";
 import module from "../lotus.ts";
 import { buildGenerationBody } from "../generation.ts";
-import { supportGuoba } from "../settings.ts";
+import { handleMemeSettings, supportGuoba } from "../settings.ts";
 
 test("表情设置命令可安全更新旧 YAML 并即时生效", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-settings-"));
@@ -201,6 +202,56 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     else Bun.env.LOTUS_MEME_CONFIG_DIR = previousDirectory;
     if (previousServer === undefined) delete Bun.env.LOTUS_MEME_SERVER_URL;
     else Bun.env.LOTUS_MEME_SERVER_URL = previousServer;
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("面板与聊天设置隐藏下线模板，拒绝通过旧键和别名再次添加", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "lotus-meme-unavailable-"));
+  const previous = Bun.env.LOTUS_MEME_CONFIG_DIR;
+  const previousCatalog = Bun.env.LOTUS_MEME_DB;
+  const Result = { ok: () => ({ ok: true }), error: (_message: string, status: number) => ({ ok: false, status }) };
+  try {
+    Bun.env.LOTUS_MEME_CONFIG_DIR = directory;
+    Bun.env.LOTUS_MEME_DB = join(directory, "catalog.sqlite");
+    const database = new Database(Bun.env.LOTUS_MEME_DB);
+    try {
+      database.exec("CREATE TABLE meme (key TEXT, keyWords TEXT, tags TEXT)");
+      const insert = database.query("INSERT INTO meme VALUES (?, ?, ?)");
+      insert.run("old_custom_key", JSON.stringify(["陈旧别名", "共享别名"]), JSON.stringify(["鸣潮"]));
+      insert.run("ordinary_cat", JSON.stringify(["共享别名"]), JSON.stringify(["猫"]));
+    } finally {
+      database.close();
+    }
+    const access = join(directory, "access.yaml");
+    const protect = join(directory, "protect.yaml");
+    const oldAccess = "blackListEnable: true\nblackList: [jinhsi, 今汐, kuroGames_rosetta, old_custom_key, 共享别名, 可莉吃]\n";
+    const oldProtect = "list: [今汐, 小猫]\nuser: 10001\n";
+    await writeFile(access, oldAccess);
+    await writeFile(protect, oldProtect);
+    const { configInfo: form } = supportGuoba();
+    expect(form.getConfigData()).toMatchObject({ access: { blackList: ["共享别名", "可莉吃"] }, protect: { list: ["小猫"], user: [10001] } });
+    const owner = { isMaster: true };
+    expect(handleMemeSettings("#表情合成设置 黑名单表情列表", owner)).toBe("黑名单表情列表：共享别名、可莉吃");
+    expect(handleMemeSettings("#表情合成设置 表情保护列表 添加 jinhsi", owner)).toBe("该表情不在可管理目录中。");
+    expect(form.setConfigData({ "access.blackList": ["今汐"], "protect.list": ["保持原样"] }, { Result }))
+      .toEqual({ ok: false, status: 422 });
+    expect(form.setConfigData({ "access.blackList": ["old_custom_key"] }, { Result })).toEqual({ ok: false, status: 422 });
+    expect(form.setConfigData({ "access.blackList": ["kurogames_rosetta"] }, { Result })).toEqual({ ok: false, status: 422 });
+    expect(form.setConfigData({ "protect.list": ["爱弥斯抓"] }, { Result })).toEqual({ ok: false, status: 422 });
+    expect(await readFile(access, "utf8")).toBe(oldAccess);
+    expect(await readFile(protect, "utf8")).toBe(oldProtect);
+    expect(handleMemeSettings("#表情合成设置 黑名单表情列表 删除 jinhsi", owner)).toBe("黑名单表情列表：共享别名、可莉吃");
+    expect(Bun.YAML.parse(await readFile(access, "utf8"))).toEqual({
+      blackListEnable: true, blackList: ["今汐", "kuroGames_rosetta", "old_custom_key", "共享别名", "可莉吃"],
+    });
+    expect(form.setConfigData({ "protect.list": ["小猫", "共享别名"] }, { Result })).toEqual({ ok: true });
+    expect(Bun.YAML.parse(await readFile(protect, "utf8"))).toEqual({ list: ["小猫", "共享别名"], user: 10001 });
+  } finally {
+    if (previous === undefined) delete Bun.env.LOTUS_MEME_CONFIG_DIR;
+    else Bun.env.LOTUS_MEME_CONFIG_DIR = previous;
+    if (previousCatalog === undefined) delete Bun.env.LOTUS_MEME_DB;
+    else Bun.env.LOTUS_MEME_DB = previousCatalog;
     await rm(directory, { recursive: true, force: true });
   }
 });

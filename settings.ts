@@ -7,10 +7,12 @@ import { isMap, isSeq, parseDocument } from "yaml";
 import type { MemeReference } from "./reference-card.ts";
 import { configDirectory, defaultAvatarCache, defaultPokeCooldown, defaultPokeProbability, maxPokeCooldown, maxPokeProbability,
   normalizeCatalogCron, parseGenerationServerUrl, readConfig } from "./catalog-policy.ts";
+import { isExcludedMemeName, memeNameExclusion } from "./catalog-exclusions.ts";
 
 type Setting = readonly [title: string, key: string,
   type: "toggle" | "mode" | "users" | "templates" | "percentage" | "cooldown", fallback: unknown];
 type PanelSetting = Setting | readonly [title: string, key: string, type: "url" | "seconds" | "cron", fallback: string | number];
+type MemeNameExclusion = ReturnType<typeof memeNameExclusion>;
 const sections = [
   { title: "表情设置", file: "meme.yaml", fields: [
     ["默认表情", "enable", "toggle", true],
@@ -127,6 +129,12 @@ function settingValue(setting: PanelSetting, values: Record<string, unknown>): u
   return value;
 }
 
+function visibleSettingValue(setting: PanelSetting, value: unknown, excluded: MemeNameExclusion): unknown {
+  if (setting[2] !== "templates") return value;
+  if (!Array.isArray(value)) return [];
+  return value.filter(entry => (typeof entry === "string" || Number.isSafeInteger(entry)) && !excluded(String(entry)));
+}
+
 function panelField(group: string, [label, key, type]: PanelSetting) {
   const field = `${group}.${key}`;
   switch (type) {
@@ -148,7 +156,7 @@ function panelField(group: string, [label, key, type]: PanelSetting) {
   }
 }
 
-function panelValue(type: PanelSetting[2], value: unknown) {
+function panelValue(type: PanelSetting[2], value: unknown, excluded = isExcludedMemeName) {
   switch (type) {
     case "toggle": if (typeof value === "boolean") return value; break;
     case "mode": if (value === 0 || value === 1) return value; break;
@@ -156,7 +164,7 @@ function panelValue(type: PanelSetting[2], value: unknown) {
     case "templates": {
       if (!Array.isArray(value) || !value.every(item => typeof item === "string" || Number.isSafeInteger(item))) break;
       const entries = value.map(item => typeof item === "string" ? item.trim() : item as number);
-      if (type === "templates" ? entries.every(item => item !== "") :
+      if (type === "templates" ? entries.every(item => item !== "" && !excluded(String(item))) :
         entries.every(item => /^[1-9]\d*$/u.test(String(item)) && Number.isSafeInteger(Number(item)))) return entries;
       break;
     }
@@ -245,22 +253,27 @@ export function supportGuoba() {
       ]),
       getConfigData() {
         const directory = configDirectory();
+        const excluded = memeNameExclusion();
         return Object.fromEntries(panelSections.map(({ file, fields }) => {
           const values = readConfig(directory, file);
-          return [file.slice(0, -5), Object.fromEntries(fields.map(setting => [setting[1], settingValue(setting, values)]))];
+          return [file.slice(0, -5), Object.fromEntries(fields.map(setting => [
+            setting[1], visibleSettingValue(setting, settingValue(setting, values), excluded),
+          ]))];
         }));
       },
       setConfigData(data: Record<string, unknown>, { Result, changedFields }: {
         Result: { ok(): unknown; error(message: string, status: number): unknown }; changedFields?: readonly string[];
       }) {
         const patches = new Map<string, Map<string, unknown>>();
+        let excluded: MemeNameExclusion | undefined;
         try {
           for (const name of changedFields ?? Object.keys(data)) {
             const entry = fields.get(name);
             if (!entry || !Object.hasOwn(data, name)) throw new Error();
             const { file, setting } = entry;
             const patch = patches.get(file) ?? new Map();
-            patch.set(setting[1], panelValue(setting[2], data[name]));
+            if (setting[2] === "templates") excluded ??= memeNameExclusion();
+            patch.set(setting[1], panelValue(setting[2], data[name], excluded));
             patches.set(file, patch);
           }
         } catch {
@@ -310,6 +323,8 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
   if (!isMemeOwner(context)) return "只有主人可以修改表情合成设置。";
   try {
     const directory = configDirectory();
+    let excludeName: MemeNameExclusion | undefined;
+    const excluded = (name: string) => (excludeName ??= memeNameExclusion())(name);
     const normalized = argument.replace(/^(统计设置|其他设置)/u,
       (name) => name === "统计设置" ? "表情统计设置" : "目录更新设置");
     const selected = panelSections.find((section) => normalized.startsWith(section.title));
@@ -330,7 +345,7 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
       const previous = snapshot(path);
       const { document, values } = documentOf(previous.text);
       const current = settingValue(setting, values);
-      if (!value) return `${title}：${show(setting, current)}`;
+      if (!value) return `${title}：${show(setting, visibleSettingValue(setting, current, excluded))}`;
       let next: unknown;
       if (type === "toggle") {
         if (value !== "开启" && value !== "关闭") return "请指定开启或关闭。";
@@ -360,6 +375,7 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
         const added = names.filter((name) => !current.some((entry) => String(entry).trim() === name));
         const sequence = document.get(key, true);
         if (change[1] === "添加") {
+          if (type === "templates" && names.some(excluded)) return "该表情不在可管理目录中。";
           next = [...current, ...added];
           if (isSeq(sequence)) for (const item of added) sequence.add(item);
           else document.set(key, next);
@@ -377,14 +393,14 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
         rewrite(directory, path, previous, yaml);
       }
       const restart = section.file === "other.yaml" ? "（重启后重新登记定时任务。）" : "";
-      return `${title}：${show(setting, next)}${restart}`;
+      return `${title}：${show(setting, visibleSettingValue(setting, next, excluded))}${restart}`;
     }
 
     if (action) return "未找到该表情合成设置项。";
     const groups = candidates.map((section) => {
       const values = documentOf(snapshot(join(directory, section.file)).text).values;
       const entries = section.fields.map((field) => {
-        const value = settingValue(field, values);
+        const value = visibleSettingValue(field, settingValue(field, values), excluded);
         const detail = Array.isArray(value) ? (value.length ? `已配置 ${value.length} 项` : "未配置") : show(field, value);
         return { title: field[0], detail };
       });
