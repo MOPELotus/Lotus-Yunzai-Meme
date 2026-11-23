@@ -11,9 +11,9 @@ import { encodeMemeGif } from "../templates/gif.ts";
 
 const signal = new AbortController().signal;
 
-test("默认本机目录注册全部二十五项且只接入固定上游帧的白名单", () => {
+test("默认本机目录注册全部三十七项且只接入固定上游帧的白名单", () => {
   const selected = new Set(fixedAvatarAnimations.map(({ info }) => info.key));
-  expect(selected.size).toBe(25);
+  expect(selected.size).toBe(37);
   expect(builtinMemeTemplates.filter(({ info }) => selected.has(info.key))).toEqual([...fixedAvatarAnimations]);
   for (const [path, digest] of anyliewFixedAnimationAssets) {
     expect(extraMemeAssets.get(`images/anyliew/${path}`)).toMatchObject({ path, digest });
@@ -95,6 +95,18 @@ test("逐项保留固定动画的原关键词、参数和资产路径，并输�
     ["doro_knight", ["骑士", "doro骑士", "Doro骑士", "DORO骑士"], 16, 100],
     ["doro_stroke", ["抚摸", "doro抚摸", "Doro抚摸", "桃乐丝抚摸"], 16, 70],
     ["doro_trampoline", ["跳床", "蹦床", "doro蹦床", "桃乐丝蹦床", "doro跳床", "桃乐丝跳床"], 15, 60],
+    ["bonfire_dance", ["篝火舞", "圈舞"], 61, 40],
+    ["burning", ["燃烧"], 29, 50],
+    ["capoo_take_smash", ["咖波砸"], 20, 50],
+    ["chain", ["锁链"], 45, 30],
+    ["cooking", ["炒菜"], 52, 50],
+    ["doro_openlight", ["开灯", "桃乐丝开灯", "doro开灯", "Doro开灯", "DORO开灯"], 63, 30],
+    ["double_guns", ["双枪"], 7, 100],
+    ["dragon_hand", ["龙手"], 18, 60],
+    ["fever", ["为爱发烧", "发烧"], 13, 90],
+    ["fishing", ["钓鱼"], 8, 110],
+    ["frieren_snuggle", ["芙莉莲贴贴"], 17, 50],
+    ["heartbeat", ["心跳"], 7, 40],
   ] as const;
 
   const input = { images: [inputGif()], texts: [], args: {} };
