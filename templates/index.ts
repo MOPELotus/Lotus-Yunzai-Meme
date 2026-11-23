@@ -33,6 +33,7 @@ import { twoLayerAvatarAnimations } from "./two-layer-avatar-animation.ts";
 import { tudouShortAnimations } from "./tudou-short-animation.ts";
 import { tudouPortraitAnimations } from "./tudou-portrait-animations.ts";
 import { tudouLayeredTemplates, tudouOverlayTemplates, tudouExtendedOverlayTemplates } from "./tudou-layered-animations.ts";
+import { tudouTailTemplates } from "./tudou-tail.ts";
 import { tudouExtraTemplates } from "./tudou-extra.ts";
 import { hug, kiss } from "./kiss-hug.ts";
 import { legacyBadgeTemplates } from "./legacy-badges.ts";
@@ -136,6 +137,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...tudouLayeredTemplates,
   ...tudouExtraTemplates,
   ...tudouOverlayTemplates,
+  ...tudouTailTemplates,
   ...tudouExtendedOverlayTemplates,
   ...textSpeechMemeTemplates,
   ...pythonOverlayMemeTemplates,
