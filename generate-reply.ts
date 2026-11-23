@@ -28,6 +28,8 @@ export interface FallbackContext {
 
 const maxImageBytes = 8 * 1024 * 1024;
 export const maxAvatarBytes = 512 * 1024;
+const maxCachedAvatars = 32;
+const cachedAvatars = new Map<string, { avatar: Blob; modified: number }>();
 
 export function imageMime(bytes: Uint8Array): string | undefined {
   const startsWith = (...prefix: number[]) => prefix.every((byte, index) => bytes[index] === byte);
@@ -87,18 +89,33 @@ async function readResult(response: Response, maxBytes = maxImageBytes): Promise
   if (imageMime(image)) return image;
 }
 
-export async function fetchAvatar(user: string, { size = 0, signal }:
-  { size?: 0 | 100; signal?: AbortSignal } = {}): Promise<Blob | undefined> {
+export async function fetchAvatar(user: string, { size = 0, signal, cache = false }:
+  { size?: 0 | 100; signal?: AbortSignal; cache?: boolean } = {}): Promise<Blob | undefined> {
   if (signal?.aborted || !/^[1-9]\d{0,15}$/u.test(user) || !Number.isSafeInteger(Number(user))) return;
   const url = new URL("https://q1.qlogo.cn/g");
   url.search = new URLSearchParams({ b: "qq", s: String(size), nk: user }).toString();
+  const key = `${user}:${size}`;
+  const cached = cache ? cachedAvatars.get(key) : undefined;
   try {
     const timeout = AbortSignal.timeout(3_000);
-    const bytes = await readResult(await fetch(url, {
-      redirect: "error",
-      signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
-    }), maxAvatarBytes);
-    if (bytes) return new Blob([bytes], { type: imageMime(bytes) });
+    const active = signal ? AbortSignal.any([signal, timeout]) : timeout;
+    const response = await fetch(url, {
+      redirect: "error", signal: active, credentials: "omit",
+      ...(cached && { headers: { "If-Modified-Since": new Date(cached.modified).toUTCString() } }),
+    });
+    const bytes = response.status === 304 && cached ? undefined : await readResult(response, maxAvatarBytes);
+    if (active.aborted) return;
+    const avatar = bytes ? new Blob([bytes], { type: imageMime(bytes) }) : response.status === 304 ? cached?.avatar : undefined;
+    const modified = response.status === 304 ? cached?.modified : Date.parse(response.headers.get("last-modified") ?? "");
+    if (cache && avatar && modified !== undefined && Number.isFinite(modified) && modified >= (cachedAvatars.get(key)?.modified ?? -Infinity)) {
+      cachedAvatars.delete(key);
+      if (cachedAvatars.size >= maxCachedAvatars) {
+        const oldest = cachedAvatars.keys().next().value;
+        if (oldest !== undefined) cachedAvatars.delete(oldest);
+      }
+      cachedAvatars.set(key, { avatar, modified });
+    }
+    return avatar;
   } catch {
     // The legacy image planner can use the remaining materials if one avatar fails.
   }
@@ -214,7 +231,7 @@ export async function generateMemeReply(
       avatar: (user) => {
         const cached = avatars.get(user);
         if (cached) return cached;
-        const pending = fetchAvatar(user);
+        const pending = fetchAvatar(user, { signal: mediaBudget, cache: settings.avatarCache });
         avatars.set(user, pending);
         return pending;
       },

@@ -57,3 +57,31 @@ test("点赞头像沿用受限的 QQ 下载，并可取消或保留普通合成�
     globalThis.fetch = previous;
   }
 });
+
+test("表情头像缓存按 QQ 和尺寸发送条件请求，关闭时重新下载", async () => {
+  const previous = globalThis.fetch;
+  const original = Uint8Array.of(255, 216, 255, 0);
+  const fresh = Uint8Array.of(255, 216, 255, 1);
+  const dates = ["Wed, 21 Oct 2015 07:28:00 GMT", "Wed, 21 Oct 2015 07:29:00 GMT"];
+  const requests: (string | null)[] = [];
+  globalThis.fetch = Object.assign(async (_input: RequestInfo | URL, options?: RequestInit) => {
+    requests.push(new Headers(options?.headers).get("if-modified-since"));
+    expect(options?.credentials).toBe("omit");
+    if (requests.length === 2) return new Response(null, { status: 304 });
+    const change = requests.length > 2;
+    return new Response(change ? fresh : original, { headers: { "last-modified": dates[change ? 1 : 0]! } });
+  }, { preconnect: previous.preconnect });
+  try {
+    const user = "10008";
+    for (const [options, expected] of [
+      [{ cache: true }, original], [{ cache: true }, original], [{ cache: true }, fresh],
+      [{ size: 100, cache: true }, fresh], [{ cache: false }, fresh], [{ cache: true }, fresh],
+    ] as const) {
+      const avatar = await fetchAvatar(user, options);
+      expect(new Uint8Array(await avatar!.arrayBuffer())).toEqual(expected);
+    }
+    expect(requests).toEqual([null, dates[0]!, dates[0]!, null, null, dates[1]!]);
+  } finally {
+    globalThis.fetch = previous;
+  }
+});

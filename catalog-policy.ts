@@ -59,6 +59,7 @@ export const defaultPokeProbability = 50;
 export const defaultPokeCooldown = 20;
 export const maxPokeProbability = 100;
 export const maxPokeCooldown = 3_600;
+export const defaultAvatarCache = true;
 
 export function pokeSettings() {
   const meme = readConfig(configDirectory(), "meme.yaml");
@@ -69,7 +70,7 @@ export function pokeSettings() {
       typeof cooldown !== "number" || !Number.isSafeInteger(cooldown) || cooldown < 0 || cooldown > maxPokeCooldown) {
     throw new Error("无效的表情戳一戳配置");
   }
-  return { enabled, probability, cooldown, errorReply: flag(meme.errorReply, true) };
+  return { enabled, probability, cooldown, errorReply: flag(meme.errorReply, true), avatarCache: flag(meme.cache, defaultAvatarCache) };
 }
 
 
@@ -88,6 +89,7 @@ export function generationSettings() {
     useNickname: flag(meme.userName, false),
     quote: flag(meme.reply, false),
     errorReply: flag(meme.errorReply, true),
+    avatarCache: flag(meme.cache, defaultAvatarCache),
     master,
     protectedUsers: users ? list(userList) : [],
     protectedTemplates: protection ? list(protect.list) : [],

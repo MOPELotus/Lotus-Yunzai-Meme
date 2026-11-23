@@ -43,6 +43,8 @@ test("表情设置命令可安全更新旧 YAML 并即时生效", async () => {
     expect((await stat(meme)).mode & 0o777).toBe(0o640);
     expect(await settings("引用回复开启", milkyOwner)).toBe("引用回复：开启");
     expect(generationSettings().quote).toBe(true);
+    expect(await settings("缓存关闭", milkyOwner)).toBe("头像缓存：关闭");
+    expect(generationSettings().avatarCache).toBe(false);
 
     expect(await settings("名单设置 用户白名单 添加", {
       ...owner, message: [{ type: "at", qq: 10001 }, { type: "at", qq: 10002 }],
@@ -146,12 +148,13 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     await Promise.all(Object.entries(original).map(([file, text]) => writeFile(path(file), text, { mode: 0o640 })));
     const { configInfo: form } = supportGuoba();
     const fields = form.schemas.flatMap(schema => "field" in schema ? [schema.field] : []);
-    expect(fields).toHaveLength(26);
-    for (const field of ["meme.cache", "server.retry", "other.autoUpdate", "other.hijackRes", "other.renderScale"]) {
+    expect(fields).toHaveLength(27);
+    expect(fields).toContain("meme.cache");
+    for (const field of ["server.retry", "other.autoUpdate", "other.hijackRes", "other.renderScale"]) {
       expect(fields).not.toContain(field);
     }
     expect(form.getConfigData()).toMatchObject({
-      meme: { enable: false, reply: false, imagesInMessage: true, pokeEnable: false, pokeProbability: 50, pokeLimit: 20 },
+      meme: { enable: false, reply: false, cache: true, imagesInMessage: true, pokeEnable: false, pokeProbability: 50, pokeLimit: 20 },
       access: { mode: 0, userWhiteList: [10001] }, protect: { user: [10002] },
       server: { url: "http://127.0.0.1:1/saved", timeout: 5 }, stat: { enable: true },
     });
@@ -168,7 +171,7 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     for (const file of ["protect", "server", "other"] as const) expect(await read(file)).toBe(original[file]);
 
     for (const invalid of [
-      { "meme.cache": false }, { "protect.user": ["bad-id"] }, { "access.mode": 7 },
+      { "meme.cache": "false" }, { "protect.user": ["bad-id"] }, { "access.mode": 7 },
       { "server.timeout": 0 }, { "server.url": "http://user@127.0.0.1/" },
       { "other.autoUpdateResCron": "0 0 99 * * *" }, { "other.autoUpdateResCron": "tomorrow" },
       { "meme.pokeProbability": 101 }, { "meme.pokeLimit": -1 }, { "meme.pokeLimit": 1.5 },
@@ -179,9 +182,10 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     expect(await read("server")).toBe(original.server);
     expect(await read("other")).toBe(original.other);
 
-    expect(form.setConfigData({ "meme.pokeEnable": true, "meme.pokeProbability": 0, "meme.pokeLimit": 0 }, { Result }))
+    expect(form.setConfigData({ "meme.cache": false, "meme.pokeEnable": true, "meme.pokeProbability": 0, "meme.pokeLimit": 0 }, { Result }))
       .toEqual({ ok: true });
-    expect(form.getConfigData().meme).toMatchObject({ reply: true, pokeEnable: true, pokeProbability: 0, pokeLimit: 0 });
+    expect(form.getConfigData().meme).toMatchObject({ reply: true, cache: false, pokeEnable: true, pokeProbability: 0, pokeLimit: 0 });
+    expect(generationSettings().avatarCache).toBe(false);
     const withPoke = await read("meme");
 
     expect(form.setConfigData({ "other.autoUpdateResCron": "*/15 * * * ?", "stat.enable": false }, { Result })).toEqual({ ok: true });

@@ -5,7 +5,7 @@ import { isDeepStrictEqual } from "node:util";
 import { Job } from "node-schedule";
 import { isMap, isSeq, parseDocument } from "yaml";
 import type { MemeReference } from "./reference-card.ts";
-import { configDirectory, defaultPokeCooldown, defaultPokeProbability, maxPokeCooldown, maxPokeProbability,
+import { configDirectory, defaultAvatarCache, defaultPokeCooldown, defaultPokeProbability, maxPokeCooldown, maxPokeProbability,
   normalizeCatalogCron, parseGenerationServerUrl, readConfig } from "./catalog-policy.ts";
 
 type Setting = readonly [title: string, key: string,
@@ -15,6 +15,7 @@ const sections = [
   { title: "表情设置", file: "meme.yaml", fields: [
     ["默认表情", "enable", "toggle", true],
     ["强制触发", "forceSharp", "toggle", false],
+    ["头像缓存", "cache", "toggle", defaultAvatarCache],
     ["引用回复", "reply", "toggle", false],
     ["用户昵称", "userName", "toggle", false],
     ["消息图片", "imagesInMessage", "toggle", true],
@@ -130,6 +131,7 @@ function panelField(group: string, [label, key, type]: PanelSetting) {
   const field = `${group}.${key}`;
   switch (type) {
     case "toggle": return { label, field, component: "Switch",
+      ...(field === "meme.cache" && { bottomHelpMessage: "头像未变更时复用本进程中的缓存。" }),
       ...(field === "other.autoUpdateRes" && { bottomHelpMessage: "重启后重新登记定时任务。" }) };
     case "mode": return { label, field, component: "Select", componentProps: { options: [
       { label: "白名单", value: 0 }, { label: "黑名单", value: 1 },
@@ -313,6 +315,7 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
     const selected = panelSections.find((section) => normalized.startsWith(section.title));
     const action = (selected ? normalized.slice(selected.title.length).trimStart() : normalized)
       .replace(/^(戳一戳触发)(?!概率)/u, "戳一戳表情")
+      .replace(/^缓存/u, "头像缓存")
       .replace(/^自定义地址/u, "服务地址")
       .replace(/^(超时时间|请求超时(?!（秒）))/u, "请求超时（秒）");
     const candidates = selected ? [selected] : panelSections;

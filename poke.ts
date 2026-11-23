@@ -80,7 +80,7 @@ export function createMemePokeHandler(
         return;
       }
 
-      const avatar = await fetchAvatar(String(actorId), { signal });
+      const avatar = await fetchAvatar(String(actorId), { signal, cache: active.settings.avatarCache });
       if (!checkPolicy()) return;
       if (avatar) for (const template of templates) {
         if (!checkPolicy(template) || catalogVersion() !== version) return;
