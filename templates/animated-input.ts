@@ -25,7 +25,7 @@ export interface MemeImageSequence {
 
 const GIF_TRAILER = Buffer.from([0x3b]);
 const MAX_SOURCE_PIXELS = 16_000_000;
-const MAX_TOTAL_PIXELS = 64_000_000;
+const MAX_TOTAL_PIXELS = 64 * 1024 * 1024;
 const MAX_SOURCE_BYTES = 24 * 1024 ** 2;
 const MAX_SOURCE_FRAMES = 1_000;
 const DEFAULT_GIF_DURATION_MS = 20;

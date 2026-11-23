@@ -8,7 +8,7 @@ interface RgbaFrame {
 }
 
 const maxFramePixels = 24_000_000;
-const maxStreamPixels = 64_000_000;
+const maxStreamPixels = 64 * 1024 * 1024;
 const maxGifBytes = 16 * 1024 * 1024;
 const maxStreamGifBytes = 8 * 1024 * 1024;
 const maxColor = 255;
