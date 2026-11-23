@@ -1,6 +1,7 @@
 import { anyliewSignAssets } from "./backend-anyliew-sign-assets.ts";
 import { anyliewTextDialogueAssets } from "./backend-text-dialogue-assets.ts";
 import { anyliewAvatarSceneAssets } from "./backend-anyliew-avatar-scene-assets.ts";
+import { anyliewStaticAvatarAssets } from "./backend-anyliew-static-avatar-assets.ts";
 import { anyliewCircleDialogueAssets } from "./backend-circle-dialogue-assets.ts";
 import { anyliewDialogueAssets } from "./backend-dialogue-assets.ts";
 import { anyliewFixedAnimationAssets } from "./backend-fixed-animation-assets.ts";
@@ -75,6 +76,7 @@ const anyliewAssets = [
   ...anyliewFixedAnimationAssets,
   ...anyliewRectangleOverlayAssets,
   ...anyliewAvatarSceneAssets,
+  ...anyliewStaticAvatarAssets,
   ...anyliewShortAnimationAssets,
   ...anyliewSignAssets,
   ...anyliewTextDialogueAssets,
