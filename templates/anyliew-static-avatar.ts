@@ -2,31 +2,44 @@ import { ImageData, loadImage, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeFirstImage, readMemeImageSequence } from "./animated-input.ts";
+import { anyliewAvatarCaptionScenes } from "./anyliew-avatar-caption-scenes.ts";
+import { anyLiewCaptionFonts, paintAnyLiewCaption, type AnyLiewCaptionStyle, type CaptionBox } from "./anyliew-dialogue.ts";
 import { renderMaskedRgba } from "./masked-layout.ts";
 import { renderPythonGif } from "./python-gif.ts";
-import { jpg, previewImage, rgbaFrameDimensions, type Draw } from "./template-layout.ts";
+import { jpg, previewImage, rgbaFrameDimensions, rotateExpanded, type Draw } from "./template-layout.ts";
 
 interface Placement {
   readonly image: number;
   readonly box: readonly [left: number, top: number, width: number, height: number];
-  readonly circle?: true;
+  readonly circle?: true | "stretch-first";
   readonly angle?: number;
+  readonly brightness?: number;
 }
 
-interface Scene {
+interface SceneCaption extends AnyLiewCaptionStyle {
+  readonly text: (input: MemeTemplateInput) => string;
+  readonly box: CaptionBox;
+  readonly rotation?: { readonly x: number; readonly y: number; readonly degrees: number };
+}
+
+export interface AnyLiewAvatarScene {
   readonly key: string;
   readonly keywords: readonly string[];
   readonly count: number;
   readonly layers: readonly Placement[];
   readonly above?: true;
   readonly jpegFrame?: true;
+  readonly jpegOutput?: true;
   readonly animatedInput?: true;
   readonly tags?: readonly string[];
+  readonly captions?: readonly SceneCaption[];
+  readonly defaultTexts?: readonly string[];
+  readonly argsType?: unknown;
 }
 
 const genshin = ["米哈游", "原神"] as const;
 
-const scenes: readonly Scene[] = [
+const scenes: readonly AnyLiewAvatarScene[] = [
   { key: "shipborne_laser_weapons", keywords: ["舰载激光武器"], count: 1, animatedInput: true, layers: [
     { image: 0, box: [118, 212, 167, 167] },
     { image: 0, box: [572, 918, 73, 73] },
@@ -93,29 +106,25 @@ const scenes: readonly Scene[] = [
 
 const transparent: Draw = () => {};
 
-function drawPlacement({ box, angle, circle }: Placement, image: Image): Draw {
+function drawPlacement({ box, angle, circle, brightness }: Placement, image: Image): Draw {
   return draw => {
     const [left, top, width, height] = box;
     draw.translate(left, top);
-    if (angle) {
-      const radians = -angle * Math.PI / 180;
-      const cosine = Math.abs(Math.cos(radians));
-      const sine = Math.abs(Math.sin(radians));
-      // The original rotates the already resized avatar and expands both rounded edges.
-      const center = (side: number, extent: number) => (Math.ceil((side + extent) / 2) - Math.floor((side - extent) / 2)) / 2;
-      draw.translate(center(width, width * cosine + height * sine), center(height, width * sine + height * cosine));
-      draw.rotate(radians);
-      draw.translate(-width / 2, -height / 2);
-    }
+    if (angle) rotateExpanded(draw, width, height, angle);
+    if (brightness !== undefined) draw.filter = `brightness(${brightness}%)`;
     draw.imageSmoothingQuality = "high";
     if (circle) {
       draw.beginPath();
       draw.ellipse(width / 2, height / 2, width / 2, height / 2, 0, 0, Math.PI * 2);
       draw.clip();
-      const side = Math.min(image.width, image.height);
-      draw.drawImage(image, Math.floor((image.width - side) / 2), Math.floor((image.height - side) / 2),
-        side, side, 0, 0, width, height);
-    } else draw.drawImage(image, 0, 0, width, height);
+      if (circle === true) {
+        const side = Math.min(image.width, image.height);
+        draw.drawImage(image, Math.floor((image.width - side) / 2), Math.floor((image.height - side) / 2),
+          side, side, 0, 0, width, height);
+        return;
+      }
+    }
+    draw.drawImage(image, 0, 0, width, height);
   };
 }
 
@@ -124,36 +133,63 @@ function pixels(rgba: Uint8Array, width: number, height: number): Draw {
   return draw => draw.putImageData(image, 0, 0);
 }
 
-function template(scene: Scene): MemeTemplate {
+function template(scene: AnyLiewAvatarScene): MemeTemplate {
+  const minTexts = scene.defaultTexts?.length ?? 0;
+  const maxTexts = scene.captions ? 1 : 0;
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
-    if (input.images.length !== scene.count || input.texts.length) throw new Error("表情的图片或文字数量不符。");
+    if (input.images.length !== scene.count || input.texts.length < minTexts || input.texts.length > maxTexts) {
+      throw new Error("表情的图片或文字数量不符。");
+    }
     const { signal } = context;
-    const art = await context.imageAsset(`anyliew/emoji/${scene.key}/images/0.${scene.jpegFrame ? "jpg" : "png"}`).then(loadImage);
+    const [art, captions] = await Promise.all([
+      context.imageAsset(`anyliew/emoji/${scene.key}/images/0.${scene.jpegFrame ? "jpg" : "png"}`).then(loadImage),
+      Promise.all((scene.captions ?? []).map(async caption => {
+        const family = await anyLiewCaptionFonts(context, caption.font);
+        const text = caption.text(input);
+        const paint: Draw = draw => {
+          const { rotation, box } = caption;
+          if (rotation) {
+            draw.translate(rotation.x, rotation.y);
+            rotateExpanded(draw, box[2] - box[0], box[3] - box[1], rotation.degrees);
+          }
+          paintAnyLiewCaption(draw, box, text, family, caption);
+        };
+        return { paint, rotated: caption.rotation !== undefined };
+      })),
+    ]);
     const { width, height } = rgbaFrameDimensions(art.width, art.height);
-    async function raster(images: readonly Image[], w: number, h: number) {
+    async function raster(images: readonly Image[], w: number, h: number, whiteBackground = false) {
       const scale = (paint: Draw): Draw => draw => {
         draw.scale(w / art.width, h / art.height);
         paint(draw);
       };
-      const background = scale(draw => draw.drawImage(art, 0, 0));
+      const artwork = scale(draw => {
+        draw.drawImage(art, 0, 0);
+        for (const { paint, rotated } of captions) if (!rotated) paint(draw);
+      });
+      const rotatedCaptions = captions.filter(caption => caption.rotated).map(({ paint }) => scale(paint));
+      const background = rotatedCaptions.length
+        ? pixels(await renderMaskedRgba(w, h, artwork, rotatedCaptions, signal), w, h)
+        : artwork;
       const placements = scene.layers.map(layer => scale(drawPlacement(layer, images[layer.image]!)));
-      if (scene.above) return renderMaskedRgba(w, h, background, placements, signal, { whiteBackground: !scene.animatedInput });
+      if (scene.above) return renderMaskedRgba(w, h, background, placements, signal, { whiteBackground });
       let foreground = background;
       let result!: Uint8Array;
       for (const [index, draw] of placements.entries()) {
         result = await renderMaskedRgba(w, h, transparent, [draw, foreground], signal,
-          { whiteBackground: !scene.animatedInput && index === placements.length - 1 });
+          { whiteBackground: whiteBackground && index === placements.length - 1 });
         foreground = pixels(result, w, h);
       }
       return result;
     }
     if (!scene.animatedInput) {
       const images = await Promise.all(input.images.map(image => readMemeFirstImage(image, signal)));
-      return jpg(art.width, art.height, pixels(await raster(images, width, height), width, height), signal);
+      return jpg(art.width, art.height, pixels(await raster(images, width, height, true), width, height), signal);
     }
     const sequence = await readMemeImageSequence(input.images[0]!, signal);
     if (sequence.frames.length === 1) {
-      return (await renderExactPng(width, height, pixels(await raster(sequence.frames, width, height), width, height))).png;
+      const draw = pixels(await raster(sequence.frames, width, height, scene.jpegOutput), width, height);
+      return scene.jpegOutput ? jpg(art.width, art.height, draw, signal) : (await renderExactPng(width, height, draw)).png;
     }
     return renderPythonGif({
       width, height, signal,
@@ -163,13 +199,14 @@ function template(scene: Scene): MemeTemplate {
   }
   return {
     info: { key: scene.key, keywords: scene.keywords, tags: scene.tags,
-      params_type: { min_images: scene.count, max_images: scene.count, min_texts: 0, max_texts: 0, args_type: null } },
+      params_type: { min_images: scene.count, max_images: scene.count, min_texts: minTexts, max_texts: maxTexts,
+        default_texts: scene.defaultTexts, args_type: scene.argsType ?? null } },
     render,
     async preview(context) {
       const input = await previewImage(context.signal);
-      return render({ images: Array.from({ length: scene.count }, () => input), texts: [], args: {} }, context);
+      return render({ images: Array.from({ length: scene.count }, () => input), texts: scene.defaultTexts ?? [], args: {} }, context);
     },
   };
 }
 
-export const anyliewStaticAvatarTemplates = scenes.map(template);
+export const anyliewStaticAvatarTemplates = [...scenes, ...anyliewAvatarCaptionScenes].map(template);

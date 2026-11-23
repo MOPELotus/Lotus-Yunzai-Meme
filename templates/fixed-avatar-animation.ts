@@ -5,7 +5,7 @@ import { readMemeFirstImage, readMemeImageSequence } from "./animated-input.ts";
 import {
   assertMemeGifDimensions, encodeMemeGif, encodeMemeGifStream, MemeGifByteLimitError, MemeGifDimensionLimitError,
 } from "./gif.ts";
-import { previewImage } from "./template-layout.ts";
+import { previewImage, rotateExpanded } from "./template-layout.ts";
 
 type Position = readonly [left: number, top: number];
 type Size = readonly [width: number, height: number];
@@ -22,6 +22,8 @@ interface FixedAvatarAnimation {
   // Counts of byte-identical consecutive source PNGs, before GIF encoding.
   readonly sourceHolds?: readonly number[];
   readonly crop?: true;
+  readonly angle?: number;
+  readonly squareResize?: number;
   readonly circle?: "before-resize" | "after-resize" | "hard-ellipse";
   readonly initialCircle?: { readonly size: Size; readonly cropFirst?: boolean };
   readonly firstFrame?: 0 | 1;
@@ -375,6 +377,11 @@ async function circleSource(avatar: Image, mode: Parameters<typeof renderRgba>[3
   return loadImage(png);
 }
 
+async function resizedSquare(avatar: Image, size: number, mode: Parameters<typeof renderRgba>[3]) {
+  const { png } = await renderExactPng(size, size, draw => placeAvatar(draw, avatar, [0, 0], [size, size], false, true), mode);
+  return loadImage(png);
+}
+
 function mixChannel(bottom: number, top: number, mask: number) {
   return Math.round((bottom * (255 - mask) + top * mask) / 255);
 }
@@ -420,7 +427,7 @@ async function* orderedFrames(
 }
 
 export function createFixedAvatarAnimation({
-  key, keywords, tags, delayMs, positions, sizes, frames, sourceHolds, crop, circle, initialCircle, firstFrame = 1,
+  key, keywords, tags, delayMs, positions, sizes, frames, sourceHolds, crop, angle, squareResize, circle, initialCircle, firstFrame = 1,
   framePath = frame => `anyliew/emoji/${key}/images/${frame}.png`, avatarStart = 0, avatarFrames, cycleSquareAvatar, preserveZeroDelay,
   avatarOnTop, secondAvatar, directUnderlay,
   largeCanvas, mode = "auto",
@@ -463,6 +470,7 @@ export function createFixedAvatarAnimation({
       Promise.all(input.images.map(async file => {
         if (cycleSquareAvatar) return (await readMemeImageSequence(file, signal)).frames;
         const image = await readMemeFirstImage(file, signal);
+        if (squareResize) return [await resizedSquare(image, squareResize, mode)];
         return [circle === "before-resize" ? await circleSource(image, mode, initialCircle) : image];
       })),
       readFrame(0, context),
@@ -520,7 +528,11 @@ export function createFixedAvatarAnimation({
               }
               const source = avatars[avatarIndex]!;
               const image = source[(offset - avatarStart) % source.length]!;
-              placeAvatar(canvas, image, position, size, crop ?? false, cycleSquareAvatar);
+              if (angle) {
+                canvas.translate(...position);
+                rotateExpanded(canvas, ...size, angle);
+              }
+              placeAvatar(canvas, image, angle ? [0, 0] : position, size, crop ?? false, cycleSquareAvatar);
             }, mode);
             if (circle === "hard-ellipse") {
               // The source replaces the original alpha with a hard ellipse.

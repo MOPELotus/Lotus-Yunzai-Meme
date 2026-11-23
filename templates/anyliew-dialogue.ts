@@ -7,7 +7,8 @@ import { renderPythonGif } from "./python-gif.ts";
 import { jpg, registerFont, registerMemeTypeface, rgbaFrameDimensions } from "./template-layout.ts";
 import { readTransformSource, transformPreviewInput } from "./transforms.ts";
 
-type Box = readonly [number, number, number, number];
+export type CaptionBox = readonly [number, number, number, number];
+type Box = CaptionBox;
 type Caption = (name: string) => string;
 const cjkFonts = {
   child: ["FZSEJW.ttf", "LotusMemeChild"],
@@ -136,7 +137,23 @@ function captionText(input: MemeTemplateInput, definition: Dialogue) {
   return definition.caption(input.texts[0] ?? definition.defaultText ?? (nickname || (user ? pronoun : definition.defaultName ?? "他")));
 }
 
-function paintCaption(draw: CanvasRenderingContext2D, box: Box, text: string, family: string, definition: Dialogue) {
+export type AnyLiewCaptionStyle = Pick<Dialogue, "sizes" | "color" | "leftLines" | "bottom" | "cropAvatar" | "wrap" | "font"> & {
+  readonly lineHeight?: number;
+};
+
+export async function anyLiewCaptionFonts(context: MemeTemplateContext, font?: Dialogue["font"], withEmoji?: boolean) {
+  const typeface = font && cjkFonts[font];
+  const [fallback, primary, emoji] = await Promise.all([
+    registerFont(context),
+    typeface && registerMemeTypeface(context, typeface[0], typeface[1]),
+    withEmoji && registerMemeTypeface(context, "NotoColorEmoji.ttf", "LotusMemeColorEmoji"),
+  ]);
+  return [primary, fallback, emoji, "sans-serif"].filter(Boolean).join(", ");
+}
+
+export function paintAnyLiewCaption(draw: CanvasRenderingContext2D, box: Box, text: string, family: string,
+  definition: AnyLiewCaptionStyle,
+) {
   const [left, top, right, bottom] = box;
   const [minimum, maximum] = definition.sizes;
   draw.textWrap = true;
@@ -144,19 +161,21 @@ function paintCaption(draw: CanvasRenderingContext2D, box: Box, text: string, fa
   draw.textAlign = definition.leftLines ? "left" : "center";
   draw.fillStyle = definition.color ?? "#000";
   for (let size = maximum; size >= minimum; size--) {
-    draw.font = `${size}px ${family}`;
+    const leading = definition.lineHeight === undefined ? undefined : Math.round(size * definition.lineHeight);
+    draw.font = `${size}px${leading === undefined ? "" : `/${leading}px`} ${family}`;
     const availableWidth = right - left;
     const full = draw.measureText(text);
     const wrapWidth = definition.wrap && full.lines.some(line => line.width > availableWidth) ? availableWidth : undefined;
     const { lines } = wrapWidth ? draw.measureText(text, wrapWidth) : full;
     const first = lines[0], last = lines.at(-1);
     if (!first || !last) return;
-    const height = last.y + last.height - first.y;
+    const height = leading === undefined ? last.y + last.height - first.y : lines.length * leading;
+    const contentTop = leading === undefined ? first.y : (first.ascent + first.descent - leading) / 2;
     const width = Math.max(...lines.map(line => line.width));
     if (height > bottom - top || width > right - left) continue;
     // PIL centers the widest block while leaving the individual lines left-aligned.
     const x = (left + right - (definition.leftLines ? wrapWidth ?? width : 0)) / 2;
-    const y = bottom - height - first.y - (definition.bottom ? 0 : (bottom - top - height) / 2);
+    const y = bottom - height - contentTop - (definition.bottom ? 0 : (bottom - top - height) / 2);
     if (definition.cropAvatar) {
       draw.strokeStyle = "#000";
       draw.lineWidth = Math.round(size * 0.06) * 2;
@@ -204,15 +223,11 @@ async function squareCircle(image: Image) {
 
 export async function renderAnyLiewDialogue(input: MemeTemplateInput, context: MemeTemplateContext, definition: Dialogue) {
   const { signal } = context;
-  const typeface = definition.font && cjkFonts[definition.font];
-  const [sequence, frame, fallback, primary, emoji] = await Promise.all([
+  const [sequence, frame, family] = await Promise.all([
     readTransformSource(input, signal),
     context.imageAsset(`anyliew/emoji/${definition.key}/images/${definition.asset ?? "0.png"}`).then(loadImage),
-    registerFont(context),
-    typeface && registerMemeTypeface(context, typeface[0], typeface[1]),
-    definition.emoji && registerMemeTypeface(context, "NotoColorEmoji.ttf", "LotusMemeColorEmoji"),
+    anyLiewCaptionFonts(context, definition.font, definition.emoji),
   ]);
-  const family = [primary, fallback, emoji, "sans-serif"].filter(Boolean).join(", ");
   const text = captionText(input, definition);
   const box = typeof definition.box === "function" ? definition.box(frame.width, frame.height) : definition.box;
   const { width, height, scale } = rgbaFrameDimensions(frame.width, frame.height);
@@ -222,7 +237,7 @@ export async function renderAnyLiewDialogue(input: MemeTemplateInput, context: M
     const backdrop = (draw: CanvasRenderingContext2D) => {
       draw.scale(scaleX, scaleY);
       draw.drawImage(frame, 0, 0);
-      paintCaption(draw, box, text, family, definition);
+      paintAnyLiewCaption(draw, box, text, family, definition);
     };
     const avatar = (draw: CanvasRenderingContext2D) => {
       draw.scale(scaleX, scaleY);

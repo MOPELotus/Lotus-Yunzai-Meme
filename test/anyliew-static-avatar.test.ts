@@ -3,7 +3,7 @@ import { Canvas, loadImage } from "skia-canvas";
 import { anyliewStaticAvatarAssets } from "../backend-anyliew-static-avatar-assets.ts";
 import { anyliewStaticAvatarTemplates } from "../templates/anyliew-static-avatar.ts";
 
-const expected = [
+const expected: readonly (readonly [string, readonly string[], number, string, number?, number?])[] = [
   ["shipborne_laser_weapons", ["舰载激光武器"], 1, "png"],
   ["steal_two", ["双偷"], 3, "png"],
   ["swimsuit_group_photo", ["泳衣合影", "比基尼合影"], 2, "png"],
@@ -22,19 +22,32 @@ const expected = [
   ["mihoyo_funina_square_head", ["芙芙方形头像", "芙宁娜方形头像"], 1, "png"],
   ["naruro_s_ninja", ["S忍", "s忍"], 1, "png"],
   ["pig_surrounded", ["被猪包围"], 1, "png"],
+  ["ly01", ["ly01", "ly-1", "LY-1"], 2, "png"],
+  ["mihoyo_aino_ride", ["爱诺骑"], 1, "png"],
+  ["ikun_why_are_you", ["你干嘛", "你干吗"], 1, "jpg"],
+  ["tencent_np", ["农P", "农批"], 1, "png"],
+  ["mihoyo_player", ["二游玩家"], 1, "png"],
+  ["dalia_everyone", ["所有人"], 1, "png", 0, 1],
+  ["doro_surrounding_photos", ["周边写真"], 1, "png", 0, 1],
+  ["doro_work_for_you", ["为你打工"], 1, "png", 0, 1],
+  ["jd_delivery_person", ["京东外卖骑手", "京东外卖工牌"], 1, "png", 0, 1],
+  ["mihoyo_kuki_shinobu_who", ["此人是谁", "是谁", "是谁？", "是谁？"], 1, "png", 0, 1],
+  ["mihoyo_liuwei_dinner", ["刘伟晚餐", "共进晚餐", "大伟哥晚餐"], 1, "png", 0, 1],
+  ["new_goodnews", ["新喜报"], 1, "png", 1, 1],
 ] as const;
 
 test("头像场景保留旧键、触发词、图片数量和原素材名", () => {
   expect(anyliewStaticAvatarTemplates.filter(({ info }) => info.tags?.includes("原神")).map(({ info }) => info.key)).toEqual([
     "mihoyo_funina_death_penalty", "mihoyo_funina_finger", "mihoyo_genshin_impact_op",
     "mihoyo_genshin_impact_players", "mihoyo_funina_square_head",
+    "mihoyo_aino_ride", "mihoyo_kuki_shinobu_who", "mihoyo_liuwei_dinner",
   ]);
   expect(anyliewStaticAvatarAssets.map<string>(([path]) => path)).toEqual(
     expected.map(([key, , , ext]) => `emoji/${key}/images/0.${ext}`));
   expect(anyliewStaticAvatarTemplates.map(({ info }) => [
     info.key, info.keywords, info.params_type.min_images, info.params_type.max_images,
     info.params_type.min_texts, info.params_type.max_texts,
-  ])).toEqual(expected.map(([key, keywords, images]) => [key, keywords, images, images, 0, 0]));
+  ])).toEqual(expected.map(([key, keywords, images, , minTexts = 0, maxTexts = 0]) => [key, keywords, images, images, minTexts, maxTexts]));
 });
 
 test("双偷保留三个圆形头像顺序及遮挡层", async () => {

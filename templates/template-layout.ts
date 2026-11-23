@@ -6,6 +6,18 @@ import { nativeImageRasterScale, renderExactPng, renderPng, renderRgba } from ".
 import { MemeTemplateFeedback, type MemeTemplateContext } from "../builtin-template.ts";
 
 export type Draw = (context: CanvasRenderingContext2D) => void;
+
+export function rotateExpanded(draw: CanvasRenderingContext2D, width: number, height: number, degrees: number) {
+  const radians = -degrees * Math.PI / 180;
+  const cosine = Math.abs(Math.cos(radians));
+  const sine = Math.abs(Math.sin(radians));
+  // Pillow expands both rounded edges around the source center.
+  const center = (side: number, extent: number) => (Math.ceil((side + extent) / 2) - Math.floor((side - extent) / 2)) / 2;
+  draw.translate(center(width, width * cosine + height * sine), center(height, width * sine + height * cosine));
+  draw.rotate(radians);
+  draw.translate(-width / 2, -height / 2);
+}
+
 type Box = readonly [left: number, top: number, right: number, bottom: number];
 const maxStaticPixels = 12_000_000;
 const normalFont = "LotusMemeNotoRegular";

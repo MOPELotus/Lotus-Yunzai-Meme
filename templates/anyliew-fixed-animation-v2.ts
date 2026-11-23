@@ -142,4 +142,22 @@ export const anyliewFixedAnimationV2 = [
       [85, 85], [85, 85],
     ],
   }),
+  createFixedAvatarAnimation({
+    key: "chuini", keywords: ["捶你"], frames: 2, firstFrame: 0, delayMs: 50,
+    positions: [[23, 142], [21, 158]], sizes: [[56, 50], [49, 34]], squareResize: 110, directUnderlay: true,
+  }),
+  createFixedAvatarAnimation({
+    key: "bird_lgnoring", keywords: ["不鸟你", "我鸟都不鸟你"], frames: 45, delayMs: 70, sizes: [55, 55],
+    positions: [
+      [95, 69], [95, 69], [95, 66], [95, 64], [95, 61], [95, 60], [96, 58], [96, 60], [96, 61], [96, 65],
+      [96, 66], [95, 67], [95, 66], [95, 65], [95, 63], [96, 60], [96, 60], [96, 61], [96, 62], [96, 65],
+      [96, 66], [96, 69], [96, 69], [95, 68], [95, 64], [95, 63], [95, 60], [95, 59], [95, 59], [95, 59],
+      [96, 62], [96, 64], [96, 66], [96, 68], [96, 70], [95, 70], [95, 68], [95, 65], [96, 63], [96, 60],
+      [96, 59], [96, 59], [96, 61], [96, 62], [96, 64],
+    ],
+  }),
+  createFixedAvatarAnimation({
+    key: "capoo_take_sleep", keywords: ["咖波睡觉", "睡觉"], frames: 27, delayMs: 40,
+    sizes: [65, 47], positions: [1, 103], angle: 35, tags: ["猫猫虫", "咖波"],
+  }),
 ] as const;
