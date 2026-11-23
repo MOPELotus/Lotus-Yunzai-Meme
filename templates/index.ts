@@ -20,6 +20,7 @@ import { petpet } from "./petpet.ts";
 import { photoCompositeMemeTemplates } from "./photo-composites.ts";
 import { photoInsetMemeTemplates } from "./photo-insets.ts";
 import { rectangleOverlayTemplates } from "./rectangle-overlays.ts";
+import { rotatedInsetMemeTemplates } from "./rotated-insets.ts";
 import { pythonOverlayMemeTemplates } from "./python-overlay-animation.ts";
 import { staticMemeTemplates } from "./static-layouts.ts";
 import { textAnnouncementMemeTemplates } from "./text-announcements.ts";
@@ -44,6 +45,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...avatarCaptionMemeTemplates,
   ...photoCompositeMemeTemplates,
   ...photoInsetMemeTemplates,
+  ...rotatedInsetMemeTemplates,
   ...rectangleOverlayTemplates,
   ...anyliewDialogueTemplates,
   ...anyliewCircleDialogueTemplates,
