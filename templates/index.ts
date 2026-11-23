@@ -18,6 +18,7 @@ import { shortAvatarAnimations } from "./short-avatar-animation.ts";
 import { tudouShortAnimations } from "./tudou-short-animation.ts";
 import { hug, kiss } from "./kiss-hug.ts";
 import { legacyBadgeTemplates } from "./legacy-badges.ts";
+import { legacyPortraitEffectTemplates } from "./legacy-portrait-effects.ts";
 import { legacySceneMemeTemplates } from "./legacy-scene.ts";
 import { mirrorFlashMemeTemplates } from "./mirror-flash.ts";
 import { motionMemeTemplates } from "./motion.ts";
@@ -66,6 +67,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...anyliewTextDialogueTemplates,
   ...legacySceneMemeTemplates,
   ...legacyBadgeTemplates,
+  ...legacyPortraitEffectTemplates,
   ...textSignMemeTemplates,
   ...perspectiveMemeTemplates,
   ...fixedAvatarAnimations,
