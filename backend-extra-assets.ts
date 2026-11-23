@@ -5,6 +5,7 @@ import { pythonBehindAssets } from "./backend-python-behind-assets.ts";
 import { pythonGraphicAssets } from "./backend-python-graphic-assets.ts";
 import { croppedPhotoAssets } from "./backend-cropped-photo-assets.ts";
 import { legacyFixedPoseAssets } from "./backend-legacy-fixed-pose-assets.ts";
+import { pixelEffectAssets } from "./backend-pixel-effect-assets.ts";
 import { anyliewSignAssets } from "./backend-anyliew-sign-assets.ts";
 import { anyliewLargeAvatarAssets } from "./backend-anyliew-large-avatar-assets.ts";
 import { anyliewTextDialogueAssets } from "./backend-text-dialogue-assets.ts";
@@ -109,6 +110,7 @@ export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map<stri
   ...legacyFixedPoseAssets,
   ...anyliewAssets.map(([path, digest]) => [`images/anyliew/${path}`, { path, digest, sources: anyliewBase }] as const),
   anyliewDeerHelpAsset,
+  ...pixelEffectAssets,
   ...pythonOverlayAssets,
   ...croppedPhotoAssets,
   ...legacyPhotoSceneAssets,

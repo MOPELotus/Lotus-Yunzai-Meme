@@ -45,6 +45,7 @@ import { legacyBadgeTemplates } from "./legacy-badges.ts";
 import { legacyPhotoCaptionTemplates } from "./legacy-photo-captions.ts";
 import { legacyPhotoFormTemplates } from "./legacy-photo-forms.ts";
 import { leaveNoteTemplate } from "./leave-note.ts";
+import { legacyPixelEffectTemplates } from "./legacy-pixel-effects.ts";
 import { legacyPortraitEffectTemplates } from "./legacy-portrait-effects.ts";
 import { legacyContribPortraitTemplates } from "./legacy-contrib-portraits.ts";
 import { legacyLiveMemeTemplates } from "./legacy-live-effects.ts";
@@ -131,6 +132,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...pythonPhotoBehindTemplates,
   ...legacyPhotoFormTemplates,
   leaveNoteTemplate,
+  ...legacyPixelEffectTemplates,
   ...legacyPortraitEffectTemplates,
   ...legacyContribPortraitTemplates,
   ...legacyLiveMemeTemplates,
