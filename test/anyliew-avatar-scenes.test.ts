@@ -16,10 +16,10 @@ const expected = [
 ] as const;
 
 test("保留九项场景模板的原注册键、别名、素材路径和输入约束", () => {
-  expect(anyliewAvatarSceneAssets.map(([path]) => path)).toEqual(expected.map(([key]) => `emoji/${key}/images/0.png`));
+  expect(anyliewAvatarSceneAssets.map<string>(([path]) => path)).toEqual(expected.map(([key]) => `emoji/${key}/images/0.png`));
   expect(anyliewAvatarSceneTemplates.map(({ info }) => [
     info.key, info.keywords, info.params_type.min_images, info.params_type.max_texts,
-  ])).toEqual(expected);
+  ])).toEqual(expected.map(([key, keywords, images, texts]) => [key, keywords, images, texts]));
 });
 
 test("一生一世对应双头像位置、中心裁切和圆形蒙版", async () => {
