@@ -18596,6 +18596,11 @@
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/bubble_tea/0.png"
     },
+    "images/can_can_need/0.jpg": {
+      "digest": "94010c4b60c859897ad4390484931942897f3f28592d580146b65116d3f8583c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-contrib/8547f2e5718bfbb3328d700fe2c21d2ec5962500/",
+      "originalPath": "memes/can_can_need/images/0.jpg"
+    },
     "images/capoo_draw/0.png": {
       "digest": "caf15b416aaea1a53200d555310783fa9a527575e75f21ea05f0963a01b5537d",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
@@ -36420,6 +36425,11 @@
       "digest": "dd08f42c0ff0755628de827c5cfc5520542cc87f92d850d36ccb870c1631e1f5",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/stickman_dancing/108.png"
+    },
+    "images/stretch/0.png": {
+      "digest": "58b403995d087989584f4cc868680da31f35bff8e1f727b9e5241a79d3d9f29c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-contrib/8547f2e5718bfbb3328d700fe2c21d2ec5962500/",
+      "originalPath": "memes/stretch/images/0.png"
     },
     "images/subject3/00.png": {
       "digest": "75e270db3de7c3f6bc6b0677cc02063551ca5124c1e4a0ca0a10d9324b3db555",
