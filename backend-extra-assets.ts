@@ -1,3 +1,4 @@
+import { legacyFixedPoseAssets } from "./backend-legacy-fixed-pose-assets.ts";
 import { anyliewSignAssets } from "./backend-anyliew-sign-assets.ts";
 import { anyliewLargeAvatarAssets } from "./backend-anyliew-large-avatar-assets.ts";
 import { anyliewTextDialogueAssets } from "./backend-text-dialogue-assets.ts";
@@ -99,6 +100,7 @@ const anyliewAssets = [
 ];
 
 export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map<string, ExtraMemeAsset>([
+  ...legacyFixedPoseAssets,
   ...anyliewAssets.map(([path, digest]) => [`images/anyliew/${path}`, { path, digest, sources: anyliewBase }] as const),
   anyliewDeerHelpAsset,
   ...pythonOverlayAssets,
