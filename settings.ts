@@ -152,7 +152,7 @@ function panelField(group: string, [label, key, type]: PanelSetting) {
     case "templates": return { label, field, component: "Select", componentProps: { mode: "tags" } };
     case "backend": return { label, field, component: "Select",
       componentProps: { options: Object.entries(backendModes).map(([value, label]) => ({ label, value })) },
-      bottomHelpMessage: "本机托管使用已内置模板。切换后可等待定时同步，也可运行 #表情更新资源。" };
+      bottomHelpMessage: "本机托管使用已内置模板。切换后首次查目录或使用本机表情时会准备目录。" };
     case "url": return { label, field, component: "Input",
       bottomHelpMessage: "自动模式沿用已填地址，留空使用本机托管。环境变量 LOTUS_MEME_SERVER_URL 优先。" };
     case "seconds": return { label: field === "server.timeout" ? "远端请求超时（秒）" : label,
