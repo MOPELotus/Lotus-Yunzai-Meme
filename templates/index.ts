@@ -51,6 +51,7 @@ import { legacySceneMemeTemplates } from "./legacy-scene.ts";
 import { legacyCaptionSceneTemplates } from "./legacy-caption-scenes.ts";
 import { legacyCaptionShortcutTemplates } from "./legacy-caption-shortcuts.ts";
 import { legacyTextOverlayTemplates } from "./legacy-text-overlays.ts";
+import { mirageTankTemplates } from "./mirage-tank.ts";
 import { mirrorFlashMemeTemplates } from "./mirror-flash.ts";
 import { motionMemeTemplates } from "./motion.ts";
 import { offsetMotionMemeTemplates } from "./offset-motion.ts";
@@ -63,6 +64,7 @@ import { photoInsetMemeTemplates } from "./photo-insets.ts";
 import { portraitOverlayTemplates } from "./portrait-overlays.ts";
 import { rectangleOverlayTemplates } from "./rectangle-overlays.ts";
 import { rotatedInsetMemeTemplates } from "./rotated-insets.ts";
+import { rotatingAvatarTemplates } from "./rotating-avatars.ts";
 import { pythonOverlayMemeTemplates } from "./python-overlay-animation.ts";
 import { staticMemeTemplates } from "./static-layouts.ts";
 import { scrollingDialogueMemeTemplates } from "./scrolling-dialogue.ts";
@@ -89,6 +91,8 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...spatialRotationTemplates,
   ...transformMemeTemplates,
   ...basicImageMemeTemplates,
+  ...mirageTankTemplates,
+  ...rotatingAvatarTemplates,
   ...motionMemeTemplates,
   ...offsetMotionMemeTemplates,
   ...mirrorFlashMemeTemplates,
