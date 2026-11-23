@@ -23,6 +23,7 @@ import { anyliewFixedBatchAssets } from "./backend-anyliew-fixed-batch-assets.ts
 import { flushAssets } from "./backend-flush-assets.ts";
 import { pythonOverlayAssets } from "./backend-python-overlay-assets.ts";
 import { legacyTextOverlayAssets } from "./backend-legacy-text-overlay-assets.ts";
+import { legacyArchiveAssets } from "./backend-legacy-archive-assets.ts";
 import { jumpSoldAssets } from "./backend-jump-sold-assets.ts";
 import { anyliewRectangleOverlayAssets } from "./backend-rectangle-overlay-assets.ts";
 import { anyliewShortAnimationAssets } from "./backend-short-animation-assets.ts";
@@ -119,6 +120,7 @@ export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map<stri
   ...croppedPhotoAssets,
   ...legacyPhotoSceneAssets,
   ...legacyTextOverlayAssets,
+  ...legacyArchiveAssets,
   ...legacyWordmarkAssets,
   ...legacyChatCardAssets,
   ...pythonGraphicAssets,

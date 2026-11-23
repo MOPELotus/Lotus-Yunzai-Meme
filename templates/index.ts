@@ -57,6 +57,7 @@ import { legacyLiveMemeTemplates } from "./legacy-live-effects.ts";
 import { legacyProjectedActionTemplates } from "./legacy-projected-actions.ts";
 import { legacySceneMemeTemplates } from "./legacy-scene.ts";
 import { legacyCaptionSceneTemplates } from "./legacy-caption-scenes.ts";
+import { legacyArchiveOverlayTemplates } from "./legacy-archive-overlays.ts";
 import { legacyCaptionShortcutTemplates } from "./legacy-caption-shortcuts.ts";
 import { legacyTextOverlayTemplates } from "./legacy-text-overlays.ts";
 import { mirageTankTemplates } from "./mirage-tank.ts";
@@ -132,6 +133,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   pjskTemplate,
   ...legacyCaptionShortcutTemplates,
   ...legacyCaptionSceneTemplates,
+  ...legacyArchiveOverlayTemplates,
   ...legacyBadgeTemplates,
   ...legacyWordmarkTemplates,
   ...legacyChatCardTemplates,
