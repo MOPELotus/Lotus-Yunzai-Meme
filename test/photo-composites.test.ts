@@ -1,6 +1,8 @@
 import { expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { Canvas, loadImage } from "skia-canvas";
+import { readMemeImageSequence } from "../templates/animated-input.ts";
+import { encodeMemeGif } from "../templates/gif.ts";
 import { photoCompositeMemeTemplates } from "../templates/photo-composites.ts";
 
 const signal = new AbortController().signal;
@@ -9,7 +11,7 @@ const context = {
   async imageAsset() { throw new Error("这个模板不需要底图。"); },
   async fontAsset() { return readFile(new URL("../../starrail/rogue-theme/SR.ttf", import.meta.url)); },
 };
-const [call110, trance] = photoCompositeMemeTemplates;
+const [call110, trance, kaleidoscope] = photoCompositeMemeTemplates;
 
 async function sample(width: number, height: number, color: string) {
   const canvas = new Canvas(width, height);
@@ -49,4 +51,19 @@ test("恍惚保留原始画布大小及上下两侧的拖影", async () => {
   expect(result.color(40, 45)[0]).toBeLessThan(12);
   expect(result.color(40, 64)[0]).toBeLessThan(248);
   expect(result.color(40, 80)[0]).toBeGreaterThan(248);
+});
+
+test("万花筒与万花镜共用原版画布，圆形开关保留输入动图帧间隔", async () => {
+  expect(kaleidoscope.info).toMatchObject({
+    keywords: ["万花筒", "万花镜"],
+    params_type: { args_type: { parser_options: [{ names: ["--circle", "圆"], dest: "circle" }] } },
+  });
+  const rgba = Uint8Array.from({ length: 24 * 16 * 4 }, (_, index) => index % 4 < 2 ? 0 : 255);
+  const second = Uint8Array.from(rgba, (value, index) => index % 4 === 0 ? 255 : value);
+  const gif = encodeMemeGif(24, 16, [{ rgba, delayMs: 100 }, { rgba: second, delayMs: 140 }], signal);
+  const file = new File([new Uint8Array(gif)], "头像.gif");
+  const bytes = await kaleidoscope.render({ images: [file], texts: [], args: { circle: true } }, context);
+  const sequence = await readMemeImageSequence(new File([new Uint8Array(bytes)], "万花镜.gif"), signal);
+  expect([sequence.frames[0].width, sequence.frames[0].height, sequence.frames.length, sequence.averageDelayMs])
+    .toEqual([1200, 1200, 2, 120]);
 });

@@ -118,7 +118,7 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
         } },
         parser_options: [
           { names: ["-n", "--number"], args: [{ name: "number" }] },
-          { names: ["--circle"], args: null, action: { type: 0, value: true } },
+          { names: ["--circle", "圆"], args: null, action: { type: 0, value: true } },
           { names: ["--right"], args: null, dest: "mode", action: { type: 0, value: "right" } },
         ],
       },
@@ -184,6 +184,10 @@ test("从旧 meme 表分页并查询详情，数据库保持不变", async () =>
     expect(await argsFor("#只图 -n -2 --circle --right")).toEqual({
       user_infos: [{ name: "测试昵称", gender: "female" }], number: -2, circle: true, mode: "right",
     });
+    expect(await argsFor("#只图 圆")).toEqual({
+      user_infos: [{ name: "测试昵称", gender: "female" }], circle: true,
+    });
+    expect(await prepareMemeRequest("#只图 圆形", argumentInput)).toBeUndefined();
     expect(await prepareMemeRequest("#只图 --number", argumentInput)).toContain("缺少值");
     expect(await prepareMemeRequest("#只图 #mode 中间", argumentInput)).toContain("值无效");
     expect(await prepareMemeRequest("#只图 #user_infos user", argumentInput)).toContain("不支持参数");

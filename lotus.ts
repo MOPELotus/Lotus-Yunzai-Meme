@@ -340,9 +340,7 @@ function resolveTrigger(message: string, context?: CatalogContext, withParams = 
 
     const text = candidate.slice(match.keyword.length).trim();
     const textMatches = requireTextMatch(match.row, text);
-    const mayHaveFlags = !textMatches && /(?:^|\s)--?[\p{L}\p{N}_]/u.test(text);
-    if (!textMatches && !mayHaveFlags) return;
-    const params = withParams || mayHaveFlags
+    const params = withParams || !textMatches
       ? db.query<{ params: string }, [string]>("SELECT params FROM meme WHERE key = ?").get(visible.key)
       : undefined;
     if (!textMatches) {
