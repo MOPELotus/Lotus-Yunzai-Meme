@@ -7,6 +7,12 @@ const maxFramePixels = 24_000_000;
 const maxGifBytes = 16 * 1024 * 1024;
 const maxColor = 255;
 
+export class MemeGifByteLimitError extends RangeError {
+  constructor() {
+    super("表情动图超过 16 MiB。");
+  }
+}
+
 function colorBin(red: number, green: number, blue: number) {
   return ((red >>> 3) << 10) | ((green >>> 3) << 5) | (blue >>> 3);
 }
@@ -100,7 +106,7 @@ class GifBytes {
 
   byte(value: number) {
     if (this.length === this.bytes.length) {
-      if (this.length >= maxGifBytes) throw new RangeError("表情动图超过 16 MiB。");
+      if (this.length >= maxGifBytes) throw new MemeGifByteLimitError();
       const expanded = new Uint8Array(this.bytes.length * 2);
       expanded.set(this.bytes);
       this.bytes = expanded;

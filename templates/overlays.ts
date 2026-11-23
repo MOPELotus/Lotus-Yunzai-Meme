@@ -1,11 +1,12 @@
 // Geometry and JPG/GIF selection follow MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { randomInt } from "node:crypto";
-import { ImageData, loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
-import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
+import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
+import { renderExactPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import type { MemeImageSequence } from "./animated-input.ts";
-import { jpg, previewImage } from "./template-layout.ts";
+import { renderMaskedRaster } from "./masked-layout.ts";
+import { jpg, previewImage, type Draw } from "./template-layout.ts";
 import { readTransformSource, renderTransformSequence } from "./transforms.ts";
 
 interface OverlayLayout {
@@ -141,42 +142,13 @@ async function prepareSequence(source: MemeImageSequence, grayscale: boolean, si
   return { frames: [frames[0]!, ...frames.slice(1)], averageDelayMs: source.averageDelayMs * step };
 }
 
-function pasteMask(rgba: Uint8Array, overlay: Uint8Array) {
-  for (let i = 0; i < rgba.length; i += 4) {
-    const alpha = overlay[i + 3]!;
-    if (!alpha) continue;
-    for (let channel = i; channel < i + 4; channel++) {
-      rgba[channel] = Math.round((overlay[channel]! * alpha + rgba[channel]! * (255 - alpha)) / 255);
-    }
-  }
-}
-
 async function renderMaskedStill(image: Image, frame: Image, extra: Image | undefined, layout: OverlayLayout, signal: AbortSignal) {
-  // Pillow pastes the artwork using its own alpha as a mask for all four channels.
-  // Preserve that matte before flattening the static JPEG onto white.
   const { width, height } = frame;
-  const [avatar, art] = await Promise.all([
-    renderRgba(width, height, draw => drawAvatar(draw, image, layout, true)),
-    renderRgba(width, height, draw => draw.drawImage(frame, 0, 0)),
-  ]);
-  const rgba = avatar.rgba;
-  pasteMask(rgba, art.rgba);
+  const layers: Draw[] = [draw => draw.drawImage(frame, 0, 0)];
   const { sticker } = layout;
-  if (sticker && extra) {
-    signal.throwIfAborted();
-    const label = await renderRgba(width, height, draw => draw.drawImage(extra, sticker[1], sticker[2]));
-    pasteMask(rgba, label.rgba);
-  }
-  for (let i = 0; i < rgba.length; i += 4) {
-    const alpha = rgba[i + 3]!;
-    for (let channel = i; channel < i + 3; channel++) {
-      rgba[channel] = Math.round((rgba[channel]! * alpha) / 255 + 255 - alpha);
-    }
-    rgba[i + 3] = 255;
-  }
-  signal.throwIfAborted();
-  const pixels = new ImageData(new Uint8ClampedArray(rgba), width, height);
-  const { png } = await renderExactPng(width, height, draw => draw.putImageData(pixels, 0, 0));
+  if (sticker && extra) layers.push(draw => draw.drawImage(extra, sticker[1], sticker[2]));
+  const png = await renderMaskedRaster(width, height, draw => drawAvatar(draw, image, layout, true), layers, signal,
+    { whiteBackground: true });
   const composed = await loadImage(png);
   return jpg(width, height, draw => draw.drawImage(composed, 0, 0), signal);
 }

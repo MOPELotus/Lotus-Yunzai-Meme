@@ -8,6 +8,7 @@ import { motionMemeTemplates } from "./motion.ts";
 import { offsetMotionMemeTemplates } from "./offset-motion.ts";
 import { overlayMemeTemplates } from "./overlays.ts";
 import { pat, rub } from "./pat-rub.ts";
+import { perspectiveMemeTemplates } from "./perspective.ts";
 import { petpet } from "./petpet.ts";
 import { staticMemeTemplates } from "./static-layouts.ts";
 import { textSignMemeTemplates } from "./text-signs.ts";
@@ -27,4 +28,5 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...avatarFrameMemeTemplates,
   ...legacySceneMemeTemplates,
   ...textSignMemeTemplates,
+  ...perspectiveMemeTemplates,
 ];
