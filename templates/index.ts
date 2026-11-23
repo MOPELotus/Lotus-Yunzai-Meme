@@ -1,3 +1,5 @@
+import { pythonGraphicSceneTemplates } from "./python-graphic-scenes.ts";
+import { pythonMotionSceneTemplates } from "./python-motion-scenes.ts";
 import type { MemeTemplate } from "../builtin-template.ts";
 import { avatarAccessoryMemeTemplates } from "./avatar-accessories.ts";
 import { legacyFixedPoseTemplates } from "./legacy-fixed-poses.ts";
@@ -112,6 +114,8 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...legacyCaptionSceneTemplates,
   ...legacyBadgeTemplates,
   ...legacyPhotoCaptionTemplates,
+  ...pythonGraphicSceneTemplates,
+  ...pythonMotionSceneTemplates,
   ...legacyPhotoFormTemplates,
   leaveNoteTemplate,
   ...legacyPortraitEffectTemplates,
