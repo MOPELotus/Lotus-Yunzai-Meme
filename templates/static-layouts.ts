@@ -1,10 +1,10 @@
 import { randomInt } from "node:crypto";
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
-import { nativeImageRasterScale, renderExactPng } from "../../../packages/skia/index.ts";
+import { renderExactPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { alignMemeLoop, readMemeImageSequence } from "./animated-input.ts";
-import { assertMemeGifDimensions, encodeMemeGif } from "./gif.ts";
-import { drawFittedText, firstImage, jpg, paper, previewImage, registerFont, rgbaFrame, type Draw } from "./template-layout.ts";
+import { renderPythonCanvasGif } from "./python-gif.ts";
+import { drawFittedText, firstImage, jpg, paper, previewImage, registerFont, rgbaFrameDimensions, type Draw } from "./template-layout.ts";
 
 const colors = ["red", "darkorange", "gold", "darkgreen", "blue", "cyan", "purple"] as const;
 
@@ -61,17 +61,15 @@ async function always(input: MemeTemplateInput, context: MemeTemplateContext) {
     };
   }
   if (animation.length === 1) return jpg(500, height, await draw(animation[0]!.image, 0), signal);
-  const scale = nativeImageRasterScale() / 4;
-  assertMemeGifDimensions(Math.ceil(500 * scale), Math.ceil(height * scale), animation.length);
   const delayMs = mode === "loop" ? 100 : sequence.averageDelayMs;
-  const frames = [];
-  let size: { width: number; height: number } | undefined;
-  for (const { image, overlay } of animation) {
-    const raster = await rgbaFrame(500, height, await draw(image, overlay), signal);
-    size ??= { width: raster.width, height: raster.height };
-    frames.push({ rgba: raster.rgba, delayMs });
-  }
-  return encodeMemeGif(size!.width, size!.height, frames, signal);
+  return renderPythonCanvasGif({
+    ...rgbaFrameDimensions(500, height), signal,
+    frames: animation.map(value => ({ value, delayMs })),
+    async drawFrame({ image, overlay }, context) {
+      const layout = await draw(image, overlay);
+      return layout(context);
+    },
+  });
 }
 
 async function alwaysLike(input: MemeTemplateInput, context: MemeTemplateContext) {

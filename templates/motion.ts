@@ -1,7 +1,8 @@
 import { renderPng, renderRgba } from "@lotus-yunzai/skia";
 import type { MemeTemplate, MemeTemplateContext } from "../builtin-template.ts";
 import { alignMemeLoop, readMemeFirstImage, readMemeImageSequence } from "./animated-input.ts";
-import { assertMemeGifDimensions, encodeMemeGif } from "./gif.ts";
+import { encodeMemeGif } from "./gif.ts";
+import { renderPythonCanvasGif } from "./python-gif.ts";
 
 const singleImage = { min_images: 1, max_images: 1, min_texts: 0, max_texts: 0 };
 const directionHelp = "跑动方向，包含 left_right、right_left";
@@ -76,26 +77,23 @@ const leftRightJump: MemeTemplate = {
     const imageWidth = 100;
     const imageHeight = Math.max(1, Math.floor(source.frames[0].height * imageWidth / source.frames[0].width));
     const frameHeight = imageHeight + 30;
-    const frames = [];
     const distance = frameWidth - imageWidth;
     const timeline = alignMemeLoop(source, 30, 40);
-    assertMemeGifDimensions(frameWidth, frameHeight, timeline.length);
-    for (const { overlay, image } of timeline) {
-      signal.throwIfAborted();
-      const returning = overlay >= 15;
-      const step = returning ? 29 - overlay : overlay;
-      const progress = distance * step / 14;
-      const x = args.direction === "right_left" ? progress : distance - progress;
-      const arcCenter = x < distance / 2 ? distance / 4 : distance * 3 / 4;
-      const jump = 15 * (1 - ((x - arcCenter) / (distance / 4)) ** 2);
-      const { rgba } = await renderRgba(frameWidth, frameHeight, draw => {
+    return renderPythonCanvasGif({
+      width: frameWidth, height: frameHeight, signal,
+      frames: timeline.map(value => ({ value, delayMs: 40 })),
+      drawFrame({ overlay, image }, draw) {
+        const returning = overlay >= 15;
+        const step = returning ? 29 - overlay : overlay;
+        const progress = distance * step / 14;
+        const x = args.direction === "right_left" ? progress : distance - progress;
+        const arcCenter = x < distance / 2 ? distance / 4 : distance * 3 / 4;
+        const jump = 15 * (1 - ((x - arcCenter) / (distance / 4)) ** 2);
         draw.translate(Math.round(x) + (returning ? imageWidth : 0), Math.round(30 - jump));
         if (returning) draw.scale(-1, 1);
         draw.drawImage(image, 0, 0, imageWidth, imageHeight);
-      });
-      frames.push({ rgba, delayMs: 40 });
-    }
-    return encodeMemeGif(frameWidth, frameHeight, frames, signal);
+      },
+    });
   },
   async preview(context) {
     return leftRightJump.render({ images: [await previewImage(context)], texts: [], args: {} }, context);

@@ -4,7 +4,6 @@ import { randomInt } from "node:crypto";
 import { loadImage, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
-import type { MemeImageSequence } from "./animated-input.ts";
 import { drawAvatar, type AvatarPlacement } from "./avatar-slot.ts";
 import { renderMaskedRaster } from "./masked-layout.ts";
 import { jpg, previewImage, type Draw } from "./template-layout.ts";
@@ -94,19 +93,6 @@ async function grayImage(image: Image, signal: AbortSignal) {
   return loadImage(png);
 }
 
-async function prepareSequence(source: MemeImageSequence, grayscale: boolean, signal: AbortSignal): Promise<MemeImageSequence> {
-  const frameCount = Math.min(200, source.frames.length);
-  const step = source.frames.length / frameCount;
-  if (!grayscale && step === 1) return source;
-  const frames: Image[] = [];
-  for (let index = 0; index < frameCount; index++) {
-    signal.throwIfAborted();
-    const image = source.frames[Math.floor(index * step)]!;
-    frames.push(grayscale ? await grayImage(image, signal) : image);
-  }
-  return { frames: [frames[0]!, ...frames.slice(1)], averageDelayMs: source.averageDelayMs * step };
-}
-
 async function renderMaskedStill(image: Image, frame: Image, extra: Image | undefined, layout: OverlayLayout, signal: AbortSignal) {
   const { width, height } = frame;
   const layers: Draw[] = [draw => draw.drawImage(frame, 0, 0)];
@@ -124,23 +110,18 @@ function overlayTemplate({ key, keywords, tags, layout: getLayout, grayscale, ar
     const source = await readTransformSource(input, context.signal);
     const layout = typeof getLayout === "function" ? getLayout(source.frames[0], input.args) : getLayout;
     const { art = "0.png", sticker, avatarAboveArt } = layout;
-    const [frame, extra, sequence] = await Promise.all([
+    const [frame, extra] = await Promise.all([
       context.imageAsset(`${key}/${art}`).then(loadImage),
       sticker && context.imageAsset(`${key}/${sticker[0]}`).then(loadImage),
-      prepareSequence(source, grayscale === "always" || (grayscale === "optional" && input.args.black === true), context.signal),
     ]);
-    // Like the old GIF exporter, keep the animation duration and shrink oversized output.
-    let width = frame.width, height = frame.height;
-    const isStill = sequence.frames.length === 1;
-    if (isStill && layout.maskedStill) return renderMaskedStill(sequence.frames[0], frame, extra, layout, context.signal);
-    if (!isStill) {
-      while (width * height * sequence.frames.length > 24_000_000) {
-        width = Math.max(1, Math.floor(width * 0.9));
-        height = Math.max(1, Math.floor(height * 0.9));
-      }
+    const isStill = source.frames.length === 1;
+    const gray = grayscale === "always" || (grayscale === "optional" && input.args.black === true);
+    if (isStill && layout.maskedStill) {
+      const image = gray ? await grayImage(source.frames[0], context.signal) : source.frames[0];
+      return renderMaskedStill(image, frame, extra, layout, context.signal);
     }
-    return renderTransformSequence(sequence, width, height, (draw, image) => {
-      draw.scale(width / frame.width, height / frame.height);
+    return renderTransformSequence(source, frame.width, frame.height, async (draw, avatar) => {
+      const image = gray ? await grayImage(avatar, context.signal) : avatar;
       if (avatarAboveArt) draw.drawImage(frame, 0, 0);
       drawAvatar(draw, image, layout, isStill);
       if (!avatarAboveArt) draw.drawImage(frame, 0, 0);

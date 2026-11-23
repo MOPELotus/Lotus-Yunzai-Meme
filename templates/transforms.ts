@@ -3,8 +3,8 @@
 import type { CanvasRenderingContext2D, Image } from "skia-canvas";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeImageSequence, type MemeImageSequence } from "./animated-input.ts";
-import { assertMemeGifDimensions, encodeMemeGif } from "./gif.ts";
-import { drawFittedText, jpg, previewImage, registerFont, rgbaFrame, rgbaFrameDimensions } from "./template-layout.ts";
+import { renderPythonCanvasGif } from "./python-gif.ts";
+import { drawFittedText, jpg, previewImage, registerFont, rgbaFrameDimensions } from "./template-layout.ts";
 
 const flatWidth = 500;
 const captionHeight = 80;
@@ -14,7 +14,7 @@ const directionHelp = "对称方向，包含 left、right、top、bottom";
 const directions = [["left", "左"], ["right", "右"], ["top", "上"], ["bottom", "下"]] as const;
 
 type Direction = typeof directions[number][0];
-type DrawFrame = (canvas: CanvasRenderingContext2D, image: Image) => void;
+type DrawFrame = (canvas: CanvasRenderingContext2D, image: Image) => void | Promise<void>;
 
 export function readTransformSource(input: MemeTemplateInput, signal: AbortSignal) {
   if (input.images.length !== 1) throw new Error("该表情需要一张图片。");
@@ -25,20 +25,17 @@ export async function renderTransformSequence(sequence: MemeImageSequence, width
   if (sequence.frames.length === 1) return jpg(width, height, canvas => {
     canvas.fillStyle = "white";
     canvas.fillRect(0, 0, width, height);
-    draw(canvas, sequence.frames[0]);
+    return draw(canvas, sequence.frames[0]);
   }, signal);
 
-  const { width: frameWidth, height: frameHeight } = rgbaFrameDimensions(width, height);
-  assertMemeGifDimensions(frameWidth, frameHeight, sequence.frames.length);
-  const frames = [];
+  const raster = rgbaFrameDimensions(width, height);
   // The old single-image animation draws each input frame once and uses the mean duration.
   const delayMs = Math.floor(sequence.averageDelayMs / 10) * 10;
-  for (const frame of sequence.frames) {
-    signal.throwIfAborted();
-    const rendered = await rgbaFrame(width, height, target => draw(target, frame), signal);
-    frames.push({ rgba: rendered.rgba, delayMs });
-  }
-  return encodeMemeGif(frameWidth, frameHeight, frames, signal);
+  return renderPythonCanvasGif({
+    ...raster, signal,
+    frames: sequence.frames.map(value => ({ value, delayMs })),
+    drawFrame: (frame, target) => draw(target, frame),
+  });
 }
 
 function drawHalf(ctx: CanvasRenderingContext2D, image: Image, horizontal: boolean, half: number, position: number, mirrored: boolean) {

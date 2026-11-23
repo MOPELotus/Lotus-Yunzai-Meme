@@ -1,8 +1,8 @@
 import { loadImage } from "skia-canvas";
 import type { MemeTemplate, MemeTemplateInput, MemeTemplateContext, MemeTemplateShortcut } from "../builtin-template.ts";
 import { readMemeImageSequence } from "./animated-input.ts";
-import { assertMemeGifDimensions, encodeMemeGif } from "./gif.ts";
 import { renderMaskedRaster, renderMaskedRgba } from "./masked-layout.ts";
+import { renderPythonGif } from "./python-gif.ts";
 import { previewImage, rgbaFrameDimensions, type Draw } from "./template-layout.ts";
 
 interface OverlayOptions {
@@ -113,13 +113,18 @@ export const rectangleOverlayTemplates: readonly MemeTemplate[] = overlays.map(
       if (source.frames.length === 1) {
         return renderMaskedRaster(width, height, base, layers(source.frames[0]), signal, { clip });
       }
-      assertMemeGifDimensions(width, height, source.frames.length);
-      const rendered = [];
-      for (const avatar of source.frames) {
-        const rgba = await renderMaskedRgba(width, height, base, layers(avatar), signal, { clip });
-        rendered.push({ rgba, delayMs: source.averageDelayMs });
-      }
-      return encodeMemeGif(width, height, rendered, signal);
+      return renderPythonGif({
+        width, height, signal,
+        frames: source.frames.map(value => ({ value, delayMs: source.averageDelayMs })),
+        renderFrame(avatar, rasterWidth, rasterHeight) {
+          const scaleDraw = (paint: Draw): Draw => canvas => {
+            canvas.scale(rasterWidth / width, rasterHeight / height);
+            return paint(canvas);
+          };
+          return renderMaskedRgba(rasterWidth, rasterHeight, base, layers(avatar).map(scaleDraw), signal,
+            { clip: clip && scaleDraw(clip) });
+        },
+      });
     }
     return {
       info: { key, keywords, tags, ...(shortcuts && { shortcuts }), params_type: { ...params, max_texts: maxTexts } },

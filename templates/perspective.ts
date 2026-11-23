@@ -3,15 +3,13 @@
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import { renderExactPng, renderPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput, MemeTemplateShortcut } from "../builtin-template.ts";
-import { readMemeFirstImage, type MemeImageSequence } from "./animated-input.ts";
-import { assertMemeGifDimensions, MemeGifByteLimitError } from "./gif.ts";
+import { readMemeFirstImage } from "./animated-input.ts";
 import { renderMaskedRaster } from "./masked-layout.ts";
 import { screenProjection, type ProjectiveQuad } from "./projective-transform.ts";
-import { drawFittedText, jpg, previewImage, registerFont, rgbaFrameDimensions } from "./template-layout.ts";
+import { drawFittedText, jpg, previewImage, registerFont } from "./template-layout.ts";
 import { readTransformSource, renderTransformSequence } from "./transforms.ts";
 
 type Point = readonly [x: number, y: number];
-const maxSendBytes = 8 * 1024 * 1024;
 
 interface Caption {
   readonly text: string;
@@ -127,50 +125,6 @@ async function captionArtwork(art: Image, caption: Caption, text: string, contex
   return loadImage(png);
 }
 
-function fitAnimation(source: MemeImageSequence, width: number, height: number) {
-  const count = Math.min(source.frames.length, 200);
-  const step = source.frames.length / count;
-  const selected: MemeImageSequence = step === 1 ? source : {
-    frames: [source.frames[0], ...Array.from({ length: count - 1 }, (_, index) => source.frames[Math.floor((index + 1) * step)]!)],
-    averageDelayMs: source.averageDelayMs * step,
-  };
-  for (;;) {
-    const raster = rgbaFrameDimensions(width, height);
-    try {
-      assertMemeGifDimensions(raster.width, raster.height, count);
-      return { width, height, sequence: selected };
-    } catch (error) {
-      if (!(error instanceof RangeError)) throw error;
-      // Keep the old GIF shrink factor and leave ordinary images at their original size.
-      width = smallerSide(width);
-      height = smallerSide(height);
-    }
-  }
-}
-
-function smallerSide(value: number) {
-  return Math.max(1, Math.floor(value * 0.9));
-}
-
-async function renderScreenAnimation(source: MemeImageSequence, art: Image, drawAvatar: ReturnType<typeof projectedAvatar>, signal: AbortSignal) {
-  let { width, height, sequence } = fitAnimation(source, art.width, art.height);
-  for (;;) {
-    signal.throwIfAborted();
-    try {
-      const gif = await renderTransformSequence(sequence, width, height, (canvas, image) => {
-        canvas.scale(width / art.width, height / art.height);
-        drawAvatar(canvas, image);
-        canvas.drawImage(art, 0, 0);
-      }, signal);
-      if (gif.byteLength <= maxSendBytes) return gif;
-    } catch (error) {
-      if (!(error instanceof MemeGifByteLimitError)) throw error;
-    }
-    width = smallerSide(width);
-    height = smallerSide(height);
-  }
-}
-
 function screenTemplate(definition: ScreenTemplate): MemeTemplate {
   const { key, keywords, tags, firstFrameOnly, png, caption, shortcuts, avatarAboveArt } = definition;
   const drawAvatar = projectedAvatar(definition);
@@ -195,7 +149,10 @@ function screenTemplate(definition: ScreenTemplate): MemeTemplate {
       if (!png) return jpg(width, height, canvas => canvas.drawImage(image, 0, 0), signal);
       return (await renderPng(width, height, canvas => canvas.drawImage(image, 0, 0))).png;
     }
-    return renderScreenAnimation(source, art, drawAvatar, signal);
+    return renderTransformSequence(source, art.width, art.height, (canvas, image) => {
+      drawAvatar(canvas, image);
+      canvas.drawImage(art, 0, 0);
+    }, signal);
   }
   return {
     info: { key, keywords, tags, shortcuts, params_type: {

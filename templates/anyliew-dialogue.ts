@@ -2,8 +2,8 @@
 import { ImageData, loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext, type MemeTemplateInput } from "../builtin-template.ts";
-import { assertMemeGifDimensions, encodeMemeGif } from "./gif.ts";
 import { renderMaskedRgba } from "./masked-layout.ts";
+import { renderPythonGif } from "./python-gif.ts";
 import { jpg, registerFont, registerMemeTypeface, rgbaFrameDimensions } from "./template-layout.ts";
 import { readTransformSource, transformPreviewInput } from "./transforms.ts";
 
@@ -216,28 +216,28 @@ export async function renderAnyLiewDialogue(input: MemeTemplateInput, context: M
   const text = captionText(input, definition);
   const box = typeof definition.box === "function" ? definition.box(frame.width, frame.height) : definition.box;
   const { width, height, scale } = rgbaFrameDimensions(frame.width, frame.height);
-  if (sequence.frames.length > 1) assertMemeGifDimensions(width, height, sequence.frames.length);
-  const backdrop = (draw: CanvasRenderingContext2D) => {
-    draw.scale(scale, scale);
-    draw.drawImage(frame, 0, 0);
-    paintCaption(draw, box, text, family, definition);
-  };
-  async function raster(image: Image) {
+  async function raster(image: Image, rasterWidth: number, rasterHeight: number) {
     const source = definition.circle === "square-first" ? await squareCircle(image) : image;
+    const scaleX = scale * rasterWidth / width, scaleY = scale * rasterHeight / height;
+    const backdrop = (draw: CanvasRenderingContext2D) => {
+      draw.scale(scaleX, scaleY);
+      draw.drawImage(frame, 0, 0);
+      paintCaption(draw, box, text, family, definition);
+    };
     const avatar = (draw: CanvasRenderingContext2D) => {
-      draw.scale(scale, scale);
+      draw.scale(scaleX, scaleY);
       drawAvatar(draw, source, definition);
     };
     if (definition.avatarOnTop) {
-      return renderMaskedRgba(width, height, backdrop, [avatar], signal,
+      return renderMaskedRgba(rasterWidth, rasterHeight, backdrop, [avatar], signal,
         { whiteBackground: definition.jpeg === true && sequence.frames.length === 1 });
     }
     return definition.cropAvatar
-      ? renderMaskedRgba(width, height, avatar, [backdrop], signal)
-      : renderMaskedRgba(width, height, () => {}, [avatar, backdrop], signal);
+      ? renderMaskedRgba(rasterWidth, rasterHeight, avatar, [backdrop], signal)
+      : renderMaskedRgba(rasterWidth, rasterHeight, () => {}, [avatar, backdrop], signal);
   }
   if (sequence.frames.length === 1) {
-    const rgba = await raster(sequence.frames[0]);
+    const rgba = await raster(sequence.frames[0], width, height);
     const image = new ImageData(new Uint8ClampedArray(rgba), width, height);
     if (definition.jpeg) return jpg(frame.width, frame.height, draw => draw.putImageData(image, 0, 0), signal);
     const rendered = await renderExactPng(width, height, draw => draw.putImageData(image, 0, 0));
@@ -245,9 +245,11 @@ export async function renderAnyLiewDialogue(input: MemeTemplateInput, context: M
     return rendered.png;
   }
   const delayMs = Math.floor(sequence.averageDelayMs / 10) * 10;
-  const frames = [];
-  for (const frame of sequence.frames) frames.push({ rgba: await raster(frame), delayMs });
-  return encodeMemeGif(width, height, frames, signal);
+  return renderPythonGif({
+    width, height, signal,
+    frames: sequence.frames.map(value => ({ value, delayMs })),
+    renderFrame: raster,
+  });
 }
 
 const singleAvatar = { min_images: 1, max_images: 1, min_texts: 0, max_texts: 1, args_type: null } as const;

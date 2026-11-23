@@ -1,8 +1,7 @@
-import { renderRgba } from "@lotus-yunzai/skia";
 import type { MemeTemplate } from "../builtin-template.ts";
 import type { Image } from "skia-canvas";
 import { alignMemeLoop, readMemeImageSequence, type MemeImageSequence } from "./animated-input.ts";
-import { assertMemeGifDimensions, encodeMemeGif } from "./gif.ts";
+import { renderPythonCanvasGif } from "./python-gif.ts";
 import { previewImage, type Draw } from "./template-layout.ts";
 
 const singleImage = { min_images: 1, max_images: 1, min_texts: 0, max_texts: 0 };
@@ -13,14 +12,11 @@ const directions = { left: "左", right: "右", top: "上", bottom: "下" } as c
 async function offsetAnimation(source: MemeImageSequence, width: number, height: number, poseCount: number,
   drawPose: (pose: number, image: Image) => Draw, signal: AbortSignal) {
   const poses = alignMemeLoop(source, poseCount, delayMs);
-  assertMemeGifDimensions(width, height, poses.length);
-  const frames = [];
-  for (const { overlay, image } of poses) {
-    signal.throwIfAborted();
-    const { rgba } = await renderRgba(width, height, drawPose(overlay, image));
-    frames.push({ rgba, delayMs });
-  }
-  return encodeMemeGif(width, height, frames, signal);
+  return renderPythonCanvasGif({
+    width, height, signal,
+    frames: poses.map(value => ({ value, delayMs })),
+    drawFrame: ({ overlay, image }, draw) => drawPose(overlay, image)(draw),
+  });
 }
 
 const vibrate: MemeTemplate = {

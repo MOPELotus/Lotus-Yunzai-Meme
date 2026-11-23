@@ -1,9 +1,9 @@
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
-import { nativeImageRasterScale, renderPng } from "../../../packages/skia/index.ts";
+import { renderPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeImageSequence } from "./animated-input.ts";
-import { assertMemeGifDimensions, encodeMemeGif } from "./gif.ts";
-import { jpg, paper, previewImage, rgbaFrame } from "./template-layout.ts";
+import { renderPythonCanvasGif } from "./python-gif.ts";
+import { jpg, paper, previewImage, rgbaFrameDimensions } from "./template-layout.ts";
 
 const params = { min_images: 1, max_images: 1, min_texts: 0, max_texts: 0, default_texts: [], args_type: null };
 const genshinTags = ["米哈游", "原神"] as const;
@@ -86,16 +86,12 @@ function avatarFrame([key, keywords, placement]: AvatarFrame, { tags = [], maxTe
       signal.throwIfAborted();
       return result.png;
     }
-    const scale = nativeImageRasterScale() / 4;
-    const count = sequence.frames.length;
-    const rasterWidth = Math.ceil(width * scale), rasterHeight = Math.ceil(height * scale);
-    assertMemeGifDimensions(rasterWidth, rasterHeight, count);
-    const rendered = [];
-    for (const avatar of sequence.frames) {
-      const { rgba } = await rgbaFrame(width, height, drawFrame(avatar, frame, placement), signal);
-      rendered.push({ rgba, delayMs: sequence.averageDelayMs });
-    }
-    return encodeMemeGif(rasterWidth, rasterHeight, rendered, signal);
+    const raster = rgbaFrameDimensions(width, height);
+    return renderPythonCanvasGif({
+      ...raster, signal,
+      frames: sequence.frames.map(value => ({ value, delayMs: sequence.averageDelayMs })),
+      drawFrame: (avatar, canvas) => drawFrame(avatar, frame, placement)(canvas),
+    });
   }
 
   return {
