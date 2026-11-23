@@ -1,3 +1,4 @@
+import { pythonBehindAssets } from "./backend-python-behind-assets.ts";
 import { pythonGraphicAssets } from "./backend-python-graphic-assets.ts";
 import { croppedPhotoAssets } from "./backend-cropped-photo-assets.ts";
 import { legacyFixedPoseAssets } from "./backend-legacy-fixed-pose-assets.ts";
@@ -109,6 +110,7 @@ export const extraMemeAssets: ReadonlyMap<string, ExtraMemeAsset> = new Map<stri
   ...croppedPhotoAssets,
   ...legacyTextOverlayAssets,
   ...pythonGraphicAssets,
+  ...pythonBehindAssets,
   ...flushAssets,
   ...jumpSoldAssets,
   ...tudouShortAnimationAssets,

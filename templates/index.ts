@@ -1,3 +1,4 @@
+import { pythonPhotoBehindTemplates } from "./python-photo-behind.ts";
 import { pythonGraphicSceneTemplates } from "./python-graphic-scenes.ts";
 import { pythonMotionSceneTemplates } from "./python-motion-scenes.ts";
 import type { MemeTemplate } from "../builtin-template.ts";
@@ -116,6 +117,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   ...legacyPhotoCaptionTemplates,
   ...pythonGraphicSceneTemplates,
   ...pythonMotionSceneTemplates,
+  ...pythonPhotoBehindTemplates,
   ...legacyPhotoFormTemplates,
   leaveNoteTemplate,
   ...legacyPortraitEffectTemplates,

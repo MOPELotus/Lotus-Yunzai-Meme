@@ -31051,6 +31051,16 @@
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
       "originalPath": "meme/扔屎/images/9.png"
     },
+    "images/python/meme_generator/memes/rip/images/0.png": {
+      "digest": "96cf95492db0623d6e7600e622bc7379cab04a864e19c62bafe1b8691b760b87",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/rip/images/0.png"
+    },
+    "images/python/meme_generator/memes/rip/images/1.png": {
+      "digest": "02d64e18ba35b70793cb8fb7d4f144837f28cc901c5cd8551269c59f8be39e8c",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator/619fa10518fc2eca4fa1053af37f0a00a839f062/",
+      "originalPath": "meme_generator/memes/rip/images/1.png"
+    },
     "images/python/meme_generator/memes/rudong/tudou/0.png": {
       "digest": "f8fd18196a8a63e7a629d59126e8bbdf615cbd4ccff0ed9ed3ef984471493e4d",
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
@@ -35230,6 +35240,16 @@
       "digest": "34cb32b152dd7a256bd52573f4ae618ec7cf8fb2d09e3019bf1e1ecff4516b1c",
       "source": "https://raw.githubusercontent.com/LRZ9712/tudou-meme/7e799eeaca9ce712eeabe41f964636c755a86c63/",
       "originalPath": "meme/zuo/images/3.png"
+    },
+    "images/python/memes/forbid/images/0.png": {
+      "digest": "ee7ab807242466495666c51e79c3b3b20e71873c45e56da8c017b0fad64d1cc6",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-contrib/8547f2e5718bfbb3328d700fe2c21d2ec5962500/",
+      "originalPath": "memes/forbid/images/0.png"
+    },
+    "images/python/memes/grab/images/0.png": {
+      "digest": "eecb51958f3d16bc4ddd0a5e1b178b3461464304455d65153d8ce7e29a4b984e",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-contrib/8547f2e5718bfbb3328d700fe2c21d2ec5962500/",
+      "originalPath": "memes/grab/images/0.png"
     },
     "images/raise_sign/0.jpg": {
       "digest": "afc7482d3baa244020e89d994cfdd1630f12dbd9086777943b89c890ccc2fdec",
