@@ -39,8 +39,7 @@ const keepAway: MemeTemplate = {
     const caption = texts[0] ?? keepAwayCaption;
     return jpg(400, 290, draw => {
       paper(draw, 400, 290);
-      const maximum = caption === keepAwayCaption ? 24 : 40;
-      drawFittedText(draw, [10, 12, 390, 82], caption, font, 12, maximum, "left", "#000", { wrap: false });
+      drawFittedText(draw, [10, 10, 390, 80], caption, font, 12, 40, "left", "#000", { wrap: false, paragraphMetrics: true });
       for (let slot = 0; slot < 8; slot++) {
         const owner = Math.min(avatars.length - 1, Math.floor(slot / perAvatar));
         const pose = slot - owner * perAvatar;
@@ -75,12 +74,13 @@ const littleAngel: MemeTemplate = {
     const name = input.texts[0] ?? (typeof info?.name === "string" && info.name ? info.name : pronoun);
     return renderTransformSequence(sequence, 600, imageHeight + 230, (draw, frame) => {
       paper(draw, 600, imageHeight + 230);
-      drawFittedText(draw, [20, 0, 580, 110], `请问你们看到${name}了吗?`, font, 25, 70, "center", "#000", { wrap: false });
+      const textLayout = { wrap: false, paragraphMetrics: true };
+      drawFittedText(draw, [20, 0, 580, 110], `请问你们看到${name}了吗?`, font, 25, 70, "center", "#000", textLayout);
       draw.drawImage(frame, 50, 110, 500, imageHeight);
       drawFittedText(draw, [10, imageHeight + 120, 590, imageHeight + 185], "非常可爱！简直就是小天使",
-        font, 12, 48, "center", "#000", { wrap: false });
+        font, 12, 48, "center", "#000", textLayout);
       drawFittedText(draw, [20, imageHeight + 180, 580, imageHeight + 215], `${pronoun}没失踪也没怎么样  我只是觉得你们都该看一下`,
-        font, 12, 26, "center", "#000", { wrap: false });
+        font, 12, 26, "center", "#000", textLayout);
     }, context.signal);
   },
   async preview(context) {
