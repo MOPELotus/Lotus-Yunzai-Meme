@@ -3,9 +3,12 @@ export type Pose = readonly [left: number, top: number, width: number, height: n
 export interface TudouAvatarLayer {
   readonly source: number;
   readonly poses: Pose | readonly Pose[];
-  readonly mode: "resize-circle" | "cover-circle" | "circle-cover";
+  readonly mode: "resize-circle" | "cover-circle" | "circle-cover" | "resized-circle-cover" | "stretch" | "cover";
   readonly initialCircle?: readonly [width: number, height: number] | "input";
   readonly squareFirst?: true;
+  readonly initialCover?: true;
+  readonly opaque?: true;
+  readonly expandedAngle?: number;
   readonly angle?: number;
   readonly below?: true;
   readonly visible?: readonly (readonly [first: number, last: number])[];
@@ -19,6 +22,9 @@ interface Composition {
   readonly viewport: readonly [width: number, height: number];
   readonly layers: readonly TudouAvatarLayer[];
   readonly artworkLast?: true;
+  readonly firstFrameOnly?: true;
+  readonly resizeArtwork?: true;
+  readonly opaqueOutput?: true;
 }
 export type TudouComposition = Composition & (
   { readonly frames: number; readonly delayMs: number; readonly still?: never } |

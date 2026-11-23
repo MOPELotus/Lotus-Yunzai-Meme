@@ -23,8 +23,24 @@ function clipCircle(draw: CanvasRenderingContext2D, x: number, y: number, diamet
 
 function drawLayer(draw: CanvasRenderingContext2D, avatar: Image, [x, y, width, height]: Pose, layer: TudouAvatarLayer) {
   draw.imageSmoothingQuality = "high";
-  if (layer.mode === "resize-circle") {
-    draw.drawImage(avatar, x, y, width, height);
+  if (layer.opaque) {
+    draw.fillStyle = "#000";
+    draw.fillRect(x, y, width, height);
+  }
+  if (layer.mode === "resize-circle" || layer.mode === "stretch") {
+    if (layer.expandedAngle !== undefined) {
+      const radians = -layer.expandedAngle * Math.PI / 180;
+      const cos = Math.abs(Math.cos(radians)), sin = Math.abs(Math.sin(radians));
+      const drawnWidth = width * cos + height * sin, drawnHeight = width * sin + height * cos;
+      const left = Math.floor((width - drawnWidth) / 2), top = Math.floor((height - drawnHeight) / 2);
+      draw.translate(x + width / 2 - left, y + height / 2 - top);
+      draw.rotate(radians);
+      draw.drawImage(avatar, -width / 2, -height / 2, width, height);
+    } else {
+      draw.drawImage(avatar, x, y, width, height);
+    }
+  } else if (layer.mode === "cover" || layer.mode === "resized-circle-cover") {
+    drawCover(draw, avatar, x, y, width, height);
   } else if (layer.mode === "circle-cover") {
     const source = Math.min(avatar.width, avatar.height);
     const size = Math.max(width, height);
@@ -52,6 +68,17 @@ function drawLayer(draw: CanvasRenderingContext2D, avatar: Image, [x, y, width, 
   }
 }
 
+function drawCover(draw: CanvasRenderingContext2D, image: Image, x: number, y: number, width: number, height: number) {
+  const ratio = Math.max(width / image.width, height / image.height);
+  const scaledWidth = Math.max(width, Math.trunc(image.width * ratio));
+  const scaledHeight = Math.max(height, Math.trunc(image.height * ratio));
+  draw.beginPath();
+  draw.rect(x, y, width, height);
+  draw.clip();
+  draw.drawImage(image, x + Math.trunc((width - scaledWidth) / 2), y + Math.trunc((height - scaledHeight) / 2),
+    scaledWidth, scaledHeight);
+}
+
 function suppliedGifTimeline(sequences: readonly MemeImageSequence[]) {
   const animated = sequences.filter(seq => seq.frames.length > 1);
   const fastest = animated.reduce((best, seq) => seq.averageDelayMs < best.averageDelayMs ? seq : best);
@@ -66,7 +93,7 @@ function suppliedGifTimeline(sequences: readonly MemeImageSequence[]) {
   } }));
 }
 
-function template(spec: TudouComposition, mode: RenderMode): MemeTemplate {
+export function createTudouComposition(spec: TudouComposition, mode?: RenderMode): MemeTemplate {
   const { key, frames, avatars: avatarCount, viewport: [width, height] } = spec;
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
     if (input.images.length !== avatarCount || input.texts.length) throw new Error(`该表情需要 ${avatarCount} 张图片。`);
@@ -99,7 +126,8 @@ function template(spec: TudouComposition, mode: RenderMode): MemeTemplate {
             const side = Math.min(avatar.width, avatar.height);
             draw.drawImage(avatar, Math.trunc((avatar.width - side) / 2), Math.trunc((avatar.height - side) / 2), side, side,
               left, top, width, height);
-          } else draw.drawImage(avatar, left, top, width, height);
+          } else if (layer.initialCover) drawCover(draw, avatar, left, top, width, height);
+          else draw.drawImage(avatar, left, top, width, height);
         }, mode).then(({ png }) => loadImage(png));
         cached.set(avatar, image);
       }
@@ -108,18 +136,18 @@ function template(spec: TudouComposition, mode: RenderMode): MemeTemplate {
 
     async function paint(frame: Frame, outWidth: number, outHeight: number) {
       const art = await readArt(frame.artwork);
-      if (art.width !== width || art.height !== height) throw new Error(`表情模板 ${key} 的原画尺寸不符。`);
+      if (!spec.resizeArtwork && (art.width !== width || art.height !== height)) throw new Error(`表情模板 ${key} 的原画尺寸不符。`);
       const raster = async (draw: (ctx: CanvasRenderingContext2D) => void) => (await renderRgba(outWidth, outHeight, ctx => {
         ctx.scale(outWidth / width, outHeight / height);
         draw(ctx);
       }, mode)).rgba;
-      const drawArt = (draw: CanvasRenderingContext2D) => draw.drawImage(art, 0, 0);
+      const drawArt = (draw: CanvasRenderingContext2D) => draw.drawImage(art, 0, 0, width, height);
       let rgba = spec.artworkLast ? Buffer.alloc(outWidth * outHeight * 4) : await raster(drawArt);
       for (const layer of spec.layers) {
         signal.throwIfAborted();
         if (layer.visible && !layer.visible.some(([first, last]) => frame.artwork >= first && frame.artwork <= last)) continue;
         const avatar = frame.avatars[layer.source]!;
-        const image = layer.mode === "resize-circle" ? await prepareCircle(avatar, layer) : avatar;
+        const image = (layer.mode === "resize-circle" || layer.mode === "resized-circle-cover") ? await prepareCircle(avatar, layer) : avatar;
         const pose = (typeof layer.poses[0] === "number" ? layer.poses : layer.poses[frame.artwork]) as Pose;
         const pixels = await raster(draw => drawLayer(draw, image, pose, layer));
         if (layer.below) {
@@ -128,10 +156,11 @@ function template(spec: TudouComposition, mode: RenderMode): MemeTemplate {
         } else pasteMask(rgba, pixels);
       }
       if (spec.artworkLast) pasteMask(rgba, await raster(drawArt));
+      if (spec.opaqueOutput) for (let i = 3; i < rgba.length; i += 4) rgba[i] = 255;
       return rgba;
     }
 
-    const sources = await Promise.all(input.images.map(file => spec.still ? readMemeImageSequence(file, signal) :
+    const sources = await Promise.all(input.images.map(file => spec.still && !spec.firstFrameOnly ? readMemeImageSequence(file, signal) :
       readMemeFirstImage(file, signal).then(image => ({ frames: [image] as const, averageDelayMs: 0 }))));
     const first = sources.map(source => source.frames[0]);
     if (spec.still && sources.every(source => source.frames.length === 1)) {
@@ -191,19 +220,19 @@ function template(spec: TudouComposition, mode: RenderMode): MemeTemplate {
 }
 
 export function createTudouLayeredTemplates(mode?: RenderMode) {
-  return tudouCompositions.map(spec => template(spec, mode));
+  return tudouCompositions.map(spec => createTudouComposition(spec, mode));
 }
 
 export const tudouLayeredTemplates = createTudouLayeredTemplates();
 
 export function createTudouOverlayTemplates(mode?: RenderMode) {
-  return tudouOverlays.map(spec => template(spec, mode));
+  return tudouOverlays.map(spec => createTudouComposition(spec, mode));
 }
 
 export const tudouOverlayTemplates = createTudouOverlayTemplates();
 
 export function createTudouExtendedOverlayTemplates(mode?: RenderMode) {
-  return tudouExtendedOverlays.map(spec => template(spec, mode));
+  return tudouExtendedOverlays.map(spec => createTudouComposition(spec, mode));
 }
 
 export const tudouExtendedOverlayTemplates = createTudouExtendedOverlayTemplates();
