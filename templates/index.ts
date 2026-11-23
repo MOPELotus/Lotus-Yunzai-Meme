@@ -23,6 +23,7 @@ import { anyliewTailTemplates } from "./anyliew-tail.ts";
 import { anyliewWordCardTemplates } from "./anyliew-word-cards.ts";
 import { anyliewTextDialogueTemplates } from "./anyliew-text-dialogue.ts";
 import { avatarCaptionMemeTemplates } from "./avatar-caption-cards.ts";
+import { archiveOverlayTemplates } from "./archive-overlays.ts";
 import { avatarFrameMemeTemplates } from "./avatar-frames.ts";
 import { basicImageMemeTemplates } from "./basic-image-transforms.ts";
 import { captionOverlayMemeTemplates } from "./caption-overlays.ts";
@@ -112,6 +113,7 @@ export const builtinMemeTemplates: readonly MemeTemplate[] = [
   dianzhongdian,
   ...avatarFrameMemeTemplates,
   ...avatarCaptionMemeTemplates,
+  ...archiveOverlayTemplates,
   ...photoCompositeMemeTemplates,
   ...photoInsetMemeTemplates,
   ...rotatedInsetMemeTemplates,
