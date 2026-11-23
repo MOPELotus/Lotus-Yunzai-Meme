@@ -1,3 +1,4 @@
+import { anyliewCircleDialogueAssets } from "./backend-circle-dialogue-assets.ts";
 import { anyliewDialogueAssets } from "./backend-dialogue-assets.ts";
 import { anyliewFixedAnimationAssets } from "./backend-fixed-animation-assets.ts";
 import { pythonOverlayAssets } from "./backend-python-overlay-assets.ts";
@@ -63,6 +64,7 @@ interface ExtraMemeAsset {
 const anyliewAssets = [
   ...Object.entries(anyliewFrames).map(([key, digest]) => [`emoji/${key}/images/0.png`, digest] as const),
   ...anyliewDialogueAssets,
+  ...anyliewCircleDialogueAssets,
   ...anyliewFixedAnimationAssets,
   ...anyliewRectangleOverlayAssets,
 ];

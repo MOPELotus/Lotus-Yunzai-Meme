@@ -4,7 +4,7 @@ import { renderExactPng } from "../../../packages/skia/index.ts";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext, type MemeTemplateInput } from "../builtin-template.ts";
 import { assertMemeGifDimensions, encodeMemeGif } from "./gif.ts";
 import { renderMaskedRgba } from "./masked-layout.ts";
-import { registerFont, registerMemeTypeface, rgbaFrameDimensions } from "./template-layout.ts";
+import { jpg, registerFont, registerMemeTypeface, rgbaFrameDimensions } from "./template-layout.ts";
 import { readTransformSource, transformPreviewInput } from "./transforms.ts";
 
 type Box = readonly [number, number, number, number];
@@ -15,7 +15,7 @@ const cjkFonts = {
   cartoon: ["FZKATJW.ttf", "LotusMemeCartoon"],
 } as const;
 
-interface Dialogue {
+export interface AnyLiewDialogue {
   readonly key: string;
   readonly keywords: readonly string[];
   readonly tags?: readonly string[];
@@ -31,7 +31,15 @@ interface Dialogue {
   readonly cropAvatar?: boolean;
   readonly defaultText?: string;
   readonly defaultName?: string;
+  readonly maleName?: string;
+  readonly asset?: string;
+  readonly circle?: "square-first" | "stretch-first";
+  readonly avatarOnTop?: boolean;
+  readonly jpeg?: boolean;
+  readonly wrap?: boolean;
 }
+
+type Dialogue = AnyLiewDialogue;
 
 const lowerCaption = (width: number, height: number): Box => [5, height - 60, width - 5, height - 10];
 const genshin = ["米哈游", "原神"];
@@ -124,7 +132,7 @@ const dialogues: readonly Dialogue[] = [
 function captionText(input: MemeTemplateInput, definition: Dialogue) {
   const user = Array.isArray(input.args.user_infos) ? input.args.user_infos[0] : undefined;
   const nickname = typeof user?.name === "string" ? user.name : undefined;
-  const pronoun = user && user.gender !== "male" ? "她" : "他";
+  const pronoun = user && user.gender !== "male" ? "她" : definition.maleName ?? "他";
   return definition.caption(input.texts[0] ?? definition.defaultText ?? (nickname || (user ? pronoun : definition.defaultName ?? "他")));
 }
 
@@ -137,21 +145,24 @@ function paintCaption(draw: CanvasRenderingContext2D, box: Box, text: string, fa
   draw.fillStyle = definition.color ?? "#000";
   for (let size = maximum; size >= minimum; size--) {
     draw.font = `${size}px ${family}`;
-    const { lines } = draw.measureText(text);
+    const availableWidth = right - left;
+    const full = draw.measureText(text);
+    const wrapWidth = definition.wrap && full.lines.some(line => line.width > availableWidth) ? availableWidth : undefined;
+    const { lines } = wrapWidth ? draw.measureText(text, wrapWidth) : full;
     const first = lines[0], last = lines.at(-1);
     if (!first || !last) return;
     const height = last.y + last.height - first.y;
     const width = Math.max(...lines.map(line => line.width));
     if (height > bottom - top || width > right - left) continue;
     // PIL centers the widest block while leaving the individual lines left-aligned.
-    const x = (left + right - (definition.leftLines ? width : 0)) / 2;
+    const x = (left + right - (definition.leftLines ? wrapWidth ?? width : 0)) / 2;
     const y = bottom - height - first.y - (definition.bottom ? 0 : (bottom - top - height) / 2);
     if (definition.cropAvatar) {
       draw.strokeStyle = "#000";
       draw.lineWidth = Math.round(size * 0.06) * 2;
-      draw.strokeText(text, x, y);
+      draw.strokeText(text, x, y, wrapWidth);
     }
-    draw.fillText(text, x, y);
+    draw.fillText(text, x, y, wrapWidth);
     return;
   }
   throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
@@ -160,6 +171,11 @@ function paintCaption(draw: CanvasRenderingContext2D, box: Box, text: string, fa
 function drawAvatar(draw: CanvasRenderingContext2D, image: Image, definition: Dialogue) {
   const [left, top, width, height] = definition.avatar;
   draw.imageSmoothingQuality = "high";
+  if (definition.circle === "stretch-first") {
+    draw.beginPath();
+    draw.arc(left + width / 2, top + height / 2, width / 2, 0, Math.PI * 2);
+    draw.clip();
+  }
   if (!definition.cropAvatar) {
     draw.drawImage(image, left, top, width, height);
     return;
@@ -175,12 +191,23 @@ function drawAvatar(draw: CanvasRenderingContext2D, image: Image, definition: Di
     top + Math.floor((height - scaledHeight) / 2), scaledWidth, scaledHeight);
 }
 
-async function renderDialogue(input: MemeTemplateInput, context: MemeTemplateContext, definition: Dialogue) {
+async function squareCircle(image: Image) {
+  const size = Math.min(image.width, image.height);
+  const { png } = await renderExactPng(size, size, draw => {
+    draw.beginPath();
+    draw.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+    draw.clip();
+    draw.drawImage(image, Math.trunc((size - image.width) / 2), Math.trunc((size - image.height) / 2));
+  });
+  return loadImage(png);
+}
+
+export async function renderAnyLiewDialogue(input: MemeTemplateInput, context: MemeTemplateContext, definition: Dialogue) {
   const { signal } = context;
   const typeface = definition.font && cjkFonts[definition.font];
   const [sequence, frame, fallback, primary, emoji] = await Promise.all([
     readTransformSource(input, signal),
-    context.imageAsset(`anyliew/emoji/${definition.key}/images/0.png`).then(loadImage),
+    context.imageAsset(`anyliew/emoji/${definition.key}/images/${definition.asset ?? "0.png"}`).then(loadImage),
     registerFont(context),
     typeface && registerMemeTypeface(context, typeface[0], typeface[1]),
     definition.emoji && registerMemeTypeface(context, "NotoColorEmoji.ttf", "LotusMemeColorEmoji"),
@@ -196,10 +223,15 @@ async function renderDialogue(input: MemeTemplateInput, context: MemeTemplateCon
     paintCaption(draw, box, text, family, definition);
   };
   async function raster(image: Image) {
+    const source = definition.circle === "square-first" ? await squareCircle(image) : image;
     const avatar = (draw: CanvasRenderingContext2D) => {
       draw.scale(scale, scale);
-      drawAvatar(draw, image, definition);
+      drawAvatar(draw, source, definition);
     };
+    if (definition.avatarOnTop) {
+      return renderMaskedRgba(width, height, backdrop, [avatar], signal,
+        { whiteBackground: definition.jpeg === true && sequence.frames.length === 1 });
+    }
     return definition.cropAvatar
       ? renderMaskedRgba(width, height, avatar, [backdrop], signal)
       : renderMaskedRgba(width, height, () => {}, [avatar, backdrop], signal);
@@ -207,6 +239,7 @@ async function renderDialogue(input: MemeTemplateInput, context: MemeTemplateCon
   if (sequence.frames.length === 1) {
     const rgba = await raster(sequence.frames[0]);
     const image = new ImageData(new Uint8ClampedArray(rgba), width, height);
+    if (definition.jpeg) return jpg(frame.width, frame.height, draw => draw.putImageData(image, 0, 0), signal);
     const rendered = await renderExactPng(width, height, draw => draw.putImageData(image, 0, 0));
     signal.throwIfAborted();
     return rendered.png;
@@ -219,11 +252,15 @@ async function renderDialogue(input: MemeTemplateInput, context: MemeTemplateCon
 
 const singleAvatar = { min_images: 1, max_images: 1, min_texts: 0, max_texts: 1, args_type: null } as const;
 
-export const anyliewDialogueTemplates: readonly MemeTemplate[] = dialogues.map(definition => ({
-  info: {
-    key: definition.key, keywords: definition.keywords, tags: definition.tags,
-    params_type: { ...singleAvatar, default_texts: definition.defaultText ? [definition.defaultText] : [] },
-  },
-  render: (input, context) => renderDialogue(input, context, definition),
-  preview: async context => renderDialogue(await transformPreviewInput(context), context, definition),
-}));
+export function anyLiewDialogueTemplate(definition: Dialogue): MemeTemplate {
+  return {
+    info: {
+      key: definition.key, keywords: definition.keywords, tags: definition.tags,
+      params_type: { ...singleAvatar, default_texts: definition.defaultText ? [definition.defaultText] : [] },
+    },
+    render: (input, context) => renderAnyLiewDialogue(input, context, definition),
+    preview: async context => renderAnyLiewDialogue(await transformPreviewInput(context), context, definition),
+  };
+}
+
+export const anyliewDialogueTemplates: readonly MemeTemplate[] = dialogues.map(anyLiewDialogueTemplate);

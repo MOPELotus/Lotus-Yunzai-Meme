@@ -1,0 +1,23 @@
+// Registered circular dialogue assets from the fixed revision in backend-extra-assets.ts.
+export const anyliewCircleDialogueAssets = [
+  ["emoji/atri_finger/images/0.jpg", "94fc48515b3f827fad41add963cec0793fd19bcd9fe46b54a43344954ed763ee"],
+  ["emoji/azur_lane_cheshire_thumbs_up/images/0.jpg", "e6b773255064d8a4e2aa40eee39ef6e6885b77b64646c3157896107b579d4a54"],
+  ["emoji/contract/images/0.png", "a923ebe53b55c90a1d6b0d0268a5235a0556e78ab7d83d6addfb02af6d772277"],
+  ["emoji/deer_plan/images/0.png", "a5825a2033d68b87b9ee4ca101c344bc409f24d11edb025cc3b7ee7357b9fe9b"],
+  ["emoji/doro_thumbs_up/images/0.jpg", "a28baafb8546e0f8cf67b926e138925fdd568efa02588e6008e23985e56a44af"],
+  ["emoji/family_know/images/0.png", "cba04a4e8c435339cee9522b35fc76640a465a42596da711754ea4617efe50de"],
+  ["emoji/hitachi_mako_together/images/0.png", "6235c2cf3033167fe56925d552d26ef10e45007d746ef30c24e0d133bd49a788"],
+  ["emoji/laughing/images/0.jpg", "b8eb0ea671f3f47b0bd2e423f5238df71ed655f5ef2587314fe06af296854a48"],
+  ["emoji/mihoyo_liuwei_noise/images/0.png", "4e373cb2bf8f6dfc3e2fd1f611da28c3f8596e9cf6407e5b9ccd789253b7e9a6"],
+  ["emoji/mihoyo_sigewinne_fingered/images/0.png", "2821f23a2c515ce87b7809f9d7a9ddd0c916906508d2a4938d817591593afeab"],
+  ["emoji/national_day_plan/images/0.png", "0a8afc77673aaf49a45f5496444cbb3d46f25dbc5679b581d5eb46897e0c6e4f"],
+  ["emoji/national_day_plan/images/1.png", "8e85f4d0daf08b89d76d133b1307a7672ed631feb40013b9d9f19ae3a3a72fa5"],
+  ["emoji/national_day_plan/images/2.png", "f220d085d11ebc6feb4c576b431962d2eac32366e6618d3c1921fccf194ef05e"],
+  ["emoji/national_day_plan/images/3.png", "7aa5ce49549ac6e72c767724adbcb7868acc19aaf6b37c098364d0f00280b1d2"],
+  ["emoji/qixi_festival/images/0.png", "520c25b44fdd0d3c0b59dde538180e210717cbcf28ae7f73809df76e7aabcae7"],
+  ["emoji/spend_christmas/images/0.png", "0a030d5155bcd4e6d94cacad904c6ead5dd6e446201bffe9ff050e07c0e4cfb7"],
+  ["emoji/vme50/images/0.png", "a18df908688361599f0692ab6c805b3cefd229f0273f4ba6e592265bc3625ba6"],
+  ["emoji/yuzu_soft_murasame_clothes/images/0.jpg", "2a0c7a86b7eb99ef4a7b633842ea6b227727907370221cc2b51aa9fe21b30809"],
+  ["emoji/yuzu_soft_murasame_finger/images/0.png", "a627755f7ec65395056055e09c83314e419dbb42ada3dc5ad8078e305a395c80"],
+  ["emoji/yuzu_soft_shocked/images/0.png", "bf7ce67af7b1a8c68185943c4dd11ced638189f432b27d8a95554d7eae6fcf60"],
+] as const;
