@@ -4,10 +4,16 @@ import { mkdtemp, readFile, rm, stat, symlink, writeFile } from "node:fs/promise
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { catalogPolicy, catalogRefreshSchedule, configDirectory, generationServer, generationSettings } from "../catalog-policy.ts";
+import { catalogPolicy, catalogRefreshSchedule, configDirectory, generationServer, generationSettings,
+  usesManagedMemeServer } from "../catalog-policy.ts";
 import module from "../lotus.ts";
 import { buildGenerationBody } from "../generation.ts";
 import { handleMemeSettings, supportGuoba } from "../settings.ts";
+
+function remoteServiceUrl() {
+  const server = generationServer();
+  return server?.protocol === "legacy" ? server.base.href : undefined;
+}
 
 test("表情设置命令可安全更新旧 YAML 并即时生效", async () => {
   const directory = await mkdtemp(join(tmpdir(), "lotus-meme-settings-"));
@@ -149,7 +155,7 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     await Promise.all(Object.entries(original).map(([file, text]) => writeFile(path(file), text, { mode: 0o640 })));
     const { configInfo: form } = supportGuoba();
     const fields = form.schemas.flatMap(schema => "field" in schema ? [schema.field] : []);
-    expect(fields).toHaveLength(27);
+    expect(fields).toHaveLength(28);
     expect(fields).toContain("meme.cache");
     for (const field of ["server.retry", "other.autoUpdate", "other.hijackRes", "other.renderScale"]) {
       expect(fields).not.toContain(field);
@@ -157,9 +163,9 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     expect(form.getConfigData()).toMatchObject({
       meme: { enable: false, reply: false, cache: true, imagesInMessage: true, pokeEnable: false, pokeProbability: 50, pokeLimit: 20 },
       access: { mode: 0, userWhiteList: [10001] }, protect: { user: [10002] },
-      server: { url: "http://127.0.0.1:1/saved", timeout: 5 }, stat: { enable: true },
+      server: { backend: "auto", url: "http://127.0.0.1:1/saved", timeout: 5 }, stat: { enable: true },
     });
-    expect(generationServer()?.base.href).toBe("http://127.0.0.1:1/env");
+    expect(remoteServiceUrl()).toBe("http://127.0.0.1:1/env");
 
     expect(form.setConfigData({ "meme.reply": true, "access.mode": 1, "protect.user": [], "server.timeout": 999 }, {
       Result, changedFields: ["meme.reply", "access.mode"],
@@ -173,7 +179,7 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
 
     for (const invalid of [
       { "meme.cache": "false" }, { "protect.user": ["bad-id"] }, { "access.mode": 7 },
-      { "server.timeout": 0 }, { "server.url": "http://user@127.0.0.1/" },
+      { "server.timeout": 0 }, { "server.backend": "third-party" }, { "server.url": "http://user@127.0.0.1/" },
       { "other.autoUpdateResCron": "0 0 99 * * *" }, { "other.autoUpdateResCron": "tomorrow" },
       { "meme.pokeProbability": 101 }, { "meme.pokeLimit": -1 }, { "meme.pokeLimit": 1.5 },
     ]) {
@@ -202,6 +208,52 @@ test("原生表情面板只写明确编辑的运行项，保留旧 YAML 与目�
     else Bun.env.LOTUS_MEME_CONFIG_DIR = previousDirectory;
     if (previousServer === undefined) delete Bun.env.LOTUS_MEME_SERVER_URL;
     else Bun.env.LOTUS_MEME_SERVER_URL = previousServer;
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("表情面板可修改服务来源并保留配置和环境优先级", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "lotus-meme-backend-mode-"));
+  const previousDirectory = Bun.env.LOTUS_MEME_CONFIG_DIR;
+  const previousUrl = Bun.env.LOTUS_MEME_SERVER_URL;
+  const path = join(directory, "server.yaml");
+  const old = "url: https://meme.pippi.top/pippi # 旧默认服务\ntimeout: 9\n其他字段: 保留\n";
+  const Result = { ok: () => ({ ok: true }), error: (_message: string, status: number) => ({ ok: false, status }) };
+  try {
+    Bun.env.LOTUS_MEME_CONFIG_DIR = directory;
+    delete Bun.env.LOTUS_MEME_SERVER_URL;
+    const { configInfo: form } = supportGuoba();
+    expect(form.getConfigData().server).toMatchObject({ backend: "auto", url: "" });
+    expect(usesManagedMemeServer()).toBe(true);
+    await writeFile(path, old);
+    expect(form.getConfigData().server).toMatchObject({ backend: "auto", url: "https://meme.pippi.top/pippi" });
+    expect(usesManagedMemeServer()).toBe(false);
+    expect(remoteServiceUrl()).toBe("https://meme.pippi.top/pippi");
+    expect(form.setConfigData({ "server.backend": "remote", "server.url": "https://example.test/meme/" }, { Result }))
+      .toEqual({ ok: true });
+    expect(usesManagedMemeServer()).toBe(false);
+    expect(remoteServiceUrl()).toBe("https://example.test/meme/");
+    expect(await readFile(path, "utf8")).toContain('# 旧默认服务\ntimeout: 9\n其他字段: 保留');
+    const owner = { isMaster: true };
+    expect(handleMemeSettings("#表情合成设置 服务来源", owner)).toBe("服务来源：远端服务");
+    expect(handleMemeSettings("#表情合成设置 服务来源 本机托管", owner)).toBe("服务来源：本机托管（可运行 #表情更新资源 同步目录。）");
+    expect(usesManagedMemeServer()).toBe(true);
+    expect(form.getConfigData().server).toMatchObject({ backend: "managed", url: "https://example.test/meme/" });
+    Bun.env.LOTUS_MEME_SERVER_URL = "http://127.0.0.1:1/remote";
+    expect(usesManagedMemeServer()).toBe(false);
+    expect(remoteServiceUrl()).toBe("http://127.0.0.1:1/remote");
+    Bun.env.LOTUS_MEME_SERVER_URL = "";
+    expect(usesManagedMemeServer()).toBe(false);
+    expect(generationServer()).toBeUndefined();
+    delete Bun.env.LOTUS_MEME_SERVER_URL;
+    expect(form.setConfigData({ "server.backend": "remote", "server.url": "" }, { Result })).toEqual({ ok: true });
+    expect(usesManagedMemeServer()).toBe(false);
+    expect(generationServer()).toBeUndefined();
+  } finally {
+    if (previousDirectory === undefined) delete Bun.env.LOTUS_MEME_CONFIG_DIR;
+    else Bun.env.LOTUS_MEME_CONFIG_DIR = previousDirectory;
+    if (previousUrl === undefined) delete Bun.env.LOTUS_MEME_SERVER_URL;
+    else Bun.env.LOTUS_MEME_SERVER_URL = previousUrl;
     await rm(directory, { recursive: true, force: true });
   }
 });

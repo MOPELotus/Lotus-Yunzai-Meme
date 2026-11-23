@@ -11,8 +11,9 @@ import { isExcludedMemeName, memeNameExclusion } from "./catalog-exclusions.ts";
 
 type Setting = readonly [title: string, key: string,
   type: "toggle" | "mode" | "users" | "templates" | "percentage" | "cooldown", fallback: unknown];
-type PanelSetting = Setting | readonly [title: string, key: string, type: "url" | "seconds" | "cron", fallback: string | number];
+type PanelSetting = Setting | readonly [title: string, key: string, type: "backend" | "url" | "seconds" | "cron", fallback: string | number];
 type MemeNameExclusion = ReturnType<typeof memeNameExclusion>;
+const backendModes = { auto: "自动", managed: "本机托管", remote: "远端服务" } as const;
 const sections = [
   { title: "表情设置", file: "meme.yaml", fields: [
     ["默认表情", "enable", "toggle", true],
@@ -46,6 +47,7 @@ const sections = [
 
 const panelSections: readonly { title: string; file: string; fields: readonly PanelSetting[] }[] = [
   { title: "服务设置", file: "server.yaml", fields: [
+    ["服务来源", "backend", "backend", "auto"],
     ["服务地址", "url", "url", ""], ["请求超时（秒）", "timeout", "seconds", 5],
   ] },
   ...sections,
@@ -146,7 +148,11 @@ function panelField(group: string, [label, key, type]: PanelSetting) {
     ] } };
     case "users":
     case "templates": return { label, field, component: "Select", componentProps: { mode: "tags" } };
-    case "url": return { label, field, component: "Input", bottomHelpMessage: "环境变量 LOTUS_MEME_SERVER_URL 优先。" };
+    case "backend": return { label, field, component: "Select",
+      componentProps: { options: Object.entries(backendModes).map(([value, label]) => ({ label, value })) },
+      bottomHelpMessage: "本机托管使用已内置模板。切换后可等待定时同步，也可运行 #表情更新资源。" };
+    case "url": return { label, field, component: "Input",
+      bottomHelpMessage: "自动模式沿用已填地址，留空使用本机托管。环境变量 LOTUS_MEME_SERVER_URL 优先。" };
     case "seconds": return { label, field, component: "InputNumber", componentProps: { min: 0, max: 120 } };
     case "percentage":
     case "cooldown": return { label, field, component: "InputNumber",
@@ -160,6 +166,7 @@ function panelValue(type: PanelSetting[2], value: unknown, excluded = isExcluded
   switch (type) {
     case "toggle": if (typeof value === "boolean") return value; break;
     case "mode": if (value === 0 || value === 1) return value; break;
+    case "backend": if (typeof value === "string" && Object.hasOwn(backendModes, value)) return value; break;
     case "users":
     case "templates": {
       if (!Array.isArray(value) || !value.every(item => typeof item === "string" || Number.isSafeInteger(item))) break;
@@ -298,6 +305,9 @@ export function supportGuoba() {
 function show(setting: PanelSetting, value: unknown): string {
   if (setting[2] === "toggle") return value === true ? "开启" : "关闭";
   if (setting[2] === "mode") return value === 1 ? "黑名单" : "白名单";
+  if (setting[2] === "backend") {
+    return typeof value === "string" && Object.hasOwn(backendModes, value) ? backendModes[value as keyof typeof backendModes] : "无效设置";
+  }
   if (setting[2] === "percentage") return `${value}%`;
   if (setting[2] === "cooldown" || setting[2] === "seconds") return `${value} 秒`;
   if (setting[2] === "url") return value ? "已配置" : "未配置";
@@ -360,8 +370,10 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
         if (!/^\d+$/u.test(value) || Number(value) > max) return `请填写 0 至 ${max} 的整数。`;
         next = Number(value);
         document.set(key, next);
-      } else if (type === "url" || type === "seconds" || type === "cron") {
-        try { next = panelValue(type, type === "url" && value === "清除" ? "" : value); }
+      } else if (type === "backend" || type === "url" || type === "seconds" || type === "cron") {
+        const input = type === "backend" ? Object.entries(backendModes).find(([, label]) => label === value)?.[0] ?? value :
+          type === "url" && value === "清除" ? "" : value;
+        try { next = panelValue(type, input); }
         catch { return `${title}格式无效。`; }
         document.set(key, next);
       } else {
@@ -392,8 +404,9 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
         if (!isDeepStrictEqual(written, { ...values, [key]: next })) throw new Error();
         rewrite(directory, path, previous, yaml);
       }
-      const restart = section.file === "other.yaml" ? "（重启后重新登记定时任务。）" : "";
-      return `${title}：${show(setting, visibleSettingValue(setting, next, excluded))}${restart}`;
+      const help = type === "backend" ? "（可运行 #表情更新资源 同步目录。）" :
+        section.file === "other.yaml" ? "（重启后重新登记定时任务。）" : "";
+      return `${title}：${show(setting, visibleSettingValue(setting, next, excluded))}${help}`;
     }
 
     if (action) return "未找到该表情合成设置项。";
