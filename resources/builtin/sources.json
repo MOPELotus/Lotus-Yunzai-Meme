@@ -131,6 +131,11 @@
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/addiction/0.png"
     },
+    "images/alipay/0.png": {
+      "digest": "d1db5d6cbf924a153a7bb8b2a8e659fc3326627fcae55072e80725b0d1753844",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/alipay/0.png"
+    },
     "images/always_like/0.png": {
       "digest": "303b6a4cd39c0e25c7f093902763c740eb3289e5335c5e39b13942f299fdf286",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
@@ -40710,6 +40715,16 @@
       "digest": "beb9f4b460c460bc84e7ffcf3d93f4a11085d67bb5ef42f231fce02ea88bfdb9",
       "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
       "originalPath": "images/washer/0.png"
+    },
+    "images/wechat_pay/0.png": {
+      "digest": "5a98886a8ab45fc5ac090ac6284c5d048d7dd4be38330bb7082d6c9935ada9dc",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/wechat_pay/0.png"
+    },
+    "images/wechat_pay/logo.png": {
+      "digest": "4a8db078f7243687e38ccf10a4a3ad47dcba420dfbef5aca30fa3b1e3c0cb0da",
+      "source": "https://raw.githubusercontent.com/MemeCrafters/meme-generator-rs/9c0607407675a2a92d4d24b5fbbeaf0cc119db67/resources/",
+      "originalPath": "images/wechat_pay/logo.png"
     },
     "images/what_he_wants/0.png": {
       "digest": "795bd21a031a30d77c2e6c36f14067bdb28da0abd832d3c4c5e0ff686a4d4651",

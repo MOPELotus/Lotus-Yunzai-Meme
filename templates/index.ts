@@ -5,6 +5,7 @@ import { pythonPhotoBehindTemplates } from "./python-photo-behind.ts";
 import { pythonGraphicSceneTemplates } from "./python-graphic-scenes.ts";
 import { pythonMotionSceneTemplates } from "./python-motion-scenes.ts";
 import type { MemeTemplate } from "../builtin-template.ts";
+import { payPosterMemeTemplates } from "./pay-posters.ts";
 import { friendNotificationMemeTemplates } from "./friend-notifications.ts";
 import { avatarAccessoryMemeTemplates } from "./avatar-accessories.ts";
 import { legacyFixedPoseTemplates } from "./legacy-fixed-poses.ts";
@@ -89,6 +90,7 @@ import { louvreMemeTemplate } from "./louvre.ts";
 import { waveMemeTemplate } from "./wave.ts";
 
 export const builtinMemeTemplates: readonly MemeTemplate[] = [
+  ...payPosterMemeTemplates,
   ...friendNotificationMemeTemplates,
   ...avatarAccessoryMemeTemplates,
   petpet, pat, rub, kiss, hug,
