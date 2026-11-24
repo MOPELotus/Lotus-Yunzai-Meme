@@ -1,3 +1,4 @@
+import { builtinResourceDirectory } from "../../lib/builtin-resources.ts";
 // SPDX-License-Identifier: GPL-3.0-only
 // Adapts the composition in yeyang52/yenai-plugin model/memes.js (zan, crawl, ganyu)
 // and apps/thumbUp.js. See the original history for the authors and their changes.
@@ -18,7 +19,7 @@ interface Options {
   readonly rasterScale?: 1 | 4;
 }
 
-// Original files verified against the selected yenai revision. No artwork is distributed here.
+// Original files verified against the selected yenai revision; repository artwork is the default fallback.
 const digests = {
   ganyu: {
     "0.png": "6c2ba3b5b8091b20d6092fd442a2264ca7ac95d48358dc99c4d3209f43269b36",
@@ -57,7 +58,8 @@ interface Template {
 async function readTemplate(outcome: Outcome, { directory, signal, random = Math.random }: Options): Promise<Template | undefined> {
   if (!directory || signal?.aborted) return;
   const family: Family = outcome === "failure" ? "crawl" : random() < 0.5 ? "ganyu" : "bixin";
-  const folder = join(directory, family);
+  const requested = join(directory, family);
+  const folder = await readdir(requested).then(() => requested, () => join(builtinResourceDirectory("social/likes"), family));
   const files = new Set((await readdir(folder, { withFileTypes: true })).filter((file) => file.isFile()).map((file) => file.name));
   const candidates = Object.entries(digests[family]).filter(([name]) => files.has(name));
   const candidate = candidates[Math.floor(random() * candidates.length)];
