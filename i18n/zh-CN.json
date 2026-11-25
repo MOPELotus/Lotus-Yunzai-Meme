@@ -5,435 +5,435 @@
   "description": "表情制作",
   "sections": {
     "backend-builtin-assets": {
-      "description": "表情制作",
+      "description": "内置表情素材清单加载与校验",
       "source": "plugins/meme/backend-builtin-assets.ts"
     },
     "backend-lifecycle": {
-      "description": "表情制作",
+      "description": "表情后端模板加载与请求解析",
       "source": "plugins/meme/backend-lifecycle.ts"
     },
     "backend-tudou-short-animation-assets": {
-      "description": "表情制作",
+      "description": "土豆短动画表情素材目录映射",
       "source": "plugins/meme/backend-tudou-short-animation-assets.ts"
     },
     "catalog-card": {
-      "description": "表情制作：图片卡片",
+      "description": "表情目录信息卡片渲染",
       "source": "plugins/meme/catalog-card.ts"
     },
     "catalog-policy": {
-      "description": "表情制作",
+      "description": "表情目录访问控制与配置校验",
       "source": "plugins/meme/catalog-policy.ts"
     },
     "catalog-runtime": {
-      "description": "表情制作：运行环境",
+      "description": "表情目录运行时初始化",
       "source": "plugins/meme/catalog-runtime.ts"
     },
     "catalog-update": {
-      "description": "表情制作：更新",
+      "description": "表情目录数据更新与命令处理",
       "source": "plugins/meme/catalog-update.ts"
     },
     "generate-reply": {
-      "description": "表情制作",
+      "description": "表情生成回复与消息素材提取",
       "source": "plugins/meme/generate-reply.ts"
     },
     "generation": {
-      "description": "表情制作",
+      "description": "表情生成请求参数构造与错误处理",
       "source": "plugins/meme/generation.ts"
     },
     "generation-args": {
-      "description": "表情制作",
+      "description": "表情生成命令行参数解析与校验",
       "source": "plugins/meme/generation-args.ts"
     },
     "legacy-caption-shortcuts": {
-      "description": "表情制作",
+      "description": "传统文字表情快捷匹配规则与提示",
       "source": "plugins/meme/legacy-caption-shortcuts.ts"
     },
     "lotus": {
-      "description": "表情制作",
+      "description": "表情目录查询、详情、搜索、统计与指令处理",
       "source": "plugins/meme/lotus.ts"
     },
     "models.Meme.preset": {
-      "description": "表情制作",
+      "description": "表情预设名称与角色参数映射配置",
       "source": "plugins/meme/models/Meme/preset.ts"
     },
     "reference-card": {
-      "description": "表情制作：图片卡片",
+      "description": "表情功能命令帮助参考卡片",
       "source": "plugins/meme/reference-card.ts"
     },
     "scripts.pack-builtin-assets": {
-      "description": "表情制作",
+      "description": "校验并打包表情插件内置字体与图片资源索引的构建脚本",
       "source": "plugins/meme/scripts/pack-builtin-assets.ts"
     },
     "settings": {
-      "description": "表情制作：设置",
+      "description": "表情插件 YAML 配置项定义、读写及设置面板交互",
       "source": "plugins/meme/settings.ts"
     },
     "template-policy": {
-      "description": "表情制作",
+      "description": "表情模板禁用策略、旧版目录标签校验与未找到提示",
       "source": "plugins/meme/template-policy.ts"
     },
     "templates.animated-input": {
-      "description": "表情制作",
+      "description": "表情制作动态图片输入读取与尺寸帧数校验",
       "source": "plugins/meme/templates/animated-input.ts"
     },
     "templates.anyliew-avatar-caption-scenes": {
-      "description": "表情制作",
+      "description": "AnyLiew 带头像与自定义/默认配文场景的表情模板定义",
       "source": "plugins/meme/templates/anyliew-avatar-caption-scenes.ts"
     },
     "templates.anyliew-avatar-scenes": {
-      "description": "表情制作",
+      "description": "AnyLiew 头像场景表情模板渲染与输入数量校验",
       "source": "plugins/meme/templates/anyliew-avatar-scenes.ts"
     },
     "templates.anyliew-circle-dialogue": {
-      "description": "表情制作",
+      "description": "AnyLiew 圆形头像对话类表情模板定义与配文渲染",
       "source": "plugins/meme/templates/anyliew-circle-dialogue.ts"
     },
     "templates.anyliew-deer-help": {
-      "description": "表情制作：帮助",
+      "description": "AnyLiew 双图“鹿求助”表情模板输入校验与合成渲染",
       "source": "plugins/meme/templates/anyliew-deer-help.ts"
     },
     "templates.anyliew-dialogue": {
-      "description": "表情制作",
+      "description": "含头像与对话文本的表情模板渲染",
       "source": "plugins/meme/templates/anyliew-dialogue.ts"
     },
     "templates.anyliew-fixed-batch": {
-      "description": "表情制作",
+      "description": "固定批次被窝表情模板渲染",
       "source": "plugins/meme/templates/anyliew-fixed-batch.ts"
     },
     "templates.anyliew-signs": {
-      "description": "表情制作",
+      "description": "举牌类表情模板渲染",
       "source": "plugins/meme/templates/anyliew-signs.ts"
     },
     "templates.anyliew-static-avatar": {
-      "description": "表情制作",
+      "description": "静态头像类表情模板渲染",
       "source": "plugins/meme/templates/anyliew-static-avatar.ts"
     },
     "templates.anyliew-tail": {
-      "description": "表情制作",
+      "description": "头像变换与带文案的场景表情模板渲染",
       "source": "plugins/meme/templates/anyliew-tail.ts"
     },
     "templates.anyliew-text-dialogue": {
-      "description": "表情制作",
+      "description": "角色台词对话类表情模板定义与底图编号参数校验",
       "source": "plugins/meme/templates/anyliew-text-dialogue.ts"
     },
     "templates.anyliew-word-cards": {
-      "description": "表情制作",
+      "description": "文字卡片、手写字体及图文配字类表情模板实现",
       "source": "plugins/meme/templates/anyliew-word-cards.ts"
     },
     "templates.archive-overlay-specs": {
-      "description": "表情制作",
+      "description": "归档叠加表情模板的坐标与名称规格配置",
       "source": "plugins/meme/templates/archive-overlay-specs.ts"
     },
     "templates.archive-overlays": {
-      "description": "表情制作",
+      "description": "归档叠加类表情模板的渲染与参数校验",
       "source": "plugins/meme/templates/archive-overlays.ts"
     },
     "templates.avatar-accessories": {
-      "description": "表情制作",
+      "description": "头像装饰与证书类表情模板",
       "source": "plugins/meme/templates/avatar-accessories.ts"
     },
     "templates.avatar-caption-cards": {
-      "description": "表情制作",
+      "description": "头像配文卡片类表情模板",
       "source": "plugins/meme/templates/avatar-caption-cards.ts"
     },
     "templates.avatar-frames": {
-      "description": "表情制作",
+      "description": "头像相框类表情模板",
       "source": "plugins/meme/templates/avatar-frames.ts"
     },
     "templates.basic-image-transforms": {
-      "description": "表情制作",
+      "description": "基础图像变换类表情模板（如像素化、上下颠倒）",
       "source": "plugins/meme/templates/basic-image-transforms.ts"
     },
     "templates.bbcode-text": {
-      "description": "表情制作",
+      "description": "BBCode 富文本解析与表情文字排版",
       "source": "plugins/meme/templates/bbcode-text.ts"
     },
     "templates.caption-overlays": {
-      "description": "表情制作",
+      "description": "配文叠加类表情模板",
       "source": "plugins/meme/templates/caption-overlays.ts"
     },
     "templates.classic-avatar-animations": {
-      "description": "表情制作",
+      "description": "经典头像帧动画表情模板",
       "source": "plugins/meme/templates/classic-avatar-animations.ts"
     },
     "templates.classic-layered-animations": {
-      "description": "表情制作",
+      "description": "经典分层动画表情模板",
       "source": "plugins/meme/templates/classic-layered-animations.ts"
     },
     "templates.cropped-photo-templates": {
-      "description": "表情制作",
+      "description": "裁剪照片拼接类静态表情模板的图片数量校验与合成",
       "source": "plugins/meme/templates/cropped-photo-templates.ts"
     },
     "templates.dianzhongdian": {
-      "description": "表情制作",
+      "description": "「典中典」双语黑白草图表情模板的校验与图文排版",
       "source": "plugins/meme/templates/dianzhongdian.ts"
     },
     "templates.fixed-avatar-animation": {
-      "description": "表情制作",
+      "description": "固定点位头像动态表情模板的参数校验与多帧合成",
       "source": "plugins/meme/templates/fixed-avatar-animation.ts"
     },
     "templates.friend-notifications": {
-      "description": "表情制作",
+      "description": "Steam 好友动态通知与「我朋友说」消息气泡表情模板",
       "source": "plugins/meme/templates/friend-notifications.ts"
     },
     "templates.gif": {
-      "description": "表情制作",
+      "description": "表情动图 GIF 编码、缓存帧读写及大小、尺寸和调色板校验",
       "source": "plugins/meme/templates/gif.ts"
     },
     "templates.jump-sold": {
-      "description": "表情制作",
+      "description": "头像叠加类动态表情模板的输入校验与逐帧绘制",
       "source": "plugins/meme/templates/jump-sold.ts"
     },
     "templates.kiss-hug": {
-      "description": "表情制作",
+      "description": "双人头像互动动图（如亲亲、抱抱）模板的素材校验与帧合成",
       "source": "plugins/meme/templates/kiss-hug.ts"
     },
     "templates.large-source-animations": {
-      "description": "表情制作",
+      "description": "大素材序列帧动图表情模板及角色选择参数校验",
       "source": "plugins/meme/templates/large-source-animations.ts"
     },
     "templates.leave-note": {
-      "description": "表情制作",
+      "description": "「请假条」表情模板的参数解析、日期格式化与画布排版",
       "source": "plugins/meme/templates/leave-note.ts"
     },
     "templates.legacy-badges": {
-      "description": "表情制作",
+      "description": "逆转裁判对话气泡与米哈游旧版徽标等经典表情模板渲染",
       "source": "plugins/meme/templates/legacy-badges.ts"
     },
     "templates.legacy-caption-scenes": {
-      "description": "表情制作",
+      "description": "情景配文类表情模板与文字渲染",
       "source": "plugins/meme/templates/legacy-caption-scenes.ts"
     },
     "templates.legacy-caption-shortcuts": {
-      "description": "表情制作",
+      "description": "快捷配文类表情模板与输入校验",
       "source": "plugins/meme/templates/legacy-caption-shortcuts.ts"
     },
     "templates.legacy-chat-card-layouts": {
-      "description": "表情制作：图片卡片",
+      "description": "聊天卡片布局定义与随机名称词库",
       "source": "plugins/meme/templates/legacy-chat-card-layouts.ts"
     },
     "templates.legacy-chat-cards": {
-      "description": "表情制作",
+      "description": "聊天卡片与头像类表情模板",
       "source": "plugins/meme/templates/legacy-chat-cards.ts"
     },
     "templates.legacy-fixed-poses": {
-      "description": "表情制作",
+      "description": "固定动作帧合成类表情模板",
       "source": "plugins/meme/templates/legacy-fixed-poses.ts"
     },
     "templates.legacy-live-effects": {
-      "description": "表情制作",
+      "description": "动态图片特效类表情模板",
       "source": "plugins/meme/templates/legacy-live-effects.ts"
     },
     "templates.legacy-photo-captions": {
-      "description": "表情制作",
+      "description": "图片配文类表情模板",
       "source": "plugins/meme/templates/legacy-photo-captions.ts"
     },
     "templates.legacy-photo-forms": {
-      "description": "表情制作",
+      "description": "图文表单类传统表情模板渲染与文本排版",
       "source": "plugins/meme/templates/legacy-photo-forms.ts"
     },
     "templates.legacy-photo-scenes": {
-      "description": "表情制作",
+      "description": "照片场景类传统表情模板渲染与参数校验",
       "source": "plugins/meme/templates/legacy-photo-scenes.ts"
     },
     "templates.legacy-pixel-effects": {
-      "description": "表情制作",
+      "description": "像素动效类传统表情模板渲染",
       "source": "plugins/meme/templates/legacy-pixel-effects.ts"
     },
     "templates.legacy-portrait-effects": {
-      "description": "表情制作",
+      "description": "人像特效类传统表情模板渲染与文本处理",
       "source": "plugins/meme/templates/legacy-portrait-effects.ts"
     },
     "templates.legacy-projected-actions": {
-      "description": "表情制作",
+      "description": "投影动作类传统表情模板渲染与帧遮罩校验",
       "source": "plugins/meme/templates/legacy-projected-actions.ts"
     },
     "templates.legacy-scene": {
-      "description": "表情制作",
+      "description": "场景合成类传统表情模板渲染",
       "source": "plugins/meme/templates/legacy-scene.ts"
     },
     "templates.legacy-text-overlays": {
-      "description": "表情制作",
+      "description": "文字叠加类传统表情模板配置与预览",
       "source": "plugins/meme/templates/legacy-text-overlays.ts"
     },
     "templates.legacy-wordmarks": {
-      "description": "表情制作",
+      "description": "双段文字标志类传统表情模板渲染",
       "source": "plugins/meme/templates/legacy-wordmarks.ts"
     },
     "templates.local-canvas-animation": {
-      "description": "表情制作",
+      "description": "局部画布动画类表情模板渲染与资源尺寸校验",
       "source": "plugins/meme/templates/local-canvas-animation.ts"
     },
     "templates.louvre": {
-      "description": "表情制作",
+      "description": "卢浮宫线迹滤镜表情模板渲染与模式参数校验",
       "source": "plugins/meme/templates/louvre.ts"
     },
     "templates.meme-date": {
-      "description": "表情制作",
+      "description": "表情模板日期文本解析与相对星期计算",
       "source": "plugins/meme/templates/meme-date.ts"
     },
     "templates.mirage-tank": {
-      "description": "表情制作",
+      "description": "幻影坦克表情模板的图片与文字数量校验提示",
       "source": "plugins/meme/templates/mirage-tank.ts"
     },
     "templates.mirror-flash": {
-      "description": "表情制作",
+      "description": "闪烁特效表情模板的默认配文与尺寸、文字长度校验",
       "source": "plugins/meme/templates/mirror-flash.ts"
     },
     "templates.motion": {
-      "description": "表情制作",
+      "description": "跑动方向类动画表情模板的方向选项与说明",
       "source": "plugins/meme/templates/motion.ts"
     },
     "templates.offset-motion": {
-      "description": "表情制作",
+      "description": "偏移循环动画类表情模板的方向选项与说明",
       "source": "plugins/meme/templates/offset-motion.ts"
     },
     "templates.operator-generator": {
-      "description": "表情制作",
+      "description": "干员信息生成表情模板的默认名称与标题文案",
       "source": "plugins/meme/templates/operator-generator.ts"
     },
     "templates.overlays": {
-      "description": "表情制作",
+      "description": "图片叠加层类表情模板的选项参数与校验提示",
       "source": "plugins/meme/templates/overlays.ts"
     },
     "templates.pat-rub": {
-      "description": "表情制作",
+      "description": "拍一拍与贴贴表情模板的图片数量及素材尺寸校验提示",
       "source": "plugins/meme/templates/pat-rub.ts"
     },
     "templates.pay-posters": {
-      "description": "表情制作",
+      "description": "收款码海报类表情模板的文案与二维码参数校验提示",
       "source": "plugins/meme/templates/pay-posters.ts"
     },
     "templates.perspective": {
-      "description": "表情制作",
+      "description": "透视投影类表情模板的默认配文、快捷指令与校验提示",
       "source": "plugins/meme/templates/perspective.ts"
     },
     "templates.petpet": {
-      "description": "表情制作",
+      "description": "摸头动画表情模板的圆形选项、素材校验与错误提示",
       "source": "plugins/meme/templates/petpet.ts"
     },
     "templates.photo-composites": {
-      "description": "表情制作",
+      "description": "照片合成类表情模板的配文与圆形裁剪选项",
       "source": "plugins/meme/templates/photo-composites.ts"
     },
     "templates.photo-insets": {
-      "description": "表情制作",
+      "description": "多图嵌入类表情模板的图片数量校验提示",
       "source": "plugins/meme/templates/photo-insets.ts"
     },
     "templates.pjsk": {
-      "description": "表情制作",
+      "description": "世界计划（PJSK）表情模板",
       "source": "plugins/meme/templates/pjsk.ts"
     },
     "templates.portrait-overlays": {
-      "description": "表情制作",
+      "description": "人像叠加静态表情模板",
       "source": "plugins/meme/templates/portrait-overlays.ts"
     },
     "templates.portrait-overlays-metadata": {
-      "description": "表情制作",
+      "description": "人像叠加表情模板参数元数据",
       "source": "plugins/meme/templates/portrait-overlays-metadata.ts"
     },
     "templates.projective-transform": {
-      "description": "表情制作",
+      "description": "图像透视变换计算",
       "source": "plugins/meme/templates/projective-transform.ts"
     },
     "templates.python-gif": {
-      "description": "表情制作",
+      "description": "GIF 动图编码与尺寸限制处理",
       "source": "plugins/meme/templates/python-gif.ts"
     },
     "templates.python-graphic-scenes": {
-      "description": "表情制作",
+      "description": "图形场景合成表情模板",
       "source": "plugins/meme/templates/python-graphic-scenes.ts"
     },
     "templates.python-overlay-animation": {
-      "description": "表情制作",
+      "description": "叠加动画表情模板渲染",
       "source": "plugins/meme/templates/python-overlay-animation.ts"
     },
     "templates.rectangle-overlays": {
-      "description": "表情制作",
+      "description": "矩形区域叠加表情模板",
       "source": "plugins/meme/templates/rectangle-overlays.ts"
     },
     "templates.rotated-insets": {
-      "description": "表情制作",
+      "description": "旋转插图表情模板",
       "source": "plugins/meme/templates/rotated-insets.ts"
     },
     "templates.rotating-avatars": {
-      "description": "表情制作",
+      "description": "旋转头像动图表情模板",
       "source": "plugins/meme/templates/rotating-avatars.ts"
     },
     "templates.scrolling-dialogue": {
-      "description": "表情制作",
+      "description": "复读与滚屏对话表情模板",
       "source": "plugins/meme/templates/scrolling-dialogue.ts"
     },
     "templates.shape-timed-animations": {
-      "description": "表情制作",
+      "description": "按帧定时遮罩动画表情模板",
       "source": "plugins/meme/templates/shape-timed-animations.ts"
     },
     "templates.special-print-cards": {
-      "description": "表情制作",
+      "description": "奖状、包装、立绘及印章等图文卡片类表情模板的渲染、选项与默认文案",
       "source": "plugins/meme/templates/special-print-cards.ts"
     },
     "templates.special-text-cards": {
-      "description": "表情制作",
+      "description": "特效文字卡片类表情模板（诺基亚、蔚蓝档案标题、5000兆等）的渲染与默认文案",
       "source": "plugins/meme/templates/special-text-cards.ts"
     },
     "templates.static-layouts": {
-      "description": "表情制作",
+      "description": "静态及循环排版类表情模板（一直、我永远喜欢、精神支柱）的渲染、参数选项与校验提示",
       "source": "plugins/meme/templates/static-layouts.ts"
     },
     "templates.subtitle-animations": {
-      "description": "表情制作",
+      "description": "影视动图字幕类表情模板的默认台词配置与字幕渲染",
       "source": "plugins/meme/templates/subtitle-animations.ts"
     },
     "templates.template-layout": {
-      "description": "表情制作",
+      "description": "表情模板基础排版渲染、字体注册及尺寸校验工具",
       "source": "plugins/meme/templates/template-layout.ts"
     },
     "templates.text-announcements": {
-      "description": "表情制作",
+      "description": "悲报、喜报与罗永浩说等公告屏类表情模板",
       "source": "plugins/meme/templates/text-announcements.ts"
     },
     "templates.text-graphics": {
-      "description": "表情制作",
+      "description": "艺术字与图形化文字类表情模板渲染",
       "source": "plugins/meme/templates/text-graphics.ts"
     },
     "templates.text-panels": {
-      "description": "表情制作",
+      "description": "固定配文展板与多框文本类表情模板定义与渲染",
       "source": "plugins/meme/templates/text-panels.ts"
     },
     "templates.text-signs": {
-      "description": "表情制作",
+      "description": "举牌类表情模板",
       "source": "plugins/meme/templates/text-signs.ts"
     },
     "templates.text-speech": {
-      "description": "表情制作",
+      "description": "角色对话类表情模板",
       "source": "plugins/meme/templates/text-speech.ts"
     },
     "templates.timed-overlays": {
-      "description": "表情制作",
+      "description": "动态帧叠加类表情模板",
       "source": "plugins/meme/templates/timed-overlays.ts"
     },
     "templates.transforms": {
-      "description": "表情制作",
+      "description": "实现图片对称镜像与压扁变形等几何变换类表情模板",
       "source": "plugins/meme/templates/transforms.ts"
     },
     "templates.tudou-extra": {
-      "description": "表情制作",
+      "description": "实现需文字输入的配文类表情模板渲染逻辑",
       "source": "plugins/meme/templates/tudou-extra.ts"
     },
     "templates.tudou-layered-animations": {
-      "description": "表情制作",
+      "description": "实现基于多图层原画与头像合成的动态表情模板渲染引擎",
       "source": "plugins/meme/templates/tudou-layered-animations.ts"
     },
     "templates.tudou-tail": {
-      "description": "表情制作",
+      "description": "实现支持多图与可选配文的序列帧表情模板渲染逻辑",
       "source": "plugins/meme/templates/tudou-tail.ts"
     },
     "usage-card": {
-      "description": "表情制作：图片卡片",
+      "description": "汇总各表情模板调用次数并渲染统计网格图片卡片",
       "source": "plugins/meme/usage-card.ts"
     },
     "version-card": {
-      "description": "表情制作：图片卡片",
+      "description": "读取更新日志并分页渲染版本信息图片卡片或回退文本",
       "source": "plugins/meme/version-card.ts"
     }
   },
@@ -656,7 +656,7 @@
     "templates.anyliew-avatar-caption-scenes.text_2ab425e0c6": "她",
     "templates.anyliew-avatar-caption-scenes.text_34f3dab6f4": "天命之人",
     "templates.anyliew-avatar-caption-scenes.text_54bbcc674e": "昵称（第一段文字）",
-    "templates.anyliew-avatar-caption-scenes.text_612d5e9674": "桃乐丝:我这边里有Doro动漫周边公仔\n桃乐丝:还有{value1}的写真~\n桃乐丝:你要吗？",
+    "templates.anyliew-avatar-caption-scenes.text_612d5e9674": "桃乐丝:我这边有Doro动漫周边公仔\n桃乐丝:还有{value1}的写真~\n桃乐丝:你要吗？",
     "templates.anyliew-avatar-caption-scenes.text_8b7b91e000": "他",
     "templates.anyliew-avatar-caption-scenes.text_9e9a196944": "所有人，给我{value1}生成黄图",
     "templates.anyliew-avatar-caption-scenes.text_b259f5e7da": "喜报传佳讯\n福星高照\n满门庭",
@@ -709,7 +709,7 @@
     "templates.anyliew-dialogue.text_fa215fea06": "亚托莉喜欢这个",
     "templates.anyliew-fixed-batch.text_6b80a530c3": "被窝表情的原帧尺寸无效。",
     "templates.anyliew-signs.text_002fc2fab2": "文字过长，无法放进表情模板。",
-    "templates.anyliew-signs.text_1cbd153405": "当那古老的预言终结、一切落幕之后，我曾经陷入很长时间的消沉。站在舞台上的人受到观众的追捧，同时也承受着更多的注视与期待。但我很清楚，他们期待的并不是我，而是我扮演的那位「神明」...在这个过程中，我真正得到的只有孤独。所以我一度庆恶任何跟表演有关的事，把自己关在房间里，直到再次站上舞台、再次面对观众的时候，我才发现不知不觉我内心的不安已经消失了。现在的我可以坦然承受他们的目光,也许是因为…我终于开始「扮演」我自己了。",
+    "templates.anyliew-signs.text_1cbd153405": "当那古老的预言终结、一切落幕之后，我曾经陷入很长时间的消沉。站在舞台上的人受到观众的追捧，同时也承受着更多的注视与期待。但我很清楚，他们期待的并不是我，而是我扮演的那位「神明」...在这个过程中，我真正得到的只有孤独。所以我一度厌恶任何跟表演有关的事，把自己关在房间里，直到再次站上舞台、再次面对观众的时候，我才发现不知不觉我内心的不安已经消失了。现在的我可以坦然承受他们的目光,也许是因为…我终于开始「扮演」我自己了。",
     "templates.anyliew-signs.text_2fa0e92d72": "快说吾辈可爱",
     "templates.anyliew-signs.text_49c12ffc4b": "图片编号，0 随机，1～{length} 指定底图",
     "templates.anyliew-signs.text_4ba7c75320": "变身",
@@ -1131,7 +1131,7 @@
     "templates.subtitle-animations.text_2ce2464352": "好啊",
     "templates.subtitle-animations.text_32520ecd80": "（飞扑）",
     "templates.subtitle-animations.text_35ec4e38b9": "你那是馋她身子",
-    "templates.subtitle-animations.text_39bffd94a7": "这幅嫉妒我的表情",
+    "templates.subtitle-animations.text_39bffd94a7": "这副嫉妒我的表情",
     "templates.subtitle-animations.text_3d767e5e33": "偶尔",
     "templates.subtitle-animations.text_44a8cad558": "跟着这样的大哥",
     "templates.subtitle-animations.text_454bb1101b": "我叫你改报告你就要改",
@@ -1248,7 +1248,7 @@
     "templates.transforms.text_d7fdb22a2d": "可恶...被人看扁了",
     "templates.transforms.text_db5ba671d2": "上",
     "templates.transforms.text_e2e0c454e5": "左",
-    "templates.transforms.text_f5122dc965": "图片太窄，无法按这个方向对称。",
+    "templates.transforms.text_f5122dc965": "图片尺寸过小，无法按这个方向对称。",
     "templates.tudou-extra.text_307eedbde6": "该表情需要一段文字。",
     "templates.tudou-extra.text_7159815dd3": "输入文字",
     "templates.tudou-extra.text_fa65d94b35": "你好，世界！",
@@ -1267,416 +1267,416 @@
   },
   "parameters": {
     "backend-builtin-assets.text_372d18c0e4": {
-      "name": "name"
+      "name": "素材名称"
     },
     "backend-builtin-assets.text_a4d385351e": {
-      "name": "name"
+      "name": "素材名称"
     },
     "backend-lifecycle.text_32d31f87d7": {
-      "key": "key"
+      "key": "模板键名"
     },
     "catalog-card.text_7ee71ff3c3": {
-      "total": "total"
+      "total": "表情模板总数"
     },
     "catalog-update.text_df2fa8ae58": {
-      "length": "entries.length",
-      "value2": "removed.length",
-      "added": "added"
+      "length": "更新的条目数",
+      "value2": "移除的条目数",
+      "added": "补齐的预设条目数"
     },
     "generation-args.text_5e616dd2d9": {
-      "name": "name"
+      "name": "不支持的参数名"
     },
     "generation-args.text_641cf27fb0": {
-      "dest": "option.dest"
+      "dest": "缺少值的参数名"
     },
     "generation-args.text_a084b72322": {
-      "name": "name"
+      "name": "值无效的参数名"
     },
     "generation.text_7ecb81ab1b": {
-      "min_images": "params.min_images",
-      "max_images": "params.max_images"
+      "min_images": "最少图片数量",
+      "max_images": "最多图片数量"
     },
     "generation.text_7accd94ee0": {
-      "min_texts": "params.min_texts",
-      "max_texts": "params.max_texts"
+      "min_texts": "最少文字段数",
+      "max_texts": "最多文字段数"
     },
     "lotus.text_e0dd1d987a": {
-      "pages": "pages"
+      "pages": "总页数"
     },
     "lotus.text_274edb770b": {
-      "page": "page",
-      "pages": "pages",
-      "total": "total"
+      "page": "当前页码",
+      "pages": "总页数",
+      "total": "表情总数"
     },
     "lotus.text_56c02d6724": {
-      "key": "row.key"
+      "key": "表情模板编号"
     },
     "lotus.text_37155de2e0": {
-      "value1": "format(aliases)"
+      "value1": "格式化后的关键词列表"
     },
     "lotus.text_a14530a3f2": {
-      "min_images": "row.min_images",
-      "max_images": "row.max_images"
+      "min_images": "最少图片张数",
+      "max_images": "最多图片张数"
     },
     "lotus.text_2629a5bcd9": {
-      "min_texts": "row.min_texts",
-      "max_texts": "row.max_texts"
+      "min_texts": "最少文字段数",
+      "max_texts": "最多文字段数"
     },
     "lotus.text_1c2bdef5ad": {
-      "value1": "format(defaults)"
+      "value1": "格式化后的默认文本列表"
     },
     "lotus.text_fc59e7cc2f": {
-      "value1": "format(tags)"
+      "value1": "格式化后的标签列表"
     },
     "lotus.text_ddfdbcd27d": {
-      "value1": "options.join(\" \")"
+      "value1": "空格分隔的可选参数列表"
     },
     "lotus.text_c9454c9d75": {
-      "value1": "format(presets)"
+      "value1": "格式化后的预设参数命令列表"
     },
     "lotus.text_83150da573": {
-      "text": "text"
+      "text": "表情详情文本"
     },
     "lotus.text_96c95c81e5": {
-      "length": "lines.length"
+      "length": "匹配的关键词数量"
     },
     "lotus.text_e137bd4647": {
-      "key": "row.key",
-      "value2": "aliases.map((word) => `[${word}]`).join(\" \") || \"[无]\""
+      "key": "表情模板编号",
+      "value2": "格式化后的表情别名或[无]"
     },
     "lotus.text_d43a58dda9": {
-      "total": "report.total"
+      "total": "表情调用总次数"
     },
     "lotus.text_141d3aff41": {
-      "keywords": "keywords",
-      "count": "count"
+      "keywords": "表情关键词",
+      "count": "调用次数"
     },
     "lotus.text_6b5869bfd2": {
-      "value1": "packageUpdate[1] ?? \"\""
+      "value1": "可选的强制更新修饰词"
     },
     "scripts.pack-builtin-assets.text_48af74ed9e": {
-      "path": "path"
+      "path": "格式或哈希校验失败的资源路径"
     },
     "scripts.pack-builtin-assets.text_890115cdbc": {
-      "path": "path"
+      "path": "重复出现的资源路径"
     },
     "scripts.pack-builtin-assets.text_17fb653fc6": {
-      "path": "path"
+      "path": "缺失固定来源 URL 的额外资源路径"
     },
     "scripts.pack-builtin-assets.text_1f21a244de": {
-      "path": "path"
+      "path": "索引中异常的素材路径"
     },
     "scripts.pack-builtin-assets.text_1bfc5b87be": {
-      "path": "path"
+      "path": "校验失败的字体资源路径"
     },
     "scripts.pack-builtin-assets.text_3f381a9228": {
-      "path": "path"
+      "path": "实际使用索引中缺失的额外素材路径"
     },
     "scripts.pack-builtin-assets.text_54f6ff931d": {
-      "digest": "digest"
+      "digest": "预期素材文件的 SHA-256 摘要"
     },
     "settings.text_55c9cd213f": {
-      "value": "value"
+      "value": "超时秒数数值"
     },
     "settings.text_1303cd69ff": {
-      "title": "title"
+      "title": "设置项中文名称"
     },
     "settings.text_dd4a9fca8f": {
-      "length": "value.length"
+      "length": "已配置的数组项数量"
     },
     "templates.anyliew-avatar-caption-scenes.text_9e9a196944": {
-      "value1": "targetName(input)"
+      "value1": "目标对象名称或自定义文本"
     },
     "templates.anyliew-avatar-caption-scenes.text_612d5e9674": {
-      "value1": "targetName(input)"
+      "value1": "目标对象名称或自定义文本"
     },
     "templates.anyliew-avatar-caption-scenes.text_d0010b60ae": {
-      "value1": "targetName(input)"
+      "value1": "目标对象名称或自定义文本"
     },
     "templates.anyliew-avatar-caption-scenes.text_b73d523576": {
-      "value1": "targetName(input)"
+      "value1": "目标对象名称或自定义文本"
     },
     "templates.anyliew-avatar-caption-scenes.text_f4f3e6eaa4": {
-      "name": "name",
-      "value2": "name",
-      "value3": "name",
-      "value4": "name"
+      "name": "对话第一句发言者的目标名称",
+      "value2": "刘伟回应的目标名称",
+      "value3": "对话第三句发言者的目标名称",
+      "value4": "刘伟提及一起用餐的目标名称"
     },
     "templates.anyliew-avatar-scenes.text_61f4a663e9": {
-      "name": "name"
+      "name": "目标对象名称或默认代称"
     },
     "templates.anyliew-circle-dialogue.text_c4a8f5307b": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_d9d9e37238": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_c82d3d074a": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_2614ddd947": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_779da2a39a": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_9b6b699450": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_d320573c3c": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_9ebea056cd": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_bb60cfb3f9": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_c988250eec": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_8cd91cdf93": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_7a073e179f": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_49d4c5b34e": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_b16c501a90": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_f75004abd1": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-circle-dialogue.text_d38569d508": {
-      "length": "holiday.length"
+      "length": "可选图片编号的最大值"
     },
     "templates.anyliew-circle-dialogue.text_9671f0f1f7": {
-      "name": "name"
+      "name": "目标对象名称"
     },
     "templates.anyliew-dialogue.text_3f5cd8d4a8": {
-      "name": "name"
+      "name": "用户名或输入文本"
     },
     "templates.anyliew-dialogue.text_f67a72dd95": {
-      "name": "name",
-      "value2": "name",
-      "value3": "name",
-      "value4": "name"
+      "name": "用户名或输入文本",
+      "value2": "用户名或输入文本",
+      "value3": "用户名或输入文本",
+      "value4": "用户名或输入文本"
     },
     "templates.anyliew-dialogue.text_1287a7c3c3": {
-      "name": "name",
-      "value2": "name",
-      "value3": "name",
-      "value4": "name",
-      "value5": "name"
+      "name": "用户名或输入文本",
+      "value2": "用户名或输入文本",
+      "value3": "用户名或输入文本",
+      "value4": "用户名或输入文本",
+      "value5": "用户名或输入文本"
     },
     "templates.anyliew-dialogue.text_c8b2e81d61": {
-      "name": "name"
+      "name": "用户名或输入文本"
     },
     "templates.anyliew-dialogue.text_76904f3fcb": {
-      "name": "name",
-      "value2": "name"
+      "name": "用户名或输入文本",
+      "value2": "用户名或输入文本"
     },
     "templates.anyliew-dialogue.text_4181511629": {
-      "name": "name",
-      "value2": "name"
+      "name": "用户名或输入文本",
+      "value2": "用户名或输入文本"
     },
     "templates.anyliew-dialogue.text_10537aed28": {
-      "name": "name"
+      "name": "用户名或输入文本"
     },
     "templates.anyliew-dialogue.text_0073f8cff2": {
-      "name": "name"
+      "name": "用户名或输入文本"
     },
     "templates.anyliew-dialogue.text_f52746553a": {
-      "name": "name"
+      "name": "用户名或输入文本"
     },
     "templates.anyliew-dialogue.text_30b74513a9": {
-      "name": "name"
+      "name": "用户名或输入文本"
     },
     "templates.anyliew-dialogue.text_4df7398d30": {
-      "name": "name"
+      "name": "用户名或输入文本"
     },
     "templates.anyliew-signs.text_49c12ffc4b": {
-      "length": "sign.frames.length"
+      "length": "底图数量"
     },
     "templates.anyliew-signs.text_aed3f52a49": {
-      "length": "sign.frames.length"
+      "length": "底图数量"
     },
     "templates.anyliew-tail.text_04b078853f": {
-      "name": "name",
-      "value2": "name"
+      "name": "用户名或输入文本",
+      "value2": "用户名或输入文本"
     },
     "templates.anyliew-tail.text_95e75f9cc6": {
-      "name": "name"
+      "name": "用户名或输入文本"
     },
     "templates.anyliew-tail.text_9b3f8cfe24": {
-      "count": "count"
+      "count": "底图数量"
     },
     "templates.anyliew-tail.text_aed3f52a49": {
-      "length": "frames.length"
+      "length": "底图数量"
     },
     "templates.anyliew-text-dialogue.text_9b3f8cfe24": {
-      "count": "count"
+      "count": "可用底图总数"
     },
     "templates.anyliew-text-dialogue.text_9cac8fb54e": {
-      "count": "count"
+      "count": "可用底图总数"
     },
     "templates.avatar-accessories.text_d91327d626": {
-      "keyword": "keyword"
+      "keyword": "模板关键词"
     },
     "templates.avatar-accessories.text_1890662526": {
-      "name": "name"
+      "name": "戒导人姓名"
     },
     "templates.avatar-accessories.text_a83233035d": {
-      "value1": "date.getFullYear()",
-      "value2": "date.getMonth() + 1",
-      "value3": "date.getDate()"
+      "value1": "年份",
+      "value2": "月份",
+      "value3": "日期"
     },
     "templates.avatar-caption-cards.text_bd13114929": {
-      "name": "name"
+      "name": "目标名称"
     },
     "templates.avatar-caption-cards.text_50dd0c475e": {
-      "pronoun": "pronoun"
+      "pronoun": "人称代词"
     },
     "templates.caption-overlays.text_05551f82c9": {
-      "value1": "date ?? whatHeWantsDate"
+      "value1": "日期或自定义前缀文本"
     },
     "templates.caption-overlays.text_30acaab1c0": {
-      "value1": "text ?? firstUserName(args, \"它\")"
+      "value1": "对象名称"
     },
     "templates.caption-overlays.text_3e9a1269e4": {
-      "value1": "text ?? firstUserName(args, \"群友\")"
+      "value1": "对象名称"
     },
     "templates.classic-avatar-animations.text_bc92350be8": {
-      "key": "key"
+      "key": "表情模板标识"
     },
     "templates.classic-layered-animations.text_bc92350be8": {
-      "key": "key"
+      "key": "表情模板标识"
     },
     "templates.cropped-photo-templates.text_078675c312": {
-      "min_images": "min_images",
-      "max_images": "max_images"
+      "min_images": "所需最少图片数量",
+      "max_images": "所需最多图片数量"
     },
     "templates.fixed-avatar-animation.text_bc92350be8": {
-      "key": "key"
+      "key": "表情模板标识符"
     },
     "templates.gif.text_ea7ba354a9": {
-      "value1": "limit / (1024 * 1024)"
+      "value1": "动图大小上限（单位为 MiB）"
     },
     "templates.jump-sold.text_bc92350be8": {
-      "key": "spec.key"
+      "key": "表情模板标识符"
     },
     "templates.kiss-hug.text_1a49c3b4f3": {
-      "asset": "asset"
+      "asset": "帧背景素材资源路径"
     },
     "templates.kiss-hug.text_4cf8ede751": {
-      "value1": "keywords[1]"
+      "value1": "当前表情模板的触发关键词"
     },
     "templates.leave-note.text_df5fe10f03": {
-      "value1": "day.getFullYear()",
-      "value2": "day.getMonth() + 1",
-      "value3": "day.getDate()"
+      "value1": "请假日期的年份",
+      "value2": "请假日期的月份",
+      "value3": "请假日期的日份"
     },
     "templates.legacy-chat-cards.text_aae590df38": {
-      "value1": "texts[0]!.repeat(2)"
+      "value1": "重复两次的输入文本"
     },
     "templates.legacy-photo-forms.text_f93b005cf8": {
-      "name": "name"
+      "name": "目标对象的名称或昵称"
     },
     "templates.legacy-photo-forms.text_7910650aa4": {
-      "name": "name"
+      "name": "目标对象的名称或昵称"
     },
     "templates.legacy-photo-forms.text_edb0d8171e": {
-      "name": "name"
+      "name": "目标对象的名称或昵称"
     },
     "templates.legacy-photo-forms.text_bfc56e260b": {
-      "name": "name"
+      "name": "目标对象的名称或昵称"
     },
     "templates.legacy-portrait-effects.text_a60083f553": {
-      "name": "name"
+      "name": "目标对象的名称或昵称"
     },
     "templates.legacy-portrait-effects.text_ac77145c4b": {
-      "name": "name"
+      "name": "目标对象的名称或昵称"
     },
     "templates.legacy-portrait-effects.text_13c71fe2f7": {
-      "pronoun": "pronoun"
+      "pronoun": "第三人称代词"
     },
     "templates.legacy-projected-actions.text_bc92350be8": {
-      "key": "spec.key"
+      "key": "表情模板标识"
     },
     "templates.operator-generator.text_2bc3592c66": {
-      "name": "name"
+      "name": "干员或用户名称"
     },
     "templates.photo-insets.text_1ea32e62ce": {
-      "count": "count"
+      "count": "所需的图片数量"
     },
     "templates.pjsk.text_d03a6c367a": {
-      "name": "name",
-      "count": "count"
+      "name": "角色名称",
+      "count": "该角色的图片总数"
     },
     "templates.portrait-overlays.text_b1291e903f": {
-      "name": "name"
+      "name": "称呼"
     },
     "templates.portrait-overlays.text_c845fe8bb7": {
-      "name": "name",
-      "pronoun": "pronoun",
-      "value3": "name"
+      "name": "称呼",
+      "pronoun": "人称代词",
+      "value3": "称呼"
     },
     "templates.portrait-overlays.text_f711756fc9": {
-      "name": "name"
+      "name": "称呼"
     },
     "templates.python-overlay-animation.text_bc92350be8": {
-      "key": "key"
+      "key": "表情模板键名"
     },
     "templates.subtitle-animations.text_67a924bd7f": {
-      "count": "count"
+      "count": "模板所需的文字段数"
     },
     "templates.text-panels.text_c09cf4d952": {
-      "text": "text"
+      "text": "生前经历或专业描述文本"
     },
     "templates.text-panels.text_13a0a4f470": {
-      "text": "text"
+      "text": "传入模板用于拼接称赞对象的文本"
     },
     "templates.text-panels.text_2b3e79221f": {
-      "value1": "day.getFullYear()",
-      "month": "month",
-      "date": "date",
-      "text": "text"
+      "value1": "年份",
+      "month": "补零后的两位月份",
+      "date": "补零后的两位日期",
+      "text": "记仇内容文本"
     },
     "templates.text-speech.text_63e3a1aef6": {
-      "length": "baCharacters.length"
+      "length": "可选角色总数"
     },
     "templates.timed-overlays.text_bc92350be8": {
-      "key": "key"
+      "key": "表情模板标识名"
     },
     "templates.tudou-layered-animations.text_c6f3f37c53": {
-      "avatarCount": "avatarCount"
+      "avatarCount": "模板所需的头像图片数量"
     },
     "templates.tudou-layered-animations.text_0c274271b9": {
-      "key": "key"
+      "key": "当前表情模板的唯一标识"
     },
     "templates.tudou-tail.text_bbde429693": {
-      "minImages": "minImages",
-      "maxImages": "maxImages"
+      "minImages": "模板允许的最少图片数量",
+      "maxImages": "模板允许的最多图片数量"
     },
     "usage-card.text_d43a58dda9": {
-      "total": "total"
+      "total": "所有表情模板的累计调用总次数"
     },
     "usage-card.text_e6c66976bb": {
-      "count": "count"
+      "count": "单个表情模板的调用次数"
     },
     "version-card.text_d5a9eae866": {
-      "version": "packageInfo.version"
+      "version": "当前模块包版本号"
     },
     "version-card.text_87ad7d0914": {
-      "value1": "index + 1",
-      "length": "pages.length"
+      "value1": "当前页码（从 1 开始）",
+      "length": "分页后的总页数"
     },
     "version-card.text_17790da4c3": {
-      "title": "title",
-      "metadata": "metadata"
+      "title": "版本卡片标题",
+      "metadata": "模块版本信息文本"
     }
   }
 }
