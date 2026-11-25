@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { ImageData, loadImage, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
@@ -161,7 +164,7 @@ function template(scene: AnyLiewAvatarScene): MemeTemplate {
   const maxTexts = scene.maxTexts ?? Number(!!scene.captions);
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
     if (input.images.length !== scene.count || input.texts.length < minTexts || input.texts.length > maxTexts) {
-      throw new Error("表情的图片或文字数量不符。");
+      throw new Error($t("templates.anyliew-static-avatar.text_1873817cf3"));
     }
     const { signal } = context;
     const legacy = scene.legacy?.use(input) ? scene.legacy : undefined;

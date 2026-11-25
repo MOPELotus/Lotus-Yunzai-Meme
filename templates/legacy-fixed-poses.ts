@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type Image } from "skia-canvas";
 import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
@@ -93,7 +96,7 @@ function paste(dst: Uint8Array, src: Uint8Array) {
 
 function template(spec: FixedPoseSpec): MemeTemplate {
   async function render({ images, texts }: MemeTemplateInput, context: MemeTemplateContext) {
-    if (images.length !== spec.inputs || texts.length) throw new Error("表情的图片或文字数量不符。");
+    if (images.length !== spec.inputs || texts.length) throw new Error($t("templates.legacy-fixed-poses.text_1873817cf3"));
     const { signal } = context;
     const [prepared, first] = await Promise.all([
       Promise.all(images.map(async file => prepareAvatar(await readMemeFirstImage(file, signal), spec.prepare, signal))),
@@ -116,7 +119,7 @@ function template(spec: FixedPoseSpec): MemeTemplate {
       for (const [i, frame] of spec.frames.entries()) {
         signal.throwIfAborted();
         const artwork = i === 0 ? first : await readArt(i);
-        if (artwork.width !== width || artwork.height !== height) throw new Error("表情原帧尺寸不一致。");
+        if (artwork.width !== width || artwork.height !== height) throw new Error($t("templates.legacy-fixed-poses.text_051504bc7f"));
         const { rgba: art } = await renderFrame(draw => draw.drawImage(artwork, 0, 0));
         let rgba: Uint8Array = art;
         if (spec.layer === "paper") {

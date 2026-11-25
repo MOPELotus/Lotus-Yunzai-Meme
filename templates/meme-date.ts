@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 const namedDates: Readonly<Record<string, number>> = {
   今天: 0, 今日: 0, 昨天: -1, 昨日: -1, 前天: -2, 大前天: -3, 明天: 1, 明日: 1, 后天: 2, 大后天: 3, 上周: -7, 下周: 7,
   today: 0, yesterday: -1, tomorrow: 1,
@@ -35,7 +38,7 @@ export function readMemeDate(value: unknown, baseline = new Date()) {
   if (text === "上个月" || text === "下个月") return moveDate(now, "month", text.startsWith("上") ? -1 : 1);
   const weekday = /^(上|本|下)?(?:周|星期)([日天一二三四五六])$/u.exec(text);
   if (weekday) {
-    const wanted = "一二三四五六日".indexOf(weekday[2] === "天" ? "日" : weekday[2]!);
+    const wanted = $t("templates.meme-date.text_80caf9b17c").indexOf(weekday[2] === "天" ? $t("templates.meme-date.text_85217f7aff") : weekday[2]!);
     const actual = (now.getDay() + 6) % 7;
     const offset = weekday[1] === "下" ? 7 : weekday[1] === "上" ? -7 : 0;
     return moveDate(now, "day", wanted - actual + offset);

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext, type MemeTemplateInput } from "../builtin-template.ts";
@@ -37,7 +40,7 @@ function sceneTemplate(key: string, keywords: readonly string[], imageCount: num
       min_images: imageCount, max_images: imageCount, min_texts: 0, max_texts: maxTexts, default_texts: [], args_type: null,
     } },
     async render(input, context) {
-      if (input.images.length !== imageCount || input.texts.length > maxTexts) throw new MemeTemplateFeedback("图片或文字数量不符合表情要求。");
+      if (input.images.length !== imageCount || input.texts.length > maxTexts) throw new MemeTemplateFeedback($t("templates.legacy-photo-scenes.text_c3c4c3a422"));
       return compose(input, context);
     },
     async preview(context) {
@@ -50,9 +53,9 @@ function sceneTemplate(key: string, keywords: readonly string[], imageCount: num
 function fbiName({ texts, args }: MemeTemplateInput) {
   if (texts[0] !== undefined) return texts[0];
   const first: unknown = Array.isArray(args.user_infos) ? args.user_infos[0] : undefined;
-  if (!first || typeof first !== "object") return "她";
+  if (!first || typeof first !== "object") return $t("templates.legacy-photo-scenes.text_2ab425e0c6");
   if ("name" in first && typeof first.name === "string" && first.name) return first.name;
-  return "gender" in first && first.gender === "male" ? "他" : "她";
+  return "gender" in first && first.gender === "male" ? $t("templates.legacy-photo-scenes.text_8b7b91e000") : $t("templates.legacy-photo-scenes.text_2ab425e0c6");
 }
 
 async function photoOrGif(input: MemeTemplateInput, context: MemeTemplateContext, art: Image,

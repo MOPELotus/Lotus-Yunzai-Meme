@@ -1,9 +1,12 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import type { MemeTemplateInput } from "../builtin-template.ts";
 import type { AnyLiewAvatarScene } from "./anyliew-static-avatar.ts";
 
 const genshin = ["米哈游", "原神"] as const;
-const nameHelp = "昵称（第一段文字）";
-const defaultNewsBody = "喜报传佳讯\n福星高照\n满门庭";
+const nameHelp = $t("templates.anyliew-avatar-caption-scenes.text_54bbcc674e");
+const defaultNewsBody = $t("templates.anyliew-avatar-caption-scenes.text_b259f5e7da");
 
 function namedNewsTitle(input: MemeTemplateInput) {
   return typeof input.args.name === "string" && input.args.name ? input.args.name : undefined;
@@ -18,7 +21,7 @@ function userInfo(input: MemeTemplateInput) {
 function targetName(input: MemeTemplateInput) {
   if (input.texts.length) return input.texts[0]!;
   const user = userInfo(input);
-  return user?.name || (user && user.gender !== "male" ? "她" : "他");
+  return user?.name || (user && user.gender !== "male" ? $t("templates.anyliew-avatar-caption-scenes.text_2ab425e0c6") : $t("templates.anyliew-avatar-caption-scenes.text_8b7b91e000"));
 }
 
 export const anyliewAvatarCaptionScenes: readonly AnyLiewAvatarScene[] = [
@@ -53,7 +56,7 @@ export const anyliewAvatarCaptionScenes: readonly AnyLiewAvatarScene[] = [
     key: "dalia_everyone", keywords: ["所有人"], count: 1, animatedInput: true,
     layers: [{ image: 0, box: [611, 387, 95, 95], circle: "stretch-first", angle: -5 }],
     captions: [{
-      text: input => `所有人，给我${targetName(input)}生成黄图`, box: [211, 0, 1060, 132],
+      text: input => $t("templates.anyliew-avatar-caption-scenes.text_9e9a196944", { "value1": targetName(input) }), box: [211, 0, 1060, 132],
       sizes: [15, 60], leftLines: true, color: "#fff", ...pixelCaption,
     }],
   },
@@ -65,7 +68,7 @@ export const anyliewAvatarCaptionScenes: readonly AnyLiewAvatarScene[] = [
       { image: 0, box: [815, 1296, 100, 100], angle: -15 },
     ],
     captions: [{
-      text: input => `桃乐丝:我这边里有Doro动漫周边公仔\n桃乐丝:还有${targetName(input)}的写真~\n桃乐丝:你要吗？`,
+      text: input => $t("templates.anyliew-avatar-caption-scenes.text_612d5e9674", { "value1": targetName(input) }),
       box: [1, 1, 1080, 250], sizes: [30, 60], leftLines: true, wrap: true, ...pixelCaption,
     }],
   },
@@ -77,7 +80,7 @@ export const anyliewAvatarCaptionScenes: readonly AnyLiewAvatarScene[] = [
       { image: 0, box: [60, 450, 35, 35], angle: 35 },
     ],
     captions: [{
-      text: input => `${targetName(input)},桃乐丝正在努力为你打工赚钱`,
+      text: input => $t("templates.anyliew-avatar-caption-scenes.text_d0010b60ae", { "value1": targetName(input) }),
       box: [1, 520, 1077, 575], sizes: [30, 60], wrap: true, ...pixelCaption,
     }],
   },
@@ -94,7 +97,7 @@ export const anyliewAvatarCaptionScenes: readonly AnyLiewAvatarScene[] = [
     count: 1, tags: genshin, animatedInput: true,
     layers: [{ image: 0, box: [932, 310, 210, 300], angle: -11 }],
     captions: [{
-      text: input => `\n久岐忍:此人是谁?\n\n旅行者:此人是${targetName(input)},擅长跳、唱、rap、打篮球\n\n旅行者:是稻妻国两年半不可多得的尤物~\n`,
+      text: input => $t("templates.anyliew-avatar-caption-scenes.text_b73d523576", { "value1": targetName(input) }),
       box: [1, 1023, 2048, 1324], sizes: [15, 120], leftLines: true, ...pixelCaption,
     }],
   },
@@ -104,7 +107,7 @@ export const anyliewAvatarCaptionScenes: readonly AnyLiewAvatarScene[] = [
     captions: [{
       text(input) {
         const name = targetName(input);
-        return `${name}:大伟哥\n刘伟:${name}\n${name}:今天很开心和你共进晚餐\n刘伟:我也很开心和${name}一起享用麦当劳双人套餐`;
+        return $t("templates.anyliew-avatar-caption-scenes.text_f4f3e6eaa4", { "name": name, "value2": name, "value3": name, "value4": name });
       },
       box: [1, 960, 1088, 1276], sizes: [15, 60], leftLines: true, ...pixelCaption,
     }],
@@ -112,7 +115,7 @@ export const anyliewAvatarCaptionScenes: readonly AnyLiewAvatarScene[] = [
   {
     key: "new_goodnews", keywords: ["新喜报"], count: 1, animatedInput: true,
     layers: [{ image: 0, box: [319, 408, 445, 445] }],
-    minTexts: 0, maxTexts: 2, defaultTexts: ["天命之人", defaultNewsBody],
+    minTexts: 0, maxTexts: 2, defaultTexts: [$t("templates.anyliew-avatar-caption-scenes.text_34f3dab6f4"), defaultNewsBody],
     legacy: {
       use: input => namedNewsTitle(input) === undefined,
       artwork: "legacy-0.png",
@@ -120,7 +123,7 @@ export const anyliewAvatarCaptionScenes: readonly AnyLiewAvatarScene[] = [
       layers: [{ image: 0, box: [210, 270, 300, 300], circle: true }],
       captions: [
         {
-          text: input => input.texts[0] ?? "她",
+          text: input => input.texts[0] ?? $t("templates.anyliew-avatar-caption-scenes.text_2ab425e0c6"),
           box: [235, 615, 478, 659], sizes: [10, 100], color: "#ffdf00", ...pixelCaption,
         },
         {

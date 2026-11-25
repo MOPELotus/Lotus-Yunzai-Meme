@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { MemeTemplateFeedback } from "./builtin-template.ts";
 import { catalogPath } from "./catalog-file.ts";
 import { isExcludedMemeCatalogKey } from "./catalog-exclusions.ts";
@@ -159,7 +162,7 @@ export function recordGeneratedMeme(key: string, catalog: string) {
   try {
     recordMemeUsage(key, catalog);
   } catch {
-    console.warn("[meme] 无法记录表情调用次数。");
+    console.warn($t("generate-reply.text_389f6be98c"));
   }
 }
 
@@ -214,17 +217,17 @@ export async function generateMemeReply(
     if (settings.quotedImages && context.reply_id !== undefined) {
       const source = await context.lookupReply?.();
       if (signal?.aborted) return;
-      if (!source) return errorReply ? "当前无法读取引用消息中的表情素材。" : undefined;
+      if (!source) return errorReply ? $t("generate-reply.text_5263c5128f") : undefined;
       const images = await imagesIn(source.message, mediaBudget);
       if (signal?.aborted) return;
-      if (!images) return errorReply ? "当前无法读取引用消息中的表情图片。" : undefined;
+      if (!images) return errorReply ? $t("generate-reply.text_ab44459668") : undefined;
       quoted = { userId: source.user_id, images };
     }
 
     const segments: readonly InboundSegment[] = Array.isArray(context.message) ? context.message : [];
     const images = settings.imagesInMessage ? await imagesIn(segments, mediaBudget) : [];
     if (signal?.aborted) return;
-    if (!images) return errorReply ? "当前无法读取该表情图片素材。" : undefined;
+    if (!images) return errorReply ? $t("generate-reply.text_cbbb3415cf") : undefined;
     const mentions = segments.flatMap((part) =>
       part.type === "at" && (typeof part.qq === "number" || typeof part.qq === "string") ? [part.qq] : []);
     const avatars = new Map<string, Promise<Blob | undefined>>();
@@ -269,5 +272,5 @@ export async function generateMemeReply(
   } catch (error) {
     if (error instanceof MemeTemplateFeedback && errorReply && !signal?.aborted) return error.message;
   }
-  return errorReply && !signal?.aborted ? "表情生成失败，请稍后再试。" : undefined;
+  return errorReply && !signal?.aborted ? $t("generate-reply.text_95c831b67d") : undefined;
 }

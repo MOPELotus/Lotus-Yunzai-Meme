@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext } from "../builtin-template.ts";
@@ -56,7 +59,7 @@ async function animation(size: number, assets: readonly string[], context: MemeT
   drawFrame: (draw: CanvasRenderingContext2D, backdrop: Image, frame: number) => void | Promise<void>) {
   const backdrops = await Promise.all(assets.map(async (asset) => {
     const image = await loadImage(await context.imageAsset(asset));
-    if (image.width !== size || image.height !== size) throw new Error(`表情帧素材尺寸无效：${asset}`);
+    if (image.width !== size || image.height !== size) throw new Error($t("templates.kiss-hug.text_1a49c3b4f3", { "asset": asset }));
     return image;
   }));
   const frames = [];
@@ -96,7 +99,7 @@ function avatarTemplate(key: string, keywords: readonly string[], animate: typeo
   return {
     info: { key, keywords, params_type: { min_images: 2, max_images: 2, min_texts: 0, max_texts: 0 } },
     async render({ images, texts }, context) {
-      if (images.length !== 2 || texts.length) throw new Error(`${keywords[1]}需要两张图片，且不接收文字。`);
+      if (images.length !== 2 || texts.length) throw new Error($t("templates.kiss-hug.text_4cf8ede751", { "value1": keywords[1] }));
       const [sender, target] = await Promise.all(images.map(file => readMemeFirstImage(file, context.signal)));
       return animate(sender!, target!, context);
     },

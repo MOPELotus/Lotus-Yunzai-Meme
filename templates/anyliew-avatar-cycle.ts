@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import type { MemeTemplate } from "../builtin-template.ts";
 import { createFixedAvatarAnimation } from "./fixed-avatar-animation.ts";
 

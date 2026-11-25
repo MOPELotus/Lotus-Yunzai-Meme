@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Dimensions, copy and original timing from MemeCrafters/meme-generator v0.1.14.
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import { loadImage, type Image } from "skia-canvas";
@@ -51,11 +54,11 @@ async function blurPhoto(image: Image, width: number, height: number) {
   }) satisfies Draw;
 }
 
-const foggingText = "兄弟，回南了";
+const foggingText = $t("templates.legacy-live-effects.text_8797652c15");
 const fogging: MemeTemplate = {
   info: { key: "fogging", keywords: ["回南天", "水雾"], params_type: { ...single, max_texts: 1, default_texts: [foggingText] } },
   async render({ images, texts }, context) {
-    if (images.length !== 1 || texts.length > 1) throw new Error("回南天需要一张图片，最多一段文字。");
+    if (images.length !== 1 || texts.length > 1) throw new Error($t("templates.legacy-live-effects.text_747d549fd8"));
     const { signal } = context;
     const [source, mask, font] = await Promise.all([
       readMemeImageSequence(images[0]!, signal), context.imageAsset("fogging/0.png").then(loadImage), registerFont(context),
@@ -88,7 +91,7 @@ const fogging: MemeTemplate = {
 const stare: MemeTemplate = {
   info: { key: "stare_at_you", keywords: ["盯着你"], params_type: single },
   async render({ images, texts }, context) {
-    if (images.length !== 1 || texts.length) throw new Error("盯着你需要一张图片。");
+    if (images.length !== 1 || texts.length) throw new Error($t("templates.legacy-live-effects.text_e9660604e0"));
     const { signal } = context;
     const [source, font, emoji] = await Promise.all([
       readMemeImageSequence(images[0]!, signal), registerFont(context, true),
@@ -96,8 +99,8 @@ const stare: MemeTemplate = {
     ]);
     const { png } = await renderExactPng(400, 400, draw => {
       paper(draw, 400, 400);
-      drawFittedText(draw, [10, 0, 150, 100], "我雇了一只", font, 12, 30, "right", "black", { wrap: false, paragraphMetrics: true });
-      drawFittedText(draw, [250, 0, 390, 100], "来盯着👁你", `${font}, ${emoji}`, 12, 30, "left", "black", { wrap: false, paragraphMetrics: true });
+      drawFittedText(draw, [10, 0, 150, 100], $t("templates.legacy-live-effects.text_7ca7bd55a5"), font, 12, 30, "right", "black", { wrap: false, paragraphMetrics: true });
+      drawFittedText(draw, [250, 0, 390, 100], $t("templates.legacy-live-effects.text_5ad27d1bab"), `${font}, ${emoji}`, 12, 30, "left", "black", { wrap: false, paragraphMetrics: true });
     });
     const layout = await loadImage(png);
     const slots: readonly AvatarPlacement[] = [{ slot: [0, 100, 400, 300] }, { slot: [160, 20, 80, 60] }];
@@ -112,7 +115,7 @@ const stare: MemeTemplate = {
 const shake: MemeTemplate = {
   info: { key: "shake_head", keywords: ["晃脑"], params_type: single },
   async render({ images, texts }, { signal }) {
-    if (images.length !== 1 || texts.length) throw new Error("晃脑需要一张图片。");
+    if (images.length !== 1 || texts.length) throw new Error($t("templates.legacy-live-effects.text_1cda4eb3e6"));
     const source = await readMemeImageSequence(images[0]!, signal);
     const first = source.frames[0];
     const padX = Math.floor(first.width / 10), padY = Math.floor(first.height / 10);

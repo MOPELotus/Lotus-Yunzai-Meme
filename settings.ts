@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { chmodSync, chownSync, closeSync, constants, fstatSync, fsyncSync, mkdirSync, mkdtempSync,
   openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -12,39 +15,39 @@ type Setting = readonly [title: string, key: string,
 type PanelSetting = Setting | readonly [title: string, key: string, type: "seconds", fallback: number];
 type MemeNameExclusion = ReturnType<typeof memeNameExclusion>;
 const sections = [
-  { title: "表情设置", file: "meme.yaml", fields: [
-    ["默认表情", "enable", "toggle", true],
-    ["强制触发", "forceSharp", "toggle", false],
-    ["头像缓存", "cache", "toggle", defaultAvatarCache],
-    ["引用回复", "reply", "toggle", false],
-    ["用户昵称", "userName", "toggle", false],
-    ["消息图片", "imagesInMessage", "toggle", true],
-    ["引用图片", "quotedImages", "toggle", true],
-    ["错误回复", "errorReply", "toggle", true],
+  { title: $t("settings.text_afc12c1a55"), file: "meme.yaml", fields: [
+    [$t("settings.text_c5a62d9cb0"), "enable", "toggle", true],
+    [$t("settings.text_24f2d79e2b"), "forceSharp", "toggle", false],
+    [$t("settings.text_e89437675b"), "cache", "toggle", defaultAvatarCache],
+    [$t("settings.text_c4ba41a93b"), "reply", "toggle", false],
+    [$t("settings.text_71574c9a99"), "userName", "toggle", false],
+    [$t("settings.text_954bb9ada7"), "imagesInMessage", "toggle", true],
+    [$t("settings.text_7b8eaa7fd1"), "quotedImages", "toggle", true],
+    [$t("settings.text_8949203415"), "errorReply", "toggle", true],
   ] satisfies Setting[] },
-  { title: "名单设置", file: "access.yaml", fields: [
-    ["名单限制", "enable", "toggle", false],
-    ["名单模式", "mode", "mode", 0],
-    ["用户白名单", "userWhiteList", "users", []],
-    ["用户黑名单", "userBlackList", "users", []],
-    ["禁用表情列表", "blackListEnable", "toggle", false],
-    ["黑名单表情列表", "blackList", "templates", []],
+  { title: $t("settings.text_1ddd706592"), file: "access.yaml", fields: [
+    [$t("settings.text_4bce67540f"), "enable", "toggle", false],
+    [$t("settings.text_d1b53bdeb2"), "mode", "mode", 0],
+    [$t("settings.text_8c4715253c"), "userWhiteList", "users", []],
+    [$t("settings.text_6ae2ab05a0"), "userBlackList", "users", []],
+    [$t("settings.text_9bef3636bc"), "blackListEnable", "toggle", false],
+    [$t("settings.text_2857cc4121"), "blackList", "templates", []],
   ] satisfies Setting[] },
-  { title: "表情保护设置", file: "protect.yaml", fields: [
-    ["表情保护列表", "list", "templates", []],
-    ["保护用户列表", "user", "users", []],
-    ["表情保护", "enable", "toggle", false],
-    ["主人保护", "master", "toggle", false],
-    ["用户保护", "userEnable", "toggle", false],
+  { title: $t("settings.text_e5d932113e"), file: "protect.yaml", fields: [
+    [$t("settings.text_f1b18e3110"), "list", "templates", []],
+    [$t("settings.text_b9b173d82a"), "user", "users", []],
+    [$t("settings.text_f2f840293d"), "enable", "toggle", false],
+    [$t("settings.text_1bd63493b8"), "master", "toggle", false],
+    [$t("settings.text_732ddf0412"), "userEnable", "toggle", false],
   ] satisfies Setting[] },
 ];
 
 const panelSections: readonly { title: string; file: string; fields: readonly PanelSetting[] }[] = [
-  { title: "合成设置", file: "server.yaml", fields: [
-    ["合成超时（秒）", "managedTimeout", "seconds", defaultManagedMemeTimeout],
+  { title: $t("settings.text_78c8f3b315"), file: "server.yaml", fields: [
+    [$t("settings.text_939f087c86"), "managedTimeout", "seconds", defaultManagedMemeTimeout],
   ] },
   ...sections,
-  { title: "表情统计设置", file: "stat.yaml", fields: [["表情统计", "enable", "toggle", true]] },
+  { title: $t("settings.text_7720312544"), file: "stat.yaml", fields: [[$t("settings.text_1e6e80b1e5"), "enable", "toggle", true]] },
 ];
 
 const settingCommand = /^#表情(?:合成)?设置\s*/u;
@@ -131,9 +134,9 @@ function panelField(group: string, [label, key, type]: PanelSetting) {
   const field = `${group}.${key}`;
   switch (type) {
     case "toggle": return { label, field, component: "Switch",
-      ...(field === "meme.cache" && { bottomHelpMessage: "头像未变更时复用本进程中的缓存。" }) };
+      ...(field === "meme.cache" && { bottomHelpMessage: $t("settings.text_9abebabf06") }) };
     case "mode": return { label, field, component: "Select", componentProps: { options: [
-      { label: "白名单", value: 0 }, { label: "黑名单", value: 1 },
+      { label: $t("settings.text_27e2d9e2d9"), value: 0 }, { label: $t("settings.text_174ec5a4ab"), value: 1 },
     ] } };
     case "users":
     case "templates": return { label, field, component: "Select", componentProps: { mode: "tags" } };
@@ -159,7 +162,7 @@ function panelValue(type: PanelSetting[2], value: unknown, excluded = isExcluded
       break;
     }
   }
-  throw new Error("无效的表情设置");
+  throw new Error($t("settings.text_bd3956e837"));
 }
 
 function panelYaml(text: string, { document, values }: ReturnType<typeof documentOf>, updates: ReadonlyMap<string, unknown>) {
@@ -209,7 +212,7 @@ export function supportGuoba() {
     `${file.slice(0, -5)}.${setting[1]}`, { file, setting },
   ] as const)));
   return {
-    pluginInfo: { name: "meme", title: "表情合成", isV3: true, isV2: false },
+    pluginInfo: { name: "meme", title: $t("settings.text_c6807b80bc"), isV3: true, isV2: false },
     configInfo: {
       schemas: panelSections.flatMap(({ title, file, fields }) => [
         { label: title, component: "SOFT_GROUP_BEGIN" }, ...fields.map(setting => panelField(file.slice(0, -5), setting)),
@@ -240,7 +243,7 @@ export function supportGuoba() {
             patches.set(file, patch);
           }
         } catch {
-          return Result.error("表情配置包含未知字段或无效值。", 422);
+          return Result.error($t("settings.text_d21699fe5c"), 422);
         }
 
         const directory = configDirectory();
@@ -259,10 +262,10 @@ export function supportGuoba() {
 }
 
 function show(setting: PanelSetting, value: unknown): string {
-  if (setting[2] === "toggle") return value === true ? "开启" : "关闭";
-  if (setting[2] === "mode") return value === 1 ? "黑名单" : "白名单";
-  if (setting[2] === "seconds") return `${value} 秒`;
-  return Array.isArray(value) && value.length ? value.map(String).join("、") : "空";
+  if (setting[2] === "toggle") return value === true ? $t("settings.text_8da97ddda9") : $t("settings.text_3fd47edce4");
+  if (setting[2] === "mode") return value === 1 ? $t("settings.text_174ec5a4ab") : $t("settings.text_27e2d9e2d9");
+  if (setting[2] === "seconds") return $t("settings.text_55c9cd213f", { "value": value });
+  return Array.isArray(value) && value.length ? value.map(String).join("、") : $t("settings.text_2f8267a89a");
 }
 
 function namesFor(argument: string, context: SettingsContext, users: boolean): string[] {
@@ -280,7 +283,7 @@ export function isMemeOwner(context: SettingsContext): boolean {
 }
 
 function memeSettings(argument: string, context: SettingsContext): string | MemeReference {
-  if (!isMemeOwner(context)) return "只有主人可以修改表情合成设置。";
+  if (!isMemeOwner(context)) return $t("settings.text_5f9f117d1d");
   try {
     const directory = configDirectory();
     let excludeName: MemeNameExclusion | undefined;
@@ -305,21 +308,21 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
       if (!value) return `${title}：${show(setting, visibleSettingValue(setting, current, excluded))}`;
       let next: unknown;
       if (type === "toggle") {
-        if (value !== "开启" && value !== "关闭") return "请指定开启或关闭。";
+        if (value !== "开启" && value !== "关闭") return $t("settings.text_ce8cb065e4");
         next = value === "开启";
         document.set(key, next);
       } else if (type === "mode") {
-        if (value !== "0" && value !== "1") return "名单模式使用 0（白名单）或 1（黑名单）。";
+        if (value !== "0" && value !== "1") return $t("settings.text_a29c9b95f8");
         next = Number(value);
         document.set(key, next);
       } else if (type === "seconds") {
         try { next = panelValue(type, value); }
-        catch { return `${title}格式无效。`; }
+        catch { return $t("settings.text_1303cd69ff", { "title": title }); }
         document.set(key, next);
       } else {
         const change = /^(添加|删除)\s*(.*)$/u.exec(value);
         const names = change && namesFor(change[2] ?? "", context, type === "users");
-        if (!change || !names || !names.length) return "请指定要添加或删除的名单项。";
+        if (!change || !names || !names.length) return $t("settings.text_ad800d378d");
         if (!Array.isArray(current) || current.some((entry) => typeof entry !== "string" && !Number.isSafeInteger(entry))) {
           throw new Error();
         }
@@ -327,7 +330,7 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
         const added = names.filter((name) => !current.some((entry) => String(entry).trim() === name));
         const sequence = document.get(key, true);
         if (change[1] === "添加") {
-          if (type === "templates" && names.some(excluded)) return "该表情不在可管理目录中。";
+          if (type === "templates" && names.some(excluded)) return $t("settings.text_a1d4baeda4");
           next = [...current, ...added];
           if (isSeq(sequence)) for (const item of added) sequence.add(item);
           else document.set(key, next);
@@ -347,19 +350,19 @@ function memeSettings(argument: string, context: SettingsContext): string | Meme
       return `${title}：${show(setting, visibleSettingValue(setting, next, excluded))}`;
     }
 
-    if (action) return "未找到该表情合成设置项。";
+    if (action) return $t("settings.text_1c53b7ad6c");
     const groups = candidates.map((section) => {
       const values = documentOf(snapshot(join(directory, section.file)).text).values;
       const entries = section.fields.map((field) => {
         const value = visibleSettingValue(field, settingValue(field, values), excluded);
-        const detail = Array.isArray(value) ? (value.length ? `已配置 ${value.length} 项` : "未配置") : show(field, value);
+        const detail = Array.isArray(value) ? (value.length ? $t("settings.text_dd4a9fca8f", { "length": value.length }) : $t("settings.text_80a57e03f0")) : show(field, value);
         return { title: field[0], detail };
       });
       return { title: section.title, entries };
     });
-    return { title: "表情合成设置", view: "settings", groups };
+    return { title: $t("settings.text_d4bb9f1183"), view: "settings", groups };
   } catch {
-    return "无法读取或保存表情合成设置，请检查本地 YAML 配置。";
+    return $t("settings.text_eabce164b1");
   }
 }
 

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import type { LoadMemeInfoCard, MemeInfoCard } from "./info-card-runtime.ts";
 
 export interface ReferenceGroup {
@@ -14,26 +17,26 @@ export interface MemeReference {
 
 export function helpReference(owner: boolean): MemeReference {
   const groups: ReferenceGroup[] = [{
-    title: "查询与合成",
+    title: $t("reference-card.text_a589ce0aff"),
     entries: [
-      { title: "#表情列表 [页码]", detail: "浏览可用表情。指定页码时返回文字目录。", icon: 161 },
-      { title: "#表情搜索 关键词", detail: "搜索表情名称和别名。", icon: 90 },
-      { title: "#表情详情 关键词", detail: "查看图片、文本、参数数量和图样预览。", icon: 75 },
-      { title: "#表情统计", detail: "查看表情调用次数。", icon: 72 },
-      { title: "#随机表情", detail: "从可用模板中随机合成一张表情。" },
-      { title: "表情关键词 [文字/文字] [@用户] [#参数名 参数值]",
-        detail: "也可附图片或引用图片。详情中可查模板支持的参数。", icon: 71 },
+      { title: $t("reference-card.text_9aa5d79af2"), detail: $t("reference-card.text_7ee43534a0"), icon: 161 },
+      { title: $t("reference-card.text_10f0fe7df6"), detail: $t("reference-card.text_90119af892"), icon: 90 },
+      { title: $t("reference-card.text_2c78f41fbd"), detail: $t("reference-card.text_5271fc2f94"), icon: 75 },
+      { title: "#表情统计", detail: $t("reference-card.text_bde3515fc5"), icon: 72 },
+      { title: "#随机表情", detail: $t("reference-card.text_25ab51b9c4") },
+      { title: $t("reference-card.text_9c27461465"),
+        detail: $t("reference-card.text_9962dc4878"), icon: 71 },
     ],
   }];
   if (owner) groups.push({
-    title: "主人命令",
+    title: $t("reference-card.text_57cd91abe2"),
     entries: [
-      { title: "#表情合成设置", detail: "查看当前设置。发送设置项名称可查看或修改该项。", icon: 85 },
-      { title: "#表情合成更新资源", detail: "增量更新表情数据。添加「强制」可重新读取全部表情。", icon: 81 },
-      { title: "#更新 meme", detail: "通过宿主检查表情模块代码更新。", icon: 95 },
+      { title: "#表情合成设置", detail: $t("reference-card.text_05d1067425"), icon: 85 },
+      { title: "#表情合成更新资源", detail: $t("reference-card.text_a67a100892"), icon: 81 },
+      { title: $t("reference-card.text_c1937be6df"), detail: $t("reference-card.text_fcb198138f"), icon: 95 },
     ],
   });
-  return { title: "表情帮助", groups };
+  return { title: $t("reference-card.text_31cce19faf"), groups };
 }
 
 let helpIcons: Promise<import("skia-canvas").Image | undefined> | undefined;

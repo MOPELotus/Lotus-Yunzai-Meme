@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { ImageData, loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
@@ -118,7 +121,7 @@ function template(spec: TudouTailSpec, mode: RenderMode): MemeTemplate {
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
     const { images, texts, args } = input, { signal } = context;
     if (images.length < minImages || images.length > maxImages || texts.length > Number(!!spec.caption)) {
-      throw new Error(`该表情需要 ${minImages}–${maxImages} 张图片。`);
+      throw new Error($t("templates.tudou-tail.text_bbde429693", { "minImages": minImages, "maxImages": maxImages }));
     }
     const sources = await Promise.all(images.map(image => spec.format === "jpeg-or-gif" ?
       readMemeImageSequence(image, signal) :
@@ -131,7 +134,7 @@ function template(spec: TudouTailSpec, mode: RenderMode): MemeTemplate {
     if (spec.caption) {
       font = await registerFont(context);
       const nickname: unknown = Array.isArray(args.user_infos) ? args.user_infos[0]?.name : undefined;
-      caption = texts[0]?.trim() ? texts[0] : (typeof nickname === "string" && nickname) || "前任";
+      caption = texts[0]?.trim() ? texts[0] : (typeof nickname === "string" && nickname) || $t("templates.tudou-tail.text_be6af86c17");
     }
 
     function asset(index: number) {

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { renderPng, renderRgba } from "@lotus-yunzai/skia";
 import type { MemeTemplate, MemeTemplateContext } from "../builtin-template.ts";
 import { alignMemeLoop, readMemeFirstImage, readMemeImageSequence } from "./animated-input.ts";
@@ -5,8 +8,8 @@ import { encodeMemeGif } from "./gif.ts";
 import { renderPythonCanvasGif } from "./python-gif.ts";
 
 const singleImage = { min_images: 1, max_images: 1, min_texts: 0, max_texts: 0 };
-const directionHelp = "跑动方向，包含 left_right、right_left";
-const directions = [["left_right", "左右"], ["right_left", "右左"]] as const;
+const directionHelp = $t("templates.motion.text_45cb499257");
+const directions = [["left_right", $t("templates.motion.text_191e26b5d7")], ["right_left", $t("templates.motion.text_a22fe282ac")]] as const;
 
 async function previewImage(context: MemeTemplateContext) {
   context.signal.throwIfAborted();

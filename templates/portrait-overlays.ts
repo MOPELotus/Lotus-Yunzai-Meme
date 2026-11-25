@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type Image } from "skia-canvas";
 import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext } from "../builtin-template.ts";
@@ -74,7 +77,7 @@ const stills: Readonly<Record<string, Still>> = {
   async crawl(image, input, context) {
     const requested = input.args.number ?? 0;
     if (typeof requested !== "number" || !Number.isInteger(requested) || requested < 0 || requested > 92) {
-      throw new MemeTemplateFeedback("图片编号错误，请选择 1~92");
+      throw new MemeTemplateFeedback($t("templates.portrait-overlays.text_48ee81b80f"));
     }
     const number = requested || randomInteger(92);
     const art = await asset(context, "crawl", `${String(number).padStart(2, "0")}.jpg`);
@@ -112,15 +115,15 @@ const stills: Readonly<Record<string, Still>> = {
   async my_wife(image, input, context) {
     const [art, font] = await Promise.all([asset(context, "my_wife", "point.png"), registerFont(context, true)]);
     const height = Math.max(1, Math.floor(image.height * 400 / image.width));
-    const pronoun = typeof input.args.pronoun === "string" ? input.args.pronoun : "我";
-    const name = typeof input.args.name === "string" ? input.args.name : "老婆";
+    const pronoun = typeof input.args.pronoun === "string" ? input.args.pronoun : $t("templates.portrait-overlays.text_b70bb4acc0");
+    const name = typeof input.args.name === "string" ? input.args.name : $t("templates.portrait-overlays.text_120a3a2fc2");
     return jpg(650, height + 500, draw => {
       paper(draw, 650, height + 500);
       draw.drawImage(image, 125, 105, 400, height);
-      drawFittedText(draw, [27, 12, 623, 91], `如果你的${name}长这样`, font, 30, 70, "center", "#000", { paragraphMetrics: true });
-      drawFittedText(draw, [27, height + 120, 620, height + 255], `那么这就不是你的${name}\n这是${pronoun}的${name}`,
+      drawFittedText(draw, [27, 12, 623, 91], $t("templates.portrait-overlays.text_b1291e903f", { "name": name }), font, 30, 70, "center", "#000", { paragraphMetrics: true });
+      drawFittedText(draw, [27, height + 120, 620, height + 255], $t("templates.portrait-overlays.text_c845fe8bb7", { "name": name, "pronoun": pronoun, "value3": name }),
         font, 30, 70, "left", "#000", { paragraphMetrics: true, blockAlignment: "center" });
-      drawFittedText(draw, [27, height + 295, 401, height + 430], `滚去找你\n自己的${name}去`, font, 30, 70, "center", "#000", { paragraphMetrics: true });
+      drawFittedText(draw, [27, height + 295, 401, height + 430], $t("templates.portrait-overlays.text_f711756fc9", { "name": name }), font, 30, 70, "center", "#000", { paragraphMetrics: true });
       draw.drawImage(art, 421, height + 270, 200, Math.max(1, Math.floor(art.height * 200 / art.width)));
     }, context.signal);
   },

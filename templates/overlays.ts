@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Geometry and JPG/GIF selection follow MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { randomInt } from "node:crypto";
@@ -25,13 +28,13 @@ interface Overlay {
   readonly argsType?: unknown;
 }
 
-const blackHelp = "是否将图片变为黑白";
+const blackHelp = $t("templates.overlays.text_766fbf546b");
 const blackArgs = {
   args_model: { properties: { black: { type: "boolean", default: false, description: blackHelp } } },
-  parser_options: [{ names: ["--black", "黑白"], dest: "black", args: [], action: { type: 0, value: true }, help_text: blackHelp }],
+  parser_options: [{ names: ["--black", $t("templates.overlays.text_47d88357c5")], dest: "black", args: [], action: { type: 0, value: true }, help_text: blackHelp }],
 };
 
-const numberHelp = "图片编号，1-阿罗娜，2-普拉娜";
+const numberHelp = $t("templates.overlays.text_28d478cd63");
 const numberArgs = {
   args_model: { properties: { number: { type: "integer", default: 0, description: numberHelp } } },
   parser_options: [{ names: ["-n", "--number"], dest: "number", args: [{ name: "number", value: "int" }], help_text: numberHelp }],
@@ -51,7 +54,7 @@ const overlays: readonly Overlay[] = [
     key: "keep_your_money", keywords: ["压岁钱不要交给"], tags: ["阿罗娜", "普拉娜", "碧蓝档案", "蔚蓝档案"], argsType: numberArgs,
     layout(_image, args) {
       const number = args.number ?? 0;
-      if (number !== 0 && number !== 1 && number !== 2) throw new Error("图片编号错误，请输入1或2");
+      if (number !== 0 && number !== 1 && number !== 2) throw new Error($t("templates.overlays.text_b159b755d7"));
       const selected = number === 0 ? randomInt(1, 3) : number;
       return { art: selected === 1 ? "arona.png" : "plana.png", slot: [0, 440, 500, 640], fit: "contain", whitePadding: true };
     },
@@ -88,7 +91,7 @@ async function renderMaskedStill(image: Image, frame: Image, extra: Image | unde
 
 function overlayTemplate({ key, keywords, tags, layout: getLayout, grayscale, argsType }: Overlay): MemeTemplate {
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
-    if (input.texts.length) throw new Error("该表情不接收文字。");
+    if (input.texts.length) throw new Error($t("templates.overlays.text_b32428e841"));
     const source = await readTransformSource(input, context.signal);
     const layout = typeof getLayout === "function" ? getLayout(source.frames[0], input.args) : getLayout;
     const { art = "0.png", sticker, avatarAboveArt } = layout;

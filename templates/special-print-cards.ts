@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext, type MemeTemplateInput } from "../builtin-template.ts";
@@ -38,8 +41,8 @@ function localCertificateDate(value: unknown, now = new Date()) {
   return Number.isNaN(builtIn.getTime()) ? now : builtIn;
 }
 
-const certificateDefault = ["小王", "优秀学生", "一年一班"];
-const certificateIntroduction = "　　在本学年第一学期中表现优秀，被我校决定评为";
+const certificateDefault = [$t("templates.special-print-cards.text_f5c982ae40"), $t("templates.special-print-cards.text_53c5cd60ab"), $t("templates.special-print-cards.text_8cd2be8637")];
+const certificateIntroduction = $t("templates.special-print-cards.text_8f9746ddd8");
 
 async function certificate({ texts, args }: MemeTemplateInput, context: MemeTemplateContext) {
   const [background, family] = await Promise.all([
@@ -63,7 +66,7 @@ async function certificate({ texts, args }: MemeTemplateInput, context: MemeTemp
   });
 }
 
-const yeshuDefault = ["椰子特产在海南", "正宗", "椰树", "29年", "坚持在海南岛", "用新鲜椰子肉", "鲜榨", "不用椰浆\n不加香精当生榨"];
+const yeshuDefault = [$t("templates.special-print-cards.text_823ec0d8fb"), $t("templates.special-print-cards.text_f833a9aee7"), $t("templates.special-print-cards.text_5c8d079b58"), $t("templates.special-print-cards.text_436019c395"), $t("templates.special-print-cards.text_efb2c31194"), $t("templates.special-print-cards.text_8962d0324f"), $t("templates.special-print-cards.text_6ca67e473b"), $t("templates.special-print-cards.text_2ef6fbcae9")];
 
 async function yeshu({ texts }: MemeTemplateInput, context: MemeTemplateContext) {
   const family = await registerFont(context, true);
@@ -111,8 +114,8 @@ async function pandaDragonFigure({ texts, args }: MemeTemplateInput, context: Me
   ]);
   return png(background.width, background.height, context.signal, draw => {
     draw.drawImage(background, 0, 0);
-    drawFittedText(draw, [0, 470, 470, 550], String(args.name || "责怪龙"), family, 20, 60, "center", "#fff", { wrap: false, paragraphMetrics: true });
-    drawFittedText(draw, [0, 0, 550, 120], texts[0] ?? "我要玩原神", family, 20, 100, "center", "#000", { paragraphMetrics: true });
+    drawFittedText(draw, [0, 470, 470, 550], String(args.name || $t("templates.special-print-cards.text_e2731df5c1")), family, 20, 60, "center", "#fff", { wrap: false, paragraphMetrics: true });
+    drawFittedText(draw, [0, 0, 550, 120], texts[0] ?? $t("templates.special-print-cards.text_46a2c7baea"), family, 20, 100, "center", "#000", { paragraphMetrics: true });
   });
 }
 
@@ -143,7 +146,7 @@ async function atriPillow({ texts, args }: MemeTemplateInput, context: MemeTempl
 async function kokonaSeal({ texts, args }: MemeTemplateInput, context: MemeTemplateContext) {
   const requested = Number(args.number ?? 0);
   if (!Number.isInteger(requested) || requested < 0 || requested > 12) {
-    throw new MemeTemplateFeedback("图片编号错误，请选择 1~12");
+    throw new MemeTemplateFeedback($t("templates.special-print-cards.text_9ba2241237"));
   }
   const number = requested || (1 + Math.floor(Math.random() * 12));
   const [background, family] = await Promise.all([
@@ -155,7 +158,7 @@ async function kokonaSeal({ texts, args }: MemeTemplateInput, context: MemeTempl
     draw.save();
     draw.translate(75, 25);
     rotateExpanded(draw, 320, 155, 16);
-    drawFittedText(draw, [10, 10, 310, 145], texts[0] ?? "满分", family, 50, 150, "left", "#fe0000",
+    drawFittedText(draw, [10, 10, 310, 145], texts[0] ?? $t("templates.special-print-cards.text_b9035729a5"), family, 50, 150, "left", "#fe0000",
       { wrap: false, paragraphMetrics: true, blockAlignment: "center", stroke: ["#fe0000", 0.018] });
     draw.restore();
   });
@@ -195,12 +198,12 @@ function printCard(info: Omit<MemeTemplate["info"], "params_type">, render: Meme
 }
 
 export const specialPrintCardTemplates: readonly MemeTemplate[] = [
-  printCard({ key: "certificate", keywords: ["奖状", "证书"] }, certificate, certificateDefault, textOption("time", ["-t", "--time"], "指定时间"), 4),
+  printCard({ key: "certificate", keywords: ["奖状", "证书"] }, certificate, certificateDefault, textOption("time", ["-t", "--time"], $t("templates.special-print-cards.text_8a009da6e6")), 4),
   printCard({ key: "yeshu", keywords: ["椰树椰汁"] }, yeshu, yeshuDefault),
   printCard({ key: "panda_dragon_figure", keywords: ["熊猫龙图"], shortcuts: [
-    { key: "(?P<name>\\S{1,10})龙[\\s:：]+(?P<text>\\S+)", args: ["--name", "{name}龙", "{text}"], humanized: "xx龙：xx" },
-  ] }, pandaDragonFigure, ["我要玩原神"], textOption("name", ["-n", "--name"], "龙图名字")),
+    { key: "(?P<name>\\S{1,10})龙[\\s:：]+(?P<text>\\S+)", args: ["--name", "{name}龙", "{text}"], humanized: $t("templates.special-print-cards.text_80fb1a8002") },
+  ] }, pandaDragonFigure, [$t("templates.special-print-cards.text_46a2c7baea")], textOption("name", ["-n", "--name"], $t("templates.special-print-cards.text_564348fe10"))),
   printCard({ key: "atri_pillow", keywords: ["亚托莉枕头"], tags: ["ATRI", "亚托莉", "萝卜子"] }, atriPillow, ["ATRI"], pillowMode),
-  printCard({ key: "kokona_seal", keywords: ["心奈印章"], tags: ["春原心奈", "碧蓝档案", "春原心菜", "蔚蓝档案"] }, kokonaSeal, ["满分"],
-    textOption("number", ["-n", "--number"], "图片编号，范围为 1~12", "integer")),
+  printCard({ key: "kokona_seal", keywords: ["心奈印章"], tags: ["春原心奈", "碧蓝档案", "春原心菜", "蔚蓝档案"] }, kokonaSeal, [$t("templates.special-print-cards.text_b9035729a5")],
+    textOption("number", ["-n", "--number"], $t("templates.special-print-cards.text_f5a709b28e"), "integer")),
 ];

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original layouts from MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { randomInt } from "node:crypto";
@@ -22,11 +25,11 @@ type SignLayout = {
 
 const layouts: readonly SignLayout[] = [
   { key: "bronya_holdsign", keywords: ["布洛妮娅举牌", "大鸭鸭举牌"], tags: ["米哈游", "崩坏3", "布洛妮娅·扎伊切克"],
-    text: "V我50", box: [190, 675, 640, 930], color: "#6f5f5f", size: [25, 60] },
+    text: $t("templates.text-signs.text_b581639349"), box: [190, 675, 640, 930], color: "#6f5f5f", size: [25, 60] },
   { key: "nekoha_holdsign", keywords: ["猫羽雫举牌", "猫猫举牌"], tags: ["猫羽雫"],
-    text: "V我50", box: [210, 520, 570, 765], color: "#486ead", size: [25, 65], font: "child" },
+    text: $t("templates.text-signs.text_b581639349"), box: [210, 520, 570, 765], color: "#486ead", size: [25, 65], font: "child" },
   { key: "nijika_holdsign", keywords: ["伊地知虹夏举牌", "虹夏举牌"], tags: [],
-    text: "你可少看点二次元吧", box: [57, 279, 249, 405], color: "#6f5f5f", size: [25, 60], font: "diary" },
+    text: $t("templates.text-signs.text_cbb18a44fd"), box: [57, 279, 249, 405], color: "#6f5f5f", size: [25, 60], font: "diary" },
 ];
 
 const fireflyLayouts: readonly (readonly [Pair, Pair, ProjectiveQuad])[] = [
@@ -110,7 +113,7 @@ function staticSign(spec: SignLayout): MemeTemplate {
   };
 }
 
-const ayachiText = "我控制不住自己啊";
+const ayachiText = $t("templates.text-signs.text_b7ef095e21");
 async function ayachiSign(text: string, context: MemeTemplateContext) {
   const [frame, label] = await Promise.all([
     context.imageAsset("ayachi_holdsign/0.png").then(loadImage),
@@ -122,12 +125,12 @@ async function ayachiSign(text: string, context: MemeTemplateContext) {
   }, context.signal);
 }
 
-const fireflyText = "我超爱你";
-const fireflyNumberHelp = "图片编号，范围为 1~21";
+const fireflyText = $t("templates.text-signs.text_7c4aa15c51");
+const fireflyNumberHelp = $t("templates.text-signs.text_9adee70171");
 async function fireflySign(text: string, number: unknown, context: MemeTemplateContext) {
   const variant = number === undefined || number === 0 ? randomInt(1, fireflyLayouts.length + 1) : number;
   if (typeof variant !== "number" || !Number.isSafeInteger(variant) || variant < 1 || variant > fireflyLayouts.length) {
-    throw new MemeTemplateFeedback("图片编号错误，请选择 1~21");
+    throw new MemeTemplateFeedback($t("templates.text-signs.text_521887f34b"));
   }
   const [size, offset, corners] = fireflyLayouts[variant - 1]!;
   const [frame, label] = await Promise.all([
@@ -143,7 +146,7 @@ async function fireflySign(text: string, number: unknown, context: MemeTemplateC
   return png;
 }
 
-const raiseSignText = "大佬带带我";
+const raiseSignText = $t("templates.text-signs.text_e7e9c79bcd");
 async function raiseSign(text: string, context: MemeTemplateContext) {
   const [frame, label] = await Promise.all([
     context.imageAsset("raise_sign/0.jpg").then(loadImage),
@@ -155,7 +158,7 @@ async function raiseSign(text: string, context: MemeTemplateContext) {
   }, context.signal);
 }
 
-const runText = "快跑";
+const runText = $t("templates.text-signs.text_80369e6333");
 async function runSign(text: string, context: MemeTemplateContext) {
   const [frame, font] = await Promise.all([context.imageAsset("run/0.png").then(loadImage), registerFont(context)]);
   const width = 122, height = 53;

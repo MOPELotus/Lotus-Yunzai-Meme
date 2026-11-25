@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original motion and artwork from MemeCrafters/meme-generator at 619fa105.
 import { ImageData, loadImage, type Image } from "skia-canvas";
 import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
@@ -199,7 +202,7 @@ async function resizeFrame(frame: Buffer, [width, height]: Size, outWidth: numbe
 function pixelEffect(key: Effect, keywords: readonly string[]): MemeTemplate {
   const flick = key === "flick";
   async function render({ images, texts }: MemeTemplateInput, context: MemeTemplateContext) {
-    if (images.length !== 1 || texts.length !== 0) throw new Error("该表情需要一张图片。");
+    if (images.length !== 1 || texts.length !== 0) throw new Error($t("templates.legacy-pixel-effects.text_2646e324ad"));
     const { signal } = context;
     const [input, hands] = await Promise.all([readMemeImageSequence(images[0]!, signal),
       flick ? readHands(context) : []]);

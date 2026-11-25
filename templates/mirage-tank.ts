@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type Image } from "skia-canvas";
 import { renderRgba } from "../../../packages/skia/index.ts";
 import { encodeBandedPng } from "../../../packages/skia/banded-png.ts";
@@ -32,7 +35,7 @@ function brightness(text: string | undefined) {
 
 function timeline(sequences: readonly MemeImageSequence[]) {
   const [cover, base] = sequences;
-  if (!cover) throw new Error("幻影坦克需要图片。");
+  if (!cover) throw new Error($t("templates.mirage-tank.text_78a2eee503"));
   if (!base || base.frames.length === 1) return cover.frames.map(image => ({ value: [image, base?.frames[0]] as Pair,
     delayMs: Math.floor(cover.averageDelayMs / 10) * 10 }));
   if (cover.frames.length === 1) return base.frames.map(image => ({ value: [cover.frames[0], image] as Pair,
@@ -152,7 +155,7 @@ async function pixels(mode: Mode, [cover, base]: Pair, [width, height]: Dimensio
     const half = Math.max(1, Math.floor(width / 2));
     return separate(await raster(cover, half, height), width, height, half, factor, signal);
   }
-  if (!base) throw new Error("幻影坦克需要两张图。");
+  if (!base) throw new Error($t("templates.mirage-tank.text_f9ddbf155e"));
   function raw(image: Image) {
     return image.width === width && image.height === height ? original.get(image) : undefined;
   }
@@ -172,7 +175,7 @@ function template({ key, keywords, mode }: typeof scenes[number]): MemeTemplate 
   const imageCount = separateViews ? 1 : 2;
   async function render(input: MemeTemplateInput, { signal }: MemeTemplateContext) {
     if (input.images.length !== imageCount || input.texts.length > Number(separateViews)) {
-      throw new Error("幻影坦克的图片或文字数量不符。");
+      throw new Error($t("templates.mirage-tank.text_4ee0590e10"));
     }
     const sequences = await Promise.all(input.images.map(file => readMemeImageSequence(file, signal)));
     const frames = timeline(sequences);

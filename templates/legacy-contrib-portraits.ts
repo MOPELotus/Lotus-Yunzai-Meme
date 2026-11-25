@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Layouts from MemeCrafters/meme-generator-contrib (8547f2e5).
 import { loadImage, type Image } from "skia-canvas";
 import type { MemeTemplate } from "../builtin-template.ts";

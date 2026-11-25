@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original coordinates and static JPEG output from MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { loadImage, type Image } from "skia-canvas";
@@ -52,7 +55,7 @@ export function coverImage(image: Image, [left, top, width, height]: Inset, repl
 function photoTemplate({ key, keywords, tags, slots, replaceArt = false, assetPath = `${key}/0.png` }: PhotoTemplate): MemeTemplate {
   const count = slots?.length ?? 1;
   async function render({ images, texts }: MemeTemplateInput, context: MemeTemplateContext) {
-    if (images.length !== count || texts.length) throw new Error(`该表情需要 ${count} 张图片。`);
+    if (images.length !== count || texts.length) throw new Error($t("templates.photo-insets.text_1ea32e62ce", { "count": count }));
     const { signal } = context;
     const [art, ...photos] = await Promise.all([
       context.imageAsset(assetPath).then(loadImage),

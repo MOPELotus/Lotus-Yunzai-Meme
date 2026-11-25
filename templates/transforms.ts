@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Visual layout and parameters follow MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/f5ee44f6a3e134b9ac54032f97eab788d6454e3c/meme_generator/memes
 import type { CanvasRenderingContext2D, Image } from "skia-canvas";
@@ -8,16 +11,16 @@ import { drawFittedText, jpg, previewImage, registerFont, rgbaFrameDimensions } 
 
 const flatWidth = 500;
 const captionHeight = 80;
-const defaultCaption = "可恶...被人看扁了";
-const flatRatioHelp = "图片“压扁”比例，默认为 2";
-const directionHelp = "对称方向，包含 left、right、top、bottom";
-const directions = [["left", "左"], ["right", "右"], ["top", "上"], ["bottom", "下"]] as const;
+const defaultCaption = $t("templates.transforms.text_d7fdb22a2d");
+const flatRatioHelp = $t("templates.transforms.text_8967f82263");
+const directionHelp = $t("templates.transforms.text_30a9bd7486");
+const directions = [["left", $t("templates.transforms.text_e2e0c454e5")], ["right", $t("templates.transforms.text_14ab1f2bce")], ["top", $t("templates.transforms.text_db5ba671d2")], ["bottom", $t("templates.transforms.text_13c12b064b")]] as const;
 
 type Direction = typeof directions[number][0];
 type DrawFrame = (canvas: CanvasRenderingContext2D, image: Image) => void | Promise<void>;
 
 export function readTransformSource(input: MemeTemplateInput, signal: AbortSignal) {
-  if (input.images.length !== 1) throw new Error("该表情需要一张图片。");
+  if (input.images.length !== 1) throw new Error($t("templates.transforms.text_2646e324ad"));
   return readMemeImageSequence(input.images[0]!, signal);
 }
 
@@ -55,12 +58,12 @@ export function drawHalf(ctx: CanvasRenderingContext2D, image: Image, horizontal
 
 async function renderSymmetric(input: MemeTemplateInput, context: MemeTemplateContext) {
   const direction = input.args.direction ?? "left";
-  if (!directions.some(([known]) => known === direction)) throw new Error("请选择 left、right、top、bottom 之一作为对称方向。");
+  if (!directions.some(([known]) => known === direction)) throw new Error($t("templates.transforms.text_8bb8e90a97"));
   const sequence = await readTransformSource(input, context.signal);
   const { width, height } = sequence.frames[0];
   const horizontal = direction === "left" || direction === "right";
   const half = Math.floor((horizontal ? width : height) / 2);
-  if (!half) throw new Error("图片太窄，无法按这个方向对称。");
+  if (!half) throw new Error($t("templates.transforms.text_f5122dc965"));
   const original = direction === "right" || direction === "bottom" ? half : 0;
   return renderTransformSequence(sequence, horizontal ? half * 2 : width, horizontal ? height : half * 2, (canvas, image) => {
     canvas.imageSmoothingEnabled = false;
@@ -74,10 +77,10 @@ async function renderLookFlat(input: MemeTemplateInput, context: MemeTemplateCon
   const { width, height } = sequence.frames[0];
   const ratio = input.args.ratio ?? 2;
   if (typeof ratio !== "number" || !Number.isSafeInteger(ratio) || ratio < 1 || ratio >= height) {
-    throw new Error("请输入合适的“压扁”比例。");
+    throw new Error($t("templates.transforms.text_65cf65f049"));
   }
   const imageHeight = Math.floor(Math.floor(height * flatWidth / width) / ratio);
-  if (!imageHeight) throw new Error("请输入合适的“压扁”比例。");
+  if (!imageHeight) throw new Error($t("templates.transforms.text_65cf65f049"));
   const canvasHeight = imageHeight + captionHeight;
   const font = await registerFont(context, true);
   const text = input.texts[0] ?? defaultCaption;

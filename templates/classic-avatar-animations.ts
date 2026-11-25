@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original avatar placement from MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { renderExactPng } from "../../../packages/skia/index.ts";
@@ -131,7 +134,7 @@ function projectedPhoto(image: Image, { position: [x, y], quad }: Projection): D
 function create({ key, keywords, tags, initialSize, delayMs, placements }: Animation): MemeTemplate {
   const digits = String(placements.length - 1).length;
   async function render({ images, texts }: MemeTemplateInput, context: MemeTemplateContext) {
-    if (images.length !== 1 || texts.length) throw new Error("该表情需要一张图片。");
+    if (images.length !== 1 || texts.length) throw new Error($t("templates.classic-avatar-animations.text_2646e324ad"));
     const { signal } = context;
     const readArt = (index: number) => context.imageAsset(`${key}/${String(index).padStart(digits, "0")}.png`).then(loadImage);
     const [avatar, first] = await Promise.all([readMemeFirstImage(images[0]!, signal), readArt(0)]);
@@ -142,7 +145,7 @@ function create({ key, keywords, tags, initialSize, delayMs, placements }: Anima
     for (let from = 1; from < placements.length; from += 8) {
       signal.throwIfAborted();
       const batch = await Promise.all(placements.slice(from, from + 8).map((_, offset) => readArt(from + offset)));
-      if (batch.some(art => art.width !== width || art.height !== height)) throw new Error(`表情模板 ${key} 的帧尺寸不一致。`);
+      if (batch.some(art => art.width !== width || art.height !== height)) throw new Error($t("templates.classic-avatar-animations.text_bc92350be8", { "key": key }));
       artwork.push(...batch);
     }
     const frames = placements.map((placement, index) => ({ value: { placement, index }, delayMs }));

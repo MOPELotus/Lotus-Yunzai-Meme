@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage } from "skia-canvas";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeFirstImage } from "./animated-input.ts";
@@ -10,7 +13,7 @@ const slots = [
 ] as const;
 
 async function render({ images, texts }: MemeTemplateInput, context: MemeTemplateContext) {
-  if (images.length !== 2 || texts.length) throw new Error("这个表情需要两张图片。");
+  if (images.length !== 2 || texts.length) throw new Error($t("templates.anyliew-deer-help.text_7ccbb96dfc"));
   const { signal } = context;
   const [human, deer, background] = await Promise.all([
     readMemeFirstImage(images[1]!, signal),

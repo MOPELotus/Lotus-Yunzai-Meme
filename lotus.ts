@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import type { Database } from "bun:sqlite";
 import type { CatalogCardRow } from "./catalog-card.ts";
 import type { LoadMemeInfoCard } from "./info-card-runtime.ts";
@@ -30,7 +33,7 @@ const helpCommand = /^#?(?:表情(?:合成)?|meme)(?:命令|帮助|菜单|help|�
 const versionCommand = /^#?(?:表情(?:合成)?|meme)(?:版本|版本信息|version|versioninfo|(?:插件)?更新日志)$/iu;
 const packageUpdateCommand = /^#?(?:表情(?:合成)?|meme)插件(强制)?更新$/iu;
 const usageCommand = /^#?(?:表情|meme)(?:调用)?统计$/iu;
-const catalogUnavailable = "无法读取表情目录，请检查本机表情目录配置。";
+const catalogUnavailable = $t("lotus.text_a9d7e5351d");
 
 // A legacy disable entry may be a stored key or one of its keywords.
 const retainedTemplates = `meme.key NOT IN (SELECT value FROM json_each(?1, '$.excluded'))`;
@@ -88,10 +91,10 @@ function currentPolicy(userId: number | undefined, forGeneration = false) {
   try {
     policy = catalogPolicy(userId, forGeneration);
   } catch {
-    return "无法读取表情配置，请检查 meme.yaml 和 access.yaml。";
+    return $t("lotus.text_b9e7170a38");
   }
-  if (!policy.enabled) return "表情模块已停用。";
-  if (!policy.allowed) return "当前用户无权使用表情模块。";
+  if (!policy.enabled) return $t("lotus.text_410b3dcbbb");
+  if (!policy.allowed) return $t("lotus.text_c3e2122437");
   return policy;
 }
 
@@ -122,24 +125,24 @@ function queryCatalog<T>(
 
 function list(argument: string, context?: CatalogContext): string {
   const page = Number(argument || "1");
-  if (!Number.isSafeInteger(page) || page < 1) return "用法：#表情列表 [页码]";
+  if (!Number.isSafeInteger(page) || page < 1) return $t("lotus.text_37347a1466");
 
   return queryCatalog(context?.user_id, (db, filters) => db.transaction(() => {
     const { total } = db.query<{ total: number }, [string]>(`SELECT COUNT(*) AS total ${visibleCatalog}`).get(filters)!;
-    if (total === 0) return "表情目录为空。";
+    if (total === 0) return $t("lotus.text_390f0780f7");
     const pages = Math.ceil(total / pageSize);
-    if (page > pages) return `表情目录共有 ${pages} 页。`;
+    if (page > pages) return $t("lotus.text_e0dd1d987a", { "pages": pages });
 
     const rows = db.query<CatalogRow, [string, number, number]>(
       `SELECT key, keyWords ${visibleCatalog} ORDER BY key LIMIT ? OFFSET ?`,
     ).all(filters, pageSize, (page - 1) * pageSize);
     return [
-      `表情列表 ${page}/${pages}（共 ${total} 项）`,
+      $t("lotus.text_274edb770b", { "page": page, "pages": pages, "total": total }),
       ...rows.map((row) => {
         const aliases = keywords(row.keyWords).filter((word) => word !== row.key).slice(0, 3);
         return aliases.length ? `${row.key} · ${aliases.join("、")}` : row.key;
       }),
-      "#表情详情 <编号> 查看素材需要",
+      $t("lotus.text_ce6bb7c461"),
     ].join("\n");
   })());
 }
@@ -200,7 +203,7 @@ function illustratedCatalog(loadInfoCard?: LoadMemeInfoCard, signal?: AbortSigna
       const current = currentPolicy(context?.user_id);
       if (typeof current === "string") return current;
       if (catalogVersion() !== version || JSON.stringify(current.hidden) !== hidden) {
-        return "表情目录已更新，请重新查看列表。";
+        return $t("lotus.text_a5b86f0948");
       }
       return cards.length === 1 ? cards[0] : { type: "forward" as const, nodes: cards, batchSize: 2 };
     } catch {
@@ -366,7 +369,7 @@ export async function prepareMemeRequest(message: string, input: GenerationInput
 
 async function details(argument: string, context?: CatalogContext, signal?: AbortSignal) {
   const key = argument.trim();
-  if (!key) return "用法：#表情详情 <编号或关键词>";
+  if (!key) return $t("lotus.text_1cefd212ee");
   if (signal?.aborted) return;
   if (isExcludedMemeTemplate(key)) return excludedMemeTemplateMessage;
 
@@ -379,7 +382,7 @@ async function details(argument: string, context?: CatalogContext, signal?: Abor
     if (!row && !db.query("SELECT 1 FROM meme WHERE key = ?").get(key)) {
       const known = db.query<CatalogDetails, [string]>(`SELECT * ${visibleCatalog} ORDER BY key`).all(filters);
       const matches = known.filter((item) => keywords(item.keyWords).some((word) => sameKeyword(word, key)));
-      if (matches.length > 1) return "该关键词对应多个表情，请用编号查询。";
+      if (matches.length > 1) return $t("lotus.text_bf7a6984f6");
       row = matches[0] ?? null;
     }
     if (!row) return excludedMemeTemplateMessage;
@@ -405,19 +408,19 @@ async function details(argument: string, context?: CatalogContext, signal?: Abor
   });
   if (typeof entry === "string") return entry;
   const { row, aliases, defaults, tags, options, presets } = entry;
-  const format = (values: readonly string[]) => values.length ? values.map(value => `[${value}]`).join(" ") : "[无]";
+  const format = (values: readonly string[]) => values.length ? values.map(value => `[${value}]`).join(" ") : $t("lotus.text_2e18e5d723");
   const text = [
-    `表情 ${row.key}`,
-    `关键词：${format(aliases)}`,
-    `图片：${row.min_images}–${row.max_images} 张`,
-    `文字：${row.min_texts}–${row.max_texts} 段`,
-    `默认文本：${format(defaults)}`,
-    `标签：${format(tags)}`,
-    ...(options.length ? [`可选参数：${options.join(" ")}`] : []),
-    `参数命令：${format(presets)}`,
-    "预览图片：",
+    $t("lotus.text_56c02d6724", { "key": row.key }),
+    $t("lotus.text_37155de2e0", { "value1": format(aliases) }),
+    $t("lotus.text_a14530a3f2", { "min_images": row.min_images, "max_images": row.max_images }),
+    $t("lotus.text_2629a5bcd9", { "min_texts": row.min_texts, "max_texts": row.max_texts }),
+    $t("lotus.text_1c2bdef5ad", { "value1": format(defaults) }),
+    $t("lotus.text_fc59e7cc2f", { "value1": format(tags) }),
+    ...(options.length ? [$t("lotus.text_ddfdbcd27d", { "value1": options.join(" ") })] : []),
+    $t("lotus.text_c9454c9d75", { "value1": format(presets) }),
+    $t("lotus.text_abe371a896"),
   ].join("\n");
-  const failure = `${text}\n预览图片加载失败`;
+  const failure = $t("lotus.text_83150da573", { "text": text });
   let provider: ReturnType<typeof memeProvider>;
   try { provider = memeProvider(); } catch { return failure; }
   if (!provider) return failure;
@@ -427,7 +430,7 @@ async function details(argument: string, context?: CatalogContext, signal?: Abor
   if (typeof policy === "string") return policy;
   if ([row.key, ...aliases].some(name => policy.hidden.includes(name))) return excludedMemeTemplateMessage;
   try {
-    if (version !== catalogVersion()) return "表情目录已更新，请重新查看详情。";
+    if (version !== catalogVersion()) return $t("lotus.text_8ed0194713");
     if (!sameMemeProvider(provider, memeProvider())) return failure;
   } catch { return failure; }
   return {
@@ -438,17 +441,17 @@ async function details(argument: string, context?: CatalogContext, signal?: Abor
 
 function search(argument: string, context?: CatalogContext) {
   const keyword = argument.trim().toLowerCase();
-  if (!keyword) return "用法：#表情搜索 <关键词>";
+  if (!keyword) return $t("lotus.text_681ba4fa26");
   const matches = queryCatalog(context?.user_id, (db, filters) => {
     const rows = db.query<Pick<CatalogRow, "keyWords">, [string]>(`SELECT keyWords ${visibleCatalog}`).all(filters);
     return [...new Set(rows.flatMap((row) => keywords(row.keyWords)).filter((word) => word.toLowerCase().includes(keyword)))].sort();
   });
   if (typeof matches === "string") return matches;
-  if (!matches.length) return "没有找到匹配的表情关键词。";
+  if (!matches.length) return $t("lotus.text_4b97b85e61");
   const lines = matches.map((word, index) => `${index + 1}. ${word}`);
   const text = (lines: readonly string[]) => [{ type: "text" as const, text: lines.join("\n") }];
   if (lines.length <= 30) return { type: "quoted" as const, message: text(lines) };
-  const nodes = [text([`表情搜索 · ${lines.length} 个关键词`])];
+  const nodes = [text([$t("lotus.text_96c95c81e5", { "length": lines.length })])];
   for (let index = 0; index < lines.length; index += 30) nodes.push(text(lines.slice(index, index + 30)));
   return { type: "forward" as const, nodes };
 }
@@ -475,14 +478,14 @@ async function prepareRandomMeme(message: string, input: GenerationInput) {
     `).get(catalogFilters(db, policy.hidden));
   });
   if (typeof row === "string") return row;
-  if (!row) return "未找到可用的随机表情。";
+  if (!row) return $t("lotus.text_241115cf3f");
 
   const aliases = keywords(row.keyWords);
   const prepared = await buildGenerationBody(row.key, aliases, "", row.params, input);
   if (typeof prepared === "string") return prepared;
   return {
     ...prepared,
-    summary: `本次随机表情信息如下\n表情的名称：${row.key}\n表情的别名：${aliases.map((word) => `[${word}]`).join(" ") || "[无]"}\n`,
+    summary: $t("lotus.text_e137bd4647", { "key": row.key, "value2": aliases.map((word) => `[${word}]`).join(" ") || $t("lotus.text_2e18e5d723") }),
   };
 }
 
@@ -504,10 +507,10 @@ async function usageReport(context: CatalogContext, loadInfoCard?: LoadMemeInfoC
     return { total, rows };
   });
   if (typeof report === "string") return report;
-  if (!report) return "当前没有统计数据";
+  if (!report) return $t("lotus.text_3b1c5a9e59");
   const textReport = () => {
-    const heading = `表情调用总次数：${report.total}`;
-    const lines = report.rows.map(({ keywords, count }) => `${keywords} · ${count} 次`);
+    const heading = $t("lotus.text_d43a58dda9", { "total": report.total });
+    const lines = report.rows.map(({ keywords, count }) => $t("lotus.text_141d3aff41", { "keywords": keywords, "count": count }));
     if (lines.length <= 30) return [heading, ...lines].join("\n");
     const nodes = [[{ type: "text" as const, text: heading }]];
     for (let offset = 0; offset < lines.length; offset += 30) {
@@ -532,7 +535,7 @@ async function usageReport(context: CatalogContext, loadInfoCard?: LoadMemeInfoC
     }
     return images.length === 1 ? images[0]! : { type: "forward" as const, nodes: images.map((image) => [image]) };
   } catch {
-    return "表情调用统计图片生成失败，请稍后重试。";
+    return $t("lotus.text_8b5f3db0bd");
   }
 }
 
@@ -563,10 +566,10 @@ function createMemeCommands(signal?: AbortSignal, loadInfoCard?: LoadMemeInfoCar
       "#表情详情": (argument: string, context?: CatalogContext) => readCatalog(context, () => details(argument, context, signal)),
       "#表情搜索": (argument: string, context?: CatalogContext) => readCatalog(context, () => search(argument, context)),
       "#表情统计": (_argument: string, context: CatalogContext) => readCatalog(context, () => usageReport(context, loadInfoCard)),
-      "#表情帮助": (argument: string, context: FallbackContext) => argument.trim() ? "用法：#表情帮助。" :
+      "#表情帮助": (argument: string, context: FallbackContext) => argument.trim() ? $t("lotus.text_3af711eb56") :
         presentMemeReference(helpReference(isMemeOwner(context)), loadInfoCard, signal),
       "#表情版本": (argument: string, context?: Pick<FallbackContext, "inlineImageByteLimit">) =>
-        argument.trim() ? "用法：#表情版本。" : presentMemeVersion(loadInfoCard, signal, context?.inlineImageByteLimit),
+        argument.trim() ? $t("lotus.text_b46bf08475") : presentMemeVersion(loadInfoCard, signal, context?.inlineImageByteLimit),
     },
   };
 }
@@ -584,7 +587,7 @@ async function memeFallback(message: string, context: FallbackContext, listCatal
   if (versionCommand.test(input)) return presentMemeVersion(loadInfoCard, signal, context.inlineImageByteLimit);
   const packageUpdate = packageUpdateCommand.exec(input);
   if (packageUpdate) return isMemeOwner(context)
-    ? `请发送 #${packageUpdate[1] ?? ""}更新 meme，使用宿主更新表情模块。` : "只有主人可以更新表情模块。";
+    ? $t("lotus.text_6b5869bfd2", { "value1": packageUpdate[1] ?? "" }) : $t("lotus.text_49e5bee7de");
   const setting = handleMemeSettings(input, context);
   if (setting !== undefined) return typeof setting === "string" ? setting : presentMemeReference(setting, loadInfoCard, signal);
   const update = handleCatalogUpdate(message, context, signal);

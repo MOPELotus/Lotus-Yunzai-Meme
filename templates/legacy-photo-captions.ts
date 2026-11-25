@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original layouts from MemeCrafters/meme-generator at 619fa10518fc2eca4fa1053af37f0a00a839f062.
 import { Canvas, loadImage, type Image } from "skia-canvas";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateInput } from "../builtin-template.ts";
@@ -9,7 +12,7 @@ import { readTransformSource, renderTransformSequence, transformPreviewInput } f
 const speechless: MemeTemplate = {
   info: {
     key: "speechless", keywords: ["无语"],
-    shortcuts: [{ key: "(?P<text>典型的\\S+思维)", args: ["{text}"], humanized: "典型的xx思维" }],
+    shortcuts: [{ key: "(?P<text>典型的\\S+思维)", args: ["{text}"], humanized: $t("templates.legacy-photo-captions.text_675d8c7ce2") }],
     params_type: { min_images: 1, max_images: 1, min_texts: 0, max_texts: 1, default_texts: [], args_type: null },
   },
   async render(input, context) {
@@ -18,7 +21,7 @@ const speechless: MemeTemplate = {
       readTransformSource(input, signal), registerFont(context),
       context.imageAsset("speechless/sweat.png").then(loadImage),
     ]);
-    const line = "无语，和你说不下去";
+    const line = $t("templates.legacy-photo-captions.text_fc01aed9da");
     const text = input.texts.length ? `${line}\n${input.texts[0]}` : line;
     const width = 500;
     const wrapWidth = 480;
@@ -32,7 +35,7 @@ const speechless: MemeTemplate = {
     const first = lines[0]!, last = lines.at(-1)!;
     const textHeight = Math.round(last.descent - first.ascent);
     const height = photoHeight + textHeight + 10;
-    if (height > 8192) throw new MemeTemplateFeedback("表情原图或文字过长。");
+    if (height > 8192) throw new MemeTemplateFeedback($t("templates.legacy-photo-captions.text_f6882f59b7"));
     return renderTransformSequence(source, width, height, (canvas, avatar) => {
       canvas.fillStyle = "white";
       canvas.fillRect(0, 0, width, height);
@@ -79,7 +82,7 @@ const tombYeah: MemeTemplate = {
       images[0] && readMemeFirstImage(images[0], signal),
       images[1] && readMemeFirstImage(images[1], signal),
     ]);
-    if (!first) throw new MemeTemplateFeedback("该表情至少需要一张图片。");
+    if (!first) throw new MemeTemplateFeedback($t("templates.legacy-photo-captions.text_1d4fb806b2"));
     const layers = [tombPortrait(first, 138, 265, 0)];
     if (second) layers.push(tombPortrait(second, 371, 312, -Math.PI / 6));
     const bytes = await renderMaskedRaster(art.width, art.height, canvas => canvas.drawImage(art, 0, 0), layers, signal);

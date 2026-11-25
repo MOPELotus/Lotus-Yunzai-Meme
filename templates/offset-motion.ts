@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import type { MemeTemplate } from "../builtin-template.ts";
 import type { Image } from "skia-canvas";
 import { alignMemeLoop, readMemeImageSequence, type MemeImageSequence } from "./animated-input.ts";
@@ -6,8 +9,8 @@ import { previewImage, type Draw } from "./template-layout.ts";
 
 const singleImage = { min_images: 1, max_images: 1, min_texts: 0, max_texts: 0 };
 const delayMs = 50;
-const directionHelp = "循环方向，包含 left、right、top、bottom";
-const directions = { left: "左", right: "右", top: "上", bottom: "下" } as const;
+const directionHelp = $t("templates.offset-motion.text_83102bc065");
+const directions = { left: $t("templates.offset-motion.text_e2e0c454e5"), right: $t("templates.offset-motion.text_14ab1f2bce"), top: $t("templates.offset-motion.text_db5ba671d2"), bottom: $t("templates.offset-motion.text_13c12b064b") } as const;
 
 async function offsetAnimation(source: MemeImageSequence, width: number, height: number, poseCount: number,
   drawPose: (pose: number, image: Image) => Draw, signal: AbortSignal) {

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Geometry from MemeCrafters/meme-generator at 619fa10518fc2eca4fa1053af37f0a00a839f062.
 import { ImageData, type Image } from "skia-canvas";
 import { renderRgba } from "../../../packages/skia/index.ts";

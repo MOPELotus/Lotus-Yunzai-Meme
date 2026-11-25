@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Layouts and option ranges from the fixed AnyLiew registrations in backend-anyliew-tail-assets.ts.
 import { randomInt } from "node:crypto";
 import { ImageData, loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
@@ -58,14 +61,14 @@ const scenes: readonly Scene[] = [
   { key: "up_to", keywords: ["干嘛"], optionalText: true, frames: [{ file: "0.png", box: [0, 0, 960, 960] }] },
   { key: "widow", keywords: ["未亡人"], grayscale: true, rotation: 21, frames: [{ file: "0.png", box: [162, 200, 210, 215] }],
     caption: { box: [3, 877, 925, 1030], sizes: [15, 60], font: "slender", emoji: true, wrap: false,
-      message: name => `祭祀者:安心去吧,${name}桑[さん]\n你最❤️愛の妻子[未亡人]我会好好照顾的\n${name}你去了冥界也要保佑我们` } },
+      message: name => $t("templates.anyliew-tail.text_04b078853f", { "name": name, "value2": name }) } },
   { key: "xiluo_disgust", keywords: ["希罗嫌弃", "二阶堂希罗嫌弃"], optionalText: true, fit: "cover", rotation: 8,
     tags: ["魔法少女的魔女审判", "二阶堂希罗"], frames: [{ file: "0.png", box: [0, 75, 500, 800] }] },
   { key: "xueli_think", keywords: ["雪莉想", "雪梨想", "橘雪莉想"], optionalText: true, fit: "cover",
     tags: ["魔法少女的魔女审判", "橘雪莉"], frames: [{ file: "0.png", box: [0, 0, 824, 824] }] },
   { key: "yuzu_soft_ayachi_nene", keywords: ["宁宁困惑", "绫地宁宁困惑"], tags: ["柚子社", "绫地宁宁", "魔女的夜宴"], rotation: -45,
     frames: [{ file: "0.png", box: [500, 410, 165, 165] }],
-    caption: { box: [0, 0, 716, 128], sizes: [20, 150], message: name => `${name},这是你的照片吗？` } },
+    caption: { box: [0, 0, 716, 128], sizes: [20, 150], message: name => $t("templates.anyliew-tail.text_95e75f9cc6", { "name": name }) } },
   { key: "yuzu_soft_murasame_hug", keywords: ["丛雨抱"], tags: yuzu, fit: "circle", frames: [
     { file: "1.png", box: [20, 146, 118, 118] },
     { file: "2.png", box: [23, 185, 156, 156] },
@@ -76,21 +79,21 @@ const scenes: readonly Scene[] = [
 ];
 
 const textScenes: readonly TextScene[] = [
-  { key: "white_cat_say", keywords: ["白猫说"], text: "宝贝~", frames: [
+  { key: "white_cat_say", keywords: ["白猫说"], text: $t("templates.anyliew-tail.text_b1ff551678"), frames: [
     { file: "1.png", box: [55, 20, 215, 91], sizes: [10, 200], font: "child", centerLines: true },
     { file: "2.png", box: [100, 16, 488, 188], sizes: [10, 200], font: "child", centerLines: true },
   ] },
-  { key: "xueli_say", keywords: ["雪莉说", "雪梨说", "橘雪莉说"], text: "你是高手？",
+  { key: "xueli_say", keywords: ["雪莉说", "雪梨说", "橘雪莉说"], text: $t("templates.anyliew-tail.text_94b614000f"),
     frames: [{ file: "0.jpg", box: [240, 30, 300, 240], sizes: [10, 120], font: "child" }] },
-  { key: "yuzu_soft_murasame_blackboard", keywords: ["丛雨黑板"], tags: yuzu, text: "不要再涩涩了",
+  { key: "yuzu_soft_murasame_blackboard", keywords: ["丛雨黑板"], tags: yuzu, text: $t("templates.anyliew-tail.text_b722a779fa"),
     frames: [{ file: "0.jpg", box: [351, 128, 1119, 326], sizes: [20, 150], color: "#fff", font: "diary" }] },
-  { key: "yuzu_soft_murasame_say", keywords: ["丛雨说"], tags: yuzu, text: "非酋，不要再涩涩了",
+  { key: "yuzu_soft_murasame_say", keywords: ["丛雨说"], tags: yuzu, text: $t("templates.anyliew-tail.text_17e6c952a7"),
     frames: [{ file: "0.jpg", box: [922, 0, 1275, 659], sizes: [20, 150], font: "cartoon" }] },
 ];
 
 function numberOption(count: number) {
   if (count === 1) return null;
-  const help = `图片编号，0 随机，1～${count} 指定底图`;
+  const help = $t("templates.anyliew-tail.text_9b3f8cfe24", { "count": count });
   return {
     args_model: { properties: { number: { type: "integer", default: 0, description: help } } },
     parser_options: [{ names: ["-n", "--number"], args: [{ name: "number", value: "int" }], help_text: help }],
@@ -101,7 +104,7 @@ function selectFrame<F>(frames: readonly F[], number: unknown): F {
   if (frames.length === 1) return frames[0]!;
   if (number === undefined || number === 0) return frames[randomInt(frames.length)]!;
   if (typeof number === "number" && Number.isSafeInteger(number) && number >= 1 && number <= frames.length) return frames[number - 1]!;
-  throw new MemeTemplateFeedback(`图片编号错误，请选择 1～${frames.length} 或 0（随机）`);
+  throw new MemeTemplateFeedback($t("templates.anyliew-tail.text_aed3f52a49", { "length": frames.length }));
 }
 
 function loadFrame(context: MemeTemplateContext, key: string, file: string) {
@@ -139,7 +142,7 @@ function paintCaption(draw: CanvasRenderingContext2D, caption: Caption, text: st
     draw.fillText(text, x, top + (bottom - top - height) / 2 - first.ascent, wrap);
     return;
   }
-  throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+  throw new MemeTemplateFeedback($t("templates.anyliew-tail.text_002fc2fab2"));
 }
 
 async function prepareAvatar(image: Image, width: number, height: number, scene: Scene, signal: AbortSignal) {
@@ -193,7 +196,7 @@ function avatarScene(scene: Scene): MemeTemplate {
     const selected = selectFrame(scene.frames, input.args.number);
     const caption = scene.caption;
     const user = Array.isArray(input.args.user_infos) ? input.args.user_infos[0] : undefined;
-    const name = input.texts[0] ?? ((typeof user?.name === "string" && user.name) || (user && user.gender !== "male" ? "她" : "他"));
+    const name = input.texts[0] ?? ((typeof user?.name === "string" && user.name) || (user && user.gender !== "male" ? $t("templates.anyliew-tail.text_2ab425e0c6") : $t("templates.anyliew-tail.text_8b7b91e000")));
     const [sequence, frame, family] = await Promise.all([
       readTransformSource(input, signal), loadFrame(context, scene.key, selected.file), caption && captionFont(context, caption),
     ]);

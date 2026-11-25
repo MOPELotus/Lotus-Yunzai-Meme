@@ -1,0 +1,1682 @@
+{
+  "language": "zh-CN",
+  "name": "简体中文",
+  "namespace": "meme",
+  "description": "表情制作",
+  "sections": {
+    "backend-builtin-assets": {
+      "description": "表情制作",
+      "source": "plugins/meme/backend-builtin-assets.ts"
+    },
+    "backend-lifecycle": {
+      "description": "表情制作",
+      "source": "plugins/meme/backend-lifecycle.ts"
+    },
+    "backend-tudou-short-animation-assets": {
+      "description": "表情制作",
+      "source": "plugins/meme/backend-tudou-short-animation-assets.ts"
+    },
+    "catalog-card": {
+      "description": "表情制作：图片卡片",
+      "source": "plugins/meme/catalog-card.ts"
+    },
+    "catalog-policy": {
+      "description": "表情制作",
+      "source": "plugins/meme/catalog-policy.ts"
+    },
+    "catalog-runtime": {
+      "description": "表情制作：运行环境",
+      "source": "plugins/meme/catalog-runtime.ts"
+    },
+    "catalog-update": {
+      "description": "表情制作：更新",
+      "source": "plugins/meme/catalog-update.ts"
+    },
+    "generate-reply": {
+      "description": "表情制作",
+      "source": "plugins/meme/generate-reply.ts"
+    },
+    "generation": {
+      "description": "表情制作",
+      "source": "plugins/meme/generation.ts"
+    },
+    "generation-args": {
+      "description": "表情制作",
+      "source": "plugins/meme/generation-args.ts"
+    },
+    "legacy-caption-shortcuts": {
+      "description": "表情制作",
+      "source": "plugins/meme/legacy-caption-shortcuts.ts"
+    },
+    "lotus": {
+      "description": "表情制作",
+      "source": "plugins/meme/lotus.ts"
+    },
+    "models.Meme.preset": {
+      "description": "表情制作",
+      "source": "plugins/meme/models/Meme/preset.ts"
+    },
+    "reference-card": {
+      "description": "表情制作：图片卡片",
+      "source": "plugins/meme/reference-card.ts"
+    },
+    "scripts.pack-builtin-assets": {
+      "description": "表情制作",
+      "source": "plugins/meme/scripts/pack-builtin-assets.ts"
+    },
+    "settings": {
+      "description": "表情制作：设置",
+      "source": "plugins/meme/settings.ts"
+    },
+    "template-policy": {
+      "description": "表情制作",
+      "source": "plugins/meme/template-policy.ts"
+    },
+    "templates.animated-input": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/animated-input.ts"
+    },
+    "templates.anyliew-avatar-caption-scenes": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/anyliew-avatar-caption-scenes.ts"
+    },
+    "templates.anyliew-avatar-scenes": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/anyliew-avatar-scenes.ts"
+    },
+    "templates.anyliew-circle-dialogue": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/anyliew-circle-dialogue.ts"
+    },
+    "templates.anyliew-deer-help": {
+      "description": "表情制作：帮助",
+      "source": "plugins/meme/templates/anyliew-deer-help.ts"
+    },
+    "templates.anyliew-dialogue": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/anyliew-dialogue.ts"
+    },
+    "templates.anyliew-fixed-batch": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/anyliew-fixed-batch.ts"
+    },
+    "templates.anyliew-signs": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/anyliew-signs.ts"
+    },
+    "templates.anyliew-static-avatar": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/anyliew-static-avatar.ts"
+    },
+    "templates.anyliew-tail": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/anyliew-tail.ts"
+    },
+    "templates.anyliew-text-dialogue": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/anyliew-text-dialogue.ts"
+    },
+    "templates.anyliew-word-cards": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/anyliew-word-cards.ts"
+    },
+    "templates.archive-overlay-specs": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/archive-overlay-specs.ts"
+    },
+    "templates.archive-overlays": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/archive-overlays.ts"
+    },
+    "templates.avatar-accessories": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/avatar-accessories.ts"
+    },
+    "templates.avatar-caption-cards": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/avatar-caption-cards.ts"
+    },
+    "templates.avatar-frames": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/avatar-frames.ts"
+    },
+    "templates.basic-image-transforms": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/basic-image-transforms.ts"
+    },
+    "templates.bbcode-text": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/bbcode-text.ts"
+    },
+    "templates.caption-overlays": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/caption-overlays.ts"
+    },
+    "templates.classic-avatar-animations": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/classic-avatar-animations.ts"
+    },
+    "templates.classic-layered-animations": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/classic-layered-animations.ts"
+    },
+    "templates.cropped-photo-templates": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/cropped-photo-templates.ts"
+    },
+    "templates.dianzhongdian": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/dianzhongdian.ts"
+    },
+    "templates.fixed-avatar-animation": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/fixed-avatar-animation.ts"
+    },
+    "templates.friend-notifications": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/friend-notifications.ts"
+    },
+    "templates.gif": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/gif.ts"
+    },
+    "templates.jump-sold": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/jump-sold.ts"
+    },
+    "templates.kiss-hug": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/kiss-hug.ts"
+    },
+    "templates.large-source-animations": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/large-source-animations.ts"
+    },
+    "templates.leave-note": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/leave-note.ts"
+    },
+    "templates.legacy-badges": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-badges.ts"
+    },
+    "templates.legacy-caption-scenes": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-caption-scenes.ts"
+    },
+    "templates.legacy-caption-shortcuts": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-caption-shortcuts.ts"
+    },
+    "templates.legacy-chat-card-layouts": {
+      "description": "表情制作：图片卡片",
+      "source": "plugins/meme/templates/legacy-chat-card-layouts.ts"
+    },
+    "templates.legacy-chat-cards": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-chat-cards.ts"
+    },
+    "templates.legacy-fixed-poses": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-fixed-poses.ts"
+    },
+    "templates.legacy-live-effects": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-live-effects.ts"
+    },
+    "templates.legacy-photo-captions": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-photo-captions.ts"
+    },
+    "templates.legacy-photo-forms": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-photo-forms.ts"
+    },
+    "templates.legacy-photo-scenes": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-photo-scenes.ts"
+    },
+    "templates.legacy-pixel-effects": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-pixel-effects.ts"
+    },
+    "templates.legacy-portrait-effects": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-portrait-effects.ts"
+    },
+    "templates.legacy-projected-actions": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-projected-actions.ts"
+    },
+    "templates.legacy-scene": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-scene.ts"
+    },
+    "templates.legacy-text-overlays": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-text-overlays.ts"
+    },
+    "templates.legacy-wordmarks": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/legacy-wordmarks.ts"
+    },
+    "templates.local-canvas-animation": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/local-canvas-animation.ts"
+    },
+    "templates.louvre": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/louvre.ts"
+    },
+    "templates.meme-date": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/meme-date.ts"
+    },
+    "templates.mirage-tank": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/mirage-tank.ts"
+    },
+    "templates.mirror-flash": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/mirror-flash.ts"
+    },
+    "templates.motion": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/motion.ts"
+    },
+    "templates.offset-motion": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/offset-motion.ts"
+    },
+    "templates.operator-generator": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/operator-generator.ts"
+    },
+    "templates.overlays": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/overlays.ts"
+    },
+    "templates.pat-rub": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/pat-rub.ts"
+    },
+    "templates.pay-posters": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/pay-posters.ts"
+    },
+    "templates.perspective": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/perspective.ts"
+    },
+    "templates.petpet": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/petpet.ts"
+    },
+    "templates.photo-composites": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/photo-composites.ts"
+    },
+    "templates.photo-insets": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/photo-insets.ts"
+    },
+    "templates.pjsk": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/pjsk.ts"
+    },
+    "templates.portrait-overlays": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/portrait-overlays.ts"
+    },
+    "templates.portrait-overlays-metadata": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/portrait-overlays-metadata.ts"
+    },
+    "templates.projective-transform": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/projective-transform.ts"
+    },
+    "templates.python-gif": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/python-gif.ts"
+    },
+    "templates.python-graphic-scenes": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/python-graphic-scenes.ts"
+    },
+    "templates.python-overlay-animation": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/python-overlay-animation.ts"
+    },
+    "templates.rectangle-overlays": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/rectangle-overlays.ts"
+    },
+    "templates.rotated-insets": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/rotated-insets.ts"
+    },
+    "templates.rotating-avatars": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/rotating-avatars.ts"
+    },
+    "templates.scrolling-dialogue": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/scrolling-dialogue.ts"
+    },
+    "templates.shape-timed-animations": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/shape-timed-animations.ts"
+    },
+    "templates.special-print-cards": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/special-print-cards.ts"
+    },
+    "templates.special-text-cards": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/special-text-cards.ts"
+    },
+    "templates.static-layouts": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/static-layouts.ts"
+    },
+    "templates.subtitle-animations": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/subtitle-animations.ts"
+    },
+    "templates.template-layout": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/template-layout.ts"
+    },
+    "templates.text-announcements": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/text-announcements.ts"
+    },
+    "templates.text-graphics": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/text-graphics.ts"
+    },
+    "templates.text-panels": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/text-panels.ts"
+    },
+    "templates.text-signs": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/text-signs.ts"
+    },
+    "templates.text-speech": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/text-speech.ts"
+    },
+    "templates.timed-overlays": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/timed-overlays.ts"
+    },
+    "templates.transforms": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/transforms.ts"
+    },
+    "templates.tudou-extra": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/tudou-extra.ts"
+    },
+    "templates.tudou-layered-animations": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/tudou-layered-animations.ts"
+    },
+    "templates.tudou-tail": {
+      "description": "表情制作",
+      "source": "plugins/meme/templates/tudou-tail.ts"
+    },
+    "usage-card": {
+      "description": "表情制作：图片卡片",
+      "source": "plugins/meme/usage-card.ts"
+    },
+    "version-card": {
+      "description": "表情制作：图片卡片",
+      "source": "plugins/meme/version-card.ts"
+    }
+  },
+  "messages": {
+    "backend-builtin-assets.text_372d18c0e4": "随模块的表情素材清单缺少 {name}。",
+    "backend-builtin-assets.text_56c66fccc3": "无效的表情资源路径。",
+    "backend-builtin-assets.text_a4d385351e": "随模块的表情素材缺失或校验失败 {name}。",
+    "backend-builtin-assets.text_ba8486dbf1": "随模块的表情素材清单格式无效。",
+    "backend-builtin-assets.text_cc02a7daef": "随模块的表情素材条目无效。",
+    "backend-lifecycle.text_32d31f87d7": "重复的内置表情模板 {key}",
+    "backend-lifecycle.text_41f4c0fb16": "(?P<name>\\S{1,10})龙[\\s:：]+(?P<text>\\S+)",
+    "backend-lifecycle.text_4ebf793fde": "(?P<text>典型的\\S+思维)",
+    "backend-lifecycle.text_4f3bb74b95": "满脑子都是(?P<name>\\S+)",
+    "backend-lifecycle.text_617660c01c": "无效的表情合成选项",
+    "backend-lifecycle.text_62df7f8a49": "(?P<text>\\S+启动[!！]?)",
+    "backend-lifecycle.text_6e36826ab8": "(?P<name>\\S+)正在玩(?P<game>\\S+)",
+    "backend-lifecycle.text_c10756e3ca": "龙",
+    "backend-lifecycle.text_c45fb32186": "无效的表情合成参数",
+    "backend-tudou-short-animation-assets.text_140eb2b80a": "huanying被戳",
+    "backend-tudou-short-animation-assets.text_15bbebb85f": "挠挠头",
+    "backend-tudou-short-animation-assets.text_1c48e79f06": "小熊帽子",
+    "backend-tudou-short-animation-assets.text_203cc8f947": "跳绳",
+    "backend-tudou-short-animation-assets.text_41527215a4": "猫咪膜拜",
+    "backend-tudou-short-animation-assets.text_d72bea636d": "托尼",
+    "catalog-card.text_3edaeefee6": "表情列表",
+    "catalog-card.text_7ee71ff3c3": "表情总数：{total}",
+    "catalog-policy.text_0e28992659": "无效的表情配置开关",
+    "catalog-policy.text_324980952c": "无效的表情配置",
+    "catalog-policy.text_6d1e2d2ab0": "无效的表情名单模式",
+    "catalog-policy.text_7c0d04092f": "无效的表情名单项",
+    "catalog-policy.text_ad984b0b7e": "无效的表情名单",
+    "catalog-policy.text_c12bf1714f": "无效的表情配置目录",
+    "catalog-policy.text_e81d26dcff": "无效的表情合成超时",
+    "catalog-runtime.text_18ae92c446": "[meme] 初始化表情目录失败。",
+    "catalog-update.text_2267e2b079": "本机表情模板尚未就绪。",
+    "catalog-update.text_4793a83161": "表情包数据更新中。",
+    "catalog-update.text_71a6f8513e": "只有主人才能更新表情包数据",
+    "catalog-update.text_c4543afe06": "[meme] 首次本机表情目录更新失败。",
+    "catalog-update.text_cf08ec79f4": "表情包数据更新失败，旧目录仍可使用。",
+    "catalog-update.text_df2fa8ae58": "表情包数据更新完成，更新 {length} 项，移除 {value2} 项，补齐预设 {added} 项。",
+    "generate-reply.text_389f6be98c": "[meme] 无法记录表情调用次数。",
+    "generate-reply.text_5263c5128f": "当前无法读取引用消息中的表情素材。",
+    "generate-reply.text_95c831b67d": "表情生成失败，请稍后再试。",
+    "generate-reply.text_ab44459668": "当前无法读取引用消息中的表情图片。",
+    "generate-reply.text_cbbb3415cf": "当前无法读取该表情图片素材。",
+    "generation-args.text_5e616dd2d9": "该表情不支持参数：{name}",
+    "generation-args.text_641cf27fb0": "表情参数 {dest} 缺少值。",
+    "generation-args.text_a084b72322": "表情参数 {name} 的值无效。",
+    "generation.text_14017f4307": "表情预设缺少对应的模板参数。",
+    "generation.text_3ab594ae93": "表情保护需要宿主确认目标的主人身份。",
+    "generation.text_4d8c1c5b42": "未知",
+    "generation.text_7accd94ee0": "该表情需要 {min_texts}–{max_texts} 段文字。",
+    "generation.text_7ecb81ab1b": "该表情需要 {min_images}–{max_images} 张图片。",
+    "generation.text_c3a7860a11": "无法读取表情生成配置或参数。",
+    "generation.text_c539ce6435": "无法取得表情生成所需的图片或昵称。",
+    "legacy-caption-shortcuts.text_1d3f0aae06": "xx 起来了",
+    "legacy-caption-shortcuts.text_28fd6e3c41": "我推的xx",
+    "legacy-caption-shortcuts.text_5801191b6b": "高情商xx低情商xx",
+    "legacy-caption-shortcuts.text_8e52f516dc": "你的xx主要都是由这个引起的",
+    "legacy-caption-shortcuts.text_94d19939fe": "吴京xx中国xx",
+    "legacy-caption-shortcuts.text_9a2ce2d9df": "低情商xx高情商xx",
+    "lotus.text_141d3aff41": "{keywords} · {count} 次",
+    "lotus.text_1c2bdef5ad": "默认文本：{value1}",
+    "lotus.text_1cefd212ee": "用法：#表情详情 <编号或关键词>",
+    "lotus.text_241115cf3f": "未找到可用的随机表情。",
+    "lotus.text_2629a5bcd9": "文字：{min_texts}–{max_texts} 段",
+    "lotus.text_274edb770b": "表情列表 {page}/{pages}（共 {total} 项）",
+    "lotus.text_2e18e5d723": "[无]",
+    "lotus.text_37155de2e0": "关键词：{value1}",
+    "lotus.text_37347a1466": "用法：#表情列表 [页码]",
+    "lotus.text_390f0780f7": "表情目录为空。",
+    "lotus.text_3af711eb56": "用法：#表情帮助。",
+    "lotus.text_3b1c5a9e59": "当前没有统计数据",
+    "lotus.text_410b3dcbbb": "表情模块已停用。",
+    "lotus.text_49e5bee7de": "只有主人可以更新表情模块。",
+    "lotus.text_4b97b85e61": "没有找到匹配的表情关键词。",
+    "lotus.text_56c02d6724": "表情 {key}",
+    "lotus.text_681ba4fa26": "用法：#表情搜索 <关键词>",
+    "lotus.text_6b5869bfd2": "请发送 #{value1}更新 meme，使用宿主更新表情模块。",
+    "lotus.text_83150da573": "{text}\n预览图片加载失败",
+    "lotus.text_8b5f3db0bd": "表情调用统计图片生成失败，请稍后重试。",
+    "lotus.text_8ed0194713": "表情目录已更新，请重新查看详情。",
+    "lotus.text_96c95c81e5": "表情搜索 · {length} 个关键词",
+    "lotus.text_a14530a3f2": "图片：{min_images}–{max_images} 张",
+    "lotus.text_a5b86f0948": "表情目录已更新，请重新查看列表。",
+    "lotus.text_a9d7e5351d": "无法读取表情目录，请检查本机表情目录配置。",
+    "lotus.text_abe371a896": "预览图片：",
+    "lotus.text_b46bf08475": "用法：#表情版本。",
+    "lotus.text_b9e7170a38": "无法读取表情配置，请检查 meme.yaml 和 access.yaml。",
+    "lotus.text_bf7a6984f6": "该关键词对应多个表情，请用编号查询。",
+    "lotus.text_c3e2122437": "当前用户无权使用表情模块。",
+    "lotus.text_c9454c9d75": "参数命令：{value1}",
+    "lotus.text_ce6bb7c461": "#表情详情 <编号> 查看素材需要",
+    "lotus.text_d43a58dda9": "表情调用总次数：{total}",
+    "lotus.text_ddfdbcd27d": "可选参数：{value1}",
+    "lotus.text_e0dd1d987a": "表情目录共有 {pages} 页。",
+    "lotus.text_e137bd4647": "本次随机表情信息如下\n表情的名称：{key}\n表情的别名：{value2}\n",
+    "lotus.text_fc59e7cc2f": "标签：{value1}",
+    "models.Meme.preset.text_03684f6b09": "司说",
+    "models.Meme.preset.text_084c442538": "初音未来说",
+    "models.Meme.preset.text_086bba182c": "奏说",
+    "models.Meme.preset.text_0a5c034ea1": "key说",
+    "models.Meme.preset.text_0ba91b8a08": "心羽说",
+    "models.Meme.preset.text_1040419ace": "心奈说",
+    "models.Meme.preset.text_167086bd42": "穗波说",
+    "models.Meme.preset.text_213dfa886c": "泉奈说",
+    "models.Meme.preset.text_26168a2e3f": "类说",
+    "models.Meme.preset.text_2c128d5789": "连说",
+    "models.Meme.preset.text_361a117821": "濑名说",
+    "models.Meme.preset.text_3b7479ef44": "一歌说",
+    "models.Meme.preset.text_3de3b36fba": "胡桃吃",
+    "models.Meme.preset.text_44ae6c1dc9": "彰人说",
+    "models.Meme.preset.text_46827c37ea": "优香说",
+    "models.Meme.preset.text_48a8eaa5b1": "玛丽说",
+    "models.Meme.preset.text_4db0dfe14f": "咲希说",
+    "models.Meme.preset.text_54a1a3c311": "流歌说",
+    "models.Meme.preset.text_5532ab93d8": "MEIKO说",
+    "models.Meme.preset.text_59aba3d3bd": "刻晴吃",
+    "models.Meme.preset.text_6fdeaab2fb": "志步说",
+    "models.Meme.preset.text_749366b560": "真冬说",
+    "models.Meme.preset.text_7a35ea79f9": "宁宁说",
+    "models.Meme.preset.text_80f52cb0fa": "八重神子吃",
+    "models.Meme.preset.text_920854e974": "杏说",
+    "models.Meme.preset.text_9a37d2ffdc": "遥说",
+    "models.Meme.preset.text_9b67ede0fd": "爱莉说",
+    "models.Meme.preset.text_aedba643fa": "绘名说",
+    "models.Meme.preset.text_c130720a68": "可莉吃",
+    "models.Meme.preset.text_cf20a22e07": "妮露吃",
+    "models.Meme.preset.text_cf839ef83b": "钟离吃",
+    "models.Meme.preset.text_d19b5eb060": "雫说",
+    "models.Meme.preset.text_d668c3111f": "铃说",
+    "models.Meme.preset.text_d9c0105862": "梦说",
+    "models.Meme.preset.text_e29ee7aef8": "实乃理说",
+    "models.Meme.preset.text_f2b8fd257d": "KAITO说",
+    "models.Meme.preset.text_fccf2ada83": "冬弥说",
+    "models.Meme.preset.text_fdb3abaab9": "爱丽丝说",
+    "reference-card.text_05d1067425": "查看当前设置。发送设置项名称可查看或修改该项。",
+    "reference-card.text_10f0fe7df6": "#表情搜索 关键词",
+    "reference-card.text_25ab51b9c4": "从可用模板中随机合成一张表情。",
+    "reference-card.text_2c78f41fbd": "#表情详情 关键词",
+    "reference-card.text_31cce19faf": "表情帮助",
+    "reference-card.text_5271fc2f94": "查看图片、文本、参数数量和图样预览。",
+    "reference-card.text_57cd91abe2": "主人命令",
+    "reference-card.text_7ee43534a0": "浏览可用表情。指定页码时返回文字目录。",
+    "reference-card.text_90119af892": "搜索表情名称和别名。",
+    "reference-card.text_9962dc4878": "也可附图片或引用图片。详情中可查模板支持的参数。",
+    "reference-card.text_9aa5d79af2": "#表情列表 [页码]",
+    "reference-card.text_9c27461465": "表情关键词 [文字/文字] [@用户] [#参数名 参数值]",
+    "reference-card.text_a589ce0aff": "查询与合成",
+    "reference-card.text_a67a100892": "增量更新表情数据。添加「强制」可重新读取全部表情。",
+    "reference-card.text_bde3515fc5": "查看表情调用次数。",
+    "reference-card.text_c1937be6df": "#更新 meme",
+    "reference-card.text_fcb198138f": "通过宿主检查表情模块代码更新。",
+    "scripts.pack-builtin-assets.text_0e476918f3": "已授权字体来源索引格式无效。",
+    "scripts.pack-builtin-assets.text_17fb653fc6": "Meme 资源缺少固定源 {path}",
+    "scripts.pack-builtin-assets.text_1bfc5b87be": "已授权字体来源索引行无效 {path}",
+    "scripts.pack-builtin-assets.text_1f21a244de": "实际使用索引包含未知、重复或禁用素材 {path}",
+    "scripts.pack-builtin-assets.text_2838c18b23": "未指定已授权字体文件。",
+    "scripts.pack-builtin-assets.text_3f381a9228": "实际使用索引遗漏额外素材 {path}",
+    "scripts.pack-builtin-assets.text_48af74ed9e": "无效的 Meme 资源索引行 {path}",
+    "scripts.pack-builtin-assets.text_54f6ff931d": "Meme 打包素材在验证后变化：{digest}",
+    "scripts.pack-builtin-assets.text_6081e20cc7": "用法 bun scripts/pack-builtin-assets.ts --report|--write Rust资源根/resources.json 实际使用索引.json 输出目录|. [--open-fonts 已授权字体.json] [素材根目录 ...]",
+    "scripts.pack-builtin-assets.text_890115cdbc": "Meme 资源重复登记 {path}",
+    "scripts.pack-builtin-assets.text_a5d3049589": "仍缺已登记的 Meme 素材，未写入索引。",
+    "scripts.pack-builtin-assets.text_e16f35c29e": "素材使用索引与固定版本不符。",
+    "scripts.pack-builtin-assets.text_e2c15eb43a": "Meme Rust 资源索引与固定版本不符。",
+    "settings.text_1303cd69ff": "{title}格式无效。",
+    "settings.text_174ec5a4ab": "黑名单",
+    "settings.text_1bd63493b8": "主人保护",
+    "settings.text_1c53b7ad6c": "未找到该表情合成设置项。",
+    "settings.text_1ddd706592": "名单设置",
+    "settings.text_1e6e80b1e5": "表情统计",
+    "settings.text_24f2d79e2b": "强制触发",
+    "settings.text_27e2d9e2d9": "白名单",
+    "settings.text_2857cc4121": "黑名单表情列表",
+    "settings.text_2f8267a89a": "空",
+    "settings.text_3fd47edce4": "关闭",
+    "settings.text_4bce67540f": "名单限制",
+    "settings.text_55c9cd213f": "{value} 秒",
+    "settings.text_5f9f117d1d": "只有主人可以修改表情合成设置。",
+    "settings.text_6ae2ab05a0": "用户黑名单",
+    "settings.text_71574c9a99": "用户昵称",
+    "settings.text_732ddf0412": "用户保护",
+    "settings.text_7720312544": "表情统计设置",
+    "settings.text_78c8f3b315": "合成设置",
+    "settings.text_7b8eaa7fd1": "引用图片",
+    "settings.text_80a57e03f0": "未配置",
+    "settings.text_8949203415": "错误回复",
+    "settings.text_8c4715253c": "用户白名单",
+    "settings.text_8da97ddda9": "开启",
+    "settings.text_939f087c86": "合成超时（秒）",
+    "settings.text_954bb9ada7": "消息图片",
+    "settings.text_9abebabf06": "头像未变更时复用本进程中的缓存。",
+    "settings.text_9bef3636bc": "禁用表情列表",
+    "settings.text_a1d4baeda4": "该表情不在可管理目录中。",
+    "settings.text_a29c9b95f8": "名单模式使用 0（白名单）或 1（黑名单）。",
+    "settings.text_ad800d378d": "请指定要添加或删除的名单项。",
+    "settings.text_afc12c1a55": "表情设置",
+    "settings.text_b9b173d82a": "保护用户列表",
+    "settings.text_bd3956e837": "无效的表情设置",
+    "settings.text_c4ba41a93b": "引用回复",
+    "settings.text_c5a62d9cb0": "默认表情",
+    "settings.text_c6807b80bc": "表情合成",
+    "settings.text_ce8cb065e4": "请指定开启或关闭。",
+    "settings.text_d1b53bdeb2": "名单模式",
+    "settings.text_d21699fe5c": "表情配置包含未知字段或无效值。",
+    "settings.text_d4bb9f1183": "表情合成设置",
+    "settings.text_dd4a9fca8f": "已配置 {length} 项",
+    "settings.text_e5d932113e": "表情保护设置",
+    "settings.text_e89437675b": "头像缓存",
+    "settings.text_eabce164b1": "无法读取或保存表情合成设置，请检查本地 YAML 配置。",
+    "settings.text_f1b18e3110": "表情保护列表",
+    "settings.text_f2f840293d": "表情保护",
+    "template-policy.text_46fb6b72e4": "二阶堂希罗嫌弃",
+    "template-policy.text_4e42283d25": "橘雪莉想",
+    "template-policy.text_5f11e88f6b": "夏目安安举牌",
+    "template-policy.text_8d3109a531": "没有找到对应表情，发送 #表情列表 查看编号。",
+    "template-policy.text_fda1f74c1c": "雪梨想",
+    "templates.animated-input.text_2f1b534763": "无效或过大的表情输入图片。",
+    "templates.anyliew-avatar-caption-scenes.text_2ab425e0c6": "她",
+    "templates.anyliew-avatar-caption-scenes.text_34f3dab6f4": "天命之人",
+    "templates.anyliew-avatar-caption-scenes.text_54bbcc674e": "昵称（第一段文字）",
+    "templates.anyliew-avatar-caption-scenes.text_612d5e9674": "桃乐丝:我这边里有Doro动漫周边公仔\n桃乐丝:还有{value1}的写真~\n桃乐丝:你要吗？",
+    "templates.anyliew-avatar-caption-scenes.text_8b7b91e000": "他",
+    "templates.anyliew-avatar-caption-scenes.text_9e9a196944": "所有人，给我{value1}生成黄图",
+    "templates.anyliew-avatar-caption-scenes.text_b259f5e7da": "喜报传佳讯\n福星高照\n满门庭",
+    "templates.anyliew-avatar-caption-scenes.text_b73d523576": "\n久岐忍:此人是谁?\n\n旅行者:此人是{value1},擅长跳、唱、rap、打篮球\n\n旅行者:是稻妻国两年半不可多得的尤物~\n",
+    "templates.anyliew-avatar-caption-scenes.text_d0010b60ae": "{value1},桃乐丝正在努力为你打工赚钱",
+    "templates.anyliew-avatar-caption-scenes.text_f4f3e6eaa4": "{name}:大伟哥\n刘伟:{value2}\n{value3}:今天很开心和你共进晚餐\n刘伟:我也很开心和{value4}一起享用麦当劳双人套餐",
+    "templates.anyliew-avatar-scenes.text_1873817cf3": "表情的图片或文字数量不符。",
+    "templates.anyliew-avatar-scenes.text_2ab425e0c6": "她",
+    "templates.anyliew-avatar-scenes.text_61f4a663e9": "你还能有{name}聪明？",
+    "templates.anyliew-avatar-scenes.text_8b7b91e000": "他",
+    "templates.anyliew-avatar-scenes.text_b068fc319b": "这家伙",
+    "templates.anyliew-circle-dialogue.text_2614ddd947": "{name}の鹿管计划",
+    "templates.anyliew-circle-dialogue.text_2ab425e0c6": "她",
+    "templates.anyliew-circle-dialogue.text_49d4c5b34e": "{name}❤️,我们一起过圣诞",
+    "templates.anyliew-circle-dialogue.text_779da2a39a": "{name},你真是一个大聪明 \n 桃乐丝要为你点个赞👍🏻",
+    "templates.anyliew-circle-dialogue.text_7a073e179f": "农历七月初七 新历8月29日 20:00 \n{name}和派蒙在原神官方直播间过七夕",
+    "templates.anyliew-circle-dialogue.text_8cd91cdf93": "希格雯:这{name}没救了\n希格雯:快拉去璃月往生堂\n希格雯:让胡堂主埋了吧",
+    "templates.anyliew-circle-dialogue.text_9671f0f1f7": "{name}の国庆计划",
+    "templates.anyliew-circle-dialogue.text_9b6b699450": "{name}：我要和四季夏目永远在一起",
+    "templates.anyliew-circle-dialogue.text_9ebea056cd": "正常人{name}",
+    "templates.anyliew-circle-dialogue.text_b16c501a90": "{name}:V你50块钱\n与我共度疯狂星期四美好时光",
+    "templates.anyliew-circle-dialogue.text_bb60cfb3f9": "{name},你好变态,穿我的衣物",
+    "templates.anyliew-circle-dialogue.text_bca87be1d4": "蔡徐坤",
+    "templates.anyliew-circle-dialogue.text_c4a8f5307b": "{name},你和夏先生一样笨得可爱",
+    "templates.anyliew-circle-dialogue.text_c82d3d074a": "{name}の奴隶契约",
+    "templates.anyliew-circle-dialogue.text_c988250eec": "原来{name}是柚子厨",
+    "templates.anyliew-circle-dialogue.text_d320573c3c": "{name},你真是好搞笑呀🤣😂~",
+    "templates.anyliew-circle-dialogue.text_d38569d508": "图片编号错误，请选择 0～{length}",
+    "templates.anyliew-circle-dialogue.text_d9d9e37238": "{name},你真是一个大聪明\n柴郡为你点个赞👍🏻",
+    "templates.anyliew-circle-dialogue.text_f75004abd1": "{name},你是柚...柚子厨?!",
+    "templates.anyliew-deer-help.text_7ccbb96dfc": "这个表情需要两张图片。",
+    "templates.anyliew-dialogue.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.anyliew-dialogue.text_0073f8cff2": "我可以对{name} \n 使用『说服』吗?",
+    "templates.anyliew-dialogue.text_10537aed28": "此人「{name}」\n\n拥有我的六个命座\n\n已经是满命了",
+    "templates.anyliew-dialogue.text_1287a7c3c3": "桃乐丝:{name}同学,这是你的头像照片吗？\n桃乐丝:你长得好帅呀\n桃乐丝:{value2},你愿意和我交往在一起吗？\n{value3}:我愿意,我愿意\n{value4}:桃乐丝,我{value5}愿意和你在一起一生一世",
+    "templates.anyliew-dialogue.text_2ab425e0c6": "她",
+    "templates.anyliew-dialogue.text_30b74513a9": "这是符咒「{name}」",
+    "templates.anyliew-dialogue.text_35acc1d76a": "丛雨讨厌这个",
+    "templates.anyliew-dialogue.text_3f5cd8d4a8": "不用了\n我{name}是AI高手\n正在用AI写代码中ing",
+    "templates.anyliew-dialogue.text_4181511629": "坤坤好喜欢{name}\n想要一个{value2}❤️~",
+    "templates.anyliew-dialogue.text_4df7398d30": "这{name}是什么东西?\n竟然让人如此着迷",
+    "templates.anyliew-dialogue.text_76904f3fcb": "桃乐丝:和{name}一起品尝欧润吉真是一种享受\n \n{value2}:欧润吉真好吃",
+    "templates.anyliew-dialogue.text_8b7b91e000": "他",
+    "templates.anyliew-dialogue.text_b6060f7e2e": "丛雨喜欢这个",
+    "templates.anyliew-dialogue.text_c27fe7c359": "坤坤喜欢这个",
+    "templates.anyliew-dialogue.text_c8b2e81d61": "桃乐丝:{name},你永远是桃乐丝的最爱之人❤️",
+    "templates.anyliew-dialogue.text_dafaaeb6ef": "柚子厨",
+    "templates.anyliew-dialogue.text_f52746553a": "男主:旁边怎么有人傻乎乎站在那里？\n女主:{name}付钱让他站在那付费观看的",
+    "templates.anyliew-dialogue.text_f67a72dd95": "{name}:{value2}向你敬礼,忠诚!\n{value3}:{value4}당신에게 경의를 표합니다,충성!",
+    "templates.anyliew-dialogue.text_fa215fea06": "亚托莉喜欢这个",
+    "templates.anyliew-fixed-batch.text_6b80a530c3": "被窝表情的原帧尺寸无效。",
+    "templates.anyliew-signs.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.anyliew-signs.text_1cbd153405": "当那古老的预言终结、一切落幕之后，我曾经陷入很长时间的消沉。站在舞台上的人受到观众的追捧，同时也承受着更多的注视与期待。但我很清楚，他们期待的并不是我，而是我扮演的那位「神明」...在这个过程中，我真正得到的只有孤独。所以我一度庆恶任何跟表演有关的事，把自己关在房间里，直到再次站上舞台、再次面对观众的时候，我才发现不知不觉我内心的不安已经消失了。现在的我可以坦然承受他们的目光,也许是因为…我终于开始「扮演」我自己了。",
+    "templates.anyliew-signs.text_2fa0e92d72": "快说吾辈可爱",
+    "templates.anyliew-signs.text_49c12ffc4b": "图片编号，0 随机，1～{length} 指定底图",
+    "templates.anyliew-signs.text_4ba7c75320": "变身",
+    "templates.anyliew-signs.text_5ba48f7ec2": "你的声音太尖锐了",
+    "templates.anyliew-signs.text_941e06ac81": "林尼大笨蛋",
+    "templates.anyliew-signs.text_aaa3f6d5da": "我才不要在这种时候放弃,即使当不成中忍,我也会通过其他的途径成为火影的,这就是我的忍道 ",
+    "templates.anyliew-signs.text_aed3f52a49": "图片编号错误，请选择 1～{length} 或 0（随机）",
+    "templates.anyliew-signs.text_b722a779fa": "不要再涩涩了",
+    "templates.anyliew-signs.text_c6207b207b": "嗯哼，太阳出来我晒太阳，月亮出来我晒月亮嘞",
+    "templates.anyliew-signs.text_fb2036d69f": "请不要忘记我哦……\n请一直,一直记住我哦\n明天,请把我带到伊甸\n我想看见大家的笑容\n我想看到大家开心的表情\n我想学习喜悦",
+    "templates.anyliew-static-avatar.text_1873817cf3": "表情的图片或文字数量不符。",
+    "templates.anyliew-tail.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.anyliew-tail.text_04b078853f": "祭祀者:安心去吧,{name}桑[さん]\n你最❤️愛の妻子[未亡人]我会好好照顾的\n{value2}你去了冥界也要保佑我们",
+    "templates.anyliew-tail.text_17e6c952a7": "非酋，不要再涩涩了",
+    "templates.anyliew-tail.text_2ab425e0c6": "她",
+    "templates.anyliew-tail.text_8b7b91e000": "他",
+    "templates.anyliew-tail.text_94b614000f": "你是高手？",
+    "templates.anyliew-tail.text_95e75f9cc6": "{name},这是你的照片吗？",
+    "templates.anyliew-tail.text_9b3f8cfe24": "图片编号，0 随机，1～{count} 指定底图",
+    "templates.anyliew-tail.text_aed3f52a49": "图片编号错误，请选择 1～{length} 或 0（随机）",
+    "templates.anyliew-tail.text_b1ff551678": "宝贝~",
+    "templates.anyliew-tail.text_b722a779fa": "不要再涩涩了",
+    "templates.anyliew-text-dialogue.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.anyliew-text-dialogue.text_202f6ba718": "潮水啊，我已归来",
+    "templates.anyliew-text-dialogue.text_3abbd3f3c3": "前面的区域\n以后再来探索吧？",
+    "templates.anyliew-text-dialogue.text_4ba7c75320": "变身",
+    "templates.anyliew-text-dialogue.text_5ba48f7ec2": "你的声音太尖锐了",
+    "templates.anyliew-text-dialogue.text_5cb3e04c1a": "曾经我是戴上假面的演员，只想要掩饰真相…",
+    "templates.anyliew-text-dialogue.text_7372f0f0ba": "诶？！！！等……等等等，是一辈子喔？",
+    "templates.anyliew-text-dialogue.text_9b3f8cfe24": "图片编号，0 随机，1～{count} 指定底图",
+    "templates.anyliew-text-dialogue.text_9cac8fb54e": "图片编号错误，请选择 1～{count} 或 0（随机）",
+    "templates.anyliew-text-dialogue.text_f00b96dc31": "我从没觉得玩乐队开心过……",
+    "templates.anyliew-word-cards.text_0c82a5d7d0": "姓名，指定后使用日期与称呼版式",
+    "templates.anyliew-word-cards.text_1dab065c92": "恶语相向时，请注意，屏幕后面的我可是这样的：",
+    "templates.anyliew-word-cards.text_23aac92ed6": "图片编号错误，请选择 1～",
+    "templates.anyliew-word-cards.text_2646e324ad": "该表情需要一张图片。",
+    "templates.anyliew-word-cards.text_54a55f97a5": " 选定底图",
+    "templates.anyliew-word-cards.text_6c1c37dff2": "正在思考中……",
+    "templates.anyliew-word-cards.text_92bb9b31a6": "好久不见，你长大了呢。",
+    "templates.anyliew-word-cards.text_a5c37328e7": " 或 0（随机）",
+    "templates.anyliew-word-cards.text_ace43181b8": "何意味？",
+    "templates.anyliew-word-cards.text_b0115a3961": "仙法白激之术",
+    "templates.anyliew-word-cards.text_b1248cc813": "当你想对",
+    "templates.anyliew-word-cards.text_b70bb4acc0": "我",
+    "templates.anyliew-word-cards.text_ce50e24cd5": "图片编号，0 随机，1～",
+    "templates.anyliew-word-cards.text_d287a16e1d": "伊邪那美",
+    "templates.anyliew-word-cards.text_fa65d94b35": "你好，世界！",
+    "templates.archive-overlay-specs.text_08e858ce53": "对魔忍",
+    "templates.archive-overlay-specs.text_10ca3e79a4": "杰士邦",
+    "templates.archive-overlay-specs.text_1998c9c47b": "乳入娘",
+    "templates.archive-overlay-specs.text_1a1729e2fe": "偶像心跳",
+    "templates.archive-overlay-specs.text_1c3f1629ed": "啦啦队偶像",
+    "templates.archive-overlay-specs.text_2921fa5ba8": "{name}喜爱的萌新礼包",
+    "templates.archive-overlay-specs.text_36559b58f3": "天使心",
+    "templates.archive-overlay-specs.text_4fdd3eabe2": "{name}の❤️最爱",
+    "templates.archive-overlay-specs.text_56582c7bcc": "桥本友希",
+    "templates.archive-overlay-specs.text_5681f676f4": "白丝壁女",
+    "templates.archive-overlay-specs.text_5b5a774336": "{name}の挚❤️爱",
+    "templates.archive-overlay-specs.text_5d38d0cbcf": "{name}の❤️最愛",
+    "templates.archive-overlay-specs.text_669f6d9d31": "紫域精灵",
+    "templates.archive-overlay-specs.text_6a0714fb3a": "{name}最爱❤️",
+    "templates.archive-overlay-specs.text_6bfccdf964": "限定版圣修女",
+    "templates.archive-overlay-specs.text_6eee79ba4e": "琉璃子",
+    "templates.archive-overlay-specs.text_703947508c": "春奈纱希",
+    "templates.archive-overlay-specs.text_721b8f7d4d": "{name}の深情❤️推荐",
+    "templates.archive-overlay-specs.text_73f842b56c": "魔女之森",
+    "templates.archive-overlay-specs.text_7bb5f918af": "杏奈",
+    "templates.archive-overlay-specs.text_842dc2a994": "萌新礼包",
+    "templates.archive-overlay-specs.text_b617589c18": "圣修女",
+    "templates.archive-overlay-specs.text_b6aab16f88": "空气玩法",
+    "templates.archive-overlay-specs.text_bffd8a3223": "机械龙女",
+    "templates.archive-overlay-specs.text_dadc890945": "夏日琉璃子",
+    "templates.archive-overlay-specs.text_df05d76c32": "纪念版圣修女",
+    "templates.archive-overlay-specs.text_ec695eebae": "纯洁臀",
+    "templates.archive-overlay-specs.text_ec727951d1": "新手礼包",
+    "templates.archive-overlay-specs.text_f0bab6dc12": "{name}の❤️新手礼包",
+    "templates.archive-overlay-specs.text_f2dc62676a": "神宫美优子",
+    "templates.archive-overlay-specs.text_f3e94463ff": "水城不知火",
+    "templates.archive-overlay-specs.text_fba83278c0": "清洗液",
+    "templates.archive-overlays.text_2ab425e0c6": "她",
+    "templates.archive-overlays.text_4fdd3eabe2": "{name}の❤️最爱",
+    "templates.archive-overlays.text_8b7b91e000": "他",
+    "templates.archive-overlays.text_972673e00d": "图片编号，0 为随机；1~25 对应：",
+    "templates.archive-overlays.text_de95b37b13": "图片编号错误，请选择 1~25（0 为随机）",
+    "templates.avatar-accessories.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.avatar-accessories.text_1890662526": "戒导人：[u] {name} [/u]",
+    "templates.avatar-accessories.text_44af2dbe33": "表情图片或文字数量不符合要求。",
+    "templates.avatar-accessories.text_67d1d91585": "怎么说话的你",
+    "templates.avatar-accessories.text_74b5badd91": "指定名字",
+    "templates.avatar-accessories.text_8a009da6e6": "指定时间",
+    "templates.avatar-accessories.text_a83233035d": "[u] {value1} [/u]年[u] {value2} [/u]月[u] {value3} [/u]日",
+    "templates.avatar-accessories.text_d91327d626": "{keyword}的位置，包含 left、right、both",
+    "templates.avatar-caption-cards.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.avatar-caption-cards.text_2541938e27": "男同",
+    "templates.avatar-caption-cards.text_2ab425e0c6": "她",
+    "templates.avatar-caption-cards.text_2f82ee08c4": "女同",
+    "templates.avatar-caption-cards.text_50dd0c475e": "{pronoun}没失踪也没怎么样  我只是觉得你们都该看一下",
+    "templates.avatar-caption-cards.text_8b7b91e000": "他",
+    "templates.avatar-caption-cards.text_bd13114929": "请问你们看到{name}了吗?",
+    "templates.avatar-caption-cards.text_c8712b803f": "关注了你",
+    "templates.avatar-caption-cards.text_e97645da35": "如何提高社交质量 : \n远离以下头像的人",
+    "templates.avatar-caption-cards.text_f280cdf39b": "非常可爱！简直就是小天使",
+    "templates.avatar-frames.text_a2bee4ca3d": "相框的图片或文字数量不符。",
+    "templates.basic-image-transforms.text_c84c3f23bb": "图片太扁，无法生成表情。",
+    "templates.basic-image-transforms.text_ce4e377327": "我看你们是反了！",
+    "templates.basic-image-transforms.text_d610547bf1": "像素化大小，默认为 10",
+    "templates.basic-image-transforms.text_fcc419d723": "请输入合适的像素化大小。",
+    "templates.bbcode-text.text_aa7c4598b8": "文字字号超出表情绘制范围。",
+    "templates.caption-overlays.text_05551f82c9": "{value1}我会给你每个男人都最想要的东西···",
+    "templates.caption-overlays.text_10f0db0177": "阿尼亚喜欢这个",
+    "templates.caption-overlays.text_30acaab1c0": "满脑子都是{value1}",
+    "templates.caption-overlays.text_3e9a1269e4": "生活不易,炖{value1}出气",
+    "templates.caption-overlays.text_7e9260e925": "它",
+    "templates.caption-overlays.text_9ea175d333": "所谓的男人啊，只要送他们这种东西就会很开心",
+    "templates.caption-overlays.text_b728962593": "一起玩{name}吧！",
+    "templates.caption-overlays.text_c13f8953db": "偷学群友数理基础",
+    "templates.caption-overlays.text_c2f81b24c9": "群友",
+    "templates.caption-overlays.text_ca30bf0191": "该表情最多接收一段文字。",
+    "templates.caption-overlays.text_d0cc254e90": "满脑子都是xx",
+    "templates.caption-overlays.text_e0428a7a59": "走，跟我去二次元吧",
+    "templates.caption-overlays.text_eed58fd967": "此处添加文字",
+    "templates.caption-overlays.text_f6a269f6f3": "今年520",
+    "templates.classic-avatar-animations.text_2646e324ad": "该表情需要一张图片。",
+    "templates.classic-avatar-animations.text_bc92350be8": "表情模板 {key} 的帧尺寸不一致。",
+    "templates.classic-layered-animations.text_2646e324ad": "该表情需要一张图片。",
+    "templates.classic-layered-animations.text_82d06faea1": "圆",
+    "templates.classic-layered-animations.text_bc92350be8": "表情模板 {key} 的帧尺寸不一致。",
+    "templates.classic-layered-animations.text_bd6b1d72aa": "是否将图片变为圆形",
+    "templates.cropped-photo-templates.text_078675c312": "这个表情需要 {min_images} 到 {max_images} 张图片。",
+    "templates.cropped-photo-templates.text_455cc162ff": "这个表情需要一张图片。",
+    "templates.dianzhongdian.text_3612b9b959": "救命啊",
+    "templates.dianzhongdian.text_8bc8f08143": "请用斜杠补上日语文案，例如 #典中典 救命啊/助けて。",
+    "templates.dianzhongdian.text_ab90d08864": "助けて",
+    "templates.dianzhongdian.text_fefdf96e50": "典中典需要一张图片和一至两段文案。",
+    "templates.fixed-avatar-animation.text_455cc162ff": "这个表情需要一张图片。",
+    "templates.fixed-avatar-animation.text_7ccbb96dfc": "这个表情需要两张图片。",
+    "templates.fixed-avatar-animation.text_bc92350be8": "表情模板 {key} 的帧尺寸不一致。",
+    "templates.friend-notifications.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.friend-notifications.text_0669de77ec": "正在玩",
+    "templates.friend-notifications.text_2924e13e57": "黑神话：悟空",
+    "templates.friend-notifications.text_44af2dbe33": "表情图片或文字数量不符合要求。",
+    "templates.friend-notifications.text_507372c007": "让我康康",
+    "templates.friend-notifications.text_677aad1a0e": "朋友",
+    "templates.friend-notifications.text_74b5badd91": "指定名字",
+    "templates.friend-notifications.text_b9b1480dd6": "好友",
+    "templates.friend-notifications.text_d1f5fd89d2": "xx正在玩xx",
+    "templates.gif.text_36bb833a2d": "表情动图的缓存帧写入失败。",
+    "templates.gif.text_3c77a0a604": "表情动图的尺寸或帧数超限。",
+    "templates.gif.text_3e077e4f0f": "表情动图的调色板大小无效。",
+    "templates.gif.text_df7ae25630": "表情动图的缓存帧读取不完整。",
+    "templates.gif.text_ea7ba354a9": "表情动图超过 {value1} MiB。",
+    "templates.gif.text_f2c692fa2d": "表情动图的帧像素或时长无效。",
+    "templates.jump-sold.text_2646e324ad": "该表情需要一张图片。",
+    "templates.jump-sold.text_bc92350be8": "表情模板 {key} 的帧尺寸不一致。",
+    "templates.kiss-hug.text_1a49c3b4f3": "表情帧素材尺寸无效：{asset}",
+    "templates.kiss-hug.text_4cf8ede751": "{value1}需要两张图片，且不接收文字。",
+    "templates.large-source-animations.text_af9e9fb42e": "角色编号错误，请选择1-6",
+    "templates.large-source-animations.text_b7b332b122": "角色编号：1、八重神子，2、胡桃，3、妮露，4、可莉，5、刻晴，6、钟离",
+    "templates.large-source-animations.text_c47b54e84e": "角色",
+    "templates.leave-note.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.leave-note.text_1b13f8bc82": "本人",
+    "templates.leave-note.text_68926cd1c2": "想玩原神",
+    "templates.leave-note.text_74b5badd91": "指定名字",
+    "templates.leave-note.text_8a009da6e6": "指定时间",
+    "templates.leave-note.text_957ea93460": "请假条",
+    "templates.leave-note.text_a397a1ebc0": "因",
+    "templates.leave-note.text_df5fe10f03": "于[u] {value1} [/u]年[u] {value2} [/u]月[u] {value3} [/u]日请假一天,",
+    "templates.leave-note.text_e1ca33b2d2": "网友",
+    "templates.leave-note.text_edcd3597e1": "望领导批准！！！",
+    "templates.legacy-badges.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.legacy-badges.text_2646e324ad": "该表情需要一张图片。",
+    "templates.legacy-badges.text_ada8d90ad4": "表情包制作",
+    "templates.legacy-badges.text_bd6df69715": "请提供一段文字。",
+    "templates.legacy-caption-scenes.text_05f173fdc0": "朋友\n先看看这个图标再说话",
+    "templates.legacy-caption-scenes.text_2ab425e0c6": "她",
+    "templates.legacy-caption-scenes.text_43b51d22b4": "说完了吗？该走了",
+    "templates.legacy-caption-scenes.text_6f185f6b17": "主要都是由这个引起的",
+    "templates.legacy-caption-scenes.text_7e9260e925": "它",
+    "templates.legacy-caption-scenes.text_822828a7c9": "心脏病 高血压 心律不齐 心肌梗塞 失眠 脱发 呼吸困难 胸闷气短 缺氧 躁郁 焦虑 脑供血不足 心慌心悸 心脑血管炸裂",
+    "templates.legacy-caption-scenes.text_84bab84f64": "你给我的安全感\n远不及{ta}的万分之一",
+    "templates.legacy-caption-scenes.text_8b7b91e000": "他",
+    "templates.legacy-caption-scenes.text_b02d3dbfd1": "我老婆",
+    "templates.legacy-caption-scenes.text_c84459f072": "你的",
+    "templates.legacy-caption-scenes.text_e24154596e": "笨蛋",
+    "templates.legacy-caption-shortcuts.text_4262f296ac": "谢谢参与",
+    "templates.legacy-caption-shortcuts.text_50f5d65d57": "人",
+    "templates.legacy-caption-shortcuts.text_6511f66719": "不买华为不是",
+    "templates.legacy-caption-shortcuts.text_662a4d17ce": "高情商",
+    "templates.legacy-caption-shortcuts.text_6fb809e7a7": "该表情需要 ",
+    "templates.legacy-caption-shortcuts.text_6fef2ce393": " 段文字。",
+    "templates.legacy-caption-shortcuts.text_74c45f5b09": "起来了",
+    "templates.legacy-caption-shortcuts.text_c40a4732b9": "低情商",
+    "templates.legacy-caption-shortcuts.text_f867f34178": "好",
+    "templates.legacy-chat-card-layouts.text_4e1e4cf955": "废墟 深海 反应堆 学园 腐烂 东京 三维 四次元 少管所 流星 闪光 南极 消极 幽浮 网路 暗狱 离子态 液态 黑色 抱抱 暴力 垃圾 社会 残暴 残酷 工口 戮尸 原味 毛茸茸 香香 霹雳 午夜 美工刀 爆浆 机关枪 无响应 手术台 麻风病 虚拟 速冻 智能 2000 甜味 华丽 反社会 玛利亚 无 梦之 蔷薇 无政府 酷酷 西伯利亚 人造 法外 追杀 通缉 女子 微型 男子 超 毁灭 大型 绝望 阴间 死亡 坟场 高科技 奇妙 魔法 极限 社会主义 无聊",
+    "templates.legacy-chat-card-layouts.text_50aa5a5f6f": "小丑 仿生 纳米 原子 丧 电子 十字架 咩咩 赛博 野猪 外星 窒息 变态 触手 小众 悲情 飞行 绿色 电动 铁锈 碎尸 电音 蠕动 酸甜 虚构 乱码 碳水 内脏 脑浆 血管 全裸 绷带 不合格 光滑 标本 酸性 碱性 404 变身 反常 樱桃 碳基 矫情 病娇 进化 潮湿 砂糖 高潮 变异 复合盐 伏特加 抑郁 暴躁 不爱说话 废物 失败 幻想型 社恐 苦涩 粘液 浓厚 快乐 强制 中二病 恶魔 emo 激光 发射 限量版 迷因 堕落 放射性",
+    "templates.legacy-chat-card-layouts.text_b3514919ad": "天使 精灵 女孩 男孩 宝贝 小妈咪 虫 菇 公主 少女 少年 1号机 子 恐龙 蜈蚣 蟑螂 食人鱼 小飞船 舞女 桃子 团子 精 酱 废料 生物 物质 奶茶 搅拌机 液 火锅 祭司 体 实验品 试验体 小猫咪 样本 颗粒 血块 汽水 蛙 软体 机器人 人质 小熊 圣母 胶囊 乙女 主义者 屑 垢 污渍 废人 毛血旺 怪人 肉 河豚 豚 藻类 唾沫 咒语 建筑 球 小狗 碳 元素 少先队员 博士 糖",
+    "templates.legacy-chat-cards.text_0d53f08678": "示例",
+    "templates.legacy-chat-cards.text_1dc8dca7ed": "我是急急国王",
+    "templates.legacy-chat-cards.text_2ab425e0c6": "她",
+    "templates.legacy-chat-cards.text_2b7f95d215": "急",
+    "templates.legacy-chat-cards.text_392e677276": "这种情况你应该致电",
+    "templates.legacy-chat-cards.text_42185ee108": "请选择包含",
+    "templates.legacy-chat-cards.text_4c00407b04": "傻逼",
+    "templates.legacy-chat-cards.text_5075851a68": "的所有图块，如果没有，请点击“跳过”",
+    "templates.legacy-chat-cards.text_6a831661dd": "来份",
+    "templates.legacy-chat-cards.text_76b8e87b81": "文字或昵称数量不足。",
+    "templates.legacy-chat-cards.text_82d06faea1": "圆",
+    "templates.legacy-chat-cards.text_8b7b91e000": "他",
+    "templates.legacy-chat-cards.text_aae590df38": "我是{value1}国王",
+    "templates.legacy-chat-cards.text_b5e8ee74bf": "涩图",
+    "templates.legacy-chat-cards.text_bd6b1d72aa": "是否将图片变为圆形",
+    "templates.legacy-chat-cards.text_f48df74142": "您的亚名是",
+    "templates.legacy-chat-cards.text_fc50a99caa": "跳过",
+    "templates.legacy-chat-cards.text_fcdfeb01a5": "平安名すみれ",
+    "templates.legacy-fixed-poses.text_051504bc7f": "表情原帧尺寸不一致。",
+    "templates.legacy-fixed-poses.text_1873817cf3": "表情的图片或文字数量不符。",
+    "templates.legacy-live-effects.text_1cda4eb3e6": "晃脑需要一张图片。",
+    "templates.legacy-live-effects.text_5ad27d1bab": "来盯着👁你",
+    "templates.legacy-live-effects.text_747d549fd8": "回南天需要一张图片，最多一段文字。",
+    "templates.legacy-live-effects.text_7ca7bd55a5": "我雇了一只",
+    "templates.legacy-live-effects.text_8797652c15": "兄弟，回南了",
+    "templates.legacy-live-effects.text_e9660604e0": "盯着你需要一张图片。",
+    "templates.legacy-photo-captions.text_1d4fb806b2": "该表情至少需要一张图片。",
+    "templates.legacy-photo-captions.text_675d8c7ce2": "典型的xx思维",
+    "templates.legacy-photo-captions.text_f6882f59b7": "表情原图或文字过长。",
+    "templates.legacy-photo-captions.text_fc01aed9da": "无语，和你说不下去",
+    "templates.legacy-photo-forms.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.legacy-photo-forms.text_67f1165c88": "\n（永久有效）",
+    "templates.legacy-photo-forms.text_7910650aa4": "托托{name}!",
+    "templates.legacy-photo-forms.text_8eb4d3d551": "采访大佬经验",
+    "templates.legacy-photo-forms.text_aec31b2f85": "陪睡券",
+    "templates.legacy-photo-forms.text_bfc56e260b": "为{name}奉献所有财产!",
+    "templates.legacy-photo-forms.text_d6822a7f2b": "エロ本",
+    "templates.legacy-photo-forms.text_e1ca33b2d2": "网友",
+    "templates.legacy-photo-forms.text_edb0d8171e": "赞美{name}!",
+    "templates.legacy-photo-forms.text_f49def079b": "该表情需要指定文字或昵称。",
+    "templates.legacy-photo-forms.text_f93b005cf8": "摸摸{name}!",
+    "templates.legacy-photo-scenes.text_2ab425e0c6": "她",
+    "templates.legacy-photo-scenes.text_8b7b91e000": "他",
+    "templates.legacy-photo-scenes.text_c3c4c3a422": "图片或文字数量不符合表情要求。",
+    "templates.legacy-pixel-effects.text_2646e324ad": "该表情需要一张图片。",
+    "templates.legacy-portrait-effects.text_13c71fe2f7": "啊这，{pronoun}说不知道",
+    "templates.legacy-portrait-effects.text_1487d35303": "吴九",
+    "templates.legacy-portrait-effects.text_1d841bc0ee": "张三",
+    "templates.legacy-portrait-effects.text_2ab425e0c6": "她",
+    "templates.legacy-portrait-effects.text_34e2bef711": "孙七",
+    "templates.legacy-portrait-effects.text_528c1f9868": "该表情需要一张图片和至多一段文字。",
+    "templates.legacy-portrait-effects.text_5989f6f405": "刘一",
+    "templates.legacy-portrait-effects.text_7292b7eda2": "郑十",
+    "templates.legacy-portrait-effects.text_76b8e87b81": "文字或昵称数量不足。",
+    "templates.legacy-portrait-effects.text_7df288465c": "周八",
+    "templates.legacy-portrait-effects.text_808b4f6221": "李四",
+    "templates.legacy-portrait-effects.text_8b7b91e000": "他",
+    "templates.legacy-portrait-effects.text_a60083f553": "{name}不知道哦。",
+    "templates.legacy-portrait-effects.text_ac77145c4b": "让{name}告诉你吧",
+    "templates.legacy-portrait-effects.text_c68e010446": "王五",
+    "templates.legacy-portrait-effects.text_c80834bf8e": "陈二",
+    "templates.legacy-portrait-effects.text_ccdf13dcac": "表情原图长宽比超限。",
+    "templates.legacy-portrait-effects.text_e6bb13166f": "赵六",
+    "templates.legacy-projected-actions.text_2646e324ad": "该表情需要一张图片。",
+    "templates.legacy-projected-actions.text_6e146f3c6a": "白子舔的原遮罩尺寸不一致。",
+    "templates.legacy-projected-actions.text_bc92350be8": "表情模板 {key} 的帧尺寸不一致。",
+    "templates.legacy-scene.text_9dc5c0158d": "一样",
+    "templates.legacy-scene.text_b2b2993d91": "你怎么跟",
+    "templates.legacy-scene.text_d2afe1056e": "小画家需要一张图片。",
+    "templates.legacy-text-overlays.text_0d53f08678": "示例",
+    "templates.legacy-text-overlays.text_36a8dabb68": "该表情需要 1 段文字。",
+    "templates.legacy-text-overlays.text_46e8d25cb9": "你不要再说了",
+    "templates.legacy-text-overlays.text_e283983dad": "你的假期余额不足",
+    "templates.legacy-text-overlays.text_ecf85cad14": "我发涩图被抓起来了",
+    "templates.legacy-wordmarks.text_d9a35f8f6c": "该表情需要 2 段文字。",
+    "templates.local-canvas-animation.text_455cc162ff": "这个表情需要一张图片。",
+    "templates.local-canvas-animation.text_54c9a4d41c": "表情模板的局部图层超出画布。",
+    "templates.louvre.text_455cc162ff": "这个表情需要一张图片。",
+    "templates.louvre.text_72f641bd63": "线迹模式: 0=随机选择, 1=精细, 2=一般, 3=稍粗, 4=超粗, 5=极粗, 6=浮雕, 7=线稿(彩色)",
+    "templates.louvre.text_e84d89e311": "模式编号错误，请选择 1~7 或 0（随机）",
+    "templates.meme-date.text_80caf9b17c": "一二三四五六日",
+    "templates.meme-date.text_85217f7aff": "日",
+    "templates.mirage-tank.text_4ee0590e10": "幻影坦克的图片或文字数量不符。",
+    "templates.mirage-tank.text_78a2eee503": "幻影坦克需要图片。",
+    "templates.mirage-tank.text_f9ddbf155e": "幻影坦克需要两张图。",
+    "templates.mirror-flash.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.mirror-flash.text_284122a88e": "图片高度太小，无法生成表情。",
+    "templates.mirror-flash.text_a5df1ef1c3": "闪瞎你们的狗眼",
+    "templates.motion.text_191e26b5d7": "左右",
+    "templates.motion.text_45cb499257": "跑动方向，包含 left_right、right_left",
+    "templates.motion.text_a22fe282ac": "右左",
+    "templates.offset-motion.text_13c12b064b": "下",
+    "templates.offset-motion.text_14ab1f2bce": "右",
+    "templates.offset-motion.text_83102bc065": "循环方向，包含 left、right、top、bottom",
+    "templates.offset-motion.text_db5ba671d2": "上",
+    "templates.offset-motion.text_e2e0c454e5": "左",
+    "templates.operator-generator.text_2bc3592c66": "{name}，你的干员信息如下：",
+    "templates.operator-generator.text_670d974354": "你好",
+    "templates.overlays.text_28d478cd63": "图片编号，1-阿罗娜，2-普拉娜",
+    "templates.overlays.text_47d88357c5": "黑白",
+    "templates.overlays.text_766fbf546b": "是否将图片变为黑白",
+    "templates.overlays.text_b159b755d7": "图片编号错误，请输入1或2",
+    "templates.overlays.text_b32428e841": "该表情不接收文字。",
+    "templates.pat-rub.text_181d08b1de": "表情帧素材尺寸无效。",
+    "templates.pat-rub.text_a3b8991807": "拍需要一张图片。",
+    "templates.pat-rub.text_f11ac2982d": "贴贴需要两张图片。",
+    "templates.pay-posters.text_1c14b86168": "请提供文字或可用的用户昵称。",
+    "templates.pay-posters.text_2d0222b61b": "二维码内容",
+    "templates.pay-posters.text_2f9494793a": "预览用户",
+    "templates.pay-posters.text_44af2dbe33": "表情图片或文字数量不符合要求。",
+    "templates.pay-posters.text_dd140f5cc8": "二维码内容过长或无法生成。",
+    "templates.perspective.text_2b015f51fb": "这是十二生肖中的鸡",
+    "templates.perspective.text_44af2dbe33": "表情图片或文字数量不符合要求。",
+    "templates.perspective.text_966991231f": "来玩休闲游戏啊",
+    "templates.perspective.text_aaea7aecc6": "xx启动",
+    "templates.perspective.text_afce589776": "你刚才说的话不是很礼貌！",
+    "templates.perspective.text_f114be37d4": "原神，启动！",
+    "templates.petpet.text_6e1e87beb6": "摸头需要一张图片。",
+    "templates.petpet.text_82d06faea1": "圆",
+    "templates.petpet.text_9eb863b5eb": "摸头手掌素材的尺寸无效。",
+    "templates.petpet.text_bd6b1d72aa": "是否将图片变为圆形",
+    "templates.petpet.text_fd8ae5af87": "-圆",
+    "templates.photo-composites.text_5eb7b9a45f": "遇到困难请拨打",
+    "templates.photo-composites.text_82d06faea1": "圆",
+    "templates.photo-composites.text_bd6b1d72aa": "是否将图片变为圆形",
+    "templates.photo-insets.text_1ea32e62ce": "该表情需要 {count} 张图片。",
+    "templates.pjsk.text_36a8dabb68": "该表情需要 1 段文字。",
+    "templates.pjsk.text_4cdc46966a": "角色编号错误，请输入1-26",
+    "templates.pjsk.text_88521a2e5a": "角色编号",
+    "templates.pjsk.text_cb3e26741b": "角色编号：",
+    "templates.pjsk.text_cf578fb3cc": "图片编号",
+    "templates.pjsk.text_d03a6c367a": "角色{name}的图片编号错误，请输入1-{count}",
+    "templates.pjsk.text_dfca3fbfc4": "世界计划",
+    "templates.portrait-overlays-metadata.text_120a3a2fc2": "老婆",
+    "templates.portrait-overlays-metadata.text_61a2d5fcf1": "是否使用爷爷头轮廓",
+    "templates.portrait-overlays-metadata.text_69e3750b77": "称呼，默认为“老婆”",
+    "templates.portrait-overlays-metadata.text_b70bb4acc0": "我",
+    "templates.portrait-overlays-metadata.text_d20e128911": "爷",
+    "templates.portrait-overlays-metadata.text_e6bc22d5fb": "人称代词，默认为“我”",
+    "templates.portrait-overlays-metadata.text_ebe4a3f63c": "图片编号，范围为 1~92",
+    "templates.portrait-overlays.text_120a3a2fc2": "老婆",
+    "templates.portrait-overlays.text_48ee81b80f": "图片编号错误，请选择 1~92",
+    "templates.portrait-overlays.text_b1291e903f": "如果你的{name}长这样",
+    "templates.portrait-overlays.text_b70bb4acc0": "我",
+    "templates.portrait-overlays.text_c845fe8bb7": "那么这就不是你的{name}\n这是{pronoun}的{value3}",
+    "templates.portrait-overlays.text_f711756fc9": "滚去找你\n自己的{name}去",
+    "templates.projective-transform.text_816ac781db": "无效的表情透视四边形。",
+    "templates.python-gif.text_5e8150e972": "表情动图超过 8 MiB 发送上限。",
+    "templates.python-gif.text_aa0fc5139f": "表情动图的尺寸、帧数或时长无效。",
+    "templates.python-graphic-scenes.text_57a6d8752a": "群\n青",
+    "templates.python-graphic-scenes.text_e45c9b0369": "不出来",
+    "templates.python-overlay-animation.text_455cc162ff": "这个表情需要一张图片。",
+    "templates.python-overlay-animation.text_bc92350be8": "表情模板 {key} 的帧尺寸不一致。",
+    "templates.rectangle-overlays.text_1873817cf3": "表情的图片或文字数量不符。",
+    "templates.rotated-insets.text_2646e324ad": "该表情需要一张图片。",
+    "templates.rotating-avatars.text_455cc162ff": "这个表情需要一张图片。",
+    "templates.scrolling-dialogue.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.scrolling-dialogue.text_1487d35303": "吴九",
+    "templates.scrolling-dialogue.text_1d841bc0ee": "张三",
+    "templates.scrolling-dialogue.text_34e2bef711": "孙七",
+    "templates.scrolling-dialogue.text_3612b9b959": "救命啊",
+    "templates.scrolling-dialogue.text_5989f6f405": "刘一",
+    "templates.scrolling-dialogue.text_7292b7eda2": "郑十",
+    "templates.scrolling-dialogue.text_7df288465c": "周八",
+    "templates.scrolling-dialogue.text_808b4f6221": "李四",
+    "templates.scrolling-dialogue.text_a328cd1da1": "复读需要一至五张图片和一段文字。",
+    "templates.scrolling-dialogue.text_c2f81b24c9": "群友",
+    "templates.scrolling-dialogue.text_c68e010446": "王五",
+    "templates.scrolling-dialogue.text_c80834bf8e": "陈二",
+    "templates.scrolling-dialogue.text_c99a3fb81e": "滚屏需要一段文字。",
+    "templates.scrolling-dialogue.text_ce06e61868": "你们说话啊",
+    "templates.scrolling-dialogue.text_e6bb13166f": "赵六",
+    "templates.shape-timed-animations.text_1d77285bc3": "你写!",
+    "templates.shape-timed-animations.text_d06b1d9cf1": "此乃旧病复发也",
+    "templates.special-print-cards.text_2ef6fbcae9": "不用椰浆\n不加香精当生榨",
+    "templates.special-print-cards.text_436019c395": "29年",
+    "templates.special-print-cards.text_46a2c7baea": "我要玩原神",
+    "templates.special-print-cards.text_53c5cd60ab": "优秀学生",
+    "templates.special-print-cards.text_564348fe10": "龙图名字",
+    "templates.special-print-cards.text_5c8d079b58": "椰树",
+    "templates.special-print-cards.text_6ca67e473b": "鲜榨",
+    "templates.special-print-cards.text_80fb1a8002": "xx龙：xx",
+    "templates.special-print-cards.text_823ec0d8fb": "椰子特产在海南",
+    "templates.special-print-cards.text_8962d0324f": "用新鲜椰子肉",
+    "templates.special-print-cards.text_8a009da6e6": "指定时间",
+    "templates.special-print-cards.text_8cd2be8637": "一年一班",
+    "templates.special-print-cards.text_8f9746ddd8": "　　在本学年第一学期中表现优秀，被我校决定评为",
+    "templates.special-print-cards.text_9ba2241237": "图片编号错误，请选择 1~12",
+    "templates.special-print-cards.text_b9035729a5": "满分",
+    "templates.special-print-cards.text_e2731df5c1": "责怪龙",
+    "templates.special-print-cards.text_efb2c31194": "坚持在海南岛",
+    "templates.special-print-cards.text_f5a709b28e": "图片编号，范围为 1~12",
+    "templates.special-print-cards.text_f5c982ae40": "小王",
+    "templates.special-print-cards.text_f833a9aee7": "正宗",
+    "templates.special-text-cards.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.special-text-cards.text_18daf306ec": "无内鬼，继续交易",
+    "templates.special-text-cards.text_9196202f8e": "我去",
+    "templates.special-text-cards.text_f943f78aa7": "洛天依",
+    "templates.static-layouts.text_0aada09ebe": "套娃",
+    "templates.static-layouts.text_1d841bc0ee": "张三",
+    "templates.static-layouts.text_2e0619ec52": "要我一直",
+    "templates.static-layouts.text_5ac1612110": "吗",
+    "templates.static-layouts.text_6d06f21414": "我永远喜欢",
+    "templates.static-layouts.text_7423ab78cd": "我永远喜欢需要一至六张图片。",
+    "templates.static-layouts.text_76b8e87b81": "文字或昵称数量不足。",
+    "templates.static-layouts.text_86d688f955": "生成模式，包含 normal、loop、circle",
+    "templates.static-layouts.text_8e2328d557": "表情尺寸超限。",
+    "templates.static-layouts.text_a0357c4bd7": "精神支柱需要一张图片。",
+    "templates.static-layouts.text_ad3221dd66": "循环",
+    "templates.static-layouts.text_dd7f8efff3": "一直需要一张图片。",
+    "templates.static-layouts.text_f0a5f687c4": "循环模式",
+    "templates.static-layouts.text_f81ff4376c": "套娃模式",
+    "templates.subtitle-animations.text_033b5337f7": "没有钱啊 肯定要做的啊",
+    "templates.subtitle-animations.text_09fed1a1bb": "不做的话没有钱用",
+    "templates.subtitle-animations.text_0ad0e1c218": "就算你出报告再完美",
+    "templates.subtitle-animations.text_0e4c818a5c": "五年",
+    "templates.subtitle-animations.text_1515bfe01a": "既然追求刺激",
+    "templates.subtitle-animations.text_19f41e4448": "如果让我去阻止xxx",
+    "templates.subtitle-animations.text_2064c386d4": "谁反对",
+    "templates.subtitle-animations.text_2282e18562": "今天掉线了没",
+    "templates.subtitle-animations.text_2672c15eb5": "那么我宁愿去阻止上帝",
+    "templates.subtitle-animations.text_286fd27cb8": "以后叫他天天改报告",
+    "templates.subtitle-animations.text_2ce2464352": "好啊",
+    "templates.subtitle-animations.text_32520ecd80": "（飞扑）",
+    "templates.subtitle-animations.text_35ec4e38b9": "你那是馋她身子",
+    "templates.subtitle-animations.text_39bffd94a7": "这幅嫉妒我的表情",
+    "templates.subtitle-animations.text_3d767e5e33": "偶尔",
+    "templates.subtitle-animations.text_44a8cad558": "跟着这样的大哥",
+    "templates.subtitle-animations.text_454bb1101b": "我叫你改报告你就要改",
+    "templates.subtitle-animations.text_49dbd05964": "我反对",
+    "templates.subtitle-animations.text_4b76b8cff3": "天天改 天天改",
+    "templates.subtitle-animations.text_4cfe0fdb44": "这辈子不可能打工的",
+    "templates.subtitle-animations.text_500f7b18b1": "客户了不起啊",
+    "templates.subtitle-animations.text_5232cff014": "平时你打电子游戏吗",
+    "templates.subtitle-animations.text_5260239b4e": "有手有脚的",
+    "templates.subtitle-animations.text_623e006e40": "美国前五星上将麦克阿瑟",
+    "templates.subtitle-animations.text_6543812821": "你知道有多好玩吗",
+    "templates.subtitle-animations.text_67a924bd7f": "该表情需要 {count} 段文字。",
+    "templates.subtitle-animations.text_68be0d66bc": "穿西装打领带",
+    "templates.subtitle-animations.text_6bab8359d8": "那你不会去打工啊",
+    "templates.subtitle-animations.text_763aacba55": "你知道我这五年是怎么过的吗",
+    "templates.subtitle-animations.text_79ff200148": "食屎啦你",
+    "templates.subtitle-animations.text_8143cbf58b": "来给他弹个版本过低",
+    "templates.subtitle-animations.text_836bee2565": "毕竟我是客户",
+    "templates.subtitle-animations.text_8403a1cf53": "Sorry 客户真的了不起",
+    "templates.subtitle-animations.text_89cf0a8523": "我就是饿死",
+    "templates.subtitle-animations.text_8c102614fe": "连连看",
+    "templates.subtitle-animations.text_8d3244050a": "主要是28岁了还没媳妇儿",
+    "templates.subtitle-animations.text_aa3785a154": "你好骚啊",
+    "templates.subtitle-animations.text_aed755f855": "真香",
+    "templates.subtitle-animations.text_baa822ea61": "我话说完了",
+    "templates.subtitle-animations.text_bd36311a78": "外界都说我们压力大",
+    "templates.subtitle-animations.text_c582e14938": "就算你是一流工程师",
+    "templates.subtitle-animations.text_c630907406": "哟 Lotus-Yunzai机器人",
+    "templates.subtitle-animations.text_c639a80d36": "不会吃你们一点东西",
+    "templates.subtitle-animations.text_cc083e275f": "星际还是魔兽",
+    "templates.subtitle-animations.text_cf1ef87cca": "你那叫喜欢吗？",
+    "templates.subtitle-animations.text_d005326a8f": "哦～",
+    "templates.subtitle-animations.text_d11b69341b": "死外边 从这里跳下去",
+    "templates.subtitle-animations.text_d2ae298320": "我觉得吧压力也没有那么大",
+    "templates.subtitle-animations.text_d509e197f8": "拿大哥大有什么用",
+    "templates.subtitle-animations.text_da7698df77": "我每天躲在家里玩贪玩蓝月",
+    "templates.subtitle-animations.text_eacdffb834": "谁赞成",
+    "templates.subtitle-animations.text_f1dc4f5578": "打工是不可能打工的",
+    "templates.subtitle-animations.text_f465efa245": "曾这样评价道",
+    "templates.subtitle-animations.text_f9bb694542": "就贯彻到底了",
+    "templates.subtitle-animations.text_fe7987ad53": "你下贱！",
+    "templates.subtitle-animations.text_ff1b30208d": "一直想看你这幅表情",
+    "templates.template-layout.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.template-layout.text_8e2328d557": "表情尺寸超限。",
+    "templates.template-layout.text_e8fd5b11dd": "表情字体无法加载。",
+    "templates.template-layout.text_f409207115": "表情图片文件太大或为空。",
+    "templates.template-layout.text_fc7c0a1bda": "表情原图尺寸超限。",
+    "templates.text-announcements.text_4f3035edb0": "又不是不能用",
+    "templates.text-announcements.text_6c2619a8f8": "喜报",
+    "templates.text-announcements.text_9e94346a88": "悲报",
+    "templates.text-graphics.text_f24028df39": "在此处添加文字",
+    "templates.text-panels.text_002fc2fab2": "文字过长，无法放进表情模板。",
+    "templates.text-panels.text_04c2416f9a": "我要对象",
+    "templates.text-panels.text_13a0a4f470": "好，不愧是顶尖{text}",
+    "templates.text-panels.text_1433b0e669": "运营",
+    "templates.text-panels.text_1487d35303": "吴九",
+    "templates.text-panels.text_1d841bc0ee": "张三",
+    "templates.text-panels.text_296406c8d9": "浙大人！",
+    "templates.text-panels.text_2b3e79221f": "{value1}年{month}月{date}日 晴\n{text}\n这个仇我先记下了",
+    "templates.text-panels.text_34e2bef711": "孙七",
+    "templates.text-panels.text_3b0e95fd2a": "世界毁灭",
+    "templates.text-panels.text_3c674bc731": "群友不发涩图",
+    "templates.text-panels.text_463bd7c369": "混！",
+    "templates.text-panels.text_58774d1535": "学的是机械",
+    "templates.text-panels.text_5989f6f405": "刘一",
+    "templates.text-panels.text_63939c76de": "该表情需要提供文字。",
+    "templates.text-panels.text_7292b7eda2": "郑十",
+    "templates.text-panels.text_7df288465c": "周八",
+    "templates.text-panels.text_808b4f6221": "李四",
+    "templates.text-panels.text_8423506b4f": "到浙大来做什么？",
+    "templates.text-panels.text_88ee030f4f": "我说的是归根结底，活着是为了什么",
+    "templates.text-panels.text_95461f4616": "我打算待会去码头整点薯条",
+    "templates.text-panels.text_9f696160ab": "为了待会去码头整点薯条",
+    "templates.text-panels.text_affc4d5221": "开银趴不喊我是吧",
+    "templates.text-panels.text_b5c3de9cf5": "将来毕业后要做什么样的人？",
+    "templates.text-panels.text_c09cf4d952": "你原本应该要去地狱的，但因为你生前{text}，我们就当作你已经服完刑期了",
+    "templates.text-panels.text_c67923af49": "我们是谁？",
+    "templates.text-panels.text_c68e010446": "王五",
+    "templates.text-panels.text_c80834bf8e": "陈二",
+    "templates.text-panels.text_c9143068cb": "混混！",
+    "templates.text-panels.text_cc49f0dfd7": "我们要飞向何方",
+    "templates.text-panels.text_e6bb13166f": "赵六",
+    "templates.text-panels.text_f943f78aa7": "洛天依",
+    "templates.text-signs.text_521887f34b": "图片编号错误，请选择 1~21",
+    "templates.text-signs.text_7c4aa15c51": "我超爱你",
+    "templates.text-signs.text_80369e6333": "快跑",
+    "templates.text-signs.text_9adee70171": "图片编号，范围为 1~21",
+    "templates.text-signs.text_b581639349": "V我50",
+    "templates.text-signs.text_b7ef095e21": "我控制不住自己啊",
+    "templates.text-signs.text_cbb18a44fd": "你可少看点二次元吧",
+    "templates.text-signs.text_e7e9c79bcd": "大佬带带我",
+    "templates.text-speech.text_01cb8a01a4": "咖波素材尺寸不同。",
+    "templates.text-speech.text_14ab1f2bce": "右",
+    "templates.text-speech.text_2d6cc4d598": "好想去海边啊～",
+    "templates.text-speech.text_48953f88b7": "寄",
+    "templates.text-speech.text_63e3a1aef6": "角色编号错误，请输入1-{length}",
+    "templates.text-speech.text_834f657029": "--鲁迅",
+    "templates.text-speech.text_91d13d7223": "消息框的位置，包含 left、right、random",
+    "templates.text-speech.text_be4d662115": "我没有说过这句话",
+    "templates.text-speech.text_c65bc162fc": "那我问你",
+    "templates.text-speech.text_cb3e26741b": "角色编号：",
+    "templates.text-speech.text_e2e0c454e5": "左",
+    "templates.timed-overlays.text_2646e324ad": "该表情需要一张图片。",
+    "templates.timed-overlays.text_82d06faea1": "圆",
+    "templates.timed-overlays.text_bc92350be8": "表情模板 {key} 的帧尺寸不一致。",
+    "templates.timed-overlays.text_bd6b1d72aa": "是否将图片变为圆形",
+    "templates.transforms.text_13c12b064b": "下",
+    "templates.transforms.text_14ab1f2bce": "右",
+    "templates.transforms.text_2646e324ad": "该表情需要一张图片。",
+    "templates.transforms.text_30a9bd7486": "对称方向，包含 left、right、top、bottom",
+    "templates.transforms.text_65cf65f049": "请输入合适的“压扁”比例。",
+    "templates.transforms.text_8967f82263": "图片“压扁”比例，默认为 2",
+    "templates.transforms.text_8bb8e90a97": "请选择 left、right、top、bottom 之一作为对称方向。",
+    "templates.transforms.text_d7fdb22a2d": "可恶...被人看扁了",
+    "templates.transforms.text_db5ba671d2": "上",
+    "templates.transforms.text_e2e0c454e5": "左",
+    "templates.transforms.text_f5122dc965": "图片太窄，无法按这个方向对称。",
+    "templates.tudou-extra.text_307eedbde6": "该表情需要一段文字。",
+    "templates.tudou-extra.text_7159815dd3": "输入文字",
+    "templates.tudou-extra.text_fa65d94b35": "你好，世界！",
+    "templates.tudou-layered-animations.text_0c274271b9": "表情模板 {key} 的原画尺寸不符。",
+    "templates.tudou-layered-animations.text_c6f3f37c53": "该表情需要 {avatarCount} 张图片。",
+    "templates.tudou-tail.text_bbde429693": "该表情需要 {minImages}–{maxImages} 张图片。",
+    "templates.tudou-tail.text_be6af86c17": "前任",
+    "usage-card.text_862a6e26a2": "表情合成统计",
+    "usage-card.text_d43a58dda9": "表情调用总次数：{total}",
+    "usage-card.text_e6c66976bb": "{count} 次",
+    "version-card.text_17790da4c3": "{title}\n{metadata}\n更新日志暂不可用。",
+    "version-card.text_2160fd4e12": "表情版本",
+    "version-card.text_6d1797778f": "表情版本图片超过消息大小上限。",
+    "version-card.text_87ad7d0914": "第 {value1} / {length} 页",
+    "version-card.text_d5a9eae866": "模块版本 {version}"
+  },
+  "parameters": {
+    "backend-builtin-assets.text_372d18c0e4": {
+      "name": "name"
+    },
+    "backend-builtin-assets.text_a4d385351e": {
+      "name": "name"
+    },
+    "backend-lifecycle.text_32d31f87d7": {
+      "key": "key"
+    },
+    "catalog-card.text_7ee71ff3c3": {
+      "total": "total"
+    },
+    "catalog-update.text_df2fa8ae58": {
+      "length": "entries.length",
+      "value2": "removed.length",
+      "added": "added"
+    },
+    "generation-args.text_5e616dd2d9": {
+      "name": "name"
+    },
+    "generation-args.text_641cf27fb0": {
+      "dest": "option.dest"
+    },
+    "generation-args.text_a084b72322": {
+      "name": "name"
+    },
+    "generation.text_7ecb81ab1b": {
+      "min_images": "params.min_images",
+      "max_images": "params.max_images"
+    },
+    "generation.text_7accd94ee0": {
+      "min_texts": "params.min_texts",
+      "max_texts": "params.max_texts"
+    },
+    "lotus.text_e0dd1d987a": {
+      "pages": "pages"
+    },
+    "lotus.text_274edb770b": {
+      "page": "page",
+      "pages": "pages",
+      "total": "total"
+    },
+    "lotus.text_56c02d6724": {
+      "key": "row.key"
+    },
+    "lotus.text_37155de2e0": {
+      "value1": "format(aliases)"
+    },
+    "lotus.text_a14530a3f2": {
+      "min_images": "row.min_images",
+      "max_images": "row.max_images"
+    },
+    "lotus.text_2629a5bcd9": {
+      "min_texts": "row.min_texts",
+      "max_texts": "row.max_texts"
+    },
+    "lotus.text_1c2bdef5ad": {
+      "value1": "format(defaults)"
+    },
+    "lotus.text_fc59e7cc2f": {
+      "value1": "format(tags)"
+    },
+    "lotus.text_ddfdbcd27d": {
+      "value1": "options.join(\" \")"
+    },
+    "lotus.text_c9454c9d75": {
+      "value1": "format(presets)"
+    },
+    "lotus.text_83150da573": {
+      "text": "text"
+    },
+    "lotus.text_96c95c81e5": {
+      "length": "lines.length"
+    },
+    "lotus.text_e137bd4647": {
+      "key": "row.key",
+      "value2": "aliases.map((word) => `[${word}]`).join(\" \") || \"[无]\""
+    },
+    "lotus.text_d43a58dda9": {
+      "total": "report.total"
+    },
+    "lotus.text_141d3aff41": {
+      "keywords": "keywords",
+      "count": "count"
+    },
+    "lotus.text_6b5869bfd2": {
+      "value1": "packageUpdate[1] ?? \"\""
+    },
+    "scripts.pack-builtin-assets.text_48af74ed9e": {
+      "path": "path"
+    },
+    "scripts.pack-builtin-assets.text_890115cdbc": {
+      "path": "path"
+    },
+    "scripts.pack-builtin-assets.text_17fb653fc6": {
+      "path": "path"
+    },
+    "scripts.pack-builtin-assets.text_1f21a244de": {
+      "path": "path"
+    },
+    "scripts.pack-builtin-assets.text_1bfc5b87be": {
+      "path": "path"
+    },
+    "scripts.pack-builtin-assets.text_3f381a9228": {
+      "path": "path"
+    },
+    "scripts.pack-builtin-assets.text_54f6ff931d": {
+      "digest": "digest"
+    },
+    "settings.text_55c9cd213f": {
+      "value": "value"
+    },
+    "settings.text_1303cd69ff": {
+      "title": "title"
+    },
+    "settings.text_dd4a9fca8f": {
+      "length": "value.length"
+    },
+    "templates.anyliew-avatar-caption-scenes.text_9e9a196944": {
+      "value1": "targetName(input)"
+    },
+    "templates.anyliew-avatar-caption-scenes.text_612d5e9674": {
+      "value1": "targetName(input)"
+    },
+    "templates.anyliew-avatar-caption-scenes.text_d0010b60ae": {
+      "value1": "targetName(input)"
+    },
+    "templates.anyliew-avatar-caption-scenes.text_b73d523576": {
+      "value1": "targetName(input)"
+    },
+    "templates.anyliew-avatar-caption-scenes.text_f4f3e6eaa4": {
+      "name": "name",
+      "value2": "name",
+      "value3": "name",
+      "value4": "name"
+    },
+    "templates.anyliew-avatar-scenes.text_61f4a663e9": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_c4a8f5307b": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_d9d9e37238": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_c82d3d074a": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_2614ddd947": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_779da2a39a": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_9b6b699450": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_d320573c3c": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_9ebea056cd": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_bb60cfb3f9": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_c988250eec": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_8cd91cdf93": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_7a073e179f": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_49d4c5b34e": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_b16c501a90": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_f75004abd1": {
+      "name": "name"
+    },
+    "templates.anyliew-circle-dialogue.text_d38569d508": {
+      "length": "holiday.length"
+    },
+    "templates.anyliew-circle-dialogue.text_9671f0f1f7": {
+      "name": "name"
+    },
+    "templates.anyliew-dialogue.text_3f5cd8d4a8": {
+      "name": "name"
+    },
+    "templates.anyliew-dialogue.text_f67a72dd95": {
+      "name": "name",
+      "value2": "name",
+      "value3": "name",
+      "value4": "name"
+    },
+    "templates.anyliew-dialogue.text_1287a7c3c3": {
+      "name": "name",
+      "value2": "name",
+      "value3": "name",
+      "value4": "name",
+      "value5": "name"
+    },
+    "templates.anyliew-dialogue.text_c8b2e81d61": {
+      "name": "name"
+    },
+    "templates.anyliew-dialogue.text_76904f3fcb": {
+      "name": "name",
+      "value2": "name"
+    },
+    "templates.anyliew-dialogue.text_4181511629": {
+      "name": "name",
+      "value2": "name"
+    },
+    "templates.anyliew-dialogue.text_10537aed28": {
+      "name": "name"
+    },
+    "templates.anyliew-dialogue.text_0073f8cff2": {
+      "name": "name"
+    },
+    "templates.anyliew-dialogue.text_f52746553a": {
+      "name": "name"
+    },
+    "templates.anyliew-dialogue.text_30b74513a9": {
+      "name": "name"
+    },
+    "templates.anyliew-dialogue.text_4df7398d30": {
+      "name": "name"
+    },
+    "templates.anyliew-signs.text_49c12ffc4b": {
+      "length": "sign.frames.length"
+    },
+    "templates.anyliew-signs.text_aed3f52a49": {
+      "length": "sign.frames.length"
+    },
+    "templates.anyliew-tail.text_04b078853f": {
+      "name": "name",
+      "value2": "name"
+    },
+    "templates.anyliew-tail.text_95e75f9cc6": {
+      "name": "name"
+    },
+    "templates.anyliew-tail.text_9b3f8cfe24": {
+      "count": "count"
+    },
+    "templates.anyliew-tail.text_aed3f52a49": {
+      "length": "frames.length"
+    },
+    "templates.anyliew-text-dialogue.text_9b3f8cfe24": {
+      "count": "count"
+    },
+    "templates.anyliew-text-dialogue.text_9cac8fb54e": {
+      "count": "count"
+    },
+    "templates.avatar-accessories.text_d91327d626": {
+      "keyword": "keyword"
+    },
+    "templates.avatar-accessories.text_1890662526": {
+      "name": "name"
+    },
+    "templates.avatar-accessories.text_a83233035d": {
+      "value1": "date.getFullYear()",
+      "value2": "date.getMonth() + 1",
+      "value3": "date.getDate()"
+    },
+    "templates.avatar-caption-cards.text_bd13114929": {
+      "name": "name"
+    },
+    "templates.avatar-caption-cards.text_50dd0c475e": {
+      "pronoun": "pronoun"
+    },
+    "templates.caption-overlays.text_05551f82c9": {
+      "value1": "date ?? whatHeWantsDate"
+    },
+    "templates.caption-overlays.text_30acaab1c0": {
+      "value1": "text ?? firstUserName(args, \"它\")"
+    },
+    "templates.caption-overlays.text_3e9a1269e4": {
+      "value1": "text ?? firstUserName(args, \"群友\")"
+    },
+    "templates.classic-avatar-animations.text_bc92350be8": {
+      "key": "key"
+    },
+    "templates.classic-layered-animations.text_bc92350be8": {
+      "key": "key"
+    },
+    "templates.cropped-photo-templates.text_078675c312": {
+      "min_images": "min_images",
+      "max_images": "max_images"
+    },
+    "templates.fixed-avatar-animation.text_bc92350be8": {
+      "key": "key"
+    },
+    "templates.gif.text_ea7ba354a9": {
+      "value1": "limit / (1024 * 1024)"
+    },
+    "templates.jump-sold.text_bc92350be8": {
+      "key": "spec.key"
+    },
+    "templates.kiss-hug.text_1a49c3b4f3": {
+      "asset": "asset"
+    },
+    "templates.kiss-hug.text_4cf8ede751": {
+      "value1": "keywords[1]"
+    },
+    "templates.leave-note.text_df5fe10f03": {
+      "value1": "day.getFullYear()",
+      "value2": "day.getMonth() + 1",
+      "value3": "day.getDate()"
+    },
+    "templates.legacy-chat-cards.text_aae590df38": {
+      "value1": "texts[0]!.repeat(2)"
+    },
+    "templates.legacy-photo-forms.text_f93b005cf8": {
+      "name": "name"
+    },
+    "templates.legacy-photo-forms.text_7910650aa4": {
+      "name": "name"
+    },
+    "templates.legacy-photo-forms.text_edb0d8171e": {
+      "name": "name"
+    },
+    "templates.legacy-photo-forms.text_bfc56e260b": {
+      "name": "name"
+    },
+    "templates.legacy-portrait-effects.text_a60083f553": {
+      "name": "name"
+    },
+    "templates.legacy-portrait-effects.text_ac77145c4b": {
+      "name": "name"
+    },
+    "templates.legacy-portrait-effects.text_13c71fe2f7": {
+      "pronoun": "pronoun"
+    },
+    "templates.legacy-projected-actions.text_bc92350be8": {
+      "key": "spec.key"
+    },
+    "templates.operator-generator.text_2bc3592c66": {
+      "name": "name"
+    },
+    "templates.photo-insets.text_1ea32e62ce": {
+      "count": "count"
+    },
+    "templates.pjsk.text_d03a6c367a": {
+      "name": "name",
+      "count": "count"
+    },
+    "templates.portrait-overlays.text_b1291e903f": {
+      "name": "name"
+    },
+    "templates.portrait-overlays.text_c845fe8bb7": {
+      "name": "name",
+      "pronoun": "pronoun",
+      "value3": "name"
+    },
+    "templates.portrait-overlays.text_f711756fc9": {
+      "name": "name"
+    },
+    "templates.python-overlay-animation.text_bc92350be8": {
+      "key": "key"
+    },
+    "templates.subtitle-animations.text_67a924bd7f": {
+      "count": "count"
+    },
+    "templates.text-panels.text_c09cf4d952": {
+      "text": "text"
+    },
+    "templates.text-panels.text_13a0a4f470": {
+      "text": "text"
+    },
+    "templates.text-panels.text_2b3e79221f": {
+      "value1": "day.getFullYear()",
+      "month": "month",
+      "date": "date",
+      "text": "text"
+    },
+    "templates.text-speech.text_63e3a1aef6": {
+      "length": "baCharacters.length"
+    },
+    "templates.timed-overlays.text_bc92350be8": {
+      "key": "key"
+    },
+    "templates.tudou-layered-animations.text_c6f3f37c53": {
+      "avatarCount": "avatarCount"
+    },
+    "templates.tudou-layered-animations.text_0c274271b9": {
+      "key": "key"
+    },
+    "templates.tudou-tail.text_bbde429693": {
+      "minImages": "minImages",
+      "maxImages": "maxImages"
+    },
+    "usage-card.text_d43a58dda9": {
+      "total": "total"
+    },
+    "usage-card.text_e6c66976bb": {
+      "count": "count"
+    },
+    "version-card.text_d5a9eae866": {
+      "version": "packageInfo.version"
+    },
+    "version-card.text_87ad7d0914": {
+      "value1": "index + 1",
+      "length": "pages.length"
+    },
+    "version-card.text_17790da4c3": {
+      "title": "title",
+      "metadata": "metadata"
+    }
+  }
+}

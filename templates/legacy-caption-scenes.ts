@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { Canvas, loadImage, type Image } from "skia-canvas";
 import { renderPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext } from "../builtin-template.ts";
@@ -27,8 +30,8 @@ interface CaptionScene {
 }
 
 const assetPrefix = "python/meme_generator/memes";
-const safeCaption = "你给我的安全感\n远不及{ta}的万分之一";
-const causedCaption = "心脏病 高血压 心律不齐 心肌梗塞 失眠 脱发 呼吸困难 胸闷气短 缺氧 躁郁 焦虑 脑供血不足 心慌心悸 心脑血管炸裂";
+const safeCaption = $t("templates.legacy-caption-scenes.text_84bab84f64");
+const causedCaption = $t("templates.legacy-caption-scenes.text_822828a7c9");
 
 function caption(draw: Parameters<Draw>[0], box: Box, text: string, font: string, min: number, max: number,
   options: { readonly center?: boolean; readonly wrap?: boolean; readonly outline?: boolean } = {}) {
@@ -55,7 +58,7 @@ function overlayScene(art: Image, image: Placement, text: string, font: string, 
 
 const scenes: readonly CaptionScene[] = [
   {
-    key: "teach", keywords: ["讲课", "敲黑板"], defaultText: "我老婆", tags: ["井之上泷奈", "莉可丽丝"], output: "jpg-or-gif",
+    key: "teach", keywords: ["讲课", "敲黑板"], defaultText: $t("templates.legacy-caption-scenes.text_b02d3dbfd1"), tags: ["井之上泷奈", "莉可丽丝"], output: "jpg-or-gif",
     render(art, _first, text, font) {
       const height = Math.floor(art.height * 960 / art.width);
       return overlayScene(art, [313, 60, 550, 395], text, font, [10, height - 80, 950, height - 5], 12, 50,
@@ -63,17 +66,17 @@ const scenes: readonly CaptionScene[] = [
     },
   },
   {
-    key: "time_to_go", keywords: ["该走了"], defaultText: "说完了吗？该走了", output: "jpg",
+    key: "time_to_go", keywords: ["该走了"], defaultText: $t("templates.legacy-caption-scenes.text_43b51d22b4"), output: "jpg",
     render: (art, _first, text, font) => overlayScene(art, [230, 82, 105, 105], text, font, [20, 232, 330, 312], 20, 40),
   },
   {
     key: "safe_sense", keywords: ["安全感"], defaultText: safeCaption, output: "jpg",
-    defaultForGender: gender => safeCaption.replace("{ta}", gender === "male" ? "他" : gender === "female" ? "她" : "它"),
+    defaultForGender: gender => safeCaption.replace("{ta}", gender === "male" ? $t("templates.legacy-caption-scenes.text_8b7b91e000") : gender === "female" ? $t("templates.legacy-caption-scenes.text_2ab425e0c6") : $t("templates.legacy-caption-scenes.text_7e9260e925")),
     render: (art, _first, text, font) => overlayScene(art, [215, 135, 215, 343], text, font, [30, 0, 400, 130], 12, 50,
       { above: true, wrap: true, center: true }),
   },
   {
-    key: "look_this_icon", keywords: ["看图标"], defaultText: "朋友\n先看看这个图标再说话", asset: "nmsl.png",
+    key: "look_this_icon", keywords: ["看图标"], defaultText: $t("templates.legacy-caption-scenes.text_05f173fdc0"), asset: "nmsl.png",
     specializedFont: "bold", output: "jpg-or-gif",
     render: (art, _first, text, font) => overlayScene(art, [599, 403, 515, 515], text, font, [0, 933, 1170, 1143], 50, 100,
       { center: true }),
@@ -83,7 +86,7 @@ const scenes: readonly CaptionScene[] = [
     render(art, _first, text, font) {
       const measure = new Canvas(1, 1).getContext("2d");
       measure.font = `55px ${font}`;
-      const left = "你的", right = "主要都是由这个引起的";
+      const left = $t("templates.legacy-caption-scenes.text_c84459f072"), right = $t("templates.legacy-caption-scenes.text_6f185f6b17");
       const leftWidth = Math.ceil(measure.measureText(left).width);
       const rightWidth = Math.ceil(measure.measureText(right).width);
       return {
@@ -100,7 +103,7 @@ const scenes: readonly CaptionScene[] = [
     },
   },
   {
-    key: "thermometer_gun", keywords: ["体温枪"], defaultText: "笨蛋", specializedFont: "cartoon", output: "png-or-gif",
+    key: "thermometer_gun", keywords: ["体温枪"], defaultText: $t("templates.legacy-caption-scenes.text_e24154596e"), specializedFont: "cartoon", output: "png-or-gif",
     render(art, first, text, font) {
       const { width, height } = first;
       const side = Math.min(width, height);

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { ImageData, loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
@@ -96,7 +99,7 @@ function suppliedGifTimeline(sequences: readonly MemeImageSequence[]) {
 export function createTudouComposition(spec: TudouComposition, mode?: RenderMode): MemeTemplate {
   const { key, frames, avatars: avatarCount, viewport: [width, height] } = spec;
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
-    if (input.images.length !== avatarCount || input.texts.length) throw new Error(`该表情需要 ${avatarCount} 张图片。`);
+    if (input.images.length !== avatarCount || input.texts.length) throw new Error($t("templates.tudou-layered-animations.text_c6f3f37c53", { "avatarCount": avatarCount }));
     const { signal } = context;
     const artwork = new Map<number, Promise<Image>>();
     const prepared = new Map<TudouAvatarLayer, WeakMap<Image, Promise<Image>>>();
@@ -136,7 +139,7 @@ export function createTudouComposition(spec: TudouComposition, mode?: RenderMode
 
     async function paint(frame: Frame, outWidth: number, outHeight: number) {
       const art = await readArt(frame.artwork);
-      if (!spec.resizeArtwork && (art.width !== width || art.height !== height)) throw new Error(`表情模板 ${key} 的原画尺寸不符。`);
+      if (!spec.resizeArtwork && (art.width !== width || art.height !== height)) throw new Error($t("templates.tudou-layered-animations.text_0c274271b9", { "key": key }));
       const raster = async (draw: (ctx: CanvasRenderingContext2D) => void) => (await renderRgba(outWidth, outHeight, ctx => {
         ctx.scale(outWidth / width, outHeight / height);
         draw(ctx);

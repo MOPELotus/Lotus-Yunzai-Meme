@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { Canvas, loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import type { MemeTemplate, MemeTemplateContext } from "../builtin-template.ts";
 import { readMemeImageSequence } from "./animated-input.ts";
@@ -57,7 +60,7 @@ async function compose(context: MemeTemplateContext, key: "pat" | "rub", width: 
   signal.throwIfAborted();
   const assets = await Promise.all(Array.from({ length: assetCount }, async (_, i) => {
     const asset = await loadImage(await context.imageAsset(`${key}/${i}.png`));
-    if (asset.width !== width || asset.height !== height) throw new Error("表情帧素材尺寸无效。");
+    if (asset.width !== width || asset.height !== height) throw new Error($t("templates.pat-rub.text_181d08b1de"));
     return asset;
   }));
   const canvas = new Canvas(width, height);
@@ -113,7 +116,7 @@ export const pat: MemeTemplate = {
     params_type: { min_images: 1, max_images: 1, min_texts: 0, max_texts: 0, args_type: null },
   },
   async render({ images }, context) {
-    if (images.length !== 1) throw new Error("拍需要一张图片。");
+    if (images.length !== 1) throw new Error($t("templates.pat-rub.text_a3b8991807"));
     const { frames } = await readMemeImageSequence(images[0]!, context.signal);
     return patPicture(frames[0], context);
   },
@@ -128,7 +131,7 @@ export const rub: MemeTemplate = {
     params_type: { min_images: 2, max_images: 2, min_texts: 0, max_texts: 0, args_type: null },
   },
   async render({ images }, context) {
-    if (images.length !== 2) throw new Error("贴贴需要两张图片。");
+    if (images.length !== 2) throw new Error($t("templates.pat-rub.text_f11ac2982d"));
     const [first, second] = await Promise.all([
       readMemeImageSequence(images[0]!, context.signal), readMemeImageSequence(images[1]!, context.signal),
     ]);

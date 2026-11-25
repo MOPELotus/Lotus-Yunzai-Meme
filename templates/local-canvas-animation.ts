@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
@@ -64,7 +67,7 @@ async function prepareAvatar(avatar: Image, context: MemeTemplateContext) {
 
 function createLocalCanvasAnimation(spec: LocalCanvas): MemeTemplate {
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
-    if (input.images.length !== 1 || input.texts.length) throw new Error("这个表情需要一张图片。");
+    if (input.images.length !== 1 || input.texts.length) throw new Error($t("templates.local-canvas-animation.text_455cc162ff"));
     const { signal } = context;
     const [width, height] = spec.viewport;
     assertMemeGifDimensions(width, height, spec.frames);
@@ -75,7 +78,7 @@ function createLocalCanvasAnimation(spec: LocalCanvas): MemeTemplate {
     for (let index = 0; index < spec.frames; index++) {
       signal.throwIfAborted();
       const frame = await loadImage(await context.imageAsset(`${spec.directory}/${index + spec.firstFrame}.png`));
-      if (frame.width > width || frame.height > height) throw new Error("表情模板的局部图层超出画布。");
+      if (frame.width > width || frame.height > height) throw new Error($t("templates.local-canvas-animation.text_54c9a4d41c"));
       const [x, y] = (typeof spec.positions[0] === "number" ? spec.positions : spec.positions[index]) as Point;
       const [avatarWidth, avatarHeight] = spec.avatarSize;
       const drawAvatar = (draw: CanvasRenderingContext2D) => {

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Pinned original metadata, artwork and font substitutions are documented with the asset bundle.
 import { randomInt } from "node:crypto";
 import { ImageData, loadImage, type Image } from "skia-canvas";
@@ -32,9 +35,9 @@ interface OverlayLayout {
 function avatarName(input: MemeTemplateInput) {
   const userInfo: unknown = Array.isArray(input.args.user_infos) ? input.args.user_infos[0] : undefined;
   if (input.texts[0] !== undefined) return input.texts[0];
-  if (!userInfo || typeof userInfo !== "object") return "他";
+  if (!userInfo || typeof userInfo !== "object") return $t("templates.archive-overlays.text_8b7b91e000");
   const user = userInfo as {name?: unknown; gender?: unknown};
-  return typeof user.name === "string" && user.name ? user.name : user.gender === "male" ? "他" : "她";
+  return typeof user.name === "string" && user.name ? user.name : user.gender === "male" ? $t("templates.archive-overlays.text_8b7b91e000") : $t("templates.archive-overlays.text_2ab425e0c6");
 }
 
 async function captionFont(context: MemeTemplateContext, type: OverlayLayout["font"]) {
@@ -143,7 +146,7 @@ function fixedTemplate(layout: OverlayLayout & {readonly key: string; readonly k
   };
 }
 
-const numberHelp = "图片编号，0 为随机；1~25 对应：" +
+const numberHelp = $t("templates.archive-overlays.text_972673e00d") +
   numberedArchiveOverlays.map(([name], index) => (index + 1) + "=" + name).join("、");
 const numbered: MemeTemplate = {
   info: {
@@ -158,13 +161,13 @@ const numbered: MemeTemplate = {
   render(input, context) {
     const number = input.args.number ?? 0;
     if (typeof number !== "number" || !Number.isInteger(number) || number < 0 || number > numberedArchiveOverlays.length) {
-      throw new MemeTemplateFeedback("图片编号错误，请选择 1~25（0 为随机）");
+      throw new MemeTemplateFeedback($t("templates.archive-overlays.text_de95b37b13"));
     }
     const choice = number || randomInt(1, numberedArchiveOverlays.length + 1);
     const [, box, fill, avatar] = numberedArchiveOverlays[choice - 1]!;
     return renderOverlay({
       asset: "fleshlight_random/archive/" + choice + ".png", box, fill, avatar, shape: "circle",
-      caption: "{name}の❤️最爱", sizes: [5, 100], font: "rounded", jpeg: true, avatarAbove: choice === 6,
+      caption: $t("templates.archive-overlays.text_4fdd3eabe2"), sizes: [5, 100], font: "rounded", jpeg: true, avatarAbove: choice === 6,
     }, input, context);
   },
   async preview(context) {

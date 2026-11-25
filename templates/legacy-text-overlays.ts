@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext } from "../builtin-template.ts";
@@ -21,9 +24,9 @@ interface TextOverlay {
 
 // Original MemeCrafters Python layout, pinned in backend-legacy-text-overlay-assets.ts.
 const overlays: readonly TextOverlay[] = [
-  { key: "imprison", keyword: "坐牢", asset: "0.jpg", defaultText: "我发涩图被抓起来了", box: [10, 157, 230, 197], sizes: [15, 35], wrap: true },
-  { key: "murmur", keyword: "低语", asset: "0.jpg", defaultText: "你的假期余额不足", box: [10, 255, 430, 300], sizes: [15, 40] },
-  { key: "shutup", keyword: "别说了", asset: "0.jpg", defaultText: "你不要再说了", box: [10, 180, 230, 230], sizes: [15, 40], wrap: true },
+  { key: "imprison", keyword: "坐牢", asset: "0.jpg", defaultText: $t("templates.legacy-text-overlays.text_ecf85cad14"), box: [10, 157, 230, 197], sizes: [15, 35], wrap: true },
+  { key: "murmur", keyword: "低语", asset: "0.jpg", defaultText: $t("templates.legacy-text-overlays.text_e283983dad"), box: [10, 255, 430, 300], sizes: [15, 40] },
+  { key: "shutup", keyword: "别说了", asset: "0.jpg", defaultText: $t("templates.legacy-text-overlays.text_46e8d25cb9"), box: [10, 180, 230, 230], sizes: [15, 40], wrap: true },
   { key: "slap", keyword: "一巴掌", asset: "0.jpg", box: [20, 450, 620, 630], sizes: [50, 110], wrap: true },
   { key: "emperor_dragon", keyword: "皇帝龙图", asset: "0.png", box: [30, 440, 485, 512], sizes: [10, 100], lines: "center", wrap: true },
   { key: "osu", keyword: "osu", asset: "osu.png", defaultText: "hso!", box: [80, 80, 432, 432],
@@ -61,10 +64,10 @@ function overlayTemplate(overlay: TextOverlay): MemeTemplate {
     },
     render: async (input, context) => {
       const [text] = input.texts;
-      if (text === undefined || input.texts.length !== 1) throw new MemeTemplateFeedback("该表情需要 1 段文字。");
+      if (text === undefined || input.texts.length !== 1) throw new MemeTemplateFeedback($t("templates.legacy-text-overlays.text_36a8dabb68"));
       return render(text, context);
     },
-    preview: context => render(overlay.defaultText ?? "示例", context),
+    preview: context => render(overlay.defaultText ?? $t("templates.legacy-text-overlays.text_0d53f08678"), context),
   };
 }
 

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import type { CanvasRenderingContext2D } from "skia-canvas";
 import { renderRgba } from "../../../packages/skia/index.ts";
 import { assertMemeGifDimensions, encodeMemeGif, MemeGifByteLimitError } from "./gif.ts";
@@ -46,7 +49,7 @@ function sampleSequence<T>(frames: readonly Frame<T>[]): Frame<T>[] {
 export async function renderPythonGif<T>({ width, height, frames, signal, renderFrame }: PythonGif<T>) {
   if (!Number.isSafeInteger(width) || !Number.isSafeInteger(height) || width <= 0 || height <= 0 || !frames.length ||
       frames.some(({ delayMs }) => !Number.isFinite(delayMs) || delayMs < 0 || delayMs > 655_350)) {
-    throw new RangeError("表情动图的尺寸、帧数或时长无效。");
+    throw new RangeError($t("templates.python-gif.text_aa0fc5139f"));
   }
   for (;;) {
     signal.throwIfAborted();
@@ -70,7 +73,7 @@ export async function renderPythonGif<T>({ width, height, frames, signal, render
         continue;
       }
     }
-    if (width === 1 && height === 1) throw new RangeError("表情动图超过 8 MiB 发送上限。");
+    if (width === 1 && height === 1) throw new RangeError($t("templates.python-gif.text_5e8150e972"));
     width = Math.max(1, Math.floor(width * 0.9));
     height = Math.max(1, Math.floor(height * 0.9));
   }

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { fileURLToPath } from "node:url";
 import { loadImage } from "skia-canvas";
 import type { MemeInfoCard } from "./info-card-runtime.ts";
@@ -36,7 +39,7 @@ export async function renderCatalogCard(
   const columnCount = Math.max(1, Math.ceil(rows.length / rowsPerColumn));
   const width = Math.max(900, 60 + columnCount * 268 + (columnCount - 1) * columnGap);
   const { renderInfoCard, measureInfoText, drawInfoText, infoCardColors } = info;
-  return renderInfoCard({ title: "表情列表", metadata: `表情总数：${total}`, width }, ({ x, y, width, measure }) => {
+  return renderInfoCard({ title: $t("catalog-card.text_3edaeefee6"), metadata: $t("catalog-card.text_7ee71ff3c3", { "total": total }), width }, ({ x, y, width, measure }) => {
     const columnWidth = (width - (columnCount - 1) * columnGap) / columnCount;
     const items = rows.map(({ keyword, types }, index) => {
       const iconsWidth = types.length ? types.length * (iconTile + iconGap) - iconGap : 0;

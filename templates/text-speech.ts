@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original layouts from MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { randomInt } from "node:crypto";
@@ -16,15 +19,15 @@ const baCharacters = [
   ["濑名", "sena", "冰室濑名"],
   ["优香", "yuuka", "早濑优香", "邮箱"],
 ] as const;
-const baText = "那我问你";
-const baCharacterHelp = "角色编号：" + baCharacters.map(([name], index) => `${index + 1}、${name}`).join("，");
-const baPositionHelp = "消息框的位置，包含 left、right、random";
+const baText = $t("templates.text-speech.text_c65bc162fc");
+const baCharacterHelp = $t("templates.text-speech.text_cb3e26741b") + baCharacters.map(([name], index) => `${index + 1}、${name}`).join("，");
+const baPositionHelp = $t("templates.text-speech.text_91d13d7223");
 const noImages = { min_images: 0, max_images: 0, min_texts: 1 };
 
 async function baSay(text: string, args: Readonly<Record<string, unknown>>, context: MemeTemplateContext) {
   const character = args.character === undefined || args.character === 0 ? randomInt(1, baCharacters.length + 1) : args.character;
   if (typeof character !== "number" || !Number.isSafeInteger(character) || character < 1 || character > baCharacters.length) {
-    throw new MemeTemplateFeedback(`角色编号错误，请输入1-${baCharacters.length}`);
+    throw new MemeTemplateFeedback($t("templates.text-speech.text_63e3a1aef6", { "length": baCharacters.length }));
   }
   const position = args.position === "left" || args.position === "right" ? args.position : randomInt(2) ? "left" : "right";
   const [, name] = baCharacters[character - 1]!;
@@ -48,7 +51,7 @@ async function baSay(text: string, args: Readonly<Record<string, unknown>>, cont
 
 const capooSpecs = [null, null, null, [45, 74, 112, 25], [73, 41, 42, 17], [80, 43, 36, 0],
   [80, 43, 30, 0], [78, 44, 30, 0], [78, 44, 29, 0], null] as const;
-const capooText = "寄";
+const capooText = $t("templates.text-speech.text_48953f88b7");
 
 async function capooSay(texts: readonly string[], context: MemeTemplateContext) {
   const { signal } = context;
@@ -57,7 +60,7 @@ async function capooSay(texts: readonly string[], context: MemeTemplateContext) 
     registerMemeTypeface(context, "FZKATJW.ttf", "LotusMemeCartoon"),
   ]);
   const { width, height } = backdrops[0]!;
-  if (backdrops.some(frame => frame.width !== width || frame.height !== height)) throw new Error("咖波素材尺寸不同。");
+  if (backdrops.some(frame => frame.width !== width || frame.height !== height)) throw new Error($t("templates.text-speech.text_01cb8a01a4"));
   const raster = rgbaFrameDimensions(width, height);
   assertMemeGifDimensions(raster.width, raster.height, texts.length * capooSpecs.length);
   const frames = [];
@@ -118,8 +121,8 @@ export const textSpeechMemeTemplates: readonly MemeTemplate[] = [
         parser_options: [
           { names: ["-c", "--character"], args: [{ name: "character", value: "str" }], help_text: baCharacterHelp },
           { names: ["-p", "--position"], args: [{ name: "position", value: "str" }], help_text: baPositionHelp },
-          { names: ["--left", "左"], dest: "position", args: [], action: { type: 0, value: "left" } },
-          { names: ["--right", "右"], dest: "position", args: [], action: { type: 0, value: "right" } },
+          { names: ["--left", $t("templates.text-speech.text_e2e0c454e5")], dest: "position", args: [], action: { type: 0, value: "left" } },
+          { names: ["--right", $t("templates.text-speech.text_14ab1f2bce")], dest: "position", args: [], action: { type: 0, value: "right" } },
         ],
       } },
     },
@@ -132,15 +135,15 @@ export const textSpeechMemeTemplates: readonly MemeTemplate[] = [
     render: (input, context) => capooSay(input.texts.length ? input.texts : [capooText], context),
     preview: context => capooSay([capooText], context),
   },
-  jpgSpeech("luotianyi_say", ["洛天依说", "天依说"], ["洛天依"], "好想去海边啊～", "luotianyi_say/0.png",
+  jpgSpeech("luotianyi_say", ["洛天依说", "天依说"], ["洛天依"], $t("templates.text-speech.text_2d6cc4d598"), "luotianyi_say/0.png",
     (draw, width, _, text, font) => drawFittedText(draw, [520, 20, width - 20, 220], text, font, 40, 140, "center", "#66ccff")),
-  jpgSpeech("luxun_say", ["鲁迅说", "鲁迅说过"], [], "我没有说过这句话", "luxun_say/0.jpg",
+  jpgSpeech("luxun_say", ["鲁迅说", "鲁迅说过"], [], $t("templates.text-speech.text_be4d662115"), "luxun_say/0.jpg",
     (draw, width, height, text, font) => {
       drawFittedText(draw, [40, height - 200, width - 40, height - 100], text, font, 30, 40, "center", "#fff");
       draw.fillStyle = "#fff";
       draw.font = `30px ${font}`;
       draw.textAlign = "left";
       draw.textBaseline = "top";
-      draw.fillText("--鲁迅", 320, 400);
+      draw.fillText($t("templates.text-speech.text_834f657029"), 320, 400);
     }),
 ];

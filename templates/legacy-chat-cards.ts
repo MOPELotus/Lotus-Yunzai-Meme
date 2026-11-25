@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext } from "../builtin-template.ts";
@@ -10,11 +13,11 @@ import { drawFittedText, jpg, paper, previewImage, registerFont, registerMemeTyp
 import { readTransformSource, renderTransformSequence, transformPreviewInput } from "./transforms.ts";
 
 const avatarFields = { min_images: 1, max_images: 1, min_texts: 0, max_texts: 1 };
-const circleHelp = "是否将图片变为圆形";
+const circleHelp = $t("templates.legacy-chat-cards.text_bd6b1d72aa");
 const circle = {
   args_model: { properties: { circle: { default: false, type: "boolean", description: circleHelp } } },
   args_examples: [{ circle: false }, { circle: true }],
-  parser_options: [{ names: ["--circle", "圆"], dest: "circle", args: [], action: { type: 0, value: true }, help_text: circleHelp }],
+  parser_options: [{ names: ["--circle", $t("templates.legacy-chat-cards.text_82d06faea1")], dest: "circle", args: [], action: { type: 0, value: true }, help_text: circleHelp }],
 };
 type DrawContext = Parameters<Draw>[0];
 type Box = readonly [number, number, number, number];
@@ -53,7 +56,7 @@ function photo(context: MemeTemplateContext, key: string, file: string) {
 function nameFrom(args: Readonly<Record<string, unknown>>, fallback?: string) {
   const user = Array.isArray(args.user_infos) ? args.user_infos[0] as { gender?: unknown; name?: unknown } | undefined : undefined;
   if (typeof user?.name === "string" && user.name) return user.name;
-  return user?.gender === "male" && fallback ? "他" : fallback;
+  return user?.gender === "male" && fallback ? $t("templates.legacy-chat-cards.text_8b7b91e000") : fallback;
 }
 
 async function avatarPreview(template: MemeTemplate, context: MemeTemplateContext, texts: string[] = []) {
@@ -64,7 +67,7 @@ function policeTemplate(alternate: boolean): MemeTemplate {
   const template: MemeTemplate = {
     info: {
       key: alternate ? "police1" : "police", keywords: [alternate ? "警察" : "出警"],
-      params_type: { ...avatarFields, max_texts: alternate ? 0 : 1, default_texts: alternate ? [] : ["平安名すみれ"], args_type: null },
+      params_type: { ...avatarFields, max_texts: alternate ? 0 : 1, default_texts: alternate ? [] : [$t("templates.legacy-chat-cards.text_fcdfeb01a5")], args_type: null },
     },
     async render({ images, texts }, context) {
       const { signal } = context;
@@ -85,7 +88,7 @@ function policeTemplate(alternate: boolean): MemeTemplate {
       }, [draw => draw.drawImage(background, 0, 0)], signal, { whiteBackground: true }));
       return jpg(width, height, draw => {
         draw.drawImage(composite, 0, 0);
-        if (font) fontText(draw, [220, 395, 470, 480], texts[0] ?? "平安名すみれ", font, 20, 60);
+        if (font) fontText(draw, [220, 395, 470, 480], texts[0] ?? $t("templates.legacy-chat-cards.text_fcdfeb01a5"), font, 20, 60);
       }, signal);
     },
     preview: context => avatarPreview(template, context),
@@ -100,10 +103,10 @@ const call: MemeTemplate = {
     const [background, sequence, font] = await Promise.all([
       photo(context, "you_should_call", "0.png"), readTransformSource(input, signal), registerFont(context),
     ]);
-    const name = input.texts[0] ?? nameFrom(input.args, "她");
+    const name = input.texts[0] ?? nameFrom(input.args, $t("templates.legacy-chat-cards.text_2ab425e0c6"));
     return renderTransformSequence(sequence, background.width, background.height, (draw, avatar) => {
       draw.drawImage(background, 0, 0);
-      fontText(draw, [50, 20, 700, 130], "这种情况你应该致电" + name, font, 20, 70, { vertical: "bottom" });
+      fontText(draw, [50, 20, 700, 130], $t("templates.legacy-chat-cards.text_392e677276") + name, font, 20, 70, { vertical: "bottom" });
       cover(draw, avatar, 400, 190, 300, 300, true);
     }, signal);
   },
@@ -116,7 +119,7 @@ const captcha: MemeTemplate = {
   info: { key: "google_captcha", keywords: ["谷歌验证码"], params_type: { ...avatarFields, args_type: null } },
   async render({ images, texts, args }, context) {
     const name = texts[0] ?? nameFrom(args);
-    if (!name) throw new MemeTemplateFeedback("文字或昵称数量不足。");
+    if (!name) throw new MemeTemplateFeedback($t("templates.legacy-chat-cards.text_76b8e87b81"));
     const { signal } = context;
     const [avatar, font] = await Promise.all([readMemeFirstImage(images[0]!, signal), registerFont(context, true)]);
     const { w, h, x, y } = crop(avatar, 932, 932);
@@ -142,19 +145,19 @@ const captcha: MemeTemplate = {
       draw.fillRect(21, 21, 962, 332);
       draw.fillRect(689, 1387, 283, 121);
       const style = { color: "white", justify: "left" } as const;
-      fontText(draw, [91, 81, 921, 141], "请选择包含", font, 12, 40, style);
+      fontText(draw, [91, 81, 921, 141], $t("templates.legacy-chat-cards.text_42185ee108"), font, 12, 40, style);
       fontText(draw, [91, 141, 921, 231], name, font, 12, 80, style);
-      fontText(draw, [91, 231, 921, 291], "的所有图块，如果没有，请点击“跳过”", font, 12, 40, style);
-      fontText(draw, [689, 1387, 972, 1508], "跳过", font, 12, 40, { color: "white", align: "center" });
+      fontText(draw, [91, 231, 921, 291], $t("templates.legacy-chat-cards.text_5075851a68"), font, 12, 40, style);
+      fontText(draw, [689, 1387, 972, 1508], $t("templates.legacy-chat-cards.text_fc50a99caa"), font, 12, 40, { color: "white", align: "center" });
     }, signal);
   },
-  preview: context => avatarPreview(captcha, context, ["示例"]),
+  preview: context => avatarPreview(captcha, context, [$t("templates.legacy-chat-cards.text_0d53f08678")]),
 };
 
 function kingCaptions(texts: readonly string[], avatars: number, count: number) {
-  if (!texts.length) return { words: ["急"], title: "我是急急国王" };
+  if (!texts.length) return { words: [$t("templates.legacy-chat-cards.text_2b7f95d215")], title: $t("templates.legacy-chat-cards.text_1dc8dca7ed") };
   if (texts.length === 1) {
-    return avatars === 1 ? { words: [texts[0]!], title: `我是${texts[0]!.repeat(2)}国王` } : { words: [], title: texts[0]! };
+    return avatars === 1 ? { words: [texts[0]!], title: $t("templates.legacy-chat-cards.text_aae590df38", { "value1": texts[0]!.repeat(2) }) } : { words: [], title: texts[0]! };
   }
   const groups = texts.slice(0, -1);
   const repetitions = Math.ceil(count / groups.length);
@@ -232,7 +235,7 @@ const nameGenerator: MemeTemplate = {
       draw.imageSmoothingQuality = "high";
       draw.drawImage(title, 100, 0, 700, 200);
       cover(draw, avatar, 310, 235, 490, 490);
-      drawNameText(draw, 450, "您的亚名是", font, 40, "#696969");
+      drawNameText(draw, 450, $t("templates.legacy-chat-cards.text_f48df74142"), font, 40, "#696969");
       drawNameText(draw, 620, name, font, 60, color, 4);
     }, signal);
   },
@@ -241,11 +244,11 @@ const nameGenerator: MemeTemplate = {
 
 const animated = [
   {
-    key: "blamed_mahiro", keyword: "真寻挨骂", defaults: ["傻逼"], tags: ["绪山真寻", "别当欧尼酱了"],
+    key: "blamed_mahiro", keyword: "真寻挨骂", defaults: [$t("templates.legacy-chat-cards.text_4c00407b04")], tags: ["绪山真寻", "别当欧尼酱了"],
     layers: mahiroLayers, extension: "png", delayMs: 80, size: [400, 80] as const, typeface: ["FZKATJW.ttf", "LotusMemeKuaiLe"] as const,
   },
   {
-    key: "psyduck", keyword: "可达鸭", defaults: ["来份", "涩图"], tags: [],
+    key: "psyduck", keyword: "可达鸭", defaults: [$t("templates.legacy-chat-cards.text_6a831661dd"), $t("templates.legacy-chat-cards.text_b5e8ee74bf")], tags: [],
     layers: psyduckLayers, extension: "jpg", delayMs: 200, size: [155, 100] as const, typeface: ["FZSJ-QINGCRJ.ttf", "LotusMemeWenKai"] as const,
   },
 ];

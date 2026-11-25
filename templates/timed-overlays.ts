@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Poses and timings from MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { renderExactPng } from "../../../packages/skia/index.ts";
@@ -163,11 +166,11 @@ const specs: readonly Spec[] = [
     photo: index => photo => [arona[index]!, ...(extraArona[index - 6] ? [extraArona[index - 6]!] : [])].map(point => circle(photo, point, 120)) },
 ];
 
-const circleHelp = "是否将图片变为圆形";
+const circleHelp = $t("templates.timed-overlays.text_bd6b1d72aa");
 const circleArgs = {
   args_model: { properties: { circle: { type: "boolean", default: false, description: circleHelp } } },
   args_examples: [{ circle: false }, { circle: true }],
-  parser_options: [{ names: ["--circle", "圆"], dest: "circle", args: [], default: false, action: { type: 0, value: true }, help_text: circleHelp }],
+  parser_options: [{ names: ["--circle", $t("templates.timed-overlays.text_82d06faea1")], dest: "circle", args: [], default: false, action: { type: 0, value: true }, help_text: circleHelp }],
 };
 
 export function timedOverlayTimeline(source: MemeImageSequence, count: number, step: number, policy: Alignment) {
@@ -199,14 +202,14 @@ async function readArt(key: string, count: number, context: MemeTemplateContext)
     })));
   }
   const { width, height } = images[0]!;
-  if (images.some(image => image.width !== width || image.height !== height)) throw new Error(`表情模板 ${key} 的帧尺寸不一致。`);
+  if (images.some(image => image.width !== width || image.height !== height)) throw new Error($t("templates.timed-overlays.text_bc92350be8", { "key": key }));
   return { images, width, height };
 }
 
 function template(spec: Spec): MemeTemplate {
   const { key, cadence, frameCount, artCount = frameCount, artIndex, alignment = "first-frame", preparation } = spec;
   async function render({ images, texts, args }: MemeTemplateInput, context: MemeTemplateContext) {
-    if (images.length !== 1 || texts.length) throw new Error("该表情需要一张图片。");
+    if (images.length !== 1 || texts.length) throw new Error($t("templates.timed-overlays.text_2646e324ad"));
     const { signal } = context;
     const [source, art] = await Promise.all([
       alignment === "first-frame" ? readMemeFirstImage(images[0]!, signal).then(image => ({ frames: [image] as const, averageDelayMs: 0 }))

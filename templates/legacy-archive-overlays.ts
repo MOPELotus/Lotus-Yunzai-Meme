@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Layouts follow the fixed Python archive sources recorded in resources/builtin/sources.json.
 import { ImageData, loadImage, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";

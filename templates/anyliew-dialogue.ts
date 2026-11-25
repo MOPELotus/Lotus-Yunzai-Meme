@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Layouts from AnyLiew/meme_emoji under the pinned revision in backend-extra-assets.ts.
 import { ImageData, loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
@@ -50,17 +53,17 @@ const outlinedCaption = { box: lowerCaption, sizes: [12, 40], color: "#fff", lef
 const dialogues: readonly Dialogue[] = [
   {
     key: "ai_ace", keywords: ["AI高手", "ai高手"], avatar: [1142, 151, 650, 650],
-    caption: name => `不用了\n我${name}是AI高手\n正在用AI写代码中ing`,
+    caption: name => $t("templates.anyliew-dialogue.text_3f5cd8d4a8", { "name": name }),
     box: [115, 83, 1104, 744], sizes: [20, 200], color: "#3a3a3a", leftLines: true, font: "child",
   },
   {
     key: "allegiance", keywords: ["충성", "忠橙", "敬礼"], avatar: [279, 159, 436, 400],
-    caption: name => `${name}:${name}向你敬礼,忠诚!\n${name}:${name}당신에게 경의를 표합니다,충성!`,
+    caption: name => $t("templates.anyliew-dialogue.text_f67a72dd95", { "name": name, "value2": name, "value3": name, "value4": name }),
     box: [1, 774, 1061, 942], sizes: [15, 120], leftLines: true, font: "slender",
   },
   {
     ...outlinedCaption, key: "atri_like", keywords: ["亚托莉喜欢"], tags: ["ATRI", "亚托莉", "萝卜子"],
-    avatar: [106, 72, 305, 235], caption: text => text, defaultText: "亚托莉喜欢这个",
+    avatar: [106, 72, 305, 235], caption: text => text, defaultText: $t("templates.anyliew-dialogue.text_fa215fea06"),
   },
   {
     key: "beloveds", keywords: ["挚爱"], avatar: [330, 140, 330, 330], caption: name => `だいじなひと${name}👩‍❤️‍💋‍👨`,
@@ -68,49 +71,49 @@ const dialogues: readonly Dialogue[] = [
   },
   {
     key: "doro_contact", keywords: ["交往", "doro交往", "Doro交往", "DORO交往", "桃乐丝交往"], avatar: [145, 278, 108, 108],
-    caption: name => `桃乐丝:${name}同学,这是你的头像照片吗？\n桃乐丝:你长得好帅呀\n桃乐丝:${name},你愿意和我交往在一起吗？\n${name}:我愿意,我愿意\n${name}:桃乐丝,我${name}愿意和你在一起一生一世`,
+    caption: name => $t("templates.anyliew-dialogue.text_1287a7c3c3", { "name": name, "value2": name, "value3": name, "value4": name, "value5": name }),
     box: [1, 1, 677, 207], sizes: [15, 60], leftLines: true, font: "child",
   },
   {
     key: "doro_dear", keywords: ["最爱", "doro最爱", "Doro最爱", "DORO最爱", "桃乐丝最爱"], avatar: [576, 529, 100, 100],
-    caption: name => `桃乐丝:${name},你永远是桃乐丝的最爱之人❤️`,
+    caption: name => $t("templates.anyliew-dialogue.text_c8b2e81d61", { "name": name }),
     box: [1, 675, 1200, 812], sizes: [15, 60], font: "child", emoji: true,
   },
   {
     key: "doro_orange", keywords: ["欧润吉", "润吉", "润橘", "橘子", "橘", "🍊"], avatar: [588, 65, 270, 270],
-    caption: name => `桃乐丝:和${name}一起品尝欧润吉真是一种享受\n \n${name}:欧润吉真好吃`,
+    caption: name => $t("templates.anyliew-dialogue.text_76904f3fcb", { "name": name, "value2": name }),
     box: [1, 585, 949, 792], sizes: [20, 100], leftLines: true, font: "slender",
   },
   {
     ...outlinedCaption, key: "ikun_like", keywords: ["坤坤喜欢"], tags: ["ikun", "坤坤", "真爱粉", "喜欢"],
-    avatar: [106, 72, 305, 235], caption: text => text, defaultText: "坤坤喜欢这个",
+    avatar: [106, 72, 305, 235], caption: text => text, defaultText: $t("templates.anyliew-dialogue.text_c27fe7c359"),
   },
   {
-    key: "ikun_need_tv", keywords: ["坤坤想要"], avatar: [614, 118, 518, 488], caption: name => `坤坤好喜欢${name}\n想要一个${name}❤️~`,
+    key: "ikun_need_tv", keywords: ["坤坤想要"], avatar: [614, 118, 518, 488], caption: name => $t("templates.anyliew-dialogue.text_4181511629", { "name": name, "value2": name }),
     box: [2, 2, 572, 250], sizes: [5, 50], color: "#fff", leftLines: true, font: "slender", emoji: true,
   },
   {
     key: "mihoyo_keqing_pointo", keywords: ["刻晴指"], tags: genshin, avatar: [26, 171, 230, 290],
-    caption: name => `此人「${name}」\n\n拥有我的六个命座\n\n已经是满命了`,
+    caption: name => $t("templates.anyliew-dialogue.text_10537aed28", { "name": name }),
     box: [1, 538, 577, 711], sizes: [15, 60], leftLines: true, font: "slender",
   },
   {
     key: "mihoyo_navia_caspar_persuade", keywords: ["说服"], tags: genshin, avatar: [141, 85, 350, 350],
-    caption: name => `我可以对${name} \n 使用『说服』吗?`,
+    caption: name => $t("templates.anyliew-dialogue.text_0073f8cff2", { "name": name }),
     box: [1, 492, 544, 616], sizes: [20, 100], font: "child",
   },
   {
     key: "pay_to_watch", keywords: ["付费观看"], avatar: [150, 240, 185, 185],
-    caption: name => `男主:旁边怎么有人傻乎乎站在那里？\n女主:${name}付钱让他站在那付费观看的`,
+    caption: name => $t("templates.anyliew-dialogue.text_f52746553a", { "name": name }),
     box: [36, 5, 1051, 141], sizes: [20, 100], leftLines: true, font: "slender",
   },
   {
-    key: "rune", keywords: ["符咒"], avatar: [456, 816, 185, 185], caption: name => `这是符咒「${name}」`,
+    key: "rune", keywords: ["符咒"], avatar: [456, 816, 185, 185], caption: name => $t("templates.anyliew-dialogue.text_30b74513a9", { "name": name }),
     box: [1, 1151, 1080, 1273], sizes: [20, 100], color: "#fff", font: "slender",
   },
   {
     key: "something", keywords: ["什么东西"], avatar: [118, 471, 308, 308],
-    caption: name => `这${name}是什么东西?\n竟然让人如此着迷`, box: [117, 0, 845, 190], sizes: [20, 90], font: "child",
+    caption: name => $t("templates.anyliew-dialogue.text_4df7398d30", { "name": name }), box: [117, 0, 845, 190], sizes: [20, 90], font: "child",
   },
   {
     key: "yes", keywords: ["yes", "Yes", "YES"], avatar: [396, 452, 165, 165], caption: name => `${name} YES!👍🏻👍🏻`,
@@ -118,23 +121,23 @@ const dialogues: readonly Dialogue[] = [
   },
   {
     ...outlinedCaption, key: "yuzu_soft_murasame_dislike", keywords: ["丛雨讨厌"], tags: yuzu,
-    avatar: [99, 60, 346, 264], caption: text => text, defaultText: "丛雨讨厌这个",
+    avatar: [99, 60, 346, 264], caption: text => text, defaultText: $t("templates.anyliew-dialogue.text_35acc1d76a"),
   },
   {
     ...outlinedCaption, key: "yuzu_soft_murasame_like", keywords: ["丛雨喜欢"], tags: yuzu,
-    avatar: [47, 51, 275, 275], caption: text => text, defaultText: "丛雨喜欢这个",
+    avatar: [47, 51, 275, 275], caption: text => text, defaultText: $t("templates.anyliew-dialogue.text_b6060f7e2e"),
   },
   {
     key: "yuzu_soft_ticket", keywords: ["准考证"], tags: yuzu, avatar: [72, 330, 300, 300],
-    caption: name => name, defaultName: "柚子厨", box: [485, 544, 625, 583], sizes: [30, 100], font: "child",
+    caption: name => name, defaultName: $t("templates.anyliew-dialogue.text_dafaaeb6ef"), box: [485, 544, 625, 583], sizes: [30, 100], font: "child",
   },
 ];
 
 function captionText(input: MemeTemplateInput, definition: Dialogue) {
   const user = Array.isArray(input.args.user_infos) ? input.args.user_infos[0] : undefined;
   const nickname = typeof user?.name === "string" ? user.name : undefined;
-  const pronoun = user && user.gender !== "male" ? "她" : definition.maleName ?? "他";
-  return definition.caption(input.texts[0] ?? definition.defaultText ?? (nickname || (user ? pronoun : definition.defaultName ?? "他")));
+  const pronoun = user && user.gender !== "male" ? $t("templates.anyliew-dialogue.text_2ab425e0c6") : definition.maleName ?? $t("templates.anyliew-dialogue.text_8b7b91e000");
+  return definition.caption(input.texts[0] ?? definition.defaultText ?? (nickname || (user ? pronoun : definition.defaultName ?? $t("templates.anyliew-dialogue.text_8b7b91e000"))));
 }
 
 export type AnyLiewCaptionStyle = Pick<Dialogue, "sizes" | "color" | "leftLines" | "bottom" | "cropAvatar" | "wrap" | "font"> & {
@@ -184,7 +187,7 @@ export function paintAnyLiewCaption(draw: CanvasRenderingContext2D, box: Box, te
     draw.fillText(text, x, y, wrapWidth);
     return;
   }
-  throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+  throw new MemeTemplateFeedback($t("templates.anyliew-dialogue.text_002fc2fab2"));
 }
 
 function drawAvatar(draw: CanvasRenderingContext2D, image: Image, definition: Dialogue) {

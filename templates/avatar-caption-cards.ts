@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Layouts from MemeCrafters/meme-generator (619fa105).
 import { loadImage, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
@@ -7,7 +10,7 @@ import { layoutMemeText } from "./bbcode-text.ts";
 import { drawFittedText, jpg, paper, previewImage, registerFont, registerMemeTypeface } from "./template-layout.ts";
 import { readTransformSource, renderTransformSequence, transformPreviewInput } from "./transforms.ts";
 
-const keepAwayCaption = "如何提高社交质量 : \n远离以下头像的人";
+const keepAwayCaption = $t("templates.avatar-caption-cards.text_e97645da35");
 
 async function opaqueSquare(avatar: Image, signal: AbortSignal) {
   signal.throwIfAborted();
@@ -71,16 +74,16 @@ const littleAngel: MemeTemplate = {
     const font = await registerFont(context, true);
     const user: unknown = Array.isArray(input.args.user_infos) ? input.args.user_infos[0] : undefined;
     const info = user && typeof user === "object" ? user as { name?: unknown; gender?: unknown } : undefined;
-    const pronoun = !input.texts.length && info?.gender === "male" ? "他" : "她";
+    const pronoun = !input.texts.length && info?.gender === "male" ? $t("templates.avatar-caption-cards.text_8b7b91e000") : $t("templates.avatar-caption-cards.text_2ab425e0c6");
     const name = input.texts[0] ?? (typeof info?.name === "string" && info.name ? info.name : pronoun);
     return renderTransformSequence(sequence, 600, imageHeight + 230, (draw, frame) => {
       paper(draw, 600, imageHeight + 230);
       const textLayout = { wrap: false, paragraphMetrics: true };
-      drawFittedText(draw, [20, 0, 580, 110], `请问你们看到${name}了吗?`, font, 25, 70, "center", "#000", textLayout);
+      drawFittedText(draw, [20, 0, 580, 110], $t("templates.avatar-caption-cards.text_bd13114929", { "name": name }), font, 25, 70, "center", "#000", textLayout);
       draw.drawImage(frame, 50, 110, 500, imageHeight);
-      drawFittedText(draw, [10, imageHeight + 120, 590, imageHeight + 185], "非常可爱！简直就是小天使",
+      drawFittedText(draw, [10, imageHeight + 120, 590, imageHeight + 185], $t("templates.avatar-caption-cards.text_f280cdf39b"),
         font, 12, 48, "center", "#000", textLayout);
-      drawFittedText(draw, [20, imageHeight + 180, 580, imageHeight + 215], `${pronoun}没失踪也没怎么样  我只是觉得你们都该看一下`,
+      drawFittedText(draw, [20, imageHeight + 180, 580, imageHeight + 215], $t("templates.avatar-caption-cards.text_50dd0c475e", { "pronoun": pronoun }),
         font, 12, 26, "center", "#000", textLayout);
     }, context.signal);
   },
@@ -103,7 +106,7 @@ const follow: MemeTemplate = {
     ]);
     const user: unknown = Array.isArray(args.user_infos) ? args.user_infos[0] : undefined;
     const info = user && typeof user === "object" ? user as { name?: unknown; gender?: unknown } : undefined;
-    const fallbackName = info?.gender === "female" ? "女同" : "男同";
+    const fallbackName = info?.gender === "female" ? $t("templates.avatar-caption-cards.text_2f82ee08c4") : $t("templates.avatar-caption-cards.text_2541938e27");
     const name = texts[0] ?? (typeof info?.name === "string" && info.name ? info.name : fallbackName);
     const families = { regular, cjk };
     const caption = (text: string, color: string) => layoutMemeText(text.split(/\r\n|\r|\n/u).map(line => ({
@@ -111,9 +114,9 @@ const follow: MemeTemplate = {
       spans: [{ text: line, size: 60, color }],
     })), undefined, families);
     const nameBlock = caption(name, "black");
-    const label = caption("关注了你", "#808080");
+    const label = caption($t("templates.avatar-caption-cards.text_c8712b803f"), "#808080");
     const textWidth = Math.max(nameBlock.width, label.width);
-    if (textWidth >= 1000) throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+    if (textWidth >= 1000) throw new MemeTemplateFeedback($t("templates.avatar-caption-cards.text_002fc2fab2"));
     const width = 350 + textWidth;
     const size = Math.min(avatar.width, avatar.height);
     const x = Math.floor((avatar.width - size) / 2);

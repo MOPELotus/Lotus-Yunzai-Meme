@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import type { MemeInfoCard } from "./info-card-runtime.ts";
 
 export interface UsageRow {
@@ -12,14 +15,14 @@ const leading = 22;
 
 export function renderUsageCard(total: number, rows: readonly UsageRow[], info: MemeInfoCard, scale: 2 | 4 = 4) {
   const { renderInfoCard, measureInfoText, drawInfoText, infoCardColors } = info;
-  return renderInfoCard({ title: "表情合成统计", metadata: `表情调用总次数：${total}`, width: 1152 },
+  return renderInfoCard({ title: $t("usage-card.text_862a6e26a2"), metadata: $t("usage-card.text_d43a58dda9", { "total": total }), width: 1152 },
     ({ x, y, width, measure }) => {
       const columns = Math.max(1, Math.min(5, rows.length));
       const cellWidth = (width - (columns - 1) * gap) / columns;
       const grid: { height: number; cells: { badge: string; lines: string[] }[] }[] = [];
       for (let offset = 0; offset < rows.length; offset += columns) {
         const cells = rows.slice(offset, offset + columns).map(({ keywords, count }) => {
-          const badge = `${count} 次`;
+          const badge = $t("usage-card.text_e6c66976bb", { "count": count });
           measureInfoText(measure, badge, cellWidth, size);
           const badgeWidth = measure.measureText(badge).width;
           const keywordWidth = cellWidth - badgeWidth - 3 * padding;

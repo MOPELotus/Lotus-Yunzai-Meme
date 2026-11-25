@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type Image } from "skia-canvas";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeFirstImage, readMemeImageSequence } from "./animated-input.ts";
@@ -143,7 +146,7 @@ const specs: readonly ShapeAnimation[] = [
       const side = Math.min(image.width, image.height);
       return { base: projection(image, at, quad, [side, side], "square"), masks: [artwork(art)] };
     } },
-  { key: "pass_the_buck", keywords: ["推锅", "甩锅"], frameCount: 8, delay: 100, caption: "你写!",
+  { key: "pass_the_buck", keywords: ["推锅", "甩锅"], frameCount: 8, delay: 100, caption: $t("templates.shape-timed-animations.text_1d77285bc3"),
     layers({ image, overlay }, art, text, font) {
       const [x, y] = bucketPositions[overlay]!;
       return { base(draw) {
@@ -152,7 +155,7 @@ const specs: readonly ShapeAnimation[] = [
           { wrap: false, paragraphMetrics: true });
       }, masks: [photo(image, [x, y, 27, 27], "square")] };
     } },
-  { key: "jiubingfufa", keywords: ["旧病复发"], frameCount: 26, delay: 60, caption: "此乃旧病复发也",
+  { key: "jiubingfufa", keywords: ["旧病复发"], frameCount: 26, delay: 60, caption: $t("templates.shape-timed-animations.text_d06b1d9cf1"),
     imageFormat: "jpg", alignment: "no-extend",
     layers({ image, overlay }, art, text, font) {
       return { base(draw) {

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { Canvas, loadImage, type CanvasRenderingContext2D } from "skia-canvas";
 import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext, type MemeTemplateInput } from "../builtin-template.ts";
@@ -6,7 +9,7 @@ import { layoutMemeText } from "./bbcode-text.ts";
 import { renderPythonGif } from "./python-gif.ts";
 
 const source = "python/meme_generator/memes/";
-const textTooLong = () => new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+const textTooLong = () => new MemeTemplateFeedback($t("templates.special-text-cards.text_002fc2fab2"));
 type Draw = CanvasRenderingContext2D;
 type CanvasPaint = string | ReturnType<CanvasRenderingContext2D["createLinearGradient"]>;
 
@@ -67,7 +70,7 @@ function rotateGeometry(width: number, height: number, degrees: number) {
 
 
 async function nokia({ texts }: MemeTemplateInput, context: MemeTemplateContext) {
-  const text = [...(texts[0] ?? "无内鬼，继续交易")].slice(0, 900).join("");
+  const text = [...(texts[0] ?? $t("templates.special-text-cards.text_18daf306ec"))].slice(0, 900).join("");
   const [background, pixel, fallback] = await Promise.all([
     imageAsset(context, "nokia", "0.jpg"),
     registerMemeTypeface(context, "FusionPixel12pxSC.ttf", "LotusMemeFusionPixel"),
@@ -313,8 +316,8 @@ async function choyen({ texts }: MemeTemplateInput, context: MemeTemplateContext
     registerFont(context),
     registerMemeTypeface(context, "NotoSerifSC-Regular.otf", "LotusMemeNotoSerif"),
   ]);
-  const first = lineShape(texts[0] ?? "我去", 200, sans);
-  const second = lineShape(texts[1] ?? "洛天依", 200, serif);
+  const first = lineShape(texts[0] ?? $t("templates.special-text-cards.text_9196202f8e"), 200, sans);
+  const second = lineShape(texts[1] ?? $t("templates.special-text-cards.text_f943f78aa7"), 200, serif);
   const width = Math.max(first.width + Math.round(first.height * 0.45) + 68,
     second.width + Math.round(second.height * 0.45) + 330);
   if (width > 8192) throw textTooLong();
@@ -343,9 +346,9 @@ function specialTextTemplate(
 }
 
 export const specialTextCardTemplates: readonly MemeTemplate[] = [
-  specialTextTemplate("nokia", ["诺基亚", "有内鬼"], ["无内鬼，继续交易"], nokia),
+  specialTextTemplate("nokia", ["诺基亚", "有内鬼"], [$t("templates.special-text-cards.text_18daf306ec")], nokia),
   specialTextTemplate("bluearchive", ["蔚蓝档案标题", "batitle"], ["Blue", "Archive"], bluearchive, ["碧蓝档案", "蔚蓝档案"]),
   specialTextTemplate("douyin", ["douyin"], ["douyin"], douyin),
   specialTextTemplate("p5letter", ["女神异闻录5预告信", "P5预告信"], ["TAKEYOURHEART"], p5letter),
-  specialTextTemplate("5000choyen", ["5000兆"], ["我去", "洛天依"], choyen),
+  specialTextTemplate("5000choyen", ["5000兆"], [$t("templates.special-text-cards.text_9196202f8e"), $t("templates.special-text-cards.text_f943f78aa7")], choyen),
 ];

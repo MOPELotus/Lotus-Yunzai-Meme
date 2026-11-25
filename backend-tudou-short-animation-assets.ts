@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 const revision = "7e799eeaca9ce712eeabe41f964636c755a86c63";
 const sources = [
   `https://raw.githubusercontent.com/LRZ9712/tudou-meme/${revision}/`,
@@ -28,7 +31,7 @@ const frames = {
     "52895b878f7461a4c37c2e02dba280562557e7a5b823a10df53a377ac51e0e03",
     "32fa853ce0b211a208bc76ba882d3e5cc8121bbce27b3a82cd3f1c8dcf00a2e3",
   ] },
-  huanyingchuo: { directory: "huanying被戳", digests: [
+  huanyingchuo: { directory: $t("backend-tudou-short-animation-assets.text_140eb2b80a"), digests: [
     "92517d8177a52e7df0cd3e65d3c20d36ed0e949b88b14753b0af6ead1e032fe7",
     "b0cab01a9ffc57187fc497d61965ecf7562fc3f223e48e1839e10d6671aa8640",
     "0d47c126752d70595b0bae075d402c9e60aafb9a9b7937f1d349f5e9e7e24363",
@@ -48,12 +51,12 @@ const frames = {
     "f419e5f242d75a2191ae7d23581160d712d59836e295aeb6b882483e336d3805",
     "b97d7b60b428546dadd03efdd24a9945f94350eef08172674ccd71f919b3c46f",
   ] },
-  maomimobai: { directory: "猫咪膜拜", digests: [
+  maomimobai: { directory: $t("backend-tudou-short-animation-assets.text_41527215a4"), digests: [
     "d9ea8d2a71862fe40ac6a08ad33dc9321b7360dc7c19ef7cdf21169bd7023988",
     "bfe1c457081a008987e47a43986cc4f3ac6c2acd27027f11dd0e415ef87333eb",
     "8980b6128ca76144b2f3e00643284c5771afece7277f58e93e3de6b64b51879c",
   ] },
-  naonao_tou: { directory: "挠挠头", digests: [
+  naonao_tou: { directory: $t("backend-tudou-short-animation-assets.text_15bbebb85f"), digests: [
     "f59002c71502ba0dffd422c150ef400a5ce34e37bf2233874750bbd70726252b",
     "1a889c4a9dbd68cf84c9c4ea436d1a3e59ab1674c60a4c4e6fcf2790158b5aad",
     "df49a4517583b3b6d70f1d5409117f7f01c62a90302ec6ac0d01b3ce22784de3",
@@ -75,7 +78,7 @@ const frames = {
     "9d85d89b3fa4d5ca04777285444478c515d39fb9a1bcd9fba08d16ddaca6c723",
     "70028d3874656d74852aab4f874c4955862d9f22ad8daf832e244bacdc6e1a51",
   ] },
-  tiaosheng: { directory: "跳绳", digests: [
+  tiaosheng: { directory: $t("backend-tudou-short-animation-assets.text_203cc8f947"), digests: [
     "7b309b1b7a5d073bf61d3943e607538d1628661ff887cb5cfa5ea70f7b95963e",
     "1829d4b44f63d4f0d9aff17b56f383b1890363b1b87946872ac94360c2ea0352",
     "d361b501616bc142cdb634477486ec0087812692073a9e24ef9e33f70ec8cf99",
@@ -100,7 +103,7 @@ const frames = {
     "095aad46c146946f40785decc0cacb28a8d7c0d20e3e8dace2cfc3f566fa2858",
     "19b4b5ab1dae6b3d9fb877cde83dd141615120a93f6f2d882605332dff31d3eb",
   ] },
-  tuoni: { directory: "托尼", digests: [
+  tuoni: { directory: $t("backend-tudou-short-animation-assets.text_d72bea636d"), digests: [
     "a91e9aad25d3ff7948ea75c3ab650f465151a0e45351154eb3e7f5d4b898d4c3",
     "6ef6fa320949d5f82b108c295bf9b8c60dd3554094a55815d6bf708321c573fb",
     "db314be76447bd5d6ea6d27318649b1b8d0813c26cc63ac8d5e8d8e123c66501",
@@ -116,7 +119,7 @@ const frames = {
     "3beaddc303ba54760e858037865d8c84634684a8eb38787aafb2d118af97db5a",
     "a1b409b94042ac714b69bdd70bdf371fe121cee1cd84e24023de5783a8cf062c",
   ] },
-  xiaoxiongmaozi: { directory: "小熊帽子", digests: [
+  xiaoxiongmaozi: { directory: $t("backend-tudou-short-animation-assets.text_1c48e79f06"), digests: [
     "2366080594c5b993d7b53cc36dcfe9077f5cfcbba1b7d0a65cb98a85a5105c97",
     "ed66c8f27adda6f5a7d81b8bf998bd8b2bd3af1d8d2026bfe7e2b20dbee5490b",
     "3da179e5d079cc54843cfd701d8e2c2fd8044a8402e210be2575b1221f7f6bb0",

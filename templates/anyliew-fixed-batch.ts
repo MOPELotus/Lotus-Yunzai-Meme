@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext } from "../builtin-template.ts";
@@ -11,7 +14,7 @@ function quiltSource(context: MemeTemplateContext): MemeTemplateContext {
       const image = await loadImage(source);
       context.signal.throwIfAborted();
       if (image.width !== 300 || image.height < 290 || image.height > 300) {
-        throw new Error("被窝表情的原帧尺寸无效。");
+        throw new Error($t("templates.anyliew-fixed-batch.text_6b80a530c3"));
       }
       if (image.height === 300) return source;
       // The original GIF keeps the first frame's logical screen and clears the shorter frames below their last row.

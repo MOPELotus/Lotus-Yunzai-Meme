@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { Canvas, loadImage } from "skia-canvas";
 import { MemeTemplateFeedback, type MemeTemplate } from "../builtin-template.ts";
 import { renderPythonCanvasGif } from "./python-gif.ts";
@@ -17,7 +20,7 @@ function captionTemplate(key: string, keyword: string, defaultText: string, rend
   };
 }
 
-const chishi = captionTemplate("chishi", "吃屎", "输入文字", async ({ texts }, context) => {
+const chishi = captionTemplate("chishi", "吃屎", $t("templates.tudou-extra.text_7159815dd3"), async ({ texts }, context) => {
   const { signal } = context;
   const [font, ...art] = await Promise.all([
     registerMemeTypeface(context, "FZSJ-QINGCRJ.ttf", "LotusMemeWenKai"),
@@ -36,12 +39,12 @@ const chishi = captionTemplate("chishi", "吃屎", "输入文字", async ({ text
   });
 });
 
-const handwriting = captionTemplate("fontqu_smile", "手写", "你好，世界！", async ({ texts }, context) => {
+const handwriting = captionTemplate("fontqu_smile", "手写", $t("templates.tudou-extra.text_fa65d94b35"), async ({ texts }, context) => {
   const [image, font] = await Promise.all([
     context.imageAsset(`${assetRoot}/fontqu_smile/tudou/0.jpg`).then(loadImage),
     registerMemeTypeface(context, "FZSJ-QINGCRJ.ttf", "LotusMemeWenKai"),
   ]);
-  if (!texts[0]) throw new MemeTemplateFeedback("该表情需要一段文字。");
+  if (!texts[0]) throw new MemeTemplateFeedback($t("templates.tudou-extra.text_307eedbde6"));
   const text = [...texts[0]].slice(0, 500).join("");
   const measure = new Canvas(1, 1).getContext("2d");
   measure.font = `200px ${font}`;

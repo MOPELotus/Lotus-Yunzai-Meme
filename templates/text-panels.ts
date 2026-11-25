@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original layouts from MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { randomInt } from "node:crypto";
@@ -29,51 +32,51 @@ interface Definition {
 const definitions: readonly Definition[] = [
   {
     key: "fanatic", keywords: ["狂爱", "狂粉"], asset: "fanatic/0.jpg", minFont: 30, maxFont: 70,
-    captions: [{ text: "洛天依", box: [145, 40, 343, 160] }],
+    captions: [{ text: $t("templates.text-panels.text_f943f78aa7"), box: [145, 40, 343, 160] }],
   },
   {
     key: "dont_press", keywords: ["不要按"], asset: "dont_press/0.png", minFont: 20, maxFont: 50,
-    captions: [{ text: "世界毁灭", box: [60, 170, 200, 225] }],
+    captions: [{ text: $t("templates.text-panels.text_3b0e95fd2a"), box: [60, 170, 200, 225] }],
   },
   {
     key: "find_chips", keywords: ["整点薯条"], asset: "find_chips/0.jpg", minFont: 12, maxFont: 30,
     captions: [
-      { text: "我们要飞向何方", box: [405, 54, 530, 130] },
-      { text: "我打算待会去码头整点薯条", box: [570, 62, 667, 160] },
-      { text: "我说的是归根结底，活着是为了什么", box: [65, 400, 325, 463] },
-      { text: "为了待会去码头整点薯条", box: [430, 400, 630, 470] },
+      { text: $t("templates.text-panels.text_cc49f0dfd7"), box: [405, 54, 530, 130] },
+      { text: $t("templates.text-panels.text_95461f4616"), box: [570, 62, 667, 160] },
+      { text: $t("templates.text-panels.text_88ee030f4f"), box: [65, 400, 325, 463] },
+      { text: $t("templates.text-panels.text_9f696160ab"), box: [430, 400, 630, 470] },
     ],
   },
   {
     key: "slogan", keywords: ["口号"], asset: "slogan/0.jpg", minFont: 15, maxFont: 40,
     captions: [
-      { text: "我们是谁？", box: [10, 0, 294, 50] },
-      { text: "浙大人！", box: [316, 0, 602, 50] },
-      { text: "到浙大来做什么？", box: [10, 230, 294, 280] },
-      { text: "混！", box: [316, 230, 602, 280] },
-      { text: "将来毕业后要做什么样的人？", box: [10, 455, 294, 505] },
-      { text: "混混！", box: [316, 455, 602, 505] },
+      { text: $t("templates.text-panels.text_c67923af49"), box: [10, 0, 294, 50] },
+      { text: $t("templates.text-panels.text_296406c8d9"), box: [316, 0, 602, 50] },
+      { text: $t("templates.text-panels.text_8423506b4f"), box: [10, 230, 294, 280] },
+      { text: $t("templates.text-panels.text_463bd7c369"), box: [316, 230, 602, 280] },
+      { text: $t("templates.text-panels.text_b5c3de9cf5"), box: [10, 455, 294, 505] },
+      { text: $t("templates.text-panels.text_c9143068cb"), box: [316, 455, 602, 505] },
     ],
   },
   {
     key: "ascension", keywords: ["升天"], asset: "ascension/0.png", minFont: 20, maxFont: 50,
     captions: [{
-      text: "学的是机械", box: [40, 30, 482, 135],
-      decorate: text => `你原本应该要去地狱的，但因为你生前${text}，我们就当作你已经服完刑期了`,
+      text: $t("templates.text-panels.text_58774d1535"), box: [40, 30, 482, 135],
+      decorate: text => $t("templates.text-panels.text_c09cf4d952", { "text": text }),
     }],
   },
   {
     key: "meteor", keywords: ["流星"], asset: "meteor/0.png", minFont: 20, maxFont: 80,
-    captions: [{ text: "我要对象", box: [220, 230, 920, 315], color: "#fff" }],
+    captions: [{ text: $t("templates.text-panels.text_04c2416f9a"), box: [220, 230, 920, 315], color: "#fff" }],
   },
   {
     key: "wish_fail", keywords: ["许愿失败"], asset: "wish_fail/0.png", minFont: 20, maxFont: 80,
-    captions: [{ text: "我要对象", box: [70, 305, 320, 380] }],
+    captions: [{ text: $t("templates.text-panels.text_04c2416f9a"), box: [70, 305, 320, 380] }],
   },
   {
     key: "top_notch", keywords: ["顶尖"], asset: "python/meme_generator/memes/top_notch/images/0.png", png: true,
     minFont: 20, maxFont: 40,
-    captions: [{ text: "运营", box: [10, 240, 420, 300], decorate: text => `好，不愧是顶尖${text}` }],
+    captions: [{ text: $t("templates.text-panels.text_1433b0e669"), box: [10, 240, 420, 300], decorate: text => $t("templates.text-panels.text_13a0a4f470", { "text": text }) }],
   },
   {
     key: "my_opinion", keywords: ["我的意见如下", "我的意见是"], asset: "my_opinion/0.png", png: true, bold: true, wrap: false,
@@ -83,17 +86,17 @@ const definitions: readonly Definition[] = [
   {
     key: "not_call_me", keywords: ["不喊我"], asset: "python/meme_generator/memes/not_call_me/images/0.png", png: true,
     minFont: 20, maxFont: 80,
-    captions: [{ text: "开银趴不喊我是吧", box: [228, 11, 340, 164] }],
+    captions: [{ text: $t("templates.text-panels.text_affc4d5221"), box: [228, 11, 340, 164] }],
   },
 ];
 
-const legacyPreviewTexts = ["刘一", "陈二", "张三", "李四", "王五", "赵六", "孙七", "周八", "吴九", "郑十"] as const;
-const grudgeDefault = "群友不发涩图";
+const legacyPreviewTexts = [$t("templates.text-panels.text_5989f6f405"), $t("templates.text-panels.text_c80834bf8e"), $t("templates.text-panels.text_1d841bc0ee"), $t("templates.text-panels.text_808b4f6221"), $t("templates.text-panels.text_c68e010446"), $t("templates.text-panels.text_e6bb13166f"), $t("templates.text-panels.text_34e2bef711"), $t("templates.text-panels.text_7df288465c"), $t("templates.text-panels.text_1487d35303"), $t("templates.text-panels.text_7292b7eda2")] as const;
+const grudgeDefault = $t("templates.text-panels.text_3c674bc731");
 
 function grudgeText(text: string, day = new Date()) {
   const month = String(day.getMonth() + 1).padStart(2, "0");
   const date = String(day.getDate()).padStart(2, "0");
-  return `${day.getFullYear()}年${month}月${date}日 晴\n${text}\n这个仇我先记下了`;
+  return $t("templates.text-panels.text_2b3e79221f", { "value1": day.getFullYear(), "month": month, "date": date, "text": text });
 }
 
 async function holdGrudge(text: string, context: MemeTemplateContext) {
@@ -111,7 +114,7 @@ async function holdGrudge(text: string, context: MemeTemplateContext) {
   const first = lines[0]!;
   const last = lines.at(-1)!;
   const height = Math.ceil(last.y + last.height - first.y);
-  if (height > 500) throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+  if (height > 500) throw new MemeTemplateFeedback($t("templates.text-panels.text_002fc2fab2"));
   return jpg(art.width, art.height + height + 20, draw => {
     draw.fillStyle = "#fff";
     draw.fillRect(0, 0, art.width, art.height + height + 20);
@@ -139,7 +142,7 @@ export const textPanelMemeTemplates: readonly MemeTemplate[] = definitions.map((
       draw.drawImage(art, 0, 0);
       for (const [index, caption] of item.captions.entries()) {
         const text = texts[index] ?? caption.text;
-        if (text === undefined) throw new MemeTemplateFeedback("该表情需要提供文字。");
+        if (text === undefined) throw new MemeTemplateFeedback($t("templates.text-panels.text_63939c76de"));
         drawFittedText(draw, caption.box, caption.decorate?.(text) ?? text, font, item.minFont, item.maxFont,
           "center", caption.color, { wrap: item.wrap });
       }

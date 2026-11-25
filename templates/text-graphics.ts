@@ -1,10 +1,13 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Template geometry from MemeCrafters/meme-generator v0.1.14.
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { googleLogoText, layoutMemeText, parseMemeBbcode, type MemeTextFamilies } from "./bbcode-text.ts";
 import { jpg, paper, registerFont, registerMemeTypeface } from "./template-layout.ts";
 import { readTransformSource, renderTransformSequence, transformPreviewInput } from "./transforms.ts";
 
-const universalText = "在此处添加文字";
+const universalText = $t("templates.text-graphics.text_f24028df39");
 const googleText = "Google";
 
 async function defaultFamilies(context: MemeTemplateContext, styled: boolean): Promise<MemeTextFamilies> {

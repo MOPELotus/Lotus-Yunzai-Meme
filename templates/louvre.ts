@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // The legacy catalog exposes only the line mode. Geometry, texture and seven
 // mode choices come from anyliew/meme_emoji at 0734d49fb5a650a6232f7a0ae15712c1fbce0e77.
 // The source credits itorr/one-last-image and su226/IdhagnBot.
@@ -8,7 +11,7 @@ import { readMemeImageSequence } from "./animated-input.ts";
 import { renderPythonGif } from "./python-gif.ts";
 import { previewImage, rgbaFrameDimensions } from "./template-layout.ts";
 
-const modeHelp = "线迹模式: 0=随机选择, 1=精细, 2=一般, 3=稍粗, 4=超粗, 5=极粗, 6=浮雕, 7=线稿(彩色)";
+const modeHelp = $t("templates.louvre.text_72f641bd63");
 const gradientColors = [
   [0, "#fbba30"], [0.4, "#fc7235"], [0.6, "#fc354e"], [0.7, "#cf36df"], [0.8, "#37b5d9"], [1, "#3eb6da"],
 ] as const;
@@ -93,10 +96,10 @@ function emboss(input: Uint8Array, width: number, height: number) {
 }
 
 async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
-  if (input.images.length !== 1 || input.texts.length) throw new MemeTemplateFeedback("这个表情需要一张图片。");
+  if (input.images.length !== 1 || input.texts.length) throw new MemeTemplateFeedback($t("templates.louvre.text_455cc162ff"));
   const selectedMode = input.args.number ?? 0;
   if (typeof selectedMode !== "number" || !Number.isInteger(selectedMode) || selectedMode < 0 || selectedMode > 7) {
-    throw new MemeTemplateFeedback("模式编号错误，请选择 1~7 或 0（随机）");
+    throw new MemeTemplateFeedback($t("templates.louvre.text_e84d89e311"));
   }
   const mode = selectedMode || 1 + Math.floor(Math.random() * 7);
   const { signal } = context;

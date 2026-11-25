@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type Image } from "skia-canvas";
 import { MemeTemplateFeedback, type MemeTemplate } from "../builtin-template.ts";
 import { layoutMemeText } from "./bbcode-text.ts";
@@ -24,7 +27,7 @@ function wordmark(youtube: boolean): MemeTemplate {
       params_type: { min_images: 0, max_images: 0, min_texts: 2, max_texts: 2, default_texts: defaults, args_type: null },
     },
     async render({ texts }, context) {
-      if (texts.length !== 2) throw new MemeTemplateFeedback("该表情需要 2 段文字。");
+      if (texts.length !== 2) throw new MemeTemplateFeedback($t("templates.legacy-wordmarks.text_d9a35f8f6c"));
       const [regular, bold, cjk, boldCjk, corner] = await Promise.all([
         registerMemeTypeface(context, "LiberationSans-Regular.ttf", "LotusMemeLiberationSans"),
         registerMemeTypeface(context, "LiberationSans-Bold.ttf", "LotusMemeLiberationSansBold"),

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Checked against MemeCrafters/meme-generator 619fa10518fc2eca4fa1053af37f0a00a839f062.
 export const portraitOverlayMetadata = [
   {
@@ -47,7 +50,7 @@ export const portraitOverlayMetadata = [
             },
             "person": {
               "default": false,
-              "description": "是否使用爷爷头轮廓",
+              "description": $t("templates.portrait-overlays-metadata.text_61a2d5fcf1"),
               "title": "Person",
               "type": "boolean"
             }
@@ -69,7 +72,7 @@ export const portraitOverlayMetadata = [
           {
             "names": [
               "--person",
-              "爷"
+              $t("templates.portrait-overlays-metadata.text_d20e128911")
             ],
             "args": null,
             "dest": null,
@@ -78,7 +81,7 @@ export const portraitOverlayMetadata = [
               "type": 0,
               "value": true
             },
-            "help_text": "是否使用爷爷头轮廓",
+            "help_text": $t("templates.portrait-overlays-metadata.text_61a2d5fcf1"),
             "compact": false
           }
         ]
@@ -132,14 +135,14 @@ export const portraitOverlayMetadata = [
               "type": "array"
             },
             "pronoun": {
-              "default": "我",
-              "description": "人称代词，默认为“我”",
+              "default": $t("templates.portrait-overlays-metadata.text_b70bb4acc0"),
+              "description": $t("templates.portrait-overlays-metadata.text_e6bc22d5fb"),
               "title": "Pronoun",
               "type": "string"
             },
             "name": {
-              "default": "老婆",
-              "description": "称呼，默认为“老婆”",
+              "default": $t("templates.portrait-overlays-metadata.text_120a3a2fc2"),
+              "description": $t("templates.portrait-overlays-metadata.text_69e3750b77"),
               "title": "Name",
               "type": "string"
             }
@@ -165,7 +168,7 @@ export const portraitOverlayMetadata = [
             "dest": "pronoun",
             "default": null,
             "action": null,
-            "help_text": "人称代词，默认为“我”",
+            "help_text": $t("templates.portrait-overlays-metadata.text_e6bc22d5fb"),
             "compact": false
           },
           {
@@ -184,7 +187,7 @@ export const portraitOverlayMetadata = [
             "dest": "name",
             "default": null,
             "action": null,
-            "help_text": "称呼，默认为“老婆”",
+            "help_text": $t("templates.portrait-overlays-metadata.text_69e3750b77"),
             "compact": false
           }
         ]
@@ -284,7 +287,7 @@ export const portraitOverlayMetadata = [
             },
             "number": {
               "default": 0,
-              "description": "图片编号，范围为 1~92",
+              "description": $t("templates.portrait-overlays-metadata.text_ebe4a3f63c"),
               "title": "Number",
               "type": "integer"
             }
@@ -310,7 +313,7 @@ export const portraitOverlayMetadata = [
             "dest": null,
             "default": null,
             "action": null,
-            "help_text": "图片编号，范围为 1~92",
+            "help_text": $t("templates.portrait-overlays-metadata.text_ebe4a3f63c"),
             "compact": false
           }
         ]

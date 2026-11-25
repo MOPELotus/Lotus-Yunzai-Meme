@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { randomInt } from "node:crypto";
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
@@ -17,7 +20,7 @@ function drawContained(context: CanvasRenderingContext2D, image: Image, left: nu
 }
 
 async function always(input: MemeTemplateInput, context: MemeTemplateContext) {
-  if (input.images.length !== 1) throw new Error("一直需要一张图片。");
+  if (input.images.length !== 1) throw new Error($t("templates.static-layouts.text_dd7f8efff3"));
   const signal = context.signal;
   const [sequence, font] = await Promise.all([readMemeImageSequence(input.images[0]!, signal), registerFont(context)]);
   const mode = input.args.mode === "circle" || input.args.mode === "loop" ? input.args.mode : "normal";
@@ -27,7 +30,7 @@ async function always(input: MemeTemplateInput, context: MemeTemplateContext) {
   const small = Math.max(1, Math.floor(100 * ratio));
   const lower = mode === "normal" ? Math.max(small, 80) : Math.max(small + Math.floor(20 * ratio) + 10, 80);
   const height = big + lower + (mode === "normal" ? 10 : 0);
-  if (height > 8192) throw new RangeError("表情尺寸超限。");
+  if (height > 8192) throw new RangeError($t("templates.static-layouts.text_8e2328d557"));
   const frame = (image: Image, thumbnail: boolean): Draw => context => {
     paper(context, 500, height);
     context.drawImage(image, 0, 0, 500, big);
@@ -36,8 +39,8 @@ async function always(input: MemeTemplateInput, context: MemeTemplateContext) {
     }
     const top = big + (thumbnail ? 5 : 0);
     const bottom = height - (thumbnail ? 5 : 0);
-    drawFittedText(context, [thumbnail ? 20 : 0, top, 280, bottom], "要我一直", font, 20, 60, "right");
-    drawFittedText(context, [400, top, thumbnail ? 480 : 500, bottom], "吗", font, 20, 60, "left");
+    drawFittedText(context, [thumbnail ? 20 : 0, top, 280, bottom], $t("templates.static-layouts.text_2e0619ec52"), font, 20, 60, "right");
+    drawFittedText(context, [400, top, thumbnail ? 480 : 500, bottom], $t("templates.static-layouts.text_5ac1612110"), font, 20, 60, "left");
   };
   const animation = mode === "loop" ? alignMemeLoop(sequence, 20, 100) :
     sequence.frames.map(image => ({ overlay: 0, image }));
@@ -73,10 +76,10 @@ async function always(input: MemeTemplateInput, context: MemeTemplateContext) {
 }
 
 async function alwaysLike(input: MemeTemplateInput, context: MemeTemplateContext) {
-  if (!input.images.length || input.images.length > 6) throw new Error("我永远喜欢需要一至六张图片。");
+  if (!input.images.length || input.images.length > 6) throw new Error($t("templates.static-layouts.text_7423ab78cd"));
   const rawNames = Array.isArray(input.args.user_infos) ? input.args.user_infos : [];
   const names = [...input.texts, ...rawNames.flatMap(value => typeof value?.name === "string" ? [value.name] : [""])];
-  if (names.length < input.images.length) throw new Error("文字或昵称数量不足。");
+  if (names.length < input.images.length) throw new Error($t("templates.static-layouts.text_76b8e87b81"));
   const [frame, images, font, regular] = await Promise.all([
     context.imageAsset("always_like/0.png").then(loadImage),
     Promise.all(input.images.map(file => firstImage(file, context.signal))),
@@ -87,7 +90,7 @@ async function alwaysLike(input: MemeTemplateInput, context: MemeTemplateContext
     image, left: 10 + randomInt(51), top: 20 + randomInt(71), y: 400 - index * 70, name: names[index + 1]!,
     line: colors[randomInt(colors.length)]!,
   }));
-  const headline = "我永远喜欢" + names[0];
+  const headline = $t("templates.static-layouts.text_6d06f21414") + names[0];
   const underline = colors[randomInt(colors.length)]!;
   return jpg(frame.width, frame.height, canvas => {
     paper(canvas, frame.width, frame.height);
@@ -121,7 +124,7 @@ async function alwaysLike(input: MemeTemplateInput, context: MemeTemplateContext
 }
 
 async function support(input: MemeTemplateInput, context: MemeTemplateContext) {
-  if (input.images.length !== 1) throw new Error("精神支柱需要一张图片。");
+  if (input.images.length !== 1) throw new Error($t("templates.static-layouts.text_a0357c4bd7"));
   const [frame, image] = await Promise.all([
     context.imageAsset("support/0.png").then(loadImage),
     firstImage(input.images[0]!, context.signal),
@@ -143,7 +146,7 @@ async function support(input: MemeTemplateInput, context: MemeTemplateContext) {
 }
 
 const singleImage = { min_images: 1, max_images: 1, min_texts: 0, max_texts: 0, default_texts: [] } as const;
-const modeHelp = "生成模式，包含 normal、loop、circle";
+const modeHelp = $t("templates.static-layouts.text_86d688f955");
 const options = {
   args_model: {
     type: "object",
@@ -152,8 +155,8 @@ const options = {
   args_examples: ["normal", "circle", "loop"].map(mode => ({ mode })),
   parser_options: [
     { names: ["--mode"], args: [{ name: "mode", value: "str" }], help_text: modeHelp },
-    { names: ["--circle", "套娃"], dest: "mode", action: { type: 0, value: "circle" }, help_text: "套娃模式" },
-    { names: ["--loop", "循环"], dest: "mode", action: { type: 0, value: "loop" }, help_text: "循环模式" },
+    { names: ["--circle", $t("templates.static-layouts.text_0aada09ebe")], dest: "mode", action: { type: 0, value: "circle" }, help_text: $t("templates.static-layouts.text_f81ff4376c") },
+    { names: ["--loop", $t("templates.static-layouts.text_ad3221dd66")], dest: "mode", action: { type: 0, value: "loop" }, help_text: $t("templates.static-layouts.text_f0a5f687c4") },
   ],
 };
 
@@ -180,7 +183,7 @@ export const staticMemeTemplates: readonly MemeTemplate[] = [
       params_type: { ...singleImage, max_images: 6, max_texts: 6, args_type: null },
     },
     render: alwaysLike,
-    preview: preview(alwaysLike, ["张三"]),
+    preview: preview(alwaysLike, [$t("templates.static-layouts.text_1d841bc0ee")]),
   },
   { info: { key: "support", keywords: ["精神支柱"], params_type: singleImage }, render: support, preview: preview(support) },
 ];

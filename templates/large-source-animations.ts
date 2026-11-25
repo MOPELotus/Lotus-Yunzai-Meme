@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import { renderRgba } from "../../../packages/skia/index.ts";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext, type MemeTemplateInput } from "../builtin-template.ts";
@@ -73,7 +76,7 @@ function roundPixel(value: number) {
 }
 
 const genshinCharacters = ["yae_miko", "hutao", "nilou", "klee", "keqing", "zhongli"] as const;
-const genshinHelp = "角色编号：1、八重神子，2、胡桃，3、妮露，4、可莉，5、刻晴，6、钟离";
+const genshinHelp = $t("templates.large-source-animations.text_b7b332b122");
 const genshinShortcuts = [
   ["八重神子吃", 1], ["神子吃", 1], ["八重吃", 1], ["胡桃吃", 2], ["妮露吃", 3], ["可莉吃", 4], ["刻晴吃", 5], ["钟离吃", 6],
 ] as const;
@@ -197,7 +200,7 @@ function charaSubdirectory(args: MemeTemplateInput["args"]): string | undefined 
   const character = args.character === undefined ? 0 : Number(args.character);
   if (character === 0) return genshinCharacters[Math.floor(Math.random() * genshinCharacters.length)];
   if (!Number.isInteger(character) || character < 1 || character > genshinCharacters.length) {
-    throw new MemeTemplateFeedback("角色编号错误，请选择1-6");
+    throw new MemeTemplateFeedback($t("templates.large-source-animations.text_af9e9fb42e"));
   }
   return genshinCharacters[character - 1];
 }
@@ -212,7 +215,7 @@ function createAnimation(spec: Animation): MemeTemplate {
       min_images: 1, max_images: 1, min_texts: 0, max_texts: 0, default_texts: [],
       args_type: genshin ? {
         args_model: { properties: { character: { type: "integer", default: 0, description: genshinHelp } } },
-        parser_options: [{ names: ["-c", "--character", "角色"], args: [{ name: "character", value: "int" }], help_text: genshinHelp }],
+        parser_options: [{ names: ["-c", "--character", $t("templates.large-source-animations.text_c47b54e84e")], args: [{ name: "character", value: "int" }], help_text: genshinHelp }],
       } : null,
     },
   };

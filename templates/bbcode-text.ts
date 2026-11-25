@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Caption tags and default typefaces follow pil-utils 0.2.0 Text2Image.
 import { Canvas, FontLibrary, type CanvasRenderingContext2D } from "skia-canvas";
 import { MemeTemplateFeedback } from "../builtin-template.ts";
@@ -94,7 +97,7 @@ export function parseMemeBbcode(text: string, size: number, alignment: Alignment
       paragraphs.push(paragraph);
     }
     const fontSize = Number(current("size") ?? size);
-    if (!Number.isSafeInteger(fontSize) || fontSize > 8192) throw new MemeTemplateFeedback("文字字号超出表情绘制范围。");
+    if (!Number.isSafeInteger(fontSize) || fontSize > 8192) throw new MemeTemplateFeedback($t("templates.bbcode-text.text_aa7c4598b8"));
     if (!fontSize) continue;
     paragraph.spans.push({
       text: token, size: fontSize, color: current("color"), stroke: current("stroke"), family: current("font"),

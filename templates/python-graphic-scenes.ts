@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { randomInt } from "node:crypto";
 import { ImageData, loadImage, type Image } from "skia-canvas";
 import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
@@ -59,7 +62,7 @@ const loading = buildImageMeme("loading", ["加载中"], [1, 1], async ({ images
       canvas => canvas.drawImage(photo, 100, height + 5 + Math.floor((stripHeight - thumbHeight) / 2), 100, thumbHeight),
     ], context.signal, { whiteBackground: source.frames.length === 1 });
     draw.drawImage(await loadImage(composed), 0, 0);
-    drawFittedText(draw, [210, height + 5, 480, height + stripHeight + 5], "不出来", font, 12, 60, "left", "black", { wrap: false, paragraphMetrics: true });
+    drawFittedText(draw, [210, height + 5, 480, height + stripHeight + 5], $t("templates.python-graphic-scenes.text_e45c9b0369"), font, 12, 60, "left", "black", { wrap: false, paragraphMetrics: true });
   }, context.signal);
 });
 
@@ -107,7 +110,7 @@ const cyan = buildImageMeme("cyan", ["群青"], [1, 1], async ({ images }, conte
   const tinted = await pixelImage(500, 500, blueTint(result.rgba));
   return jpg(500, 500, draw => {
     draw.drawImage(tinted, 0, 0);
-    drawFittedText(draw, [400, 40, 480, 280], "群\n青", bold, 12, 80, "left", "white",
+    drawFittedText(draw, [400, 40, 480, 280], $t("templates.python-graphic-scenes.text_57a6d8752a"), bold, 12, 80, "left", "white",
       { wrap: false, paragraphMetrics: true, blockAlignment: "center", stroke: ["#4e72b8", 0.04] });
     drawFittedText(draw, [200, 270, 480, 350], "YOASOBI", normal, 12, 40, "right", "white",
       { wrap: false, paragraphMetrics: true, stroke: ["#4e72b8", 0.06] });

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { createBundledMemeResources } from "./backend-builtin-assets.ts";
 import type { MemeTemplate, MemeTemplateInput } from "./builtin-template.ts";
 import { legacyCaptionShortcutPatterns, type NativeShortcutPattern } from "./legacy-caption-shortcuts.ts";
@@ -17,18 +20,18 @@ const nativeTriggers = new WeakMap<LocalMemeProvider["generate"], {
 const nativeShortcutPatterns: readonly NativeShortcutPattern[] = [
   ...legacyCaptionShortcutPatterns,
   {
-    template: "steam_message", source: "(?P<name>\\S+)正在玩(?P<game>\\S+)",
+    template: "steam_message", source: $t("backend-lifecycle.text_6e36826ab8"),
     pattern: /^(?<name>\S+)正在玩(?<game>\S+)(?=\s|$)/u,
     captions: ["game"], option: { name: "name", capture: "name", suffix: "" },
   },
   {
-    template: "panda_dragon_figure", source: "(?P<name>\\S{1,10})龙[\\s:：]+(?P<text>\\S+)",
+    template: "panda_dragon_figure", source: $t("backend-lifecycle.text_41f4c0fb16"),
     pattern: /^(?<name>\S{1,10})龙[\s:：]+(?<text>\S+)(?=\s|$)/u,
-    captions: ["text"], option: { name: "name", capture: "name", suffix: "龙" },
+    captions: ["text"], option: { name: "name", capture: "name", suffix: $t("backend-lifecycle.text_c10756e3ca") },
   },
-  { template: "genshin_start", source: "(?P<text>\\S+启动[!！]?)", pattern: /^(\S+启动[!！]?)(?=\s|$)/u },
-  { template: "fill_head", source: "满脑子都是(?P<name>\\S+)", pattern: /^满脑子都是(\S+)(?=\s|$)/u },
-  { template: "speechless", source: "(?P<text>典型的\\S+思维)", pattern: /^(典型的\S+思维)(?=\s|$)/u },
+  { template: "genshin_start", source: $t("backend-lifecycle.text_62df7f8a49"), pattern: /^(\S+启动[!！]?)(?=\s|$)/u },
+  { template: "fill_head", source: $t("backend-lifecycle.text_4f3bb74b95"), pattern: /^满脑子都是(\S+)(?=\s|$)/u },
+  { template: "speechless", source: $t("backend-lifecycle.text_4ebf793fde"), pattern: /^(典型的\S+思维)(?=\s|$)/u },
 ];
 
 export function nativeShortcutPattern(template: string, source: string) {
@@ -48,7 +51,7 @@ function buildRegistry(entries: readonly MemeTemplate[]) {
   for (const template of entries) {
     const { key, tags } = template.info;
     if (!safeCatalogKey(key) || isExcludedMemeTemplate(key, tags)) continue;
-    if (templates.has(key)) throw new Error(`重复的内置表情模板 ${key}`);
+    if (templates.has(key)) throw new Error($t("backend-lifecycle.text_32d31f87d7", { "key": key }));
     templates.set(key, template);
   }
   return templates;
@@ -59,9 +62,9 @@ function parseInput(body: FormData): MemeTemplateInput {
   const texts = body.getAll("texts");
   const raw = body.get("args");
   if (images.some((image) => typeof image === "string") || texts.some((value) => typeof value !== "string") ||
-      (raw !== null && typeof raw !== "string")) throw new Error("无效的表情合成参数");
+      (raw !== null && typeof raw !== "string")) throw new Error($t("backend-lifecycle.text_c45fb32186"));
   const args: unknown = raw === null ? {} : JSON.parse(raw);
-  if (typeof args !== "object" || args === null || Array.isArray(args)) throw new Error("无效的表情合成选项");
+  if (typeof args !== "object" || args === null || Array.isArray(args)) throw new Error($t("backend-lifecycle.text_617660c01c"));
   return { images: images as File[], texts: texts as string[], args: args as Record<string, unknown> };
 }
 

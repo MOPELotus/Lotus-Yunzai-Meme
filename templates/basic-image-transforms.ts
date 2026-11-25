@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Visual layout and parameters follow MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/f5ee44f6a3e134b9ac54032f97eab788d6454e3c/meme_generator/memes
 import { loadImage, type Image } from "skia-canvas";
@@ -6,8 +9,8 @@ import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../bu
 import { drawFittedText, paper, registerFont } from "./template-layout.ts";
 import { readTransformSource, renderTransformSequence, transformPreviewInput } from "./transforms.ts";
 
-const numberHelp = "像素化大小，默认为 10";
-const upsideCaption = "我看你们是反了！";
+const numberHelp = $t("templates.basic-image-transforms.text_d610547bf1");
+const upsideCaption = $t("templates.basic-image-transforms.text_ce4e377327");
 const width = 500;
 const captionHeight = 80;
 const singleImage = { min_images: 1, max_images: 1, min_texts: 0 } as const;
@@ -20,7 +23,7 @@ async function renderPixelate(input: MemeTemplateInput, context: MemeTemplateCon
   const { width, height } = first;
   const size = input.args.number ?? 10;
   if (typeof size !== "number" || !Number.isSafeInteger(size) || size < 1 || size >= Math.min(width, height)) {
-    throw new Error("请输入合适的像素化大小。");
+    throw new Error($t("templates.basic-image-transforms.text_fcc419d723"));
   }
   let source = sequence;
   if (size !== 1) {
@@ -48,7 +51,7 @@ async function renderUpsideDown(input: MemeTemplateInput, context: MemeTemplateC
   const sequence = await readTransformSource(input, context.signal);
   const first = sequence.frames[0];
   const imageHeight = Math.floor(first.height * width / first.width);
-  if (imageHeight < 1) throw new Error("图片太扁，无法生成表情。");
+  if (imageHeight < 1) throw new Error($t("templates.basic-image-transforms.text_c84c3f23bb"));
   const height = imageHeight + captionHeight;
   const font = await registerFont(context);
   return renderTransformSequence(sequence, width, height, (canvas, image) => {

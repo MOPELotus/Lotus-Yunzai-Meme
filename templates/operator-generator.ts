@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
@@ -13,7 +16,7 @@ const tileCount = 25;
 
 async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
   const { signal } = context;
-  const name = input.texts[0] ?? "你好";
+  const name = input.texts[0] ?? $t("templates.operator-generator.text_670d974354");
   const [avatar, font, tiles] = await Promise.all([
     readMemeFirstImage(input.images[0]!, signal),
     registerFont(context, true),
@@ -36,7 +39,7 @@ async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
     draw.imageSmoothingQuality = "high";
     draw.fillStyle = "#a0a0a0";
     draw.fillRect(0, 0, 640, 640);
-    drawFittedText(draw, [120, 0, 620, 100], `${name}，你的干员信息如下：`, font, 30, 80, "center", "white",
+    drawFittedText(draw, [120, 0, 620, 100], $t("templates.operator-generator.text_2bc3592c66", { "name": name }), font, 30, 80, "center", "white",
       { stroke: ["black", 0.1], paragraphMetrics: true });
     for (const [index, { image, height }] of tiles.entries()) {
       const x = (index % 2) * tileWidth;

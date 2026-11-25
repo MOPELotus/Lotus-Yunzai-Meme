@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original layouts from MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { loadImage } from "skia-canvas";
@@ -28,7 +31,7 @@ function newsTemplate(
   };
 }
 
-const luoText = "又不是不能用";
+const luoText = $t("templates.text-announcements.text_4f3035edb0");
 const luoProjection = screenProjection(365, 120, [[52, 10], [391, 0], [364, 110], [0, 120]]);
 async function luoYonghao(text: string, context: MemeTemplateContext) {
   const { signal } = context;
@@ -56,8 +59,8 @@ async function luoYonghao(text: string, context: MemeTemplateContext) {
 }
 
 export const textAnnouncementMemeTemplates: readonly MemeTemplate[] = [
-  newsTemplate("bad_news", "悲报", "喜报", "bad_news/0.png", "#000", "#fff"),
-  newsTemplate("good_news", "喜报", "悲报", "good_news/0.jpg", "#e00", "#ffff99"),
+  newsTemplate("bad_news", "悲报", $t("templates.text-announcements.text_6c2619a8f8"), "bad_news/0.png", "#000", "#fff"),
+  newsTemplate("good_news", "喜报", $t("templates.text-announcements.text_9e94346a88"), "good_news/0.jpg", "#e00", "#ffff99"),
   {
     info: { key: "luoyonghao_say", keywords: ["罗永浩说"], params_type: { ...base, default_texts: [luoText] } },
     render: (input, context) => luoYonghao(input.texts[0] ?? luoText, context),

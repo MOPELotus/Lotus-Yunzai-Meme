@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Template layouts follow MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/f5ee44f6a3e134b9ac54032f97eab788d6454e3c/meme_generator/memes
 import { renderExactPng, renderRgba } from "@lotus-yunzai/skia";
@@ -76,7 +79,7 @@ const funnyMirror: MemeTemplate = {
 
 const flashWidth = 500;
 const captionHeight = 65;
-const defaultFlashCaption = "闪瞎你们的狗眼";
+const defaultFlashCaption = $t("templates.mirror-flash.text_a5df1ef1c3");
 
 function fitFlashCaption(text: string, font: string) {
   const measure = new Canvas(1, 1).getContext("2d");
@@ -89,7 +92,7 @@ function fitFlashCaption(text: string, font: string) {
       return { description, lines, lineHeight };
     }
   }
-  throw new Error("文字过长，无法放进表情模板。");
+  throw new Error($t("templates.mirror-flash.text_002fc2fab2"));
 }
 
 function drawFlashCaption(draw: CanvasRenderingContext2D, caption: ReturnType<typeof fitFlashCaption>, y: number, inverted: boolean) {
@@ -111,7 +114,7 @@ const flashBlind: MemeTemplate = {
     const height = Math.floor(image.height * flashWidth / image.width);
     const zoomHeight = Math.floor(height * 0.9);
     assertMemeGifDimensions(flashWidth, height, 4);
-    if (zoomHeight < 1) throw new RangeError("图片高度太小，无法生成表情。");
+    if (zoomHeight < 1) throw new RangeError($t("templates.mirror-flash.text_284122a88e"));
     const caption = texts[0] ? fitFlashCaption(texts[0], await registerFont(context)) : undefined;
     const normalized = await renderExactPng(flashWidth, height, draw => {
       draw.fillStyle = "#000";

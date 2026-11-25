@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,28 +17,28 @@ export function readConfig(directory: string, filename: string): Record<string, 
   }
   const yaml: unknown = Bun.YAML.parse(source);
   if (yaml === undefined || yaml === null) return {};
-  if (typeof yaml !== "object" || Array.isArray(yaml)) throw new Error("无效的表情配置");
+  if (typeof yaml !== "object" || Array.isArray(yaml)) throw new Error($t("catalog-policy.text_324980952c"));
   return yaml as Record<string, unknown>;
 }
 
 function flag(value: unknown, fallback: boolean): boolean {
   if (value === undefined) return fallback;
-  if (typeof value !== "boolean") throw new Error("无效的表情配置开关");
+  if (typeof value !== "boolean") throw new Error($t("catalog-policy.text_0e28992659"));
   return value;
 }
 
 function list(value: unknown): string[] {
   if (value === undefined) return [];
-  if (!Array.isArray(value)) throw new Error("无效的表情名单");
+  if (!Array.isArray(value)) throw new Error($t("catalog-policy.text_ad984b0b7e"));
   return value.map((item: unknown) => {
-    if (typeof item !== "string" && !Number.isSafeInteger(item)) throw new Error("无效的表情名单项");
+    if (typeof item !== "string" && !Number.isSafeInteger(item)) throw new Error($t("catalog-policy.text_7c0d04092f"));
     return String(item).trim();
   }).filter(Boolean);
 }
 
 export function configDirectory(): string {
   const directory = Bun.env.LOTUS_MEME_CONFIG_DIR;
-  if (directory !== undefined && !statSync(directory).isDirectory()) throw new Error("无效的表情配置目录");
+  if (directory !== undefined && !statSync(directory).isDirectory()) throw new Error($t("catalog-policy.text_c12bf1714f"));
   return directory ?? defaultDirectory;
 }
 
@@ -47,7 +50,7 @@ export function catalogPolicy(userId: number | undefined, forGeneration = false)
   let allowed = true;
   if (flag(access.enable, false)) {
     const mode = access.mode ?? 0;
-    if (mode !== 0 && mode !== 1) throw new Error("无效的表情名单模式");
+    if (mode !== 0 && mode !== 1) throw new Error($t("catalog-policy.text_6d1e2d2ab0"));
     const users = list(mode === 0 ? access.userWhiteList : access.userBlackList);
     allowed = userId !== undefined && users.includes(String(userId)) === (mode === 0);
   }
@@ -111,7 +114,7 @@ export function memeProvider(): LocalMemeProvider | undefined {
   if (!localRenderer) return;
   const timeout = readConfig(configDirectory(), "server.yaml").managedTimeout ?? defaultManagedMemeTimeout;
   if (typeof timeout !== "number" || !Number.isFinite(timeout) || timeout <= 0 || timeout > 120) {
-    throw new Error("无效的表情合成超时");
+    throw new Error($t("catalog-policy.text_e81d26dcff"));
   }
   return { ...localRenderer, timeout: Math.ceil(timeout * 1_000) };
 }

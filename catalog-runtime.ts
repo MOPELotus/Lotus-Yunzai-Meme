@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import type { createLocalMemeBackend } from "./backend-lifecycle.ts";
 import type { LoadMemeInfoCard } from "./info-card-runtime.ts";
 import { initializeLocalCatalog } from "./catalog-update.ts";
@@ -20,7 +23,7 @@ export function startCatalogRuntime(
       const summary = await initializeLocalCatalog(signal);
       if (!signal.aborted && summary) console.info(`[meme] ${summary}`);
     } catch (error) {
-      if (!signal.aborted) console.warn("[meme] 初始化表情目录失败。", error);
+      if (!signal.aborted) console.warn($t("catalog-runtime.text_18ae92c446"), error);
     }
   }
 

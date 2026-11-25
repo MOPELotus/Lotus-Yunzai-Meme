@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { randomInt } from "node:crypto";
 import { loadImage, type CanvasRenderingContext2D } from "skia-canvas";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext } from "../builtin-template.ts";
@@ -25,22 +28,22 @@ interface Dialogue {
 const dialogue: readonly Dialogue[] = [
   {
     key: "mihoyo_funina_card", keywords: ["芙芙卡片", "芙宁娜卡片", "芙芙酱卡片"], tags: ["米哈游", "原神"],
-    text: "曾经我是戴上假面的演员，只想要掩饰真相…", font: "child", sizes: [30, 120],
+    text: $t("templates.anyliew-text-dialogue.text_5cb3e04c1a"), font: "child", sizes: [30, 120],
     frames: [{ asset: "0.png", box: [361, 274, 1392, 940] }],
   },
   {
     key: "mihoyo_liuwei_say", keywords: ["刘伟说", "大伟说", "大伟哥说"], tags: ["米哈游"],
-    text: "你的声音太尖锐了", font: "diary", sizes: [30, 120],
+    text: $t("templates.anyliew-text-dialogue.text_5ba48f7ec2"), font: "diary", sizes: [30, 120],
     frames: [{ asset: "0.jpg", box: [426, 44, 1219, 284] }],
   },
   {
     key: "mihoyo_neuvillette_say", keywords: ["那维莱特说", "水龙王说"], tags: ["米哈游"],
-    text: "潮水啊，我已归来", sizes: [20, 120],
+    text: $t("templates.anyliew-text-dialogue.text_202f6ba718"), sizes: [20, 120],
     frames: [{ asset: "0.png", box: [104, 53, 307, 460] }],
   },
   {
     key: "mihoyo_paimon_say", keywords: ["派蒙说"], tags: ["米哈游"],
-    text: "前面的区域\n以后再来探索吧？", color: "#5e5e5e", sizes: [20, 120],
+    text: $t("templates.anyliew-text-dialogue.text_3abbd3f3c3"), color: "#5e5e5e", sizes: [20, 120],
     frames: [{ asset: "0.png", box: [145, 148, 619, 1117] }],
   },
   {
@@ -50,17 +53,17 @@ const dialogue: readonly Dialogue[] = [
   },
   {
     key: "moria_ruruka_say", keywords: ["露露卡说", "森亚露露卡说"],
-    text: "变身", font: "child", sizes: [10, 120],
+    text: $t("templates.anyliew-text-dialogue.text_4ba7c75320"), font: "child", sizes: [10, 120],
     frames: [{ asset: "0.png", box: [34, 57, 255, 170] }],
   },
   {
     key: "mygo_chihaya_anon_say", keywords: ["千早爱音说"],
-    text: "诶？！！！等……等等等，是一辈子喔？", font: "child", sizes: [10, 1150], leftLines: true,
+    text: $t("templates.anyliew-text-dialogue.text_7372f0f0ba"), font: "child", sizes: [10, 1150], leftLines: true,
     frames: [{ asset: "0.png", box: [205, 166, 912, 557] }],
   },
   {
     key: "mygo_togawa_sakiko_say", keywords: ["丰川祥子说", "祥子说"],
-    text: "我从没觉得玩乐队开心过……", font: "child", sizes: [10, 180],
+    text: $t("templates.anyliew-text-dialogue.text_f00b96dc31"), font: "child", sizes: [10, 180],
     frames: [
       { asset: "1.png", box: [1483, 172, 2318, 438] },
       { asset: "2.png", box: [1145, 101, 1893, 420] },
@@ -69,7 +72,7 @@ const dialogue: readonly Dialogue[] = [
   },
   {
     key: "mygo_wakaba_mutsumi_say", keywords: ["若叶睦说", "睦子米说"],
-    text: "我从没觉得玩乐队开心过……", font: "child", sizes: [10, 180],
+    text: $t("templates.anyliew-text-dialogue.text_f00b96dc31"), font: "child", sizes: [10, 180],
     frames: [
       { asset: "1.png", box: [31, 89, 166, 175] },
       { asset: "2.png", box: [40, 48, 192, 139] },
@@ -102,12 +105,12 @@ function drawDialogue(draw: CanvasRenderingContext2D, definition: Dialogue, box:
     draw.fillText(text, x, top + (height - paragraph) / 2 - ascent, wrap);
     return;
   }
-  throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+  throw new MemeTemplateFeedback($t("templates.anyliew-text-dialogue.text_002fc2fab2"));
 }
 
 function createDialogue(definition: Dialogue): MemeTemplate {
   const count = definition.frames.length;
-  const help = `图片编号，0 随机，1～${count} 指定底图`;
+  const help = $t("templates.anyliew-text-dialogue.text_9b3f8cfe24", { "count": count });
   const argsType = count > 1 ? {
     args_model: { properties: { number: { type: "integer", default: 0, description: help } } },
     parser_options: [{ names: ["-n", "--number"], args: [{ name: "number", value: "int" }], help_text: help }],
@@ -118,7 +121,7 @@ function createDialogue(definition: Dialogue): MemeTemplate {
     if (argsType) {
       if (number === undefined || number === 0) index = randomInt(count);
       else if (typeof number === "number" && Number.isSafeInteger(number) && number >= 1 && number <= count) index = number - 1;
-      else throw new MemeTemplateFeedback(`图片编号错误，请选择 1～${count} 或 0（随机）`);
+      else throw new MemeTemplateFeedback($t("templates.anyliew-text-dialogue.text_9cac8fb54e", { "count": count }));
     }
     const frame = definition.frames[index]!;
     const typeface = definition.font && fonts[definition.font];

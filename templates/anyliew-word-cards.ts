@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { randomInt } from "node:crypto";
 import { loadImage, type CanvasRenderingContext2D } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
@@ -30,22 +33,22 @@ const noImages = { min_images: 0, max_images: 0, min_texts: 1, max_texts: 1 } as
 const cards: readonly WordCard[] = [
   { key: "admission_letter", keywords: ["录取通知书"], text: "Anyliew", args: "name",
     childFont: true, leftLines: true, sizes: [10, 16], frames: [{ asset: "legacy-0.png", box: [102, 195, 500, 217] }] },
-  { key: "aima_say", keywords: ["艾玛说", "樱羽艾玛说"], text: "何意味？",
+  { key: "aima_say", keywords: ["艾玛说", "樱羽艾玛说"], text: $t("templates.anyliew-word-cards.text_ace43181b8"),
     childFont: true, leftLines: true, sizes: [5, 120], frames: [
       { asset: "0.jpg", box: [40, 35, 140, 210] }, { asset: "1.jpg", box: [360, 10, 490, 200] },
     ] },
-  { key: "atri_say", keywords: ["亚托莉说"], tags: ["ATRI", "亚托莉", "萝卜子"], text: "好久不见，你长大了呢。",
+  { key: "atri_say", keywords: ["亚托莉说"], tags: ["ATRI", "亚托莉", "萝卜子"], text: $t("templates.anyliew-word-cards.text_92bb9b31a6"),
     childFont: true, leftLines: true, sizes: [20, 120], frames: [{ asset: "0.png", box: [25, 166, 114, 284] }] },
-  { key: "deepseek_say", keywords: ["Deepseek说", "deepseek说", "鲸鱼娘说", "大肥鱼说"], text: "正在思考中……",
+  { key: "deepseek_say", keywords: ["Deepseek说", "deepseek说", "鲸鱼娘说", "大肥鱼说"], text: $t("templates.anyliew-word-cards.text_6c1c37dff2"),
     childFont: true, sizes: [10, 180], args: "number", frames: [
       { asset: "1.png", box: [59, 57, 569, 336], color: "#041546" },
       { asset: "2.png", box: [139, 140, 653, 427], color: "#10315e" },
       { asset: "3.png", box: [372, 0, 1254, 382] },
       { asset: "4.png", box: [139, 122, 664, 427], color: "#000a35" },
     ] },
-  { key: "naruto_uchiha_itachi_say", keywords: ["鼬说", "宇智波鼬说"], text: "伊邪那美",
+  { key: "naruto_uchiha_itachi_say", keywords: ["鼬说", "宇智波鼬说"], text: $t("templates.anyliew-word-cards.text_d287a16e1d"),
     leftLines: true, sizes: [30, 300], frames: [{ asset: "0.png", box: [778, 572, 1020, 979] }] },
-  { key: "naruto_yakushi_kabuto_say", keywords: ["药师兜说", "兜说"], text: "仙法白激之术",
+  { key: "naruto_yakushi_kabuto_say", keywords: ["药师兜说", "兜说"], text: $t("templates.anyliew-word-cards.text_b0115a3961"),
     leftLines: true, sizes: [30, 300], frames: [{ asset: "0.png", box: [1040, 1, 1370, 483] }] },
 ];
 
@@ -73,7 +76,7 @@ function makeCard(card: WordCard): MemeTemplate {
   const option = card.args;
   const isLetter = option === "name";
   const count = card.frames.length;
-  const optionHelp = isLetter ? "姓名，指定后使用日期与称呼版式" : "图片编号，0 随机，1～" + count + " 选定底图";
+  const optionHelp = isLetter ? $t("templates.anyliew-word-cards.text_0c82a5d7d0") : $t("templates.anyliew-word-cards.text_ce50e24cd5") + count + $t("templates.anyliew-word-cards.text_54a55f97a5");
   const argsType = option ? {
     args_model: { properties: {
       [option]: { type: isLetter ? "string" : "integer", default: isLetter ? "" : 0, description: optionHelp },
@@ -86,7 +89,7 @@ function makeCard(card: WordCard): MemeTemplate {
       const number = option === "number" ? args.number : undefined;
       if (number === undefined || number === 0) index = randomInt(count);
       else if (typeof number === "number" && Number.isSafeInteger(number) && number >= 1 && number <= count) index = number - 1;
-      else throw new MemeTemplateFeedback("图片编号错误，请选择 1～" + count + " 或 0（随机）");
+      else throw new MemeTemplateFeedback($t("templates.anyliew-word-cards.text_23aac92ed6") + count + $t("templates.anyliew-word-cards.text_a5c37328e7"));
     }
     const name = isLetter && typeof args.name === "string" ? args.name : undefined;
     const frame = name === undefined ? card.frames[index]! : namedLetterFrame;
@@ -122,13 +125,13 @@ function makeCard(card: WordCard): MemeTemplate {
 }
 
 const handwriting: MemeTemplate = {
-  info: { key: "handwriting", keywords: ["手写"], params_type: { ...noImages, default_texts: ["你好，世界！"] } },
+  info: { key: "handwriting", keywords: ["手写"], params_type: { ...noImages, default_texts: [$t("templates.anyliew-word-cards.text_fa65d94b35")] } },
   async render({ texts }, context) {
     const [frame, primary, fallback] = await Promise.all([
       context.imageAsset(assetPath("handwriting", "0.jpg")).then(loadImage),
       registerMemeTypeface(context, "FZSJ-QINGCRJ.ttf", "LotusMemeDiary"), registerFont(context),
     ]);
-    const text = [...(texts[0] ?? "你好，世界！")].slice(0, 500).join("");
+    const text = [...(texts[0] ?? $t("templates.anyliew-word-cards.text_fa65d94b35"))].slice(0, 500).join("");
     const width = 2_000, height = 1_800;
     const patch = await renderExactPng(width, height, draw => {
       draw.font = "200px " + primary + ", " + fallback + ", sans-serif";
@@ -151,20 +154,20 @@ const handwriting: MemeTemplate = {
       draw.drawImage(lettering, -width / 2, -height / 2);
     }, context.signal);
   },
-  preview: context => handwriting.render({ images: [], texts: ["你好，世界！"], args: {} }, context),
+  preview: context => handwriting.render({ images: [], texts: [$t("templates.anyliew-word-cards.text_fa65d94b35")], args: {} }, context),
 };
 
 const bullyMe: MemeTemplate = {
   info: { key: "bully_me", keywords: ["恶语相向"],
-    params_type: { min_images: 1, max_images: 1, min_texts: 1, max_texts: 1, default_texts: ["我"] } },
+    params_type: { min_images: 1, max_images: 1, min_texts: 1, max_texts: 1, default_texts: [$t("templates.anyliew-word-cards.text_b70bb4acc0")] } },
   async render({ images, texts }, context) {
-    if (images.length !== 1) throw new MemeTemplateFeedback("该表情需要一张图片。");
+    if (images.length !== 1) throw new MemeTemplateFeedback($t("templates.anyliew-word-cards.text_2646e324ad"));
     const [photo, primary, fallback] = await Promise.all([
       readMemeFirstImage(images[0]!, context.signal), childFont(context), registerFont(context),
     ]);
     const width = 650;
     const height = Math.floor(photo.height * width / photo.width);
-    const text = "当你想对" + (texts[0] ?? "我") + "恶语相向时，请注意，屏幕后面的我可是这样的：";
+    const text = $t("templates.anyliew-word-cards.text_b1248cc813") + (texts[0] ?? $t("templates.anyliew-word-cards.text_b70bb4acc0")) + $t("templates.anyliew-word-cards.text_1dab065c92");
     const captionHeight = 50 * (Math.floor([...text].length / 15) + 1) + 10;
     return jpg(width, captionHeight + height, draw => {
       paper(draw, width, captionHeight + height);
@@ -176,7 +179,7 @@ const bullyMe: MemeTemplate = {
     }, context.signal);
   },
   async preview(context) {
-    return bullyMe.render({ images: [await previewImage(context.signal)], texts: ["我"], args: {} }, context);
+    return bullyMe.render({ images: [await previewImage(context.signal)], texts: [$t("templates.anyliew-word-cards.text_b70bb4acc0")], args: {} }, context);
   },
 };
 

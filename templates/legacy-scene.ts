@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original layouts from MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
@@ -26,7 +29,7 @@ function cropAvatar(
 }
 
 async function painter(input: MemeTemplateInput, context: MemeTemplateContext) {
-  if (input.images.length !== 1) throw new Error("小画家需要一张图片。");
+  if (input.images.length !== 1) throw new Error($t("templates.legacy-scene.text_d2afe1056e"));
   const [image, frame] = await Promise.all([
     readMemeFirstImage(input.images[0]!, context.signal),
     context.imageAsset("painter/0.png").then(loadImage),
@@ -66,8 +69,8 @@ async function alike(input: MemeTemplateInput, context: MemeTemplateContext) {
   ]);
   return renderTransformSequence(sequence, 470, 180, (draw, image) => {
     paper(draw, 470, 180);
-    drawFittedText(draw, [10, 10, 185, 140], "你怎么跟", font, 30, 40, "right");
-    drawFittedText(draw, [365, 10, 460, 140], "一样", font, 30, 40, "left");
+    drawFittedText(draw, [10, 10, 185, 140], $t("templates.legacy-scene.text_b2b2993d91"), font, 30, 40, "right");
+    drawFittedText(draw, [365, 10, 460, 140], $t("templates.legacy-scene.text_9dc5c0158d"), font, 30, 40, "left");
     cropAvatar(draw, image, 200, 15, 150, 150, "center");
   }, context.signal);
 }

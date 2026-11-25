@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { Canvas, loadImage, type Image } from "skia-canvas";
 
 interface Frame {
@@ -33,7 +36,7 @@ const DEFAULT_GIF_DURATION_MS = 20;
 const DEFAULT_ALIGNMENT_FRAMES = 100;
 
 function invalid(): never {
-  throw new Error("无效或过大的表情输入图片。");
+  throw new Error($t("templates.animated-input.text_2f1b534763"));
 }
 
 function checkSize(width: number, height: number, frames = 1) {

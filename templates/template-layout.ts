@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -48,7 +51,7 @@ export async function registerMemeTypeface(context: MemeTemplateContext, asset: 
       try {
         const file = join(directory, "font.ttf");
         await writeFile(file, bytes, { mode: 0o600 });
-        if (!FontLibrary.use(registeredFamily, file).length) throw new Error("表情字体无法加载。");
+        if (!FontLibrary.use(registeredFamily, file).length) throw new Error($t("templates.template-layout.text_e8fd5b11dd"));
       } finally {
         await rm(directory, { recursive: true, force: true });
       }
@@ -116,7 +119,7 @@ export function drawFittedText(context: CanvasRenderingContext2D, box: Box, text
         return;
       }
     }
-    throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+    throw new MemeTemplateFeedback($t("templates.template-layout.text_002fc2fab2"));
   } finally {
     context.restore();
   }
@@ -124,15 +127,15 @@ export function drawFittedText(context: CanvasRenderingContext2D, box: Box, text
 
 export async function firstImage(file: File, signal: AbortSignal) {
   signal.throwIfAborted();
-  if (!file.size || file.size > 16 * 1024 * 1024) throw new RangeError("表情图片文件太大或为空。");
+  if (!file.size || file.size > 16 * 1024 * 1024) throw new RangeError($t("templates.template-layout.text_f409207115"));
   const image = await loadImage(Buffer.from(await file.arrayBuffer()));
   signal.throwIfAborted();
-  if (image.width * image.height > maxStaticPixels) throw new RangeError("表情原图尺寸超限。");
+  if (image.width * image.height > maxStaticPixels) throw new RangeError($t("templates.template-layout.text_fc7c0a1bda"));
   return image;
 }
 
 export async function rasterCanvas(width: number, height: number, draw: Draw, signal: AbortSignal, maxPixels = maxStaticPixels) {
-  if (width * height > maxPixels || width > 8192 || height > 8192) throw new RangeError("表情尺寸超限。");
+  if (width * height > maxPixels || width > 8192 || height > 8192) throw new RangeError($t("templates.template-layout.text_8e2328d557"));
   signal.throwIfAborted();
   const rendered = await renderPng(width, height, draw);
   const image = await loadImage(rendered.png);

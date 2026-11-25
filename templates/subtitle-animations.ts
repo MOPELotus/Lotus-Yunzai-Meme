@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Subtitle windows and caption sizes follow MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/blob/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes/gif_subtitle/__init__.py
 import { renderExactPng } from "../../../packages/skia/index.ts";
@@ -22,39 +25,39 @@ interface SubtitleSpec {
 // frame. This includes sources whose original GIF mixes 120 and 130 ms.
 const specs: readonly SubtitleSpec[] = [
   { key: "wangjingze", keyword: "王境泽", delayMs: 130, windows: [[0, 9], [12, 24], [25, 35], [37, 48]],
-    captions: ["我就是饿死", "死外边 从这里跳下去", "不会吃你们一点东西", "真香"] },
+    captions: [$t("templates.subtitle-animations.text_89cf0a8523"), $t("templates.subtitle-animations.text_d11b69341b"), $t("templates.subtitle-animations.text_c639a80d36"), $t("templates.subtitle-animations.text_aed755f855")] },
   { key: "weisuoyuwei", keyword: "为所欲为", delayMs: 120, fontSize: 19,
     windows: [[11, 14], [27, 38], [42, 61], [63, 81], [82, 95], [96, 105], [111, 131], [145, 157], [157, 167]],
-    captions: ["好啊", "就算你是一流工程师", "就算你出报告再完美", "我叫你改报告你就要改", "毕竟我是客户", "客户了不起啊",
-      "Sorry 客户真的了不起", "以后叫他天天改报告", "天天改 天天改"] },
+    captions: [$t("templates.subtitle-animations.text_2ce2464352"), $t("templates.subtitle-animations.text_c582e14938"), $t("templates.subtitle-animations.text_0ad0e1c218"), $t("templates.subtitle-animations.text_454bb1101b"), $t("templates.subtitle-animations.text_836bee2565"), $t("templates.subtitle-animations.text_500f7b18b1"),
+      $t("templates.subtitle-animations.text_8403a1cf53"), $t("templates.subtitle-animations.text_286fd27cb8"), $t("templates.subtitle-animations.text_4b76b8cff3")] },
   { key: "chanshenzi", keyword: "馋身子", delayMs: 100, fontSize: 18, windows: [[0, 16], [16, 31], [33, 40]],
-    captions: ["你那叫喜欢吗？", "你那是馋她身子", "你下贱！"] },
+    captions: [$t("templates.subtitle-animations.text_cf1ef87cca"), $t("templates.subtitle-animations.text_35ec4e38b9"), $t("templates.subtitle-animations.text_fe7987ad53")] },
   { key: "qiegewala", keyword: "切格瓦拉", delayMs: 130, windows: [[0, 15], [16, 31], [31, 38], [38, 48], [49, 68], [68, 86]],
-    captions: ["没有钱啊 肯定要做的啊", "不做的话没有钱用", "那你不会去打工啊", "有手有脚的", "打工是不可能打工的", "这辈子不可能打工的"] },
+    captions: [$t("templates.subtitle-animations.text_033b5337f7"), $t("templates.subtitle-animations.text_09fed1a1bb"), $t("templates.subtitle-animations.text_6bab8359d8"), $t("templates.subtitle-animations.text_5260239b4e"), $t("templates.subtitle-animations.text_f1dc4f5578"), $t("templates.subtitle-animations.text_4cfe0fdb44")] },
   { key: "shuifandui", keyword: "谁反对", delayMs: 120, fontSize: 19, windows: [[3, 14], [21, 26], [31, 38], [40, 45]],
-    captions: ["我话说完了", "谁赞成", "谁反对", "我反对"] },
+    captions: [$t("templates.subtitle-animations.text_baa822ea61"), $t("templates.subtitle-animations.text_eacdffb834"), $t("templates.subtitle-animations.text_2064c386d4"), $t("templates.subtitle-animations.text_49dbd05964")] },
   { key: "jiamianqishi", keyword: "假面骑士", delayMs: 120, fontSize: 17, windows: [[2, 9], [14, 20], [27, 40], [45, 62]],
-    captions: ["哦～", "（飞扑）", "一直想看你这幅表情", "这幅嫉妒我的表情"] },
+    captions: [$t("templates.subtitle-animations.text_d005326a8f"), $t("templates.subtitle-animations.text_32520ecd80"), $t("templates.subtitle-animations.text_ff1b30208d"), $t("templates.subtitle-animations.text_39bffd94a7")] },
   { key: "wuyage", keyword: "乌鸦哥", delayMs: 60, fontSize: 18, windows: [[8, 32], [35, 58], [60, 85]],
-    captions: ["哟 Lotus-Yunzai机器人", "今天掉线了没", "来给他弹个版本过低"] },
+    captions: [$t("templates.subtitle-animations.text_c630907406"), $t("templates.subtitle-animations.text_2282e18562"), $t("templates.subtitle-animations.text_8143cbf58b")] },
   { key: "zengxiaoxian", keyword: "曾小贤", delayMs: 130, fontSize: 21, windows: [[3, 15], [24, 30], [30, 46], [56, 63]],
-    captions: ["平时你打电子游戏吗", "偶尔", "星际还是魔兽", "连连看"] },
+    captions: [$t("templates.subtitle-animations.text_5232cff014"), $t("templates.subtitle-animations.text_3d767e5e33"), $t("templates.subtitle-animations.text_cc083e275f"), $t("templates.subtitle-animations.text_8c102614fe")] },
   { key: "yalidaye", keyword: "压力大爷", delayMs: 130, fontSize: 21, windows: [[0, 16], [21, 47], [52, 77]],
-    captions: ["外界都说我们压力大", "我觉得吧压力也没有那么大", "主要是28岁了还没媳妇儿"] },
+    captions: [$t("templates.subtitle-animations.text_bd36311a78"), $t("templates.subtitle-animations.text_d2ae298320"), $t("templates.subtitle-animations.text_8d3244050a")] },
   { key: "nihaosaoa", keyword: "你好骚啊", delayMs: 100, fontSize: 17, windows: [[0, 14], [16, 26], [42, 61]],
-    captions: ["既然追求刺激", "就贯彻到底了", "你好骚啊"] },
+    captions: [$t("templates.subtitle-animations.text_1515bfe01a"), $t("templates.subtitle-animations.text_f9bb694542"), $t("templates.subtitle-animations.text_aa3785a154")] },
   { key: "shishilani", keyword: "食屎啦你", delayMs: 200, fontSize: 17, windows: [[14, 21], [23, 36], [38, 46], [60, 66]],
-    captions: ["穿西装打领带", "拿大哥大有什么用", "跟着这样的大哥", "食屎啦你"] },
+    captions: [$t("templates.subtitle-animations.text_68be0d66bc"), $t("templates.subtitle-animations.text_d509e197f8"), $t("templates.subtitle-animations.text_44a8cad558"), $t("templates.subtitle-animations.text_79ff200148")] },
   { key: "wunian", keyword: "五年怎么过的", delayMs: 100, fontSize: 16, windows: [[11, 20], [35, 50], [59, 77], [82, 95]],
-    captions: ["五年", "你知道我这五年是怎么过的吗", "我每天躲在家里玩贪玩蓝月", "你知道有多好玩吗"] },
+    captions: [$t("templates.subtitle-animations.text_0e4c818a5c"), $t("templates.subtitle-animations.text_763aacba55"), $t("templates.subtitle-animations.text_da7698df77"), $t("templates.subtitle-animations.text_6543812821")] },
   { key: "maikease", keyword: "麦克阿瑟说", delayMs: 200, windows: [[0, 22], [24, 46], [48, 70], [72, 84]],
-    captions: ["美国前五星上将麦克阿瑟", "曾这样评价道", "如果让我去阻止xxx", "那么我宁愿去阻止上帝"] },
+    captions: [$t("templates.subtitle-animations.text_623e006e40"), $t("templates.subtitle-animations.text_f465efa245"), $t("templates.subtitle-animations.text_19f41e4448"), $t("templates.subtitle-animations.text_2672c15eb5")] },
 ];
 
 function subtitleTemplate({ key, keyword, windows, captions, delayMs, fontSize = 20 }: SubtitleSpec): MemeTemplate {
   const count = windows.length;
   async function render({ texts, images }: MemeTemplateInput, context: MemeTemplateContext) {
-    if (images.length || texts.length !== count) throw new Error(`该表情需要 ${count} 段文字。`);
+    if (images.length || texts.length !== count) throw new Error($t("templates.subtitle-animations.text_67a924bd7f", { "count": count }));
     const { signal } = context;
     const [gif, font] = await Promise.all([context.imageAsset(`gif_subtitle/${key}.gif`), registerFont(context)]);
     const { frames } = await readMemeImageSequence(new File([new Uint8Array(gif)], `${key}.gif`), signal);

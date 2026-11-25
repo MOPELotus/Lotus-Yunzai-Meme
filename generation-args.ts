@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 type Argument = string | number | boolean;
 type Fields = Record<string, unknown>;
 
@@ -86,7 +89,7 @@ export function parseGenerationArgs(argsType: unknown, input: string, preset?: P
 
   function apply(name: string, raw: Argument) {
     if (name === "user_infos" || !Object.hasOwn(properties, name)) {
-      issue ??= `该表情不支持参数：${name}`;
+      issue ??= $t("generation-args.text_5e616dd2d9", { "name": name });
       return;
     }
     values.set(name, raw);
@@ -115,7 +118,7 @@ export function parseGenerationArgs(argsType: unknown, input: string, preset?: P
     }
     const next = tokens[i + 1];
     if (!next || flags.has(next[0]) || /^--?\p{L}/u.test(next[0])) {
-      issue ??= `表情参数 ${option.dest} 缺少值。`;
+      issue ??= $t("generation-args.text_641cf27fb0", { "dest": option.dest });
       continue;
     }
     apply(option.dest, unquote(next[0]));
@@ -127,7 +130,7 @@ export function parseGenerationArgs(argsType: unknown, input: string, preset?: P
   if (preset) apply(preset.name, preset.value);
   for (const [name, raw] of values) {
     const normalized = asType(raw, properties[name]);
-    if (normalized === undefined) issue ??= `表情参数 ${name} 的值无效。`;
+    if (normalized === undefined) issue ??= $t("generation-args.text_a084b72322", { "name": name });
     else values.set(name, normalized);
   }
   return { values: Object.fromEntries(values), text: rest.join("").trim(), found, issue };

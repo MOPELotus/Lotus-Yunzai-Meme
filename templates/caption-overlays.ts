@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Layouts from MemeCrafters/meme-generator v0.1.14 (619fa105).
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
@@ -34,31 +37,31 @@ function firstUserName(args: MemeTemplateInput["args"], fallback: string) {
   return typeof name === "string" ? name : "";
 }
 
-const togetherText = "一起玩{name}吧！";
-const whatHeWantsDate = "今年520";
+const togetherText = $t("templates.caption-overlays.text_b728962593");
+const whatHeWantsDate = $t("templates.caption-overlays.text_f6a269f6f3");
 
 const layouts: readonly CaptionOverlay[] = [
-  { key: "acg_entrance", keywords: ["二次元入口"], slot: [190, 265, 290, 410], defaultText: "走，跟我去二次元吧",
+  { key: "acg_entrance", keywords: ["二次元入口"], slot: [190, 265, 290, 410], defaultText: $t("templates.caption-overlays.text_e0428a7a59"),
     box: [30, 720, 610, 810], fontSize: [25, 50], fill: "white" },
   { key: "addiction", keywords: ["上瘾", "毒瘾发作"], slot: [0, 0, 91, 91], aboveArt: true, expandTo: 286,
     box: [10, 246, 236, 286], fontSize: [12, 45] },
   { key: "anya_suki", keywords: ["阿尼亚喜欢"], tags: ["间谍过家家", "阿尼亚·福杰"], slot: [106, 72, 305, 235],
-    defaultText: "阿尼亚喜欢这个", box: [5, 440, 470, 490], fontSize: [12, 40], fill: "white", stroke: ["black", 0.06] },
+    defaultText: $t("templates.caption-overlays.text_10f0db0177"), box: [5, 440, 470, 490], fontSize: [12, 40], fill: "white", stroke: ["black", 0.06] },
   { key: "father_work", keywords: ["闭嘴", "我爸爸"], slot: [252, 142, 230, 120], fit: "contain", aboveArt: true,
-    defaultText: "此处添加文字", box: [195, 372, 490, 462], fontSize: [10, 50], wrap: true },
+    defaultText: $t("templates.caption-overlays.text_eed58fd967"), box: [195, 372, 490, 462], fontSize: [10, 50], wrap: true },
   { key: "frieren_take", keywords: ["芙莉莲拿"], tags: ["芙莉莲", "葬送的芙莉莲"], slot: [130, 197, 102, 108],
-    defaultText: "所谓的男人啊，只要送他们这种东西就会很开心", box: [100, 439, 783, 559],
+    defaultText: $t("templates.caption-overlays.text_9ea175d333"), box: [100, 439, 783, 559],
     fontSize: [20, 50], fill: "white", stroke: ["black", 0.05] },
-  { key: "learn", keywords: ["偷学"], slot: [1440, 0, 1751, 1347], aboveArt: true, defaultText: "偷学群友数理基础",
+  { key: "learn", keywords: ["偷学"], slot: [1440, 0, 1751, 1347], aboveArt: true, defaultText: $t("templates.caption-overlays.text_c13f8953db"),
     box: [100, 1360, 3093, 1730], fontSize: [200, 350], bold: true },
   { key: "what_he_wants", keywords: ["最想要的东西"], slot: [486, 616, 538, 538], fit: "contain", aboveArt: true,
     defaultText: whatHeWantsDate, box: [0, 514, 1024, 614], fontSize: [20, 80], bold: true, vertical: "bottom",
-    stroke: ["white", 0.07], caption: date => `${date ?? whatHeWantsDate}我会给你每个男人都最想要的东西···` },
+    stroke: ["white", 0.07], caption: date => $t("templates.caption-overlays.text_05551f82c9", { "value1": date ?? whatHeWantsDate }) },
   { key: "fill_head", keywords: ["满脑子"], art: "0.jpg", slot: [150, 2, 210, 170], fit: "contain", aboveArt: true,
-    box: [20, 458, 528, 550], fontSize: [30, 65], caption: (text, args) => `满脑子都是${text ?? firstUserName(args, "它")}`,
-    shortcuts: [{ key: "满脑子都是(?P<name>\\S+)", args: ["{name}"], humanized: "满脑子都是xx" }] },
+    box: [20, 458, 528, 550], fontSize: [30, 65], caption: (text, args) => $t("templates.caption-overlays.text_30acaab1c0", { "value1": text ?? firstUserName(args, $t("templates.caption-overlays.text_7e9260e925")) }),
+    shortcuts: [{ key: "满脑子都是(?P<name>\\S+)", args: ["{name}"], humanized: $t("templates.caption-overlays.text_d0cc254e90") }] },
   { key: "stew", keywords: ["炖"], slot: [9, -2, 181, 154], box: [2, 168, 196, 198], fontSize: [6, 30],
-    caption: (text, args) => `生活不易,炖${text ?? firstUserName(args, "群友")}出气` },
+    caption: (text, args) => $t("templates.caption-overlays.text_3e9a1269e4", { "value1": text ?? firstUserName(args, $t("templates.caption-overlays.text_c2f81b24c9")) }) },
   { key: "together", keywords: ["一起"], slot: [132, 36, 63, 63], aboveArt: true, box: [10, 140, 190, 190],
     fontSize: [10, 50], bold: true, wrap: true, defaultText: togetherText,
     caption: (text, args) => text ?? togetherText.replace("{name}", () => firstUserName(args, "")) },
@@ -82,7 +85,7 @@ async function captionArt(original: Image, layout: CaptionOverlay, text: string 
 function captionOverlay(layout: CaptionOverlay): MemeTemplate {
   const { key, keywords, tags, defaultText, shortcuts } = layout;
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
-    if (input.texts.length > 1) throw new Error("该表情最多接收一段文字。");
+    if (input.texts.length > 1) throw new Error($t("templates.caption-overlays.text_ca30bf0191"));
     const { signal } = context;
     const [original, source] = await Promise.all([
       context.imageAsset(`${key}/${layout.art ?? "0.png"}`).then(loadImage), readTransformSource(input, signal),

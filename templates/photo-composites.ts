@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original layouts from MemeCrafters/meme-generator (619fa105).
 import type { MemeTemplate } from "../builtin-template.ts";
 import { readMemeFirstImage } from "./animated-input.ts";
@@ -18,7 +21,7 @@ const call110: MemeTemplate = {
     const font = await registerFont(context);
     return jpg(900, 500, draw => {
       paper(draw, 900, 500);
-      drawFittedText(draw, [0, 0, 900, 200], "遇到困难请拨打", font, 12, 100, "center", "#000", { wrap: false, paragraphMetrics: true });
+      drawFittedText(draw, [0, 0, 900, 200], $t("templates.photo-composites.text_5eb7b9a45f"), font, 12, 100, "center", "#000", { wrap: false, paragraphMetrics: true });
       [one, one, zero].forEach((image, index) => {
         const square = Math.min(image.width, image.height);
         const x = Math.floor((image.width - square) / 2);
@@ -59,7 +62,7 @@ const trance: MemeTemplate = {
   },
 };
 
-const circleHelp = "是否将图片变为圆形";
+const circleHelp = $t("templates.photo-composites.text_bd6b1d72aa");
 
 function rotatedDimension(source: number, extent: number) {
   return Math.ceil((source + extent) / 2) - Math.floor((source - extent) / 2);
@@ -74,7 +77,7 @@ const kaleidoscope: MemeTemplate = {
       args_type: {
         args_model: { properties: { circle: { default: false, type: "boolean", description: circleHelp } } },
         args_examples: [{ circle: false }, { circle: true }],
-        parser_options: [{ names: ["--circle", "圆"], dest: "circle", args: [], action: { type: 0, value: true }, help_text: circleHelp }],
+        parser_options: [{ names: ["--circle", $t("templates.photo-composites.text_82d06faea1")], dest: "circle", args: [], action: { type: 0, value: true }, help_text: circleHelp }],
       },
     },
   },

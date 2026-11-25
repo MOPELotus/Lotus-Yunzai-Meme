@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { pjskCharacters } from "./pjsk-characters.ts";
 
 // Fixed from the original Python CommandShortcut registrations.
@@ -40,24 +43,24 @@ const patterns: readonly NativeShortcutPattern[] = [
   ...pjskPatterns,
   {
     template: "oshi_no_ko", source: "我推的(?P<name>\\S+)",
-    pattern: /^我推的(?<name>\S+)(?=\s|$)/u, captions: ["name"], humanized: "我推的xx",
+    pattern: /^我推的(?<name>\S+)(?=\s|$)/u, captions: ["name"], humanized: $t("legacy-caption-shortcuts.text_28fd6e3c41"),
   },
   {
     template: "caused_by_this", source: "你的(?P<text>.+?)(?:主要)?都?是由?这个引起的",
     pattern: /^你的(?<text>.+?)(?:主要)?都?是由?这个引起的(?=\s|$)/u,
-    captions: ["text"], humanized: "你的xx主要都是由这个引起的",
+    captions: ["text"], humanized: $t("legacy-caption-shortcuts.text_8e52f516dc"),
   },
   {
     template: "high_EQ",
     source: "低情商[\\s:：]*(?P<low>\\S+)\\s*高情商[\\s:：]*(?P<high>\\S+)",
     pattern: /^低情商[\s:：]*(?<low>\S+)\s*高情商[\s:：]*(?<high>\S+)(?=\s|$)/u,
-    captions: ["low", "high"], humanized: "低情商xx高情商xx",
+    captions: ["low", "high"], humanized: $t("legacy-caption-shortcuts.text_9a2ce2d9df"),
   },
   {
     template: "high_EQ",
     source: "高情商[\\s:：]*(?P<high>\\S+)\\s*低情商[\\s:：]*(?P<low>\\S+)",
     pattern: /^高情商[\s:：]*(?<high>\S+)\s*低情商[\s:：]*(?<low>\S+)(?=\s|$)/u,
-    captions: ["low", "high"], humanized: "高情商xx低情商xx",
+    captions: ["low", "high"], humanized: $t("legacy-caption-shortcuts.text_5801191b6b"),
   },
   {
     template: "intel_inside", source: "(?P<text>\\S{1,10})\\s+inside",
@@ -66,11 +69,11 @@ const patterns: readonly NativeShortcutPattern[] = [
   {
     template: "wujing", source: "吴京[\\s:：]*(?P<left>\\S*)中国(?P<right>\\S*)",
     pattern: /^吴京[\s:：]*(?<left>\S*)中国(?<right>\S*)(?=\s|$)/u,
-    captions: ["left", "right"], humanized: "吴京xx中国xx",
+    captions: ["left", "right"], humanized: $t("legacy-caption-shortcuts.text_94d19939fe"),
   },
   {
     template: "wakeup", source: "(?P<text>\\S{1,4})\\s+起来了",
-    pattern: /^(?<text>\S{1,4})\s+起来了(?=\s|$)/u, captions: ["text"], humanized: "xx 起来了",
+    pattern: /^(?<text>\S{1,4})\s+起来了(?=\s|$)/u, captions: ["text"], humanized: $t("legacy-caption-shortcuts.text_1d3f0aae06"),
   },
 ];
 

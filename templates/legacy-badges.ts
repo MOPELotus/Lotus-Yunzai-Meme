@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original layouts from MemeCrafters/meme-generator at 619fa10518fc2eca4fa1053af37f0a00a839f062.
 import { Canvas, loadImage, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
@@ -10,7 +13,7 @@ import { previewImage, registerMemeTypeface, rgbaFrameDimensions, type Draw } fr
 const red = "#e60012";
 const outline = "#500000";
 const fontSize = 650;
-const aceDefault = "表情包制作";
+const aceDefault = $t("templates.legacy-badges.text_ada8d90ad4");
 const mihoyoSize = 500;
 const oldLogo = "python/meme_generator/memes/mihoyo/images/logo.png";
 
@@ -108,7 +111,7 @@ async function aceTextLayer(glyphs: readonly Glyph[], font: string, targetWidth:
 async function renderAce(input: MemeTemplateInput, context: MemeTemplateContext) {
   const { signal } = context;
   const text = input.texts[0];
-  if (input.images.length || input.texts.length !== 1 || !text) throw new MemeTemplateFeedback("请提供一段文字。");
+  if (input.images.length || input.texts.length !== 1 || !text) throw new MemeTemplateFeedback($t("templates.legacy-badges.text_bd6df69715"));
   const family = await registerMemeTypeface(context, "PangMenZhengDao-Cu.ttf", "LotusMemePangMen");
   const font = `${fontSize}px "${family}", "Noto Sans CJK SC", "Noto Color Emoji"`;
   const measure = new Canvas(1, 1).getContext("2d");
@@ -122,7 +125,7 @@ async function renderAce(input: MemeTemplateInput, context: MemeTemplateContext)
     const height = Math.ceil(baseline + (line?.descent ?? 0));
     const width = Math.ceil(metrics.width);
     totalWidth += width + 25;
-    if (totalWidth > 4000) throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+    if (totalWidth > 4000) throw new MemeTemplateFeedback($t("templates.legacy-badges.text_002fc2fab2"));
     glyphs.push({ text: char, width, height, baseline });
   }
   const [bubble, mark] = await Promise.all([
@@ -149,7 +152,7 @@ async function renderAce(input: MemeTemplateInput, context: MemeTemplateContext)
 }
 
 async function renderMihoyo(input: MemeTemplateInput, context: MemeTemplateContext) {
-  if (input.images.length !== 1 || input.texts.length) throw new MemeTemplateFeedback("该表情需要一张图片。");
+  if (input.images.length !== 1 || input.texts.length) throw new MemeTemplateFeedback($t("templates.legacy-badges.text_2646e324ad"));
   const { signal } = context;
   const [sequence, logo] = await Promise.all([
     readMemeImageSequence(input.images[0]!, signal), context.imageAsset(oldLogo).then(loadImage),

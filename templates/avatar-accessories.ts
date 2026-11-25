@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Parameters, geometry and media formats follow the fixed Python templates at 619fa10518fc2eca4fa1053af37f0a00a839f062.
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext, type MemeTemplateInput } from "../builtin-template.ts";
@@ -39,7 +42,7 @@ function avatarTemplate(info: MemeTemplate["info"], render: MemeTemplate["render
     info,
     async render(input, context) {
       if (input.images.length !== 1 || input.texts.length > info.params_type.max_texts) {
-        throw new MemeTemplateFeedback("表情图片或文字数量不符合要求。");
+        throw new MemeTemplateFeedback($t("templates.avatar-accessories.text_44af2dbe33"));
       }
       return render(input, context);
     },
@@ -64,7 +67,7 @@ function drawCircle(draw: CanvasRenderingContext2D, image: Image, size: number) 
 }
 
 function handAccessory(key: "bubble_tea" | "gun", keyword: string, original: "left" | "right") {
-  const help = `${keyword}的位置，包含 left、right、both`;
+  const help = $t("templates.avatar-accessories.text_d91327d626", { "keyword": keyword });
   return avatarTemplate({ key, keywords: [keyword], params_type: { ...singleAvatar,
     args_type: choiceArgs("position", hands, original, help, ["-p", "--position"]),
   } }, async ({ images, args }, context) => {
@@ -189,15 +192,15 @@ function drawCertificateText(draw: CanvasRenderingContext2D, text: string, top: 
       return;
     }
   }
-  throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+  throw new MemeTemplateFeedback($t("templates.avatar-accessories.text_002fc2fab2"));
 }
 
 const abstinence = avatarTemplate({ key: "abstinence", keywords: ["戒导"], params_type: { ...singleAvatar,
-  args_type: { args_model: { properties: { time: { type: "string", default: "", description: "指定时间" },
-    name: { type: "string", default: "", description: "指定名字" } } },
+  args_type: { args_model: { properties: { time: { type: "string", default: "", description: $t("templates.avatar-accessories.text_8a009da6e6") },
+    name: { type: "string", default: "", description: $t("templates.avatar-accessories.text_74b5badd91") } } },
   parser_options: [
-    { names: ["-t", "--time"], args: [{ name: "time", value: "str" }], help_text: "指定时间" },
-    { names: ["-n", "--name"], args: [{ name: "name", value: "str" }], help_text: "指定名字" },
+    { names: ["-t", "--time"], args: [{ name: "time", value: "str" }], help_text: $t("templates.avatar-accessories.text_8a009da6e6") },
+    { names: ["-n", "--name"], args: [{ name: "name", value: "str" }], help_text: $t("templates.avatar-accessories.text_74b5badd91") },
   ] },
 } }, async (input, context) => {
   const { signal } = context;
@@ -215,13 +218,13 @@ const abstinence = avatarTemplate({ key: "abstinence", keywords: ["戒导"], par
     draw.fillRect(0, 0, 300, 300);
     drawSquare(draw, avatar, 300, true);
     draw.restore();
-    drawCertificateText(draw, `戒导人：[u] ${name} [/u]`, 650, font);
-    drawCertificateText(draw, `[u] ${date.getFullYear()} [/u]年[u] ${date.getMonth() + 1} [/u]月[u] ${date.getDate()} [/u]日`, 750, font);
+    drawCertificateText(draw, $t("templates.avatar-accessories.text_1890662526", { "name": name }), 650, font);
+    drawCertificateText(draw, $t("templates.avatar-accessories.text_a83233035d", { "value1": date.getFullYear(), "value2": date.getMonth() + 1, "value3": date.getDate() }), 750, font);
     draw.drawImage(stamp, 350, 650, 200, 200);
   }, signal);
 });
 
-const headCaption = "怎么说话的你";
+const headCaption = $t("templates.avatar-accessories.text_67d1d91585");
 const headPositions = [[160, 121, 76], [172, 124, 69], [208, 166, 52]] as const;
 const beatHead = avatarTemplate({ key: "beat_head", keywords: ["拍头"], params_type: { ...singleAvatar,
   max_texts: 1, default_texts: [headCaption], args_type: null,

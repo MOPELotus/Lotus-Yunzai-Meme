@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Frame assets and geometry from MemeCrafters/meme-generator v0.1.14 (619fa105).
 import { ImageData, loadImage, type Image } from "skia-canvas";
 import { renderExactPng, renderPng, renderRgba } from "../../../packages/skia/index.ts";
@@ -108,7 +111,7 @@ function croppedTemplate({ key, keywords, tags, imageRange = [1, 1] }: CropSpec,
     info: { key, keywords, tags, params_type: { min_images, max_images, min_texts: 0, max_texts: 0, default_texts: [], args_type: null } },
     async render(input, context) {
       if (input.images.length < min_images || input.images.length > max_images || input.texts.length) {
-        throw new Error(min_images === max_images ? "这个表情需要一张图片。" : `这个表情需要 ${min_images} 到 ${max_images} 张图片。`);
+        throw new Error(min_images === max_images ? $t("templates.cropped-photo-templates.text_455cc162ff") : $t("templates.cropped-photo-templates.text_078675c312", { "min_images": min_images, "max_images": max_images }));
       }
       return render(input, context);
     },

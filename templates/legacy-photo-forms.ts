@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Layouts and original artwork from MemeCrafters/meme-generator at 619fa105 (MIT).
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import { renderPng } from "../../../packages/skia/index.ts";
@@ -26,7 +29,7 @@ function userName(args: Record<string, unknown>, last = false) {
 
 function requiredName(input: MemeTemplateInput) {
   if (!input.texts.length && (!Array.isArray(input.args.user_infos) || !input.args.user_infos.length)) {
-    throw new MemeTemplateFeedback("该表情需要指定文字或昵称。");
+    throw new MemeTemplateFeedback($t("templates.legacy-photo-forms.text_f49def079b"));
   }
   return input.texts[0] ?? userName(input.args);
 }
@@ -86,7 +89,7 @@ const coupon: MemeTemplate = {
     const [art, avatar, font] = await Promise.all([
       artwork(context, "coupon"), readMemeFirstImage(images[0]!, context.signal), registerFont(context),
     ]);
-    const text = (texts[0] ?? userName(args) + "陪睡券") + "\n（永久有效）";
+    const text = (texts[0] ?? userName(args) + $t("templates.legacy-photo-forms.text_aec31b2f85")) + $t("templates.legacy-photo-forms.text_67f1165c88");
     return jpg(art.width, art.height, draw => {
       draw.imageSmoothingQuality = "high";
       draw.drawImage(art, 0, 0);
@@ -99,7 +102,7 @@ const coupon: MemeTemplate = {
 };
 
 const interview: MemeTemplate = {
-  info: { key: "interview", keywords: ["采访"], params_type: params(2, ["采访大佬经验"]) },
+  info: { key: "interview", keywords: ["采访"], params_type: params(2, [$t("templates.legacy-photo-forms.text_8eb4d3d551")]) },
   async render({ images, texts }, context) {
     const [host, guest, microphone, font] = await Promise.all([
       images.length === 2 ? readMemeFirstImage(images[0]!, context.signal) : artwork(context, "interview", "huaji.png"),
@@ -112,7 +115,7 @@ const interview: MemeTemplate = {
       draw.drawImage(microphone, 330, 103);
       square(draw, host, 419, 40, 124);
       square(draw, guest, 57, 40, 124);
-      drawFittedText(draw, [20, 200, 580, 310], texts[0] ?? "采访大佬经验", font, 20, 50, "center", "#000", bodyText);
+      drawFittedText(draw, [20, 200, 580, 310], texts[0] ?? $t("templates.legacy-photo-forms.text_8eb4d3d551"), font, 20, 50, "center", "#000", bodyText);
     }, context.signal);
   },
 };
@@ -127,7 +130,7 @@ const makeFriend: MemeTemplate = {
     const height = Math.max(1, Math.floor(1000 * avatar.height / avatar.width));
     const scaled = Math.max(1, Math.floor(250 * avatar.height / avatar.width));
     const label = typeset(name, 20, family, "#fff");
-    if (label.width > 230) throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+    if (label.width > 230) throw new MemeTemplateFeedback($t("templates.legacy-photo-forms.text_002fc2fab2"));
     return jpg(1000, height, draw => {
       draw.imageSmoothingQuality = "high";
       draw.drawImage(avatar, 0, 0, 1000, height);
@@ -170,11 +173,11 @@ const whyHaveHands: MemeTemplate = {
       square(draw, avatar, 350, 670, 250, true);
       fitted(draw, avatar, 1100, 1060, 300, 400, { inside: true, alignLeft: true });
       rotation(600, 100, -15).draw(draw, 75, 825, canvas => {
-        drawFittedText(canvas, [0, 0, 600, 100], `摸摸${name}!`, font, 30, 70, "left", "#000", bodyText);
+        drawFittedText(canvas, [0, 0, 600, 100], $t("templates.legacy-photo-forms.text_f93b005cf8", { "name": name }), font, 30, 70, "left", "#000", bodyText);
       });
-      drawFittedText(draw, [840, 960, 1440, 1060], `托托${name}!`, font, 30, 70, "center", "#000", bodyText);
-      drawFittedText(draw, [50, 1325, 650, 1475], `赞美${name}!`, font, 30, 90, "center", "#000", { ...bodyText, vertical: "top" });
-      drawFittedText(draw, [700, 1340, 1075, 1490], `为${name}奉献所有财产!`, font, 30, 70, "left", "#000", { ...bodyText, wrap: true, blockAlignment: "center" });
+      drawFittedText(draw, [840, 960, 1440, 1060], $t("templates.legacy-photo-forms.text_7910650aa4", { "name": name }), font, 30, 70, "center", "#000", bodyText);
+      drawFittedText(draw, [50, 1325, 650, 1475], $t("templates.legacy-photo-forms.text_edb0d8171e", { "name": name }), font, 30, 90, "center", "#000", { ...bodyText, vertical: "top" });
+      drawFittedText(draw, [700, 1340, 1075, 1490], $t("templates.legacy-photo-forms.text_bfc56e260b", { "name": name }), font, 30, 70, "left", "#000", { ...bodyText, wrap: true, blockAlignment: "center" });
     }, context.signal);
   },
 };
@@ -182,16 +185,16 @@ const whyHaveHands: MemeTemplate = {
 const spineCorners = [[0, 108], [1092, 0], [1023, 1134], [29, 1134]] as const;
 const spine = screenProjection(1000, 1100, spineCorners);
 const readBook: MemeTemplate = {
-  info: { key: "read_book", keywords: ["看书"], params_type: params(1, ["エロ本"]) },
+  info: { key: "read_book", keywords: ["看书"], params_type: params(1, [$t("templates.legacy-photo-forms.text_d6822a7f2b")]) },
   async render({ images, texts }, context) {
     const [art, avatar, bold] = await Promise.all([
       artwork(context, "read_book"), readMemeFirstImage(images[0]!, context.signal), registerFont(context, true),
     ]);
-    const text = texts[0] ?? "エロ本";
+    const text = texts[0] ?? $t("templates.legacy-photo-forms.text_d6822a7f2b");
     const lines = text.split(/\r\n|[\r\n\v\f\u001c-\u001e\u0085\u2028\u2029]/u);
     if (lines.at(-1) === "") lines.pop();
     const parts = Array.from(lines.join(" "));
-    if (parts.length > 60) throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+    if (parts.length > 60) throw new MemeTemplateFeedback($t("templates.legacy-photo-forms.text_002fc2fab2"));
     const pieces = parts.map(char => {
       const glyph = typeset(char, 150, bold, "#fff");
       const latin = /^[a-zA-Z0-9\s]$/u.test(char);
@@ -204,7 +207,7 @@ const readBook: MemeTemplate = {
     });
     const width = Math.max(1, ...pieces.map(piece => piece.w));
     const height = pieces.reduce((sum, value) => sum + value.h, 0);
-    if (width > 265 || height > 3000) throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+    if (width > 265 || height > 3000) throw new MemeTemplateFeedback($t("templates.legacy-photo-forms.text_002fc2fab2"));
     const scale = Math.min(1, 780 / Math.max(1, height));
     const captionWidth = Math.max(1, Math.floor(width * scale));
     const captionHeight = Math.max(1, Math.floor(height * scale));
@@ -243,7 +246,7 @@ const readBook: MemeTemplate = {
 const oshiNoKo: MemeTemplate = {
   info: {
     key: "oshi_no_ko", keywords: ["我推的网友"], tags: ["我推的孩子"], shortcuts: legacyCaptionShortcuts("oshi_no_ko"),
-    params_type: params(1, ["网友"]),
+    params_type: params(1, [$t("templates.legacy-photo-forms.text_e1ca33b2d2")]),
   },
   async render(input, context) {
     const [source, background, foreground, first, last, serif, fallback] = await Promise.all([
@@ -251,9 +254,9 @@ const oshiNoKo: MemeTemplate = {
       artwork(context, "oshi_no_ko", "text1.png"), artwork(context, "oshi_no_ko", "text2.png"),
       registerMemeTypeface(context, "NotoSerifSC-Regular.otf", "LotusMemeNotoSerifSC"), registerFont(context),
     ]);
-    const label = typeset(input.texts[0] ?? "网友", 150, serif, "#000", "#fff", fallback);
+    const label = typeset(input.texts[0] ?? $t("templates.legacy-photo-forms.text_e1ca33b2d2"), 150, serif, "#000", "#fff", fallback);
     const nameWidth = Math.floor(label.width * first.height / Math.max(1, label.height));
-    if (nameWidth > 800) throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+    if (nameWidth > 800) throw new MemeTemplateFeedback($t("templates.legacy-photo-forms.text_002fc2fab2"));
     const textWidth = first.width + last.width + nameWidth;
     const captionHeight = Math.floor(last.height * 663 / textWidth);
     function paint(draw: Context, avatar: Image) {
@@ -282,7 +285,7 @@ function preview(template: MemeTemplate): MemeTemplate {
   return {
     ...template,
     async preview(context) {
-      return template.render({ images: [await previewImage(context.signal)], texts: [], args: { user_infos: [{ name: "网友" }] } }, context);
+      return template.render({ images: [await previewImage(context.signal)], texts: [], args: { user_infos: [{ name: $t("templates.legacy-photo-forms.text_e1ca33b2d2") }] } }, context);
     },
   };
 }

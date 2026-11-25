@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Conversation and scrolling layouts from the fixed MemeCrafters v0.1.14 templates.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { randomInt } from "node:crypto";
@@ -49,22 +52,22 @@ function roundAvatar(image: Image, x: number, y: number, size: number): Draw {
   };
 }
 
-const randomNames = ["刘一", "陈二", "张三", "李四", "王五", "赵六", "孙七", "周八", "吴九", "郑十"];
-const repeatText = "救命啊";
+const randomNames = [$t("templates.scrolling-dialogue.text_5989f6f405"), $t("templates.scrolling-dialogue.text_c80834bf8e"), $t("templates.scrolling-dialogue.text_1d841bc0ee"), $t("templates.scrolling-dialogue.text_808b4f6221"), $t("templates.scrolling-dialogue.text_c68e010446"), $t("templates.scrolling-dialogue.text_e6bb13166f"), $t("templates.scrolling-dialogue.text_34e2bef711"), $t("templates.scrolling-dialogue.text_7df288465c"), $t("templates.scrolling-dialogue.text_1487d35303"), $t("templates.scrolling-dialogue.text_7292b7eda2")];
+const repeatText = $t("templates.scrolling-dialogue.text_3612b9b959");
 
 const repeat: MemeTemplate = {
   info: { key: "repeat", keywords: ["复读"], params_type: {
     min_images: 1, max_images: 5, min_texts: 1, max_texts: 1, default_texts: [repeatText], args_type: null,
   } },
   async render({ images, texts, args }: MemeTemplateInput, context: MemeTemplateContext) {
-    if (!images.length || images.length > 5 || texts.length !== 1) throw new Error("复读需要一至五张图片和一段文字。");
+    if (!images.length || images.length > 5 || texts.length !== 1) throw new Error($t("templates.scrolling-dialogue.text_a328cd1da1"));
     const { signal } = context;
     const [avatars, inputBox, font] = await Promise.all([
       Promise.all(images.map(image => readMemeFirstImage(image, signal))),
       context.imageAsset("repeat/0.jpg").then(loadImage), registerFont(context),
     ]);
     const content = paragraph(texts[0]!, font, 50);
-    if (content.width > 900) throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+    if (content.width > 900) throw new MemeTemplateFeedback($t("templates.scrolling-dialogue.text_002fc2fab2"));
     const users: unknown[] = Array.isArray(args.user_infos) ? args.user_infos : [];
     const clock = new Intl.DateTimeFormat("zh-CN", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date());
     const clockText = paragraph(clock, font, 40, undefined, "gray");
@@ -114,23 +117,23 @@ const repeat: MemeTemplate = {
   },
   async preview(context) {
     const image = await previewImage(context.signal);
-    return repeat.render({ images: [image], texts: [repeatText], args: { user_infos: [{ name: "群友" }] } }, context);
+    return repeat.render({ images: [image], texts: [repeatText], args: { user_infos: [{ name: $t("templates.scrolling-dialogue.text_c2f81b24c9") }] } }, context);
   },
 };
 
-const scrollText = "你们说话啊";
+const scrollText = $t("templates.scrolling-dialogue.text_ce06e61868");
 const scroll: MemeTemplate = {
   info: { key: "scroll", keywords: ["滚屏"], params_type: {
     min_images: 0, max_images: 0, min_texts: 1, max_texts: 1, default_texts: [scrollText], args_type: null,
   } },
   async render({ images, texts }, context) {
-    if (images.length || texts.length !== 1) throw new Error("滚屏需要一段文字。");
+    if (images.length || texts.length !== 1) throw new Error($t("templates.scrolling-dialogue.text_c99a3fb81e"));
     const { signal } = context;
     const [font, corners] = await Promise.all([
       registerFont(context), Promise.all([1, 2, 3, 4].map(i => context.imageAsset(`scroll/corner${i}.png`).then(loadImage))),
     ]);
     const caption = paragraph(texts[0]!, font, 40, 600);
-    if (caption.height > 200) throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+    if (caption.height > 200) throw new MemeTemplateFeedback($t("templates.scrolling-dialogue.text_002fc2fab2"));
     const width = caption.width + 140;
     const boxHeight = Math.max(caption.height + 103, 150);
     const height = boxHeight * 4;

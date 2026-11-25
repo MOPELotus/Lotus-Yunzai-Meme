@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Fixed poses and timing from MemeCrafters/meme-generator v0.1.14.
 import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
 import { ImageData, loadImage, type Image } from "skia-canvas";
@@ -204,7 +207,7 @@ async function readFrames(spec: Spec, context: MemeTemplateContext) {
     })));
   }
   const { width, height } = art[0]!;
-  if (art.some(frame => frame.width !== width || frame.height !== height)) throw new Error(`表情模板 ${spec.key} 的帧尺寸不一致。`);
+  if (art.some(frame => frame.width !== width || frame.height !== height)) throw new Error($t("templates.legacy-projected-actions.text_bc92350be8", { "key": spec.key }));
   return { art, width, height };
 }
 
@@ -233,13 +236,13 @@ async function applyShape(photo: Image, mask: Uint8Array, signal: AbortSignal) {
 
 async function readMask(context: MemeTemplateContext) {
   const image = await context.imageAsset("shiroko_pero/mask.png").then(loadImage);
-  if (image.width !== 245 || image.height !== 245) throw new Error("白子舔的原遮罩尺寸不一致。");
+  if (image.width !== 245 || image.height !== 245) throw new Error($t("templates.legacy-projected-actions.text_6e146f3c6a"));
   return (await renderRgba(245, 245, draw => draw.drawImage(image, 0, 0))).rgba;
 }
 
 function create(spec: Spec): MemeTemplate {
   async function render({ images, texts }: MemeTemplateInput, context: MemeTemplateContext) {
-    if (images.length !== 1 || texts.length) throw new Error("该表情需要一张图片。");
+    if (images.length !== 1 || texts.length) throw new Error($t("templates.legacy-projected-actions.text_2646e324ad"));
     const { signal } = context;
     const [{ art, width, height }, source, shape] = await Promise.all([
       readFrames(spec, context),

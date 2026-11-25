@@ -1,10 +1,13 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import packageInfo from "./package.json";
 import type { LoadMemeInfoCard, MemeInfoCard } from "./info-card-runtime.ts";
 
 type ChangeRow = { readonly kind: "title" | "release" | "section" | "change"; readonly text: string };
 
-const title = "表情版本";
-const metadata = `模块版本 ${packageInfo.version}`;
+const title = $t("version-card.text_2160fd4e12");
+const metadata = $t("version-card.text_d5a9eae866", { "version": packageInfo.version });
 const maxBodyHeight = 1520;
 const textPageSize = 1500;
 const imageBatchSize = 4;
@@ -127,9 +130,9 @@ export async function renderMemeVersion(changes: readonly ChangeRow[], info: Mem
     signal?.throwIfAborted();
     const { png } = await renderInfoCard(header, layout => {
       pages ??= splitPages(measured ??= measureRows(layout));
-      return buildBody(layout, pages[index]!, `第 ${index + 1} / ${pages.length} 页`);
+      return buildBody(layout, pages[index]!, $t("version-card.text_87ad7d0914", { "value1": index + 1, "length": pages.length }));
     });
-    if (png.byteLength > imageByteLimit) throw new Error("表情版本图片超过消息大小上限。");
+    if (png.byteLength > imageByteLimit) throw new Error($t("version-card.text_6d1797778f"));
     images.push({ type: "image", file: png });
   }
   signal?.throwIfAborted();
@@ -146,7 +149,7 @@ export async function presentMemeVersion(loadInfoCard?: LoadMemeInfoCard, signal
   const source = await Bun.file(new URL("./CHANGELOG.md", import.meta.url)).text().catch(() => "");
   if (signal?.aborted) return;
   const changes = readChangeRows(source);
-  if (!changes.length) return `${title}\n${metadata}\n更新日志暂不可用。`;
+  if (!changes.length) return $t("version-card.text_17790da4c3", { "title": title, "metadata": metadata });
   if (loadInfoCard) {
     try {
       let cached = cachedCards.get(loadInfoCard);

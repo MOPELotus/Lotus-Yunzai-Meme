@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { ImageData, loadImage, type Image } from "skia-canvas";
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
@@ -106,7 +109,7 @@ function sceneTemplate(scene: Scene): MemeTemplate {
   const maxTexts = scene.maxTexts ?? Number(!!scene.caption);
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
     if (input.images.length !== scene.slots.length || input.texts.length > maxTexts) {
-      throw new Error("表情的图片或文字数量不符。");
+      throw new Error($t("templates.anyliew-avatar-scenes.text_1873817cf3"));
     }
     const { signal } = context;
     const [frame, font] = await Promise.all([
@@ -115,10 +118,10 @@ function sceneTemplate(scene: Scene): MemeTemplate {
     ]);
     const users = input.args.user_infos;
     const user = Array.isArray(users) ? users[0] as { readonly name?: unknown; readonly gender?: unknown } | undefined : undefined;
-    const name = input.texts[0] ?? ((typeof user?.name === "string" && user.name) || (user ? user.gender === "male" ? "他" : "她" : "这家伙"));
+    const name = input.texts[0] ?? ((typeof user?.name === "string" && user.name) || (user ? user.gender === "male" ? $t("templates.anyliew-avatar-scenes.text_8b7b91e000") : $t("templates.anyliew-avatar-scenes.text_2ab425e0c6") : $t("templates.anyliew-avatar-scenes.text_b068fc319b")));
     const base: Draw = draw => {
       draw.drawImage(frame, 0, 0);
-      if (font) drawFittedText(draw, [40, 845, 1056, 992], `你还能有${name}聪明？`, font.join(", "), 20, 100, "center");
+      if (font) drawFittedText(draw, [40, 845, 1056, 992], $t("templates.anyliew-avatar-scenes.text_61f4a663e9", { "name": name }), font.join(", "), 20, 100, "center");
     };
     const { width, height } = rgbaFrameDimensions(frame.width, frame.height);
 

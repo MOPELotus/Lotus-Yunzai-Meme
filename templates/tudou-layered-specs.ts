@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 export type Pose = readonly [left: number, top: number, width: number, height: number];
 
 export interface TudouAvatarLayer {

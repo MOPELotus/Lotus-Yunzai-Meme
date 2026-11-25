@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { Canvas, loadImage } from "skia-canvas";
 import { renderRgba } from "@lotus-yunzai/skia";
 import type { MemeTemplate, MemeTemplateContext } from "../builtin-template.ts";
@@ -18,7 +21,7 @@ const poses = [
 async function animate(source: MemeImageSequence, circle: boolean, context: MemeTemplateContext) {
   const hands = await Promise.all(poses.map(async (_, index) => {
     const image = await loadImage(await context.imageAsset(`petpet/${index}.png`));
-    if (image.width !== size || image.height !== size) throw new Error("摸头手掌素材的尺寸无效。");
+    if (image.width !== size || image.height !== size) throw new Error($t("templates.petpet.text_9eb863b5eb"));
     return image;
   }));
   const frames = [];
@@ -54,13 +57,13 @@ export const petpet: MemeTemplate = {
       min_texts: 0,
       max_texts: 0,
       args_type: {
-        args_model: { properties: { circle: { type: "boolean", default: false, description: "是否将图片变为圆形" } } },
-        parser_options: [{ names: ["-c", "--circle", "圆", "-圆"], dest: "circle", args: [], action: { type: 0, value: true } }],
+        args_model: { properties: { circle: { type: "boolean", default: false, description: $t("templates.petpet.text_bd6b1d72aa") } } },
+        parser_options: [{ names: ["-c", "--circle", $t("templates.petpet.text_82d06faea1"), $t("templates.petpet.text_fd8ae5af87")], dest: "circle", args: [], action: { type: 0, value: true } }],
       },
     },
   },
   async render({ images, args }, context) {
-    if (images.length !== 1) throw new Error("摸头需要一张图片。");
+    if (images.length !== 1) throw new Error($t("templates.petpet.text_6e1e87beb6"));
     return animate(await readMemeImageSequence(images[0]!, context.signal, "skia"), args.circle === true, context);
   },
   async preview(context) {

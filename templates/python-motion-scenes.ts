@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type Image } from "skia-canvas";
 import type { MemeTemplate, MemeTemplateContext } from "../builtin-template.ts";
 import { readMemeFirstImage, readMemeImageSequence, type MemeImageSequence } from "./animated-input.ts";

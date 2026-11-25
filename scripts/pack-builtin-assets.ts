@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { createHash, randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
@@ -50,16 +53,16 @@ function templateKey(logicalPath: string) {
 
 async function origins(manifestPath: string) {
   const bytes = await readFile(manifestPath);
-  if (hash(bytes) !== manifestHash) throw new Error("Meme Rust 资源索引与固定版本不符。");
+  if (hash(bytes) !== manifestHash) throw new Error($t("scripts.pack-builtin-assets.text_e2c15eb43a"));
   const raw = JSON.parse(bytes.toString("utf8")) as Record<"fonts" | "images", readonly { file: string; hash: string }[]>;
   const selected = new Map<string, Origin>();
   function add(path: string, origin: Origin) {
     if (!validPath(path) || !validPath(origin.originalPath) || !/^[a-f0-9]{64}$/u.test(origin.digest)) {
-      throw new Error(`无效的 Meme 资源索引行 ${path}`);
+      throw new Error($t("scripts.pack-builtin-assets.text_48af74ed9e", { "path": path }));
     }
     const key = templateKey(path);
     if (key && isExcludedMemeTemplate(key)) return;
-    if (selected.has(path)) throw new Error(`Meme 资源重复登记 ${path}`);
+    if (selected.has(path)) throw new Error($t("scripts.pack-builtin-assets.text_890115cdbc", { "path": path }));
     selected.set(path, origin);
   }
   for (const type of ["images", "fonts"] as const) {
@@ -70,7 +73,7 @@ async function origins(manifestPath: string) {
     }
   }
   for (const [path, { digest, path: originalPath, sources }] of extraMemeAssets) {
-    if (!sources[0]) throw new Error(`Meme 资源缺少固定源 ${path}`);
+    if (!sources[0]) throw new Error($t("scripts.pack-builtin-assets.text_17fb653fc6", { "path": path }));
     add(path, { digest, source: sources[0], originalPath });
   }
   return selected;
@@ -117,28 +120,28 @@ async function atomicFile(path: string, bytes: string | Uint8Array) {
 
 const [, , mode, manifestPath, inventoryPath, destination, ...input] = Bun.argv;
 if ((mode !== "--report" && mode !== "--write") || !manifestPath || !inventoryPath || !destination) {
-  throw new Error("用法 bun scripts/pack-builtin-assets.ts --report|--write Rust资源根/resources.json 实际使用索引.json 输出目录|. [--open-fonts 已授权字体.json] [素材根目录 ...]");
+  throw new Error($t("scripts.pack-builtin-assets.text_6081e20cc7"));
 }
 const output = destination === "." ? bundled : resolve(destination);
 let openFonts: readonly OpenFont[] = [];
 if (input[0] === "--open-fonts") {
   const [, path] = input.splice(0, 2);
-  if (!path) throw new Error("未指定已授权字体文件。");
+  if (!path) throw new Error($t("scripts.pack-builtin-assets.text_2838c18b23"));
   const document = JSON.parse(await readFile(path, "utf8")) as { fonts: readonly OpenFont[] };
-  if (!Array.isArray(document.fonts)) throw new Error("已授权字体来源索引格式无效。");
+  if (!Array.isArray(document.fonts)) throw new Error($t("scripts.pack-builtin-assets.text_0e476918f3"));
   openFonts = document.fonts;
 }
 const directories = [dirname(resolve(manifestPath)), ...input.map(path => resolve(path))];
 const known = await origins(manifestPath);
 const inventory = JSON.parse(await readFile(inventoryPath, "utf8")) as Inventory;
-if (inventory.manifestSHA256 !== manifestHash || !Array.isArray(inventory.assets)) throw new Error("素材使用索引与固定版本不符。");
+if (inventory.manifestSHA256 !== manifestHash || !Array.isArray(inventory.assets)) throw new Error($t("scripts.pack-builtin-assets.text_e16f35c29e"));
 const selected = new Map<string, Origin>();
 const auditedPaths = new Map<string, string | undefined>();
 const withheldFonts: string[] = [];
 const seen = new Set<string>();
 for (const { path, sha256, verifiedLocal } of inventory.assets) {
   const origin = known.get(path);
-  if (!origin || origin.digest !== sha256 || seen.has(path)) throw new Error(`实际使用索引包含未知、重复或禁用素材 ${path}`);
+  if (!origin || origin.digest !== sha256 || seen.has(path)) throw new Error($t("scripts.pack-builtin-assets.text_1f21a244de", { "path": path }));
   seen.add(path);
   if (path.startsWith("fonts/") && !fonts.has(path.slice("fonts/".length))) {
     withheldFonts.push(path);
@@ -152,14 +155,14 @@ for (const { path, sha256: digest, verifiedLocal, source, originalPath, license,
       !/^[a-f0-9]{64}$/u.test(digest) || !validPath(originalPath) || license !== "OFL-1.1" ||
       !/^https:\/\/raw\.githubusercontent\.com\/[\w.-]+\/[\w.-]+\/[a-f0-9]{40}\/$/u.test(source) ||
       (distribution !== undefined && !/^https:\/\/[^\s]+$/u.test(distribution))) {
-    throw new Error(`已授权字体来源索引行无效 ${path}`);
+    throw new Error($t("scripts.pack-builtin-assets.text_1bfc5b87be", { "path": path }));
   }
   seen.add(path);
   selected.set(path, { digest, source, originalPath, license, ...(distribution && { distribution }) });
   auditedPaths.set(path, verifiedLocal);
 }
 for (const path of extraMemeAssets.keys()) {
-  if (known.has(path) && !selected.has(path)) throw new Error(`实际使用索引遗漏额外素材 ${path}`);
+  if (known.has(path) && !selected.has(path)) throw new Error($t("scripts.pack-builtin-assets.text_3f381a9228", { "path": path }));
 }
 const found = new Map<string, { filename: string; size: number }>();
 const missing: Record<string, Origin> = {};
@@ -181,12 +184,12 @@ const stats = {
 };
 console.log(JSON.stringify(stats, null, 2));
 if (mode === "--write") {
-  if (Object.keys(missing).length) throw new Error("仍缺已登记的 Meme 素材，未写入索引。");
+  if (Object.keys(missing).length) throw new Error($t("scripts.pack-builtin-assets.text_a5d3049589"));
   for (const [digest, { filename }] of found) {
     const destination = digestPath(output, digest);
     if (filename === destination) continue;
     const bytes = await readFile(filename);
-    if (hash(bytes) !== digest) throw new Error(`Meme 打包素材在验证后变化：${digest}`);
+    if (hash(bytes) !== digest) throw new Error($t("scripts.pack-builtin-assets.text_54f6ff931d", { "digest": digest }));
     await atomicFile(destination, bytes);
   }
   await atomicFile(join(output, "sources.json"), `${JSON.stringify({ format: 1, files: Object.fromEntries(entries) }, null, 2)}\n`);

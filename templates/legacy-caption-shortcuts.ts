@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { ImageData, loadImage } from "skia-canvas";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext } from "../builtin-template.ts";
 import { legacyCaptionShortcuts } from "../legacy-caption-shortcuts.ts";
@@ -41,7 +44,7 @@ function wuJingLabels([left, right]: readonly string[]): Label[] {
 // Layouts and masks from the fixed Python source; Intel uses the bundled open bold font.
 const definitions: readonly CaptionTemplate[] = [
   {
-    key: "high_EQ", keywords: ["高低情商", "低高情商"], defaults: ["高情商", "低情商"], white: true, stroke: ["#000", 0.05], wrap: true,
+    key: "high_EQ", keywords: ["高低情商", "低高情商"], defaults: [$t("templates.legacy-caption-shortcuts.text_662a4d17ce"), $t("templates.legacy-caption-shortcuts.text_c40a4732b9")], white: true, stroke: ["#000", 0.05], wrap: true,
     labels: ([left, right]) => [
       { text: left!, box: [40, 540, 602, 1140], sizes: [50, 100] },
       { text: right!, box: [682, 540, 1244, 1140], sizes: [50, 100] },
@@ -53,18 +56,18 @@ const definitions: readonly CaptionTemplate[] = [
     labels: ([text]) => [{ text: text!, box: [240, 340, 680, 580], sizes: [80, 180] }],
   },
   {
-    key: "scratchcard", keywords: ["刮刮乐"], defaults: ["谢谢参与"], white: true, alignLines: "center", wrap: true, mask: true,
+    key: "scratchcard", keywords: ["刮刮乐"], defaults: [$t("templates.legacy-caption-shortcuts.text_4262f296ac")], white: true, alignLines: "center", wrap: true, mask: true,
     labels: ([text]) => [{ text: text!, box: [80, 160, 360, 290], sizes: [30, 80] }],
   },
   {
-    key: "wakeup", keywords: ["好起来了"], defaults: ["好"],
+    key: "wakeup", keywords: ["好起来了"], defaults: [$t("templates.legacy-caption-shortcuts.text_f867f34178")],
     labels: ([text]) => [
       { text: text!, box: [310, 270, 460, 380], sizes: [50, 90] },
-      { text: text + "起来了", box: [50, 610, 670, 720], sizes: [70, 110] },
+      { text: text + $t("templates.legacy-caption-shortcuts.text_74c45f5b09"), box: [50, 610, 670, 720], sizes: [70, 110] },
     ],
   },
   {
-    key: "wujing", keywords: ["吴京中国"], defaults: ["不买华为不是", "人"], white: true, stroke: ["#000", 0.05],
+    key: "wujing", keywords: ["吴京中国"], defaults: [$t("templates.legacy-caption-shortcuts.text_6511f66719"), $t("templates.legacy-caption-shortcuts.text_50f5d65d57")], white: true, stroke: ["#000", 0.05],
     labels: wuJingLabels,
   },
 ];
@@ -74,7 +77,7 @@ function createCaptionTemplate(definition: CaptionTemplate): MemeTemplate {
   const prefix = "python/meme_generator/memes/" + definition.key + "/images/";
   const shortcuts = legacyCaptionShortcuts(definition.key);
   async function render(text: readonly string[], context: MemeTemplateContext) {
-    if (text.length !== count) throw new MemeTemplateFeedback("该表情需要 " + count + " 段文字。");
+    if (text.length !== count) throw new MemeTemplateFeedback($t("templates.legacy-caption-shortcuts.text_6fb809e7a7") + count + $t("templates.legacy-caption-shortcuts.text_6fef2ce393"));
     const typeface = definition.typeface;
     const [frame, mask, preferred, fallback] = await Promise.all([
       context.imageAsset(prefix + (definition.mask ? "0.png" : "0.jpg")).then(loadImage),

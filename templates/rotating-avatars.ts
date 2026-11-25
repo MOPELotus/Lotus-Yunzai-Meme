@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import type { CanvasRenderingContext2D, Image } from "skia-canvas";
 import { renderRgba } from "../../../packages/skia/index.ts";
 import type { MemeTemplate } from "../builtin-template.ts";
@@ -107,7 +110,7 @@ const scenes = [
 
 function template(scene: typeof scenes[number]): MemeTemplate {
   async function render({ images, texts }: Parameters<MemeTemplate["render"]>[0], { signal }: Parameters<MemeTemplate["render"]>[1]) {
-    if (images.length !== 1 || texts.length) throw new Error("这个表情需要一张图片。");
+    if (images.length !== 1 || texts.length) throw new Error($t("templates.rotating-avatars.text_455cc162ff"));
     const source = await readMemeImageSequence(images[0]!, signal);
     const frames = alignMemeLoop(source, scene.poses, scene.cadence).map(value => ({ value, delayMs: scene.cadence }));
     const { width, height, scale } = rgbaFrameDimensions(scene.edge, scene.edge);

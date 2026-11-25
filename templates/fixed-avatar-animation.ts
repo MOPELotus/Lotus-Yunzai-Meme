@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type Image, type CanvasRenderingContext2D } from "skia-canvas";
 import { renderExactPng, renderRgba } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
@@ -461,7 +464,7 @@ export function createFixedAvatarAnimation({
 
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
     if (input.images.length !== imageCount || input.texts.length) {
-      throw new Error(imageCount === 1 ? "这个表情需要一张图片。" : "这个表情需要两张图片。");
+      throw new Error(imageCount === 1 ? $t("templates.fixed-avatar-animation.text_455cc162ff") : $t("templates.fixed-avatar-animation.text_7ccbb96dfc"));
     }
 
     const { signal } = context;
@@ -512,7 +515,7 @@ export function createFixedAvatarAnimation({
       const scaleX = width / sourceWidth, scaleY = height / sourceHeight;
       for await (const { index, foreground } of orderedFrames(holds.length, first, longAnimation ? 8 : 1, read, signal)) {
         if (foreground.width !== sourceWidth || foreground.height !== sourceHeight) {
-          throw new Error(`表情模板 ${key} 的帧尺寸不一致。`);
+          throw new Error($t("templates.fixed-avatar-animation.text_bc92350be8", { "key": key }));
         }
         if (!avatarLayers || !fixedPlacement) {
           const offset = offsets[index]!;

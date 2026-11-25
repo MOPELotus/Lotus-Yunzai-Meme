@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Dimensions, text and shortcuts follow the fixed Python sources at 619fa10518fc2eca4fa1053af37f0a00a839f062.
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext, type MemeTemplateInput } from "../builtin-template.ts";
@@ -5,7 +8,7 @@ import { readMemeFirstImage } from "./animated-input.ts";
 import { layoutMemeText } from "./bbcode-text.ts";
 import { jpg, previewImage, registerFont } from "./template-layout.ts";
 
-const nicknameHelp = "指定名字";
+const nicknameHelp = $t("templates.friend-notifications.text_74b5badd91");
 const nicknameArgs = {
   args_model: { properties: { name: { type: "string", description: nicknameHelp, default: "" } } },
   parser_options: [{ names: ["-n", "--name"], args: [{ name: "name", value: "str" }], help_text: nicknameHelp }],
@@ -40,15 +43,15 @@ function avatar(draw: CanvasRenderingContext2D, image: Image, x: number, y: numb
 
 function validate(input: MemeTemplateInput, maxTexts: number) {
   if (input.images.length !== 1 || !input.texts.length || input.texts.length > maxTexts) {
-    throw new MemeTemplateFeedback("表情图片或文字数量不符合要求。");
+    throw new MemeTemplateFeedback($t("templates.friend-notifications.text_44af2dbe33"));
   }
 }
 
 const steamMessage: MemeTemplate = {
   info: { key: "steam_message", keywords: ["steam消息"],
-    shortcuts: [{ key: steamShortcut, args: ["--name", "{name}", "{game}"], humanized: "xx正在玩xx" }],
+    shortcuts: [{ key: steamShortcut, args: ["--name", "{name}", "{game}"], humanized: $t("templates.friend-notifications.text_d1f5fd89d2") }],
     params_type: { min_images: 1, max_images: 1, min_texts: 1, max_texts: 1,
-      default_texts: ["黑神话：悟空"], args_type: nicknameArgs },
+      default_texts: [$t("templates.friend-notifications.text_2924e13e57")], args_type: nicknameArgs },
   },
   async render(input, context) {
     validate(input, 1);
@@ -57,8 +60,8 @@ const steamMessage: MemeTemplate = {
       readMemeFirstImage(input.images[0]!, signal), context.imageAsset("steam_message/logo.png").then(loadImage),
       registerFont(context),
     ]);
-    const name = written(nickname(input, 0, "好友"), 65, font, "#e3ffc2");
-    const playing = written("正在玩", 62, font, "#d1d1c0");
+    const name = written(nickname(input, 0, $t("templates.friend-notifications.text_b9b1480dd6")), 65, font, "#e3ffc2");
+    const playing = written($t("templates.friend-notifications.text_0669de77ec"), 62, font, "#d1d1c0");
     const game = written(input.texts[0]!, 65, font, "#91c257");
     const textX = 431;
     const width = textX + Math.max(name.width, playing.width, game.width, 1300) + 50;
@@ -78,13 +81,13 @@ const steamMessage: MemeTemplate = {
     }, signal);
   },
   async preview(context) {
-    return demo(steamMessage, "黑神话：悟空", context);
+    return demo(steamMessage, $t("templates.friend-notifications.text_2924e13e57"), context);
   },
 };
 
 const myFriend: MemeTemplate = {
   info: { key: "my_friend", keywords: ["我朋友说"], params_type: {
-    min_images: 1, max_images: 1, min_texts: 1, max_texts: 10, default_texts: ["让我康康"], args_type: nicknameArgs,
+    min_images: 1, max_images: 1, min_texts: 1, max_texts: 10, default_texts: [$t("templates.friend-notifications.text_507372c007")], args_type: nicknameArgs,
   } },
   async render(input, context) {
     validate(input, 10);
@@ -96,8 +99,8 @@ const myFriend: MemeTemplate = {
       registerFont(context),
     ]);
     const [corner1, corner2, corner3, corner4, label] = assets as [Image, Image, Image, Image, Image];
-    const name = written(nickname(input, -1, "朋友"), 25, font, "#868894");
-    if (name.width >= 600) throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+    const name = written(nickname(input, -1, $t("templates.friend-notifications.text_677aad1a0e")), 25, font, "#868894");
+    if (name.width >= 600) throw new MemeTemplateFeedback($t("templates.friend-notifications.text_002fc2fab2"));
     const dialogs = input.texts.map(value => {
       const text = written(value, 40, font, "black", 600);
       return { text, width: Math.max(text.width, name.width + 15) + 140, height: Math.max(text.height + 103, 150) };
@@ -126,7 +129,7 @@ const myFriend: MemeTemplate = {
     }, signal);
   },
   async preview(context) {
-    return demo(myFriend, "让我康康", context);
+    return demo(myFriend, $t("templates.friend-notifications.text_507372c007"), context);
   },
 };
 

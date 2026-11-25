@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
 import { renderPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
@@ -66,7 +69,7 @@ function drawFrame(avatar: Image, frame: Image, [left, top, width, height]: Avat
 function avatarFrame([key, keywords, placement]: AvatarFrame, { tags = [], maxTexts, still }: FrameOptions = {}): MemeTemplate {
   const limits = maxTexts ? { ...params, max_texts: maxTexts } : params;
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
-    if (input.images.length !== 1 || input.texts.length > limits.max_texts) throw new Error("相框的图片或文字数量不符。");
+    if (input.images.length !== 1 || input.texts.length > limits.max_texts) throw new Error($t("templates.avatar-frames.text_a2bee4ca3d"));
     const { signal } = context;
     signal.throwIfAborted();
     const [sequence, frame] = await Promise.all([

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original coordinates and static JPEG output from MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { loadImage, type Image } from "skia-canvas";
@@ -77,7 +80,7 @@ function rotatedPhoto(image: Image, { x, y, width, height, angle, expand, alignT
 
 function template({ key, keywords, tags, placements }: RotatedTemplate): MemeTemplate {
   async function render({ images, texts }: MemeTemplateInput, context: MemeTemplateContext) {
-    if (images.length !== 1 || texts.length) throw new Error("该表情需要一张图片。");
+    if (images.length !== 1 || texts.length) throw new Error($t("templates.rotated-insets.text_2646e324ad"));
     const { signal } = context;
     const [photo, original] = await Promise.all([
       readMemeFirstImage(images[0]!, signal), context.imageAsset(`${key}/0.png`).then(loadImage),

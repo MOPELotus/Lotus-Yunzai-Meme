@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { renderExactPng } from "../../../packages/skia/index.ts";
 import { loadImage, type Image } from "skia-canvas";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
@@ -9,11 +12,11 @@ import { screenProjection } from "./projective-transform.ts";
 import { renderPythonGif } from "./python-gif.ts";
 import { paper, previewImage, type Draw } from "./template-layout.ts";
 
-const circleHelp = "是否将图片变为圆形";
+const circleHelp = $t("templates.classic-layered-animations.text_bd6b1d72aa");
 const circleArgs = {
   args_model: { properties: { circle: { type: "boolean", default: false, description: circleHelp } } },
   args_examples: [{ circle: false }, { circle: true }],
-  parser_options: [{ names: ["--circle", "圆"], dest: "circle", args: [], default: false,
+  parser_options: [{ names: ["--circle", $t("templates.classic-layered-animations.text_82d06faea1")], dest: "circle", args: [], default: false,
     action: { type: 0, value: true }, help_text: circleHelp }],
 };
 
@@ -67,14 +70,14 @@ async function readArtwork(key: string, count: number, context: MemeTemplateCont
     images.push(...batch);
   }
   const { width, height } = images[0]!;
-  if (images.some(art => art.width !== width || art.height !== height)) throw new Error(`表情模板 ${key} 的帧尺寸不一致。`);
+  if (images.some(art => art.width !== width || art.height !== height)) throw new Error($t("templates.classic-layered-animations.text_bc92350be8", { "key": key }));
   return { images, width, height };
 }
 
 function template(spec: ClassicLayeredSpec): MemeTemplate {
   const { key, cadence, frames, fit = "square", layering, initialSize, circle, animatedInput } = spec;
   async function render({ images, texts, args }: MemeTemplateInput, context: MemeTemplateContext) {
-    if (images.length !== 1 || texts.length) throw new Error("该表情需要一张图片。");
+    if (images.length !== 1 || texts.length) throw new Error($t("templates.classic-layered-animations.text_2646e324ad"));
     const { signal } = context;
     const [source, artwork] = await Promise.all([
       animatedInput ? readMemeImageSequence(images[0]!, signal) : readMemeFirstImage(images[0]!, signal).then(image => ({

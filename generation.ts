@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { generationSettings } from "./catalog-policy.ts";
 import { parseGenerationArgs, type PresetArgument } from "./generation-args.ts";
 
@@ -59,7 +62,7 @@ async function assembleImages(
   const protectedTemplate = settings.protectedTemplates.some((entry) => entry === key || aliases.includes(entry));
   if (target && protectedTemplate) {
     if (settings.master && !input.isMaster && !input.isTargetMaster) {
-      return "表情保护需要宿主确认目标的主人身份。";
+      return $t("generation.text_3ab594ae93");
     }
     if (settings.master ? !input.isMaster && input.isTargetMaster?.(target) : settings.protectedUsers.includes(target)) {
       avatars.reverse();
@@ -83,13 +86,13 @@ export async function buildGenerationBody(
     settings = generationSettings();
     params = paramsOf(serialized);
   } catch {
-    return "无法读取表情生成配置或参数。";
+    return $t("generation.text_c3a7860a11");
   }
   const typedMentions = [...text.matchAll(/@\s*(\d+)/gu)].map((match) => match[1]!);
   const users = [...new Set([...(input.mentions ?? []).map(String), ...typedMentions])]
     .filter((id) => /^\d+$/u.test(id) && id !== String(input.quoted?.userId));
   const message = text.replace(/@\s*\d+/gu, "").trim();
-  if (preset && params.args_type == null) return "表情预设缺少对应的模板参数。";
+  if (preset && params.args_type == null) return $t("generation.text_14017f4307");
   const parsed = params.args_type == null ? undefined : parseGenerationArgs(params.args_type, message, preset);
   if (parsed?.issue) return parsed.issue;
   const caption = parsed?.text ?? message;
@@ -102,29 +105,29 @@ export async function buildGenerationBody(
       nickname = await input.nickname?.(firstUser);
       const gender = await input.gender?.(firstUser) ?? "unknown";
       body.append("args", JSON.stringify({
-        user_infos: [{ name: nickname || "未知", gender }],
+        user_infos: [{ name: nickname || $t("generation.text_4d8c1c5b42"), gender }],
         ...parsed.values,
       }));
     }
     if (params.max_images > 0) {
       const images = await assembleImages(key, aliases, users, params.min_images, params.max_images, input, settings);
       if (typeof images === "string") return images;
-      if (images.length < params.min_images) return `该表情需要 ${params.min_images}–${params.max_images} 张图片。`;
+      if (images.length < params.min_images) return $t("generation.text_7ecb81ab1b", { "min_images": params.min_images, "max_images": params.max_images });
       for (const [index, image] of images.entries()) body.append("images", image, `image${index}.png`);
     }
 
     if (params.max_texts > 0) {
       if (!texts.length && settings.useNickname) {
-        texts.push(nickname || await input.nickname?.(firstUser) || "未知");
+        texts.push(nickname || await input.nickname?.(firstUser) || $t("generation.text_4d8c1c5b42"));
       }
       while (texts.length < params.min_texts && params.texts.length) {
         texts.push(params.texts[Math.floor(Math.random() * params.texts.length)]!);
       }
-      if (texts.length < params.min_texts) return `该表情需要 ${params.min_texts}–${params.max_texts} 段文字。`;
+      if (texts.length < params.min_texts) return $t("generation.text_7accd94ee0", { "min_texts": params.min_texts, "max_texts": params.max_texts });
       for (const part of texts) body.append("texts", part);
     }
     return { key, body, quote: settings.quote };
   } catch {
-    return "无法取得表情生成所需的图片或昵称。";
+    return $t("generation.text_c539ce6435");
   }
 }

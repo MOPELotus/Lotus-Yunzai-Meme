@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original layouts from MemeCrafters/meme-generator at 619fa10518fc2eca4fa1053af37f0a00a839f062.
 import { randomInt } from "node:crypto";
 import { Canvas, ImageData, loadImage, type Image } from "skia-canvas";
@@ -9,7 +12,7 @@ import { drawFittedText, previewImage, registerFont, registerMemeTypeface, rgbaF
 import { readTransformSource, renderTransformSequence } from "./transforms.ts";
 
 const imageOnly = { min_images: 1, max_images: 1, min_texts: 0, max_texts: 0, default_texts: [], args_type: null };
-const previewNames = ["刘一", "陈二", "张三", "李四", "王五", "赵六", "孙七", "周八", "吴九", "郑十"];
+const previewNames = [$t("templates.legacy-portrait-effects.text_5989f6f405"), $t("templates.legacy-portrait-effects.text_c80834bf8e"), $t("templates.legacy-portrait-effects.text_1d841bc0ee"), $t("templates.legacy-portrait-effects.text_808b4f6221"), $t("templates.legacy-portrait-effects.text_c68e010446"), $t("templates.legacy-portrait-effects.text_e6bb13166f"), $t("templates.legacy-portrait-effects.text_34e2bef711"), $t("templates.legacy-portrait-effects.text_7df288465c"), $t("templates.legacy-portrait-effects.text_1487d35303"), $t("templates.legacy-portrait-effects.text_7292b7eda2")];
 const askWidth = 640;
 const askGradientHeight = 150;
 const asciiWidth = 150;
@@ -30,18 +33,18 @@ function scalePaint(scale: number, draw: Draw): Draw {
 }
 
 async function renderAsk(input: MemeTemplateInput, context: MemeTemplateContext) {
-  if (input.images.length !== 1 || input.texts.length > 1) throw new MemeTemplateFeedback("该表情需要一张图片和至多一段文字。");
+  if (input.images.length !== 1 || input.texts.length > 1) throw new MemeTemplateFeedback($t("templates.legacy-portrait-effects.text_528c1f9868"));
   const possibleUser: unknown = Array.isArray(input.args.user_infos) ? input.args.user_infos[0] : undefined;
   const user = possibleUser && typeof possibleUser === "object" ? possibleUser as { name?: unknown; gender?: unknown } : undefined;
   const name = input.texts[0] ?? (typeof user?.name === "string" ? user.name : "");
-  if (!name) throw new MemeTemplateFeedback("文字或昵称数量不足。");
-  const pronoun = user?.gender === "male" ? "他" : "她";
+  if (!name) throw new MemeTemplateFeedback($t("templates.legacy-portrait-effects.text_76b8e87b81"));
+  const pronoun = user?.gender === "male" ? $t("templates.legacy-portrait-effects.text_8b7b91e000") : $t("templates.legacy-portrait-effects.text_2ab425e0c6");
   const { signal } = context;
   const [source, regular, bold] = await Promise.all([
     readMemeFirstImage(input.images[0]!, signal), registerFont(context), registerFont(context, true),
   ]);
   const photoHeight = Math.floor(source.height * askWidth / source.width);
-  if (photoHeight < 1 || photoHeight + 160 > maxRasterSide) throw new MemeTemplateFeedback("表情原图长宽比超限。");
+  if (photoHeight < 1 || photoHeight + 160 > maxRasterSide) throw new MemeTemplateFeedback($t("templates.legacy-portrait-effects.text_ccdf13dcac"));
   const captionTop = photoHeight - askGradientHeight;
   const orange = "#ffa500";
   const dimmed = await renderMaskedRaster(askWidth, photoHeight,
@@ -63,7 +66,7 @@ async function renderAsk(input: MemeTemplateInput, context: MemeTemplateContext)
     canvas.drawImage(backdrop, 0, 0);
     canvas.font = `28px ${bold}`;
     canvas.textBaseline = "alphabetic";
-    const second = `${name}不知道哦。`;
+    const second = $t("templates.legacy-portrait-effects.text_a60083f553", { "name": name });
     const firstMetrics = canvas.measureText(name), secondMetrics = canvas.measureText(second);
     const firstLine = firstMetrics.lines[0]!, secondLine = secondMetrics.lines[0]!;
     const height = Math.round(firstLine.descent - firstLine.ascent);
@@ -80,9 +83,9 @@ async function renderAsk(input: MemeTemplateInput, context: MemeTemplateContext)
     canvas.fillStyle = "white";
     canvas.fillRect(0, 0, askWidth + 60, photoHeight + 160);
     const options = { wrap: false, paragraphMetrics: true };
-    drawFittedText(canvas, [30, 0, 670, 80], `让${name}告诉你吧`, regular, 12, 35, "left", "black", options);
+    drawFittedText(canvas, [30, 0, 670, 80], $t("templates.legacy-portrait-effects.text_ac77145c4b", { "name": name }), regular, 12, 35, "left", "black", options);
     drawFittedText(canvas, [30, photoHeight + 80, 670, photoHeight + 160],
-      `啊这，${pronoun}说不知道`, regular, 12, 35, "left", "black", options);
+      $t("templates.legacy-portrait-effects.text_13c71fe2f7", { "pronoun": pronoun }), regular, 12, 35, "left", "black", options);
   }), [scalePaint(scale, canvas => canvas.drawImage(photo, 30, 80))], signal);
 }
 
@@ -120,7 +123,7 @@ async function renderCharpic(input: MemeTemplateInput, context: MemeTemplateCont
   const rows = Math.round(height * asciiAdvance / asciiLineHeight);
   const outputWidth = Math.ceil(asciiWidth * asciiAdvance);
   const outputHeight = asciiLineHeight * rows;
-  if (!rows || outputHeight > maxRasterSide) throw new MemeTemplateFeedback("表情原图长宽比超限。");
+  if (!rows || outputHeight > maxRasterSide) throw new MemeTemplateFeedback($t("templates.legacy-portrait-effects.text_ccdf13dcac"));
   return renderTransformSequence(sequence, outputWidth, outputHeight, async (canvas, picture) => {
     const greys = await greyscale(picture, rows, signal);
     canvas.font = font;

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { randomInt } from "node:crypto";
 import { loadImage, type Image } from "skia-canvas";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
@@ -43,7 +46,7 @@ const animations: readonly Animation[] = [
 ];
 
 function requireOnePhoto({ images, texts }: MemeTemplateInput) {
-  if (images.length !== 1 || texts.length) throw new Error("该表情需要一张图片。");
+  if (images.length !== 1 || texts.length) throw new Error($t("templates.jump-sold.text_2646e324ad"));
   return images[0]!;
 }
 
@@ -85,7 +88,7 @@ function fixedAnimation(spec: Animation): MemeTemplate {
       width, height, frames, signal,
       async renderFrame({ position, index }, outWidth, outHeight) {
         const art = index === 0 ? first : await readArt(index);
-        if (art.width !== width || art.height !== height) throw new Error(`表情模板 ${spec.key} 的帧尺寸不一致。`);
+        if (art.width !== width || art.height !== height) throw new Error($t("templates.jump-sold.text_bc92350be8", { "key": spec.key }));
         const scaled = (paint: Draw) => rescale(paint, outWidth / width, outHeight / height);
         const drawArt = scaled(draw => draw.drawImage(art, 0, 0));
         const circleAbove = spec.layout === "circle-above";

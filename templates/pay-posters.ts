@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Fixed paper artwork, data and layout from MemeCrafters/meme-generator at 619fa10518fc2eca4fa1053af37f0a00a839f062.
 import QRCode from "qrcode";
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
@@ -7,8 +10,8 @@ import { drawFittedText, jpg, previewImage, registerFont } from "./template-layo
 
 const defaultMessage = "https://github.com/MemeCrafters/meme-generator";
 const textChoice = {
-  args_model: { properties: { message: { type: "string", default: "", description: "二维码内容" } } },
-  parser_options: [{ names: ["-m", "--message"], args: [{ name: "message", value: "str" }], help_text: "二维码内容" }],
+  args_model: { properties: { message: { type: "string", default: "", description: $t("templates.pay-posters.text_2d0222b61b") } } },
+  parser_options: [{ names: ["-m", "--message"], args: [{ name: "message", value: "str" }], help_text: $t("templates.pay-posters.text_2d0222b61b") }],
 };
 type Square = readonly [x: number, y: number, size: number];
 type Tile = readonly [x: number, y: number, size: number, radius: number];
@@ -29,7 +32,7 @@ function titleFrom(input: MemeTemplateInput) {
   const owner: unknown = Array.isArray(input.args.user_infos) ? input.args.user_infos[0] : undefined;
   if (input.texts[0] !== undefined) return input.texts[0];
   if (owner && typeof owner === "object" && "name" in owner && typeof owner.name === "string") return owner.name;
-  throw new MemeTemplateFeedback("请提供文字或可用的用户昵称。");
+  throw new MemeTemplateFeedback($t("templates.pay-posters.text_1c14b86168"));
 }
 
 function codeFor(text: string) {
@@ -38,7 +41,7 @@ function codeFor(text: string) {
     const code = QRCode.create(text, options);
     return code.version < 5 ? QRCode.create(text, { ...options, version: 5 }).modules : code.modules;
   } catch {
-    throw new MemeTemplateFeedback("二维码内容过长或无法生成。");
+    throw new MemeTemplateFeedback($t("templates.pay-posters.text_dd140f5cc8"));
   }
 }
 
@@ -74,7 +77,7 @@ function poster(spec: Poster): MemeTemplate {
       min_images: 1, max_images: 1, min_texts: 0, max_texts: 1, args_type: textChoice,
     } },
     async render(input, context) {
-      if (input.images.length !== 1 || input.texts.length > 1) throw new MemeTemplateFeedback("表情图片或文字数量不符合要求。");
+      if (input.images.length !== 1 || input.texts.length > 1) throw new MemeTemplateFeedback($t("templates.pay-posters.text_44af2dbe33"));
       const title = titleFrom(input);
       const content = typeof input.args.message === "string" && input.args.message ? input.args.message : defaultMessage;
       const code = codeFor(content);
@@ -97,7 +100,7 @@ function poster(spec: Poster): MemeTemplate {
       }, signal);
     },
     async preview(context) {
-      return template.render({ images: [await previewImage(context.signal)], texts: ["预览用户"], args: {} }, context);
+      return template.render({ images: [await previewImage(context.signal)], texts: [$t("templates.pay-posters.text_2f9494793a")], args: {} }, context);
     },
   };
   return template;

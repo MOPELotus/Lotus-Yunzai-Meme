@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage } from "skia-canvas";
 import type { MemeTemplate, MemeTemplateInput, MemeTemplateContext, MemeTemplateShortcut } from "../builtin-template.ts";
 import { readMemeImageSequence } from "./animated-input.ts";
@@ -76,7 +79,7 @@ export const rectangleOverlayTemplates: readonly MemeTemplate[] = overlays.map(
     const drawY = rotation ? -avatarHeight / 2 : top;
 
     async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
-      if (input.images.length !== 1 || input.texts.length > maxTexts) throw new Error("表情的图片或文字数量不符。");
+      if (input.images.length !== 1 || input.texts.length > maxTexts) throw new Error($t("templates.rectangle-overlays.text_1873817cf3"));
       const { signal } = context;
       signal.throwIfAborted();
       const [source, frame] = await Promise.all([

@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original AnyLiew layouts and documented variants. Backdrops are verified against the fixed source revision.
 import { randomInt } from "node:crypto";
 import { loadImage, type CanvasRenderingContext2D } from "skia-canvas";
@@ -36,7 +39,7 @@ const signs: readonly Sign[] = [
   {
     key: "acacia_anan_holdsign", keywords: ["安安举牌", "夏目安安举牌"], tags: ["魔法少女的魔女审判", "夏目安安"],
     // Keep the upstream short default that fits all four backdrops.
-    text: "快说吾辈可爱",
+    text: $t("templates.anyliew-signs.text_2fa0e92d72"),
     frames: [
       { asset: "0.png", box: [147, 810, 736, 1105], sizes: [30, 120] },
       { asset: "1.png", box: [179, 344, 464, 413], sizes: [30, 120] },
@@ -46,7 +49,7 @@ const signs: readonly Sign[] = [
   },
   {
     key: "atri_holdsign", keywords: ["亚托莉举牌"], tags: ["ATRI", "亚托莉", "萝卜子"],
-    text: "请不要忘记我哦……\n请一直,一直记住我哦\n明天,请把我带到伊甸\n我想看见大家的笑容\n我想看到大家开心的表情\n我想学习喜悦",
+    text: $t("templates.anyliew-signs.text_fb2036d69f"),
     frames: [{ asset: "0.jpg", box: [247, 935, 639, 1333], sizes: [20, 120], leftLines: true }],
   },
   {
@@ -55,34 +58,34 @@ const signs: readonly Sign[] = [
   },
   {
     key: "mihoyo_funina_holdsign", keywords: ["芙宁娜举牌", "芙芙举牌", "芙芙酱举牌"], tags: mihoyo,
-    text: "当那古老的预言终结、一切落幕之后，我曾经陷入很长时间的消沉。站在舞台上的人受到观众的追捧，同时也承受着更多的注视与期待。但我很清楚，他们期待的并不是我，而是我扮演的那位「神明」...在这个过程中，我真正得到的只有孤独。所以我一度庆恶任何跟表演有关的事，把自己关在房间里，直到再次站上舞台、再次面对观众的时候，我才发现不知不觉我内心的不安已经消失了。现在的我可以坦然承受他们的目光,也许是因为…我终于开始「扮演」我自己了。",
+    text: $t("templates.anyliew-signs.text_1cbd153405"),
     color: "#746f70", frames: [{ asset: "0.png", box: [616, 731, 925, 950], sizes: [10, 200], leftLines: true }],
   },
   {
     key: "mihoyo_hutao_holdsign", keywords: ["胡桃举牌"], tags: mihoyo,
-    text: "嗯哼，太阳出来我晒太阳，月亮出来我晒月亮嘞",
+    text: $t("templates.anyliew-signs.text_c6207b207b"),
     frames: [{ asset: "0.jpg", box: [196, 736, 739, 943], sizes: [30, 120] }],
   },
   {
     key: "mihoyo_liuwei_holdsign", keywords: ["刘伟举牌", "大伟举牌", "大伟哥举牌"], tags: mihoyo,
-    text: "你的声音太尖锐了", font: "diary",
+    text: $t("templates.anyliew-signs.text_5ba48f7ec2"), font: "diary",
     frames: [{ asset: "0.jpg", box: [204, 596, 763, 918], sizes: [30, 120] }],
   },
   {
-    key: "mihoyo_lynette_holdsign", keywords: ["琳妮特举牌"], tags: mihoyo, text: "林尼大笨蛋", png: true,
+    key: "mihoyo_lynette_holdsign", keywords: ["琳妮特举牌"], tags: mihoyo, text: $t("templates.anyliew-signs.text_941e06ac81"), png: true,
     frames: [{ asset: "0.png", box: [564, 1488, 1330, 1909], sizes: [30, 120] }],
   },
   {
-    key: "moria_ruruka_holdsign", keywords: ["露露卡举牌", "森亚露露卡举牌"], text: "变身", font: "diary",
+    key: "moria_ruruka_holdsign", keywords: ["露露卡举牌", "森亚露露卡举牌"], text: $t("templates.anyliew-signs.text_4ba7c75320"), font: "diary",
     frames: [{ asset: "0.png", box: [210, 714, 656, 985], sizes: [10, 120] }],
   },
   {
     key: "naruro_uzumaki_naruto_holdsign", keywords: ["鸣人举牌", "漩涡鸣人举牌"],
-    text: "我才不要在这种时候放弃,即使当不成中忍,我也会通过其他的途径成为火影的,这就是我的忍道 ",
+    text: $t("templates.anyliew-signs.text_aaa3f6d5da"),
     color: "#482c29", frames: [{ asset: "0.jpg", box: [281, 591, 858, 1001], sizes: [30, 120], leftLines: true }],
   },
   {
-    key: "yuzu_soft_holdsign", keywords: ["柚子厨举牌"], tags: yuzu, text: "不要再涩涩了", font: "boldBrush",
+    key: "yuzu_soft_holdsign", keywords: ["柚子厨举牌"], tags: yuzu, text: $t("templates.anyliew-signs.text_b722a779fa"), font: "boldBrush",
     frames: [{ asset: "0.jpg", box: [1150, 896, 3024, 1240], sizes: [30, 300], leftLines: true }],
   },
   {
@@ -116,11 +119,11 @@ function drawSignText(draw: CanvasRenderingContext2D, frame: SignFrame, text: st
     draw.fillText(text, x, top + (height - textHeight) / 2 - ascent, measure);
     return;
   }
-  throw new MemeTemplateFeedback("文字过长，无法放进表情模板。");
+  throw new MemeTemplateFeedback($t("templates.anyliew-signs.text_002fc2fab2"));
 }
 
 function createSign(sign: Sign): MemeTemplate {
-  const help = `图片编号，0 随机，1～${sign.frames.length} 指定底图`;
+  const help = $t("templates.anyliew-signs.text_49c12ffc4b", { "length": sign.frames.length });
   const argsType = sign.frames.length > 1 ? {
     args_model: { properties: { number: { type: "integer", default: 0, description: help } } },
     parser_options: [{ names: ["-n", "--number"], args: [{ name: "number", value: "int" }], help_text: help }],
@@ -131,7 +134,7 @@ function createSign(sign: Sign): MemeTemplate {
     if (argsType) {
       if (number === undefined || number === 0) index = randomInt(sign.frames.length);
       else if (typeof number === "number" && Number.isSafeInteger(number) && number >= 1 && number <= sign.frames.length) index = number - 1;
-      else throw new MemeTemplateFeedback(`图片编号错误，请选择 1～${sign.frames.length} 或 0（随机）`);
+      else throw new MemeTemplateFeedback($t("templates.anyliew-signs.text_aed3f52a49", { "length": sign.frames.length }));
     }
     const frame = sign.frames[index]!;
     const typeface = fonts[sign.font ?? "child"];

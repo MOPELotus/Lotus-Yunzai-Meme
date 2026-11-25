@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import type { TudouComposition } from "./tudou-layered-specs.ts";
 
 // Original LRZ9712/tudou-meme coordinates from revision 7e799eeaca9ce712eeabe41f964636c755a86c63.

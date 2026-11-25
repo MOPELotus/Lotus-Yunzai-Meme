@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Screen coordinates follow MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
@@ -52,17 +55,17 @@ const screens: readonly ScreenTemplate[] = [
     corners: [[0, 1], [275, 0], [273, 202], [2, 216]], position: [50, 188], png: true },
   { key: "genshin_start", keywords: ["原神启动"], screen: [600, 330],
     corners: [[0, 116], [585, 0], [584, 319], [43, 385]], position: [412, 121],
-    caption: { text: "原神，启动！", box: [100, 1471, 980, 1621], fontSize: [70, 100], fill: "white", stroke: ["black", 0.05] },
-    shortcuts: [{ key: "(?P<text>\\S+启动[!！]?)", args: ["{text}"], humanized: "xx启动" }] },
+    caption: { text: $t("templates.perspective.text_f114be37d4"), box: [100, 1471, 980, 1621], fontSize: [70, 100], fill: "white", stroke: ["black", 0.05] },
+    shortcuts: [{ key: "(?P<text>\\S+启动[!！]?)", args: ["{text}"], humanized: $t("templates.perspective.text_aaea7aecc6") }] },
   { key: "play_game", keywords: ["玩游戏"], screen: [220, 160], corners: [[0, 5], [227, 0], [216, 150], [0, 165]],
     position: [161, 117], rotation: 9,
-    caption: { text: "来玩休闲游戏啊", useDefault: true, box: [20, 433, 506, 503], fontSize: [25, 40], fill: "black", stroke: ["white", 0.06] } },
+    caption: { text: $t("templates.perspective.text_966991231f"), useDefault: true, box: [20, 433, 506, 503], fontSize: [25, 40], fill: "black", stroke: ["white", 0.06] } },
   { key: "this_chicken", keywords: ["这是鸡", "🐔"], screen: [640, 640], corners: [[507, 0], [940, 351], [383, 625], [0, 256]],
     position: [201, 201], firstFrameOnly: true,
-    caption: { text: "这是十二生肖中的鸡", useDefault: true, box: [0, 900, 1440, 1080], fontSize: [40, 80], fill: "white", stroke: ["black", 1 / 15] } },
+    caption: { text: $t("templates.perspective.text_2b015f51fb"), useDefault: true, box: [0, 900, 1440, 1080], fontSize: [40, 80], fill: "white", stroke: ["black", 1 / 15] } },
   { key: "incivilization", keywords: ["不文明"], screen: [150, 150], corners: [[0, 20], [154, 0], [164, 153], [22, 180]],
     position: [137, 151], firstFrameOnly: true, square: true, circle: true, brightness: 0.8, avatarAboveArt: true,
-    caption: { text: "你刚才说的话不是很礼貌！", useDefault: true, box: [57, 42, 528, 117], fontSize: [20, 50], fill: "black", bold: true, wrap: true } },
+    caption: { text: $t("templates.perspective.text_afce589776"), useDefault: true, box: [57, 42, 528, 117], fontSize: [20, 50], fill: "black", bold: true, wrap: true } },
 ];
 
 function rotatedExtent(width: number, height: number, radians: number): Point {
@@ -129,7 +132,7 @@ function screenTemplate(definition: ScreenTemplate): MemeTemplate {
   const { key, keywords, tags, firstFrameOnly, png, caption, shortcuts, avatarAboveArt } = definition;
   const drawAvatar = projectedAvatar(definition);
   async function render(input: MemeTemplateInput, context: MemeTemplateContext) {
-    if (input.images.length !== 1 || input.texts.length > (caption ? 1 : 0)) throw new Error("表情图片或文字数量不符合要求。");
+    if (input.images.length !== 1 || input.texts.length > (caption ? 1 : 0)) throw new Error($t("templates.perspective.text_44af2dbe33"));
     const { signal } = context;
     const [background, source] = await Promise.all([
       context.imageAsset(`${key}/0.png`).then(loadImage),

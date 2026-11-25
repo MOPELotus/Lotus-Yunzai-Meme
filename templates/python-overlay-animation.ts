@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original pose tables and timing from MemeCrafters/meme-generator v0.1.14.
 import { renderRgba } from "../../../packages/skia/index.ts";
 import { loadImage } from "skia-canvas";
@@ -86,7 +89,7 @@ function blendArtwork(art: Buffer, avatar: Buffer) {
 function template({ key, keywords, tags, poses, sequence = range(0, poses.length), delayMs }: OverlayAnimation): MemeTemplate {
   const readArt = (index: number, context: MemeTemplateContext) => context.imageAsset(artworkPath(key, index)).then(loadImage);
   async function render({ images, texts }: MemeTemplateInput, context: MemeTemplateContext) {
-    if (images.length !== 1 || texts.length) throw new Error("这个表情需要一张图片。");
+    if (images.length !== 1 || texts.length) throw new Error($t("templates.python-overlay-animation.text_455cc162ff"));
     const { signal } = context;
     const [avatar, first] = await Promise.all([readMemeFirstImage(images[0]!, signal), readArt(0, context)]);
     const { width, height } = first;
@@ -100,7 +103,7 @@ function template({ key, keywords, tags, poses, sequence = range(0, poses.length
       let frame = assets.get(index);
       if (!frame) {
         const art = index === 0 ? first : await readArt(index, context);
-        if (art.width !== width || art.height !== height) throw new Error(`表情模板 ${key} 的帧尺寸不一致。`);
+        if (art.width !== width || art.height !== height) throw new Error($t("templates.python-overlay-animation.text_bc92350be8", { "key": key }));
         const { rgba } = await renderRgba(width, height, draw => draw.drawImage(art, 0, 0));
         const pose = poses[index];
         if (pose) {

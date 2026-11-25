@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 // Exact template IDs identified from the upstream registry and template artwork.
 export const excludedMemeTemplateKeys = [
   "cat_scratch",
@@ -133,12 +136,12 @@ const originTags = new Set([
 // Match the metadata of these audited legacy records when reading an old SQLite catalog.
 // A new registry entry with the same ID must still pass the normal origin-tag check.
 const legacyTagCorrections = new Map<string, readonly [keywords: readonly string[], limits: readonly number[]]>([
-  ["acacia_anan_holdsign", [["安安举牌", "夏目安安举牌"], [0, 0, 1, 1]]],
+  ["acacia_anan_holdsign", [["安安举牌", $t("template-policy.text_5f11e88f6b")], [0, 0, 1, 1]]],
   ["admission_letter", [["录取通知书"], [0, 0, 1, 1]]],
   ["cinderella_eat", [["灰姑娘吃"], [1, 1, 0, 0]]],
   ["clownish", [["滑稽"], [1, 1, 0, 0]]],
-  ["xiluo_disgust", [["希罗嫌弃", "二阶堂希罗嫌弃"], [1, 1, 0, 1]]],
-  ["xueli_think", [["雪莉想", "雪梨想", "橘雪莉想"], [1, 1, 0, 1]]],
+  ["xiluo_disgust", [["希罗嫌弃", $t("template-policy.text_46fb6b72e4")], [1, 1, 0, 1]]],
+  ["xueli_think", [["雪莉想", $t("template-policy.text_fda1f74c1c"), $t("template-policy.text_4e42283d25")], [1, 1, 0, 1]]],
 ]);
 
 export function isCorrectedLegacyMemeTag(
@@ -170,7 +173,7 @@ const retiredAliases = new Set([
   "鸣潮男",
 ]);
 
-export const excludedMemeTemplateMessage = "没有找到对应表情，发送 #表情列表 查看编号。";
+export const excludedMemeTemplateMessage = $t("template-policy.text_8d3109a531");
 
 function normalize(value: string) {
   return value.normalize("NFKC").trim().toLowerCase();

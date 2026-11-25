@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { mkdtemp, open, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -15,13 +18,13 @@ const maxColor = 255;
 
 export class MemeGifByteLimitError extends RangeError {
   constructor(limit = maxGifBytes) {
-    super(`表情动图超过 ${limit / (1024 * 1024)} MiB。`);
+    super($t("templates.gif.text_ea7ba354a9", { "value1": limit / (1024 * 1024) }));
   }
 }
 
 export class MemeGifDimensionLimitError extends RangeError {
   constructor() {
-    super("表情动图的尺寸或帧数超限。");
+    super($t("templates.gif.text_3c77a0a604"));
   }
 }
 
@@ -244,7 +247,7 @@ export function assertMemeGifStreamDimensions(width: number, height: number, fra
 
 function validateFrame(frame: RgbaFrame, frameBytes: number) {
   if (frame.rgba.length !== frameBytes || !Number.isFinite(frame.delayMs) || frame.delayMs < 0 || frame.delayMs > 655_350) {
-    throw new RangeError("表情动图的帧像素或时长无效。");
+    throw new RangeError($t("templates.gif.text_f2c692fa2d"));
   }
 }
 
@@ -360,7 +363,7 @@ export async function encodeMemeGifStream(
   { paletteLimits }: { readonly paletteLimits?: readonly [number, ...number[]] } = {},
 ): Promise<Uint8Array> {
   if (paletteLimits?.some(limit => !Number.isSafeInteger(limit) || limit < 2 || limit > 256)) {
-    throw new RangeError("表情动图的调色板大小无效。");
+    throw new RangeError($t("templates.gif.text_3e077e4f0f"));
   }
   assertMemeGifStreamDimensions(width, height, frameLimit);
   signal.throwIfAborted();
@@ -381,7 +384,7 @@ export async function encodeMemeGifStream(
         while (written < frameBytes) {
           signal.throwIfAborted();
           const { bytesWritten } = await file.write(frame.rgba, written, frameBytes - written, position + written);
-          if (!bytesWritten) throw new Error("表情动图的缓存帧写入失败。");
+          if (!bytesWritten) throw new Error($t("templates.gif.text_36bb833a2d"));
           written += bytesWritten;
         }
         delays.push(frame.delayMs);
@@ -395,7 +398,7 @@ export async function encodeMemeGifStream(
           while (read < frameBytes) {
             signal.throwIfAborted();
             const { bytesRead } = await file.read(rgba, read, frameBytes - read, index * frameBytes + read);
-            if (!bytesRead) throw new Error("表情动图的缓存帧读取不完整。");
+            if (!bytesRead) throw new Error($t("templates.gif.text_df7ae25630"));
             read += bytesRead;
           }
           signal.throwIfAborted();

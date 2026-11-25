@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../packages/i18n/index.ts";
+import messageCatalog from "./i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { Database } from "bun:sqlite";
 import { existsSync, linkSync, mkdirSync, rmSync } from "node:fs";
 import { dirname } from "node:path";
@@ -82,7 +85,7 @@ function addPresets(db: Database, keys: ReadonlySet<string>, presets: Presets, n
 async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<string> {
   signal?.throwIfAborted();
   const provider = memeProvider();
-  if (!provider) return "本机表情模板尚未就绪。";
+  if (!provider) return $t("catalog-update.text_2267e2b079");
 
   const file = catalogPath();
   let db: Database | undefined;
@@ -157,7 +160,7 @@ async function updateCatalog(force: boolean, signal?: AbortSignal): Promise<stri
       db = undefined;
       linkSync(stagedFile, file);
     }
-    return `表情包数据更新完成，更新 ${entries.length} 项，移除 ${removed.length} 项，补齐预设 ${added} 项。`;
+    return $t("catalog-update.text_df2fa8ae58", { "length": entries.length, "value2": removed.length, "added": added });
   } finally {
     db?.close();
     if (stagedFile) rmSync(stagedFile, { force: true });
@@ -193,7 +196,7 @@ export function initializeLocalCatalog(signal?: AbortSignal) {
 
 export function prepareLocalCatalog(signal?: AbortSignal): Promise<void> | undefined {
   const warn = (error: unknown) => {
-    if (!signal?.aborted) console.warn("[meme] 首次本机表情目录更新失败。", error);
+    if (!signal?.aborted) console.warn($t("catalog-update.text_c4543afe06"), error);
   };
   try {
     return initializeLocalCatalog(signal)?.then(() => undefined, warn);
@@ -205,9 +208,9 @@ export function prepareLocalCatalog(signal?: AbortSignal): Promise<void> | undef
 export function handleCatalogUpdate(message: string, context: SettingsContext, signal?: AbortSignal): Promise<string> | string | undefined {
   const match = command.exec(message.trim());
   if (!match) return;
-  if (!isMemeOwner(context)) return "只有主人才能更新表情包数据";
+  if (!isMemeOwner(context)) return $t("catalog-update.text_71a6f8513e");
   const file = catalogPath();
-  if (refreshes.has(file)) return "表情包数据更新中。";
+  if (refreshes.has(file)) return $t("catalog-update.text_4793a83161");
   return runRefresh(file, () => updateCatalog(match[1] !== undefined, signal))
-    .catch(() => "表情包数据更新失败，旧目录仍可使用。");
+    .catch(() => $t("catalog-update.text_cf08ec79f4"));
 }

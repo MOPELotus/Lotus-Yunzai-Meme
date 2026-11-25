@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { DOMMatrix } from "skia-canvas";
 
 type Point = readonly [x: number, y: number];
@@ -11,7 +14,7 @@ export function screenProjection(
   const dx2 = x3 - x2, dy2 = y3 - y2;
   const dx3 = x0 - x1 + x2 - x3, dy3 = y0 - y1 + y2 - y3;
   const determinant = dx1 * dy2 - dx2 * dy1;
-  if (!determinant || width <= 0 || height <= 0) throw new RangeError("无效的表情透视四边形。");
+  if (!determinant || width <= 0 || height <= 0) throw new RangeError($t("templates.projective-transform.text_816ac781db"));
   const gx = (dx3 * dy2 - dx2 * dy3) / determinant;
   const gy = (dx1 * dy3 - dx3 * dy1) / determinant;
   // Skia reads these DOMMatrix components as a 3×3 projective transform.

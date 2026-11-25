@@ -1,3 +1,6 @@
+import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
+import messageCatalog from "../i18n/zh-CN.json";
+const $t = createTextTranslator("meme", messageCatalog.messages);
 import { createFixedAvatarAnimation } from "./fixed-avatar-animation.ts";
 
 // Pose tables from anyliew/meme_emoji at 33bf418ac2ccd416be70faf9a13e97befb7703a8.
