@@ -3,7 +3,7 @@ import messageCatalog from "../i18n/zh-CN.json";
 const $t = createTextTranslator("meme", messageCatalog.messages);
 // Frame assets and geometry from MemeCrafters/meme-generator v0.1.14 (619fa105).
 import { ImageData, loadImage, type Image } from "skia-canvas";
-import { renderExactPng, renderPng, renderRgba } from "../../../packages/skia/index.ts";
+import { renderExactPng, renderPngWithoutFooter as renderPng, renderRgba } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeFirstImage, readMemeImageSequence, type MemeImageSequence } from "./animated-input.ts";
 import { renderMaskedRaster, renderMaskedRgba } from "./masked-layout.ts";

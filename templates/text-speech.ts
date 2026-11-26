@@ -5,7 +5,7 @@ const $t = createTextTranslator("meme", messageCatalog.messages);
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { randomInt } from "node:crypto";
 import { loadImage, type CanvasRenderingContext2D } from "skia-canvas";
-import { renderExactPng, renderPng } from "@lotus-yunzai/skia";
+import { renderExactPng, renderPngWithoutFooter as renderPng } from "@lotus-yunzai/skia";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext } from "../builtin-template.ts";
 import { assertMemeGifDimensions, encodeMemeGif } from "./gif.ts";
 import { drawFittedText, jpg, registerFont, registerMemeTypeface, rgbaFrame, rgbaFrameDimensions } from "./template-layout.ts";

@@ -2,7 +2,7 @@ import { createTranslator as createTextTranslator } from "../../../packages/i18n
 import messageCatalog from "../i18n/zh-CN.json";
 const $t = createTextTranslator("meme", messageCatalog.messages);
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
-import { renderPng } from "../../../packages/skia/index.ts";
+import { renderPngWithoutFooter as renderPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeImageSequence } from "./animated-input.ts";
 import { renderPythonCanvasGif } from "./python-gif.ts";

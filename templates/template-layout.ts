@@ -5,7 +5,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Canvas, FontLibrary, loadImage, type CanvasRenderingContext2D } from "skia-canvas";
-import { nativeImageRasterScale, renderExactPng, renderPng, renderRgba } from "../../../packages/skia/index.ts";
+import { nativeImageRasterScale, renderExactPng, renderPngWithoutFooter as renderPng, renderRgba } from "../../../packages/skia/index.ts";
 import { MemeTemplateFeedback, type MemeTemplateContext } from "../builtin-template.ts";
 
 export type Draw = (context: CanvasRenderingContext2D) => void;

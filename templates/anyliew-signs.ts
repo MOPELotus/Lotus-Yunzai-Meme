@@ -4,7 +4,7 @@ const $t = createTextTranslator("meme", messageCatalog.messages);
 // Original AnyLiew layouts and documented variants. Backdrops are verified against the fixed source revision.
 import { randomInt } from "node:crypto";
 import { loadImage, type CanvasRenderingContext2D } from "skia-canvas";
-import { renderPng } from "../../../packages/skia/index.ts";
+import { renderPngWithoutFooter as renderPng } from "../../../packages/skia/index.ts";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext } from "../builtin-template.ts";
 import { jpg, paper, registerFont, registerMemeTypeface } from "./template-layout.ts";
 

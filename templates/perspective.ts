@@ -4,7 +4,7 @@ const $t = createTextTranslator("meme", messageCatalog.messages);
 // Screen coordinates follow MemeCrafters/meme-generator v0.1.14.
 // https://github.com/MemeCrafters/meme-generator/tree/619fa10518fc2eca4fa1053af37f0a00a839f062/meme_generator/memes
 import { loadImage, type CanvasRenderingContext2D, type Image } from "skia-canvas";
-import { renderExactPng, renderPng } from "../../../packages/skia/index.ts";
+import { renderExactPng, renderPngWithoutFooter as renderPng } from "../../../packages/skia/index.ts";
 import type { MemeTemplate, MemeTemplateContext, MemeTemplateInput, MemeTemplateShortcut } from "../builtin-template.ts";
 import { readMemeFirstImage } from "./animated-input.ts";
 import { renderMaskedRaster } from "./masked-layout.ts";

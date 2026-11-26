@@ -1,7 +1,7 @@
 import { createTranslator as createTextTranslator } from "../../../packages/i18n/index.ts";
 import messageCatalog from "../i18n/zh-CN.json";
 const $t = createTextTranslator("meme", messageCatalog.messages);
-import { renderPng, renderRgba } from "@lotus-yunzai/skia";
+import { renderPngWithoutFooter as renderPng, renderRgba } from "@lotus-yunzai/skia";
 import type { MemeTemplate, MemeTemplateContext } from "../builtin-template.ts";
 import { alignMemeLoop, readMemeFirstImage, readMemeImageSequence } from "./animated-input.ts";
 import { encodeMemeGif } from "./gif.ts";

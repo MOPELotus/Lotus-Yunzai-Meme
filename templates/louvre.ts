@@ -5,7 +5,7 @@ const $t = createTextTranslator("meme", messageCatalog.messages);
 // mode choices come from anyliew/meme_emoji at 0734d49fb5a650a6232f7a0ae15712c1fbce0e77.
 // The source credits itorr/one-last-image and su226/IdhagnBot.
 import { ImageData, loadImage, type Image } from "skia-canvas";
-import { renderExactPng, renderPng, renderRgba } from "../../../packages/skia/index.ts";
+import { renderExactPng, renderPngWithoutFooter as renderPng, renderRgba } from "../../../packages/skia/index.ts";
 import { MemeTemplateFeedback, type MemeTemplate, type MemeTemplateContext, type MemeTemplateInput } from "../builtin-template.ts";
 import { readMemeImageSequence } from "./animated-input.ts";
 import { renderPythonGif } from "./python-gif.ts";
